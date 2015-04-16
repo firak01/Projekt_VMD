@@ -1,0 +1,14 @@
+<project name="demo"  xmlns:fl="antlib:it.haefelinger.flaka">
+<!-- damit definiert man für FLAKA einen eigenen Namespace -->
+
+ <!-- taksdef ist nicht notwendig, wenn der Pfad zu FLAKA über die ANT_ARGS umgebungsvariable definiert wurde -->
+ <!--<taskdef uri="antlib:it.haefelinger.flaka"
+  resource="it/haefelinger/flaka/antlib.xml"
+  classpath="path/to/flaka.jar"/> -->
+  
+  
+  <fl:logo>
+   Hello, #{property['ant.file'].tofile.name}
+  </fl:logo>
+  
+ </project>
