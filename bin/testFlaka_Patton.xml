@@ -1,7 +1,7 @@
-<project name="demo"  xmlns:fl="antlib:it.haefelinger.flaka">
-<!-- damit definiert man für FLAKA einen eigenen Namespace -->
+ï»¿<project name="demo"  xmlns:fl="antlib:it.haefelinger.flaka">
+<!-- damit definiert man fÃ¼r FLAKA einen eigenen Namespace -->
 
- <!-- taksdef ist nicht notwendig, wenn der Pfad zu FLAKA über die ANT_ARGS umgebungsvariable definiert wurde -->
+ <!-- taksdef ist nicht notwendig, wenn der Pfad zu FLAKA Ã¼ber die ANT_ARGS umgebungsvariable definiert wurde -->
  <!--<taskdef uri="antlib:it.haefelinger.flaka"
   resource="it/haefelinger/flaka/antlib.xml"
   classpath="path/to/flaka.jar"/> -->
