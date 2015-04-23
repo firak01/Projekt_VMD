@@ -1,10 +1,10 @@
 REM Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist.
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
-echo start testFlaka fuer Patton
+echo start testFlaka hello
 
 REM call ant -buildfile testFlaka_Patton.xml
-call ant -f testFlaka_Patton.xml
+call ant -f testFlaka_ende.xml
 
-echo Ende testFlaka fuer Patton
+echo Ende testFlaka hello
 pause
 REM timeout /T 20 /nobreak
