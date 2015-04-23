@@ -1,0 +1,69 @@
+﻿<project name="tryoutAnt_EnvironmentVariable"  xmlns:fl="antlib:it.haefelinger.flaka">
+<!-- damit definiert man für FLAKA einen eigenen Namespace -->
+ 
+  <fl:logo>
+		<!-- Kleines Start Logo -->
+		<!-- a) Der Name der Ant Datei -->
+   Starte: #{property['ant.file'].tofile.name}
+   
+		<!-- b) Frage FLAKAs EL Reference ab
+             		und hole ein zur Verfügung stehendes Objekt der Klasse org.apache.ant.Project
+					hole das basedir als Fileobjekt 
+					und aus dem Fileobjekt schliesslich den Namen als String -->
+		            
+   Neue Zeile #{project.basedir.name}
+   <!-- weitere Properties des project - objekts sind listen: targets, tasks, taskdefs, macrodefs -->
+  </fl:logo>
+  
+  <!-- ########################### -->
+  <!-- Ausprobieren von flaka´s EL Syntax -->
+  <property name="userdir_sub"  value="meintest" />
+  <echo>
+		a) ${userdir_sub}
+		b) #{userdir_sub}
+	</echo>
+	<!-- a) normale ant property definiert und ausgegeben
+	       b) flaka´s EL Syntax. Aber noch kein EL Objekt vorhanden -->
+		 
+    <!-- um EL referncen zusätzlich zu den normalen Ant Referencen anzustellen, muss man die ant standard property 	helper engine austauschen.
+	       dies passiert hier durch flaka´s install-property handler task -->
+	 <fl:install-property-handler />
+	  <echo>
+		a) ${userdir_sub}
+		b) #{userdir_sub}
+	</echo>
+	<!-- nun wird mit der EL Syntax #{userdir_sub} auf einen Eintrag der EL-Tabelle zugegriffen -->
+	
+	<!-- Grenzen von Flaka´s EL, Seite 9 der Flaka 1.2 PDF Doku  :
+	       a) nur 1x den task installieren
+		   b) EL Ausdrücke sind nicht verschachtelbar.
+		   c) Standard Property Ausdrücke werden vor den EL Ausdrücken errechnet, so dass ${project.#{'basedir'}} nicht geht. -->
+	<!-- Es geht aber: -->
+	<property name="the_basedir_property" value="basedir"/>
+	<echo>
+	##############################################
+	Uebergib dynamisch den Namen einer Property fuer ein Objekt:
+	#{project.${the_basedir_property}}
+	</echo>
+	
+	<!-- ################################# -->
+	<!-- hole eine echte umgebungsvariable und die in der Batch Datei gesetzte umgebungsvariable-->
+	<property environment="env" /> <!-- ist voraussetzung um mit env auf die Umgebungsvariablen zuzugreifen -->
+	<echo>
+	##############################################
+	# a) 
+	# b) Umgebungsvariable (Merke unter cmd.exe kann man sich mit set alle möglichen Umgebungsvariablen anzeigen lassen.)
+	# c) Von mir in Batch Datei gesetzte Umgebungsvariable
+	
+	a) user.home= ${user.home}
+	b) env.COMPUTERNAME= ${env.COMPUTERNAME}
+	c) env.TRYOUT_ANT=${env.TRYOUT_ANT}
+	</echo>
+	
+	<!-- TODO GOON FLAKA DOKUMENTation Seite 9ff -->
+	
+  <property file="${user.home}/${name}.${env.HOSTNAME}.build.properties" />
+  
+
+  
+ </project>
