@@ -23,15 +23,19 @@
 		a) c:\1fgl\repository\Projekt_VMD\${userdir_sub}
 		b) c:\1fgl\repository\Projekt_VMD\#{userdir_sub}
 		
-		Ausser in den Flaka Tasks, demonstriert hier in einem WHEN Task (muss ausserhalb von echo - Tag stehen!)
+		Ausser in den Flaka Tasks. 
+		Hier ist immer EL aktiv, demonstriert hier in einem WHEN Task (Merke: Task muss ausserhalb von echo - Tag stehen!)
 	</echo>
-	<fl:when test=" file('c:\1fgl\repository\Projekt_VMD\'#{userdir_sub}).isdir" >
+	 <fl:when test=" file('c:\1fgl\repository\Projekt_VMD#{ format('\\%s', userdir_sub) }').isdir" >
 		<echo>
-		Verzeichnis geprüft mit EL.
+		Verzeichnis geprueft mit EL. 
+		Ein kleiner Vorgeschmack auf das Escapen von EL Ausdruecken und wie man es umgeht.
 		</echo>
 	</fl:when>
 	
-	     <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen, muss man die ant standard property 	helper engine austauschen.
+	
+	
+	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 	       dies passiert hier durch flaka´s install-property handler task -->
 	 <fl:install-property-handler />
 	<echo>
