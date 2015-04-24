@@ -17,20 +17,47 @@
   
   <!-- ########################### -->
   <!-- Ausprobieren von flaka´s EL Syntax -->
-  <property name="userdir_sub"  value="meintest" />
+  <property name="userdir_sub"  value="testused" />
   <echo>
-		a) ${userdir_sub}
-		b) #{userdir_sub}
+        Per se ist Flaka´s EL Syntax nicht aktiv:
+		a) c:\1fgl\repository\Projekt_VMD\${userdir_sub}
+		b) c:\1fgl\repository\Projekt_VMD\#{userdir_sub}
+		
+		Ausser in den Flaka Tasks, demonstriert hier in einem WHEN Task (muss ausserhalb von echo - Tag stehen!)
 	</echo>
-	<!-- a) normale ant property definiert und ausgegeben
-	       b) flaka´s EL Syntax. Aber noch kein EL Objekt vorhanden -->
-		 
-    <!-- um EL referncen zusätzlich zu den normalen Ant Referencen anzustellen, muss man die ant standard property 	helper engine austauschen.
+	<fl:when test=" file('c:\1fgl\repository\Projekt_VMD\'#{userdir_sub}).isdir" >
+		<echo>
+		Verzeichnis geprüft mit EL.
+		</echo>
+	</fl:when>
+	
+	     <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen, muss man die ant standard property 	helper engine austauschen.
 	       dies passiert hier durch flaka´s install-property handler task -->
 	 <fl:install-property-handler />
-	  <echo>
-		a) ${userdir_sub}
-		b) #{userdir_sub}
+	<echo>
+	##############################################
+	# Man kann auch EL Ausdruecke als Strings behandeln. 
+	#a) mit einem \ als Escape Zeichen vorweg
+	#b) als String in einen anderen EL Ausdruck
+	
+	\#{3*4} = #{3*4}
+	#{'#{3*4}'} = #{3*4}
+	
+	</echo>
+	
+	<echo>
+	###############################################
+	# Praktische Anwendung des Escapens von EL Ausdrücken.
+	# a) normale ant property definiert und ausgegeben
+	# b) flaka´s EL Syntax. Aber noch kein EL Objekt vorhanden
+    # c) Wie man trotz backslash einen EL Ausdruck machen kann.
+	
+	zu a) c:\1fgl\repository\Projekt_VMD\${userdir_sub}
+	zu b) c:\1fgl\repository\Projekt_VMD\\#{userdir_sub}
+	zu c) c:\1fgl\repository\Projekt_VMD#{ format('\\%s', userdir_sub) } 
+	
+	Hinweis: Bei EL Ausdrücken ist anders als in Ant Properties der Whitespace egal.
+	
 	</echo>
 	<!-- nun wird mit der EL Syntax #{userdir_sub} auf einen Eintrag der EL-Tabelle zugegriffen -->
 	
@@ -60,6 +87,8 @@
 	c) env.TRYOUT_ANT=${env.TRYOUT_ANT}
 	</echo>
 	
+	
+	<!--###########################################-->
 	<!-- TODO GOON FLAKA DOKUMENTation Seite 9ff -->
 	
   <property file="${user.home}/${name}.${env.HOSTNAME}.build.properties" />
