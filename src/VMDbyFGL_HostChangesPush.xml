@@ -14,8 +14,9 @@
   <property name="dest.dirRepositoryVmdLib" value="lib" />
   <property name="dest.dirRepositoryVmdBin" value="bin" />
   <property name="dest.dirRepositoryVmdSrc" value="src" />
+  <property name="dest.dirRepositoryVmdMisc" value="misc" />
   <property name="dest.dirRepositoryVmdTest" value="test" />
-  <property name="dest.dirRepositoryVmdArchive" value="archive" />
+  <property name="dest.dirRepositoryVmdArchive" value="vmd" />
   
   <!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
   <!-- Achtung: verwende auch auf deutschen Systemen C:\Program Files (x86), Abaenderung in deutschen Namen Programme... bewirkt nur, das scheinbar das Verzeichnis doppelt angelegt wird. -->
@@ -24,7 +25,7 @@
   <property name="src.dirFglPath" value="C:/1fgl"/>
   <property name="src.dirFglClientPath" value="${src.dirFglPath}/${src.dirFglClient}" /> 
 
-  <!-- Rechne den Namen der Datei aus... -->
+  <!-- TODO: Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
   
 
   <!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
@@ -85,7 +86,9 @@
 	
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben, obwohl alle txt - Dateien geloescht worden sein sollen. -->	  
 	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
-	  <fileset dir="//${src.dirFglClientPath}">
+	  <fileset dir="//${src.dirFglClientPath}">	
+	     <!-- ein bestimmtest Verzeichnis ausschliessen --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+		<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
 		<include name="**/**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->		
 	  </fileset>
 	</copy>
