@@ -84,13 +84,38 @@
 		<fileset dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" includes="**/*.txt"/>
 	</delete> -->
 	
-	<!-- Dateien, die neuer sind, werden nicht ueberschrieben, obwohl alle txt - Dateien geloescht worden sein sollen. -->	  
+	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind. -->
+	
+	
+	
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
-	     <!-- ein bestimmtest Verzeichnis ausschliessen --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
-		<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
-		<include name="**/**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->		
+	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+		
+		<!-- <include name="**/**.txt"/>--><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+
+			
 	  </fileset>
 	</copy>
+	
+	<!-- TODO: alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben. Nix aus Unterordnern verschieben. -->
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
+	  <fileset dir="//${src.dirFglClientPath}">	
+	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+		
+		<!-- <include name="**/**.txt"/>--><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+
+			
+	  </fileset>
+	</copy>
+	
+	
+	
 </target>
 </project>
