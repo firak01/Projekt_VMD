@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="FGLVmdGitPrepareHost" default="compile" basedir=".">
+
+  <!-- set global properties for this build -->
+  <!-- Example for using an environment variable, which is defined e.g. in windows: 
+       <property name="build" value="${BUILDTARGET}"/> -->
+  <!-- Beispiele fuer relative Pfade
+  <property name="dest" value="target"/>
+  <property name="src" value="src"/>
+  -->
+   
+  <!-- Ausgangsverzeichnis: Das Repository -->
+  <property name="dest.dirRepositoryVmdPath" value="c:/1fgl/repository/Projekt_VMD" />  
+  <property name="dest.dirRepositoryVmdLib" value="lib" />
+  <property name="dest.dirRepositoryVmdBin" value="bin" />
+  <property name="dest.dirRepositoryVmdSrc" value="src" />
+  <property name="dest.dirRepositoryVmdMisc" value="misc" />
+  <property name="dest.dirRepositoryVmdTest" value="test" />
+  <property name="dest.dirRepositoryVmdArchive" value="vmd" />
+  
+  <!-- ######### CLIENT ##############################################################################
+  <!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
+  <!-- Achtung: verwende auch auf deutschen Systemen C:\Program Files (x86), Abaenderung in deutschen Namen Programme... bewirkt nur, das scheinbar das Verzeichnis doppelt angelegt wird. -->
+  <!-- alle .txt Dateien, die ein juengeres Aenderungsdatum haben. --> 
+  <property name="src.dirFglClient" value="client" /> 
+  <property name="src.dirFglPath" value="C:/1fgl"/>
+  <property name="src.dirFglClientPath" value="${src.dirFglPath}/${src.dirFglClient}" /> 
+
+  <!-- TODO: Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
+  
+  <!-- HOST -->
+  <!-- TODO GOON: MAPPE das HOST - Verzeichnis... In diese Verzeichnisse werden die dazugehörenden Dateien kopiert, sofern das Verzeichnis auf dem Host existiert. -->
+	# Gib werte einer properties Datei aus, aus dem Unterverzeichnis ${userdir_sub}
+	</echo>
+	<loadproperties>
+		<file file="c:\1fgl\repository\Projekt_VMD\${userdir_sub}\mapBeispiel.properties"/>
+	</loadproperties> 
+	<echo>Wert von test02=${test02}</echo>
+
+
+  <!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
+  <property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
+  
+  <!-- ################################################################################# -->
+   <target name="compile" depends="init,FglRepositoryArchive">
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+  
+  <target name="init">
+    <!-- Create the time stamp -->
+	<echo>Receiving timestamp:</echo>
+    <!--<tstamp/>-->
+	<tstamp>
+	<format property="current.time" pattern="yyyyMMdd_HHmmss" locale="en,GB"/>
+	<!--<format property="backup_archive.name" pattern="'EinArchiv'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>-->
+	<format property="backup_RepositoryArchive.name" pattern="'${dest.dirRepositoryVmdArchive}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
+	</tstamp>
+	<echo>Current Timestamp: ${current.time}</echo>
+	<echo>Backup-Filename: ${backup_RepositoryArchive.name}</echo>
+</target>
+       
+<target name="FglRepositoryArchive">
+	<echo>VmdRepository Archive:</echo>
+	<!-- Example of howto change file modification date, usefull to enforce 'overwrite' -->
+	<!-- <touch>
+	  <fileset dir="${dest.dir}"/>
+	</touch>
+	-->
+
+	<echo>Vmd Files:</echo><!-- Nur die programmdateien kopieren. Nicht die xml / batch files fuer Ant oder fuer die Sprache kopieren. -->
+	<mkdir dir="//${dest.dirRepositoryVmdPath}"/>
+	<mkdir dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" />
+	<mkdir dir="//${dest.dirRepositoryVmdBackupPath}"/>
+	
+	<!-- Mache vom Zielverzeichnis ein Backup -->
+	  <zip destfile="//${dest.dirRepositoryVmdBackupPath}/${backup_RepositoryArchive.name}"
+       basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}"
+	/>
+	
+	<!-- damit die Aenderung: Datei wurde geloescht mitbekommen wird, alle Dateien (nur die Programmdateien!!!) nach dem Backup loeschen -->
+	<!-- IN DER ENTWICKLUNG ERST MAL ASUKOMMENTEIERN <delete includeemptydirs="false">
+		<fileset dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" includes="**/*.txt"/>
+	</delete> -->
+	
+	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind. -->
+	
+	
+	
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
+	  <fileset dir="//${src.dirFglClientPath}">	
+	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+		
+		<!-- <include name="**/**.txt"/>--><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+
+			
+	  </fileset>
+	</copy>
+	
+	<!-- TODO: alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben. Nix aus Unterordnern verschieben. -->
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
+	  <fileset dir="//${src.dirFglClientPath}">	
+	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+		
+		<!-- <include name="**/**.txt"/>--><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
+
+			
+	  </fileset>
+	</copy>
+	
+	
+	
+</target>
+</project>

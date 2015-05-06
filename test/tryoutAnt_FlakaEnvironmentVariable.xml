@@ -95,6 +95,20 @@
 	<!--###########################################-->
 	<!-- TODO GOON FLAKA DOKUMENTation Seite 9ff -->
 	
+	<!--###########################################-->
+	<echo>
+	##############################################
+	# Gib werte einer properties Datei aus, aus dem Unterverzeichnis ${userdir_sub}
+	</echo>
+	<loadproperties>
+		<file file="c:\1fgl\repository\Projekt_VMD\${userdir_sub}\mapBeispiel.properties"/>
+	</loadproperties> 
+	<echo>Wert von test02=${test02}</echo>
+
+
+	
+	
+	<!-- ########### -->
   <property file="${user.home}/${name}.${env.HOSTNAME}.build.properties" />
   
 
