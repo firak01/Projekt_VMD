@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>  
-<project name="FGLVmdGitPrepareHost" default="compile" basedir=".">
+<project name="FGLVmdGitPrepareHost" default="compile" basedir="."
+   xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 
+   <!-- TODO: Das misc Verzeichnis aus als Backup zippen, VOR dem push -->
+   
   <!-- set global properties for this build -->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
        <property name="build" value="${BUILDTARGET}"/> -->
@@ -18,6 +21,7 @@
   <property name="dest.dirRepositoryVmdTest" value="test" />
   <property name="dest.dirRepositoryVmdArchive" value="vmd" />
   
+  <!-- ######### CLIENT ############################################################################## -->
   <!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
   <!-- Achtung: verwende auch auf deutschen Systemen C:\Program Files (x86), Abaenderung in deutschen Namen Programme... bewirkt nur, das scheinbar das Verzeichnis doppelt angelegt wird. -->
   <!-- alle .txt Dateien, die ein juengeres Aenderungsdatum haben. --> 
@@ -25,8 +29,28 @@
   <property name="src.dirFglPath" value="C:/1fgl"/>
   <property name="src.dirFglClientPath" value="${src.dirFglPath}/${src.dirFglClient}" /> 
 
-  <!-- TODO: Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
+  <!-- Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
+  	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	       dies passiert hier durch flaka´s install-property handler task -->
+	<fl:install-property-handler />
+	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
+    <property name="src.dirFglClientFileName" value = "Fgl${env.COMPUTERNAME}_Installationen.txt"/><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+	
+	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
+    <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
+	<fl:let>src.dirFglClientFilePath ::= '${src.dirFglClientFilePath}/${src.dirFglClientFileName}'</fl:let>
+	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
   
+  
+  <!-- HOST -->
+  <!-- TODO GOON: MAPPE das HOST - Verzeichnis... In diese Verzeichnisse werden die dazugehörenden Dateien kopiert, sofern das Verzeichnis auf dem Host existiert. -->
+	<echo>Gib werte einer properties Datei aus, aus dem Unterverzeichnis ${userdir_sub}  TODO GOON</echo>
+	<!-- <loadproperties>
+		<file file="c:\1fgl\repository\Projekt_VMD\${userdir_sub}\mapBeispiel.properties"/>
+	</loadproperties> 
+	<echo>Wert von test02=${test02}</echo> -->
+
 
   <!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
   <property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
@@ -86,32 +110,23 @@
 	
 	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind. -->
 	
-	
-	
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
 	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
 		
-		<!-- <include name="**/**.txt"/>--><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
-		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
-
-			
+		<!--Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
+		<include name="${src.dirFglClientFileName}" />		
 	  </fileset>
 	</copy>
 	
-	<!-- TODO: alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben. Nix aus Unterordnern verschieben. -->
+	<!-- TODO: alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
+	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
-	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
-		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
-		
-		<!-- <include name="**/**.txt"/>--><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
-		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	
-
-			
+		 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
+		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	       			
 	  </fileset>
 	</copy>
 	

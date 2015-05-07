@@ -79,7 +79,7 @@
 	
 	<!-- ################################# -->
 	<!-- hole eine echte umgebungsvariable und die in der Batch Datei gesetzte umgebungsvariable-->
-	<property environment="env" /> <!-- ist voraussetzung um mit env auf die Umgebungsvariablen zuzugreifen -->
+	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
 	<echo>
 	##############################################
 	# a) 
@@ -96,17 +96,29 @@
 	<!-- TODO GOON FLAKA DOKUMENTation Seite 9ff -->
 	
 	<!--###########################################-->
+	 <echo>######################################################</echo>
+	 <echo>Normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET</echo>
+	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	       dies passiert hier durch flaka´s install-property handler task -->
+	 <fl:install-property-handler /><!-- auch wenn das oben vielleicht schon mal gemacht worden ist -->
+	<property name="fgl.test.variable" value="Ich bin ein Test" />
+    <property name="fgl.test.variablePlus" value = "... und der hat geklappt."/>
+	
+    <!--das würde also nicht verändert, wenn fgl.test.variable vorher schon definiert ist <property name="fgl.test.variable" value="${fgl.test.variable} ${fgl.test.variablePlus}" />  -->
+	<fl:let>fgl.test.variable ::= '${fgl.test.variable} ${fgl.test.variablePlus}'</fl:let> <!-- beachte den doppelten Doppelpunkt -->
+	<echo>Wert von fgl.test.variable=${fgl.test.variable}</echo>
+  
+	
+	
 	<echo>
-	##############################################
-	# Gib werte einer properties Datei aus, aus dem Unterverzeichnis ${userdir_sub}
+	###################################################
+	# Normale Ant Funktionalität: Gib werte einer properties Datei aus, aus dem Unterverzeichnis ${userdir_sub}
 	</echo>
 	<loadproperties>
 		<file file="c:\1fgl\repository\Projekt_VMD\${userdir_sub}\mapBeispiel.properties"/>
 	</loadproperties> 
 	<echo>Wert von test02=${test02}</echo>
 
-
-	
 	
 	<!-- ########### -->
   <property file="${user.home}/${name}.${env.HOSTNAME}.build.properties" />
