@@ -2,9 +2,7 @@
 <project name="FGLVmdGitPrepareHost" default="compile" basedir="."
    xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 
-   <!-- TODO: Das misc Verzeichnis aus als Backup zippen, VOR dem push -->
-   
-  <!-- set global properties for this build -->
+  <!-- ######### Set global properties for this build ####################################################-->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
        <property name="build" value="${BUILDTARGET}"/> -->
   <!-- Beispiele fuer relative Pfade
@@ -43,7 +41,7 @@
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
   
   
-  <!-- HOST -->
+  <!-- HOST - SPEZIFISCHE AUFGABEN -->
   <!-- TODO GOON: MAPPE das HOST - Verzeichnis... In diese Verzeichnisse werden die dazugehörenden Dateien kopiert, sofern das Verzeichnis auf dem Host existiert. -->
 	<echo>Gib werte einer properties Datei aus, aus dem Unterverzeichnis ${userdir_sub}  TODO GOON</echo>
 	<!-- <loadproperties>
@@ -52,11 +50,8 @@
 	<echo>Wert von test02=${test02}</echo> -->
 
 
-  <!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
-  <property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
-  
   <!-- ################################################################################# -->
-   <target name="compile" depends="init,FglRepositoryArchive">
+   <target name="compile" depends="init,FglRepositoryBackup,FglRepositoryArchive">
 	<!-- WIRD NICHT BENÖTIGT -->
 	
     <!-- Compile the java code from ${src} into ${build} -->
@@ -80,36 +75,54 @@
 	<format property="current.time" pattern="yyyyMMdd_HHmmss" locale="en,GB"/>
 	<!--<format property="backup_archive.name" pattern="'EinArchiv'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>-->
 	<format property="backup_RepositoryArchive.name" pattern="'${dest.dirRepositoryVmdArchive}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
+	<format property="backup_RepositoryMisc.name" pattern="'${dest.dirRepositoryVmdMisc}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
 	</tstamp>
 	<echo>Current Timestamp: ${current.time}</echo>
-	<echo>Backup-Filename: ${backup_RepositoryArchive.name}</echo>
+	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
 </target>
        
-<target name="FglRepositoryArchive">
-	<echo>VmdRepository Archive:</echo>
+<target name="FglRepositoryBackup">
+	<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
+	<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
+  
+	<echo>Creating Backup:</echo>
+	
 	<!-- Example of howto change file modification date, usefull to enforce 'overwrite' -->
 	<!-- <touch>
 	  <fileset dir="${dest.dir}"/>
 	</touch>
 	-->
 
-	<echo>Vmd Files:</echo><!-- Nur die programmdateien kopieren. Nicht die xml / batch files fuer Ant oder fuer die Sprache kopieren. -->
+	<!-- Erstelle sicherheitshalber die Pfade -->
 	<mkdir dir="//${dest.dirRepositoryVmdPath}"/>
 	<mkdir dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" />
 	<mkdir dir="//${dest.dirRepositoryVmdBackupPath}"/>
-	
-	<!-- Mache vom Zielverzeichnis ein Backup -->
+
+	<echo>a) VmdRepository Archive:</echo>
+	<!-- Mache von den Zielverzeichnissen ein Backup -->
 	  <zip destfile="//${dest.dirRepositoryVmdBackupPath}/${backup_RepositoryArchive.name}"
        basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}"
 	/>
 	
 	<!-- damit die Aenderung: Datei wurde geloescht mitbekommen wird, alle Dateien (nur die Programmdateien!!!) nach dem Backup loeschen -->
-	<!-- IN DER ENTWICKLUNG ERST MAL ASUKOMMENTEIERN <delete includeemptydirs="false">
+	<!-- NEIN, nicht im VMD_Projekt, da hier die Dateien von verschiedenen Rechnern in einem Verzeichnis zusammengeführt werden.
+    	<delete includeemptydirs="false">
 		<fileset dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" includes="**/*.txt"/>
 	</delete> -->
 	
 	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind. -->
+	<echo>b) VmdRepository Misc:</echo>
+	<!-- Mache von den Zielverzeichnissen ein Backup -->
+	  <zip destfile="//${dest.dirRepositoryVmdBackupPath}/${backup_RepositoryMisc.name}"
+       basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}"
+	/>
+</target>
 	
+	
+<target name="FglRepositoryArchive">
+	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
+	<echo>Pushing Files to Repository:</echo>
+	<echo>a) VMD File:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
@@ -121,12 +134,13 @@
 	  </fileset>
 	</copy>
 	
-	<!-- TODO: alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
+	<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
+	<echo>b) Misc Files:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
 		 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
-		<include name="**.txt"/><!-- TODO: Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung -->	       			
+		<include name="**.txt"/>
 	  </fileset>
 	</copy>
 	
