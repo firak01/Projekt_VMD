@@ -40,18 +40,8 @@
 	<fl:let>src.dirFglClientFilePath ::= '${src.dirFglClientFilePath}/${src.dirFglClientFileName}'</fl:let>
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
   
-  
-  <!-- HOST - SPEZIFISCHE AUFGABEN -->
-  <!-- TODO GOON: MAPPE das HOST - Verzeichnis... In diese Verzeichnisse werden die dazugehörenden Dateien kopiert, sofern das Verzeichnis auf dem Host existiert. -->
-	<echo>Gib werte einer properties Datei aus, aus dem Unterverzeichnis ${userdir_sub}  TODO GOON</echo>
-	<!-- <loadproperties>
-		<file file="c:\1fgl\repository\Projekt_VMD\${userdir_sub}\mapBeispiel.properties"/>
-	</loadproperties> 
-	<echo>Wert von test02=${test02}</echo> -->
-
-
   <!-- ################################################################################# -->
-   <target name="compile" depends="init,FglRepositoryBackup,FglRepositoryArchive">
+   <target name="compile" depends="init,FglRepositoryBackup,FglCopyClient2archive,FglCopyGeneral">
 	<!-- WIRD NICHT BENÖTIGT -->
 	
     <!-- Compile the java code from ${src} into ${build} -->
@@ -119,7 +109,7 @@
 </target>
 	
 	
-<target name="FglRepositoryArchive">
+<target name="FglCopyClient2archive">
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
 	<echo>Pushing Files to Repository:</echo>
 	<echo>a) VMD File:</echo>
@@ -143,8 +133,46 @@
 		<include name="**.txt"/>
 	  </fileset>
 	</copy>
+</target>
+
+<!-- ######################################################### -->
+<!-- HOST - SPEZIFISCHE AUFGABEN -->
+<target name="FglCopyGeneral">
+	<!-- Schiebe die angegebenen Dateien von a nach b.
+         Gesteuert wird das über eine Datei, die für jeden HOST-Rechner individuell ist.-->
 	
+	<!-- 1. Rechne den Dateinamen aus -->
+	<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	       dies passiert hier durch flaka´s install-property handler task -->
+	<fl:install-property-handler />
+	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
 	
+	 <!-- Todo: Eigentlich müssen oben erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
+	<property name="conf.dirRepositoryVmdPath" value="${dest.dirRepositoryVmdPath}" /> 
+	<property name="conf.dirRepositoryVmdBin" value="${dest.dirRepositoryVmdBin}" />
+	
+	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
+
+	<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+    <property name="conf.copyGeneralFileName" value = "Fgl${env.COMPUTERNAME}_copy_general.properties"/>
+	
+	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
+    <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
+	<fl:let>conf.copyGeneralFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBin}/${conf.copyGeneralFileName}'</fl:let>		
+	<echo>Copy files general, by property file:</echo>
+	<echo>${conf.copyGeneralFilePath}</echo>
+	
+	<!-- 2a. Prüfe, ob die Datei überhaupt existiert -->
+	<!-- 2b. Lies den Inhalt der Datei als Properties-Datei ein. -->	
+	<loadproperties>
+		<file file="${conf.copyGeneralFilePath}"/>
+	</loadproperties> 
+	
+	<!-- Test: Gib den Inhalt der Datei aus -->
+
+
+	<!-- 3. Der eigentliche Kopiervorgang -->
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	
 </target>
 </project>
