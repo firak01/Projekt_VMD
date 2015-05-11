@@ -183,7 +183,10 @@
 			<!-- Test: Gib den Inhalt der Datei aus -->
 			<echo>Dateiinhalt: ${myfile}</echo>
 	
-
+			<!-- Test: TODO GOON : Gib den Inhalt der Datei zeolenweise aus -->
+			<fl:for var="myline" in="${myfile}">
+				<echo>Zeileninhalt: ${myline}</echo>
+			</fl:for>
 
 
 	<!-- 3. Der eigentliche Kopiervorgang -->
