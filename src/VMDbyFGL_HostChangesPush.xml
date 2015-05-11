@@ -163,16 +163,41 @@
 	<echo>${conf.copyGeneralFilePath}</echo>
 	
 	<!-- 2a. Prüfe, ob die Datei überhaupt existiert -->
-	<!-- 2b. Lies den Inhalt der Datei als Properties-Datei ein. -->	
-	<loadproperties>
-		<file file="${conf.copyGeneralFilePath}"/>
-	</loadproperties> 
+	<fl:choose>
+		<when test=" '${conf.copyGeneralFilePath}'.tofile.exists == true ">
+			<echo>Datei existiert: ${conf.copyGeneralFilePath}</echo>
+
+			
+			
+			<!-- 2c. Lies den Inhalt der Datei als Properties-Datei ein. -->	
+			<loadproperties>
+				<file file="${conf.copyGeneralFilePath}"/>
+			</loadproperties> 
+			<echo>test1 hat den Wert: ${test1}</echo>
+			
+			
+				<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
+			<loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" />
+			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im V;D_Projekt 'src' ausgegangen -->
+			
+			<!-- Test: Gib den Inhalt der Datei aus -->
+			<echo>Dateiinhalt: ${myfile}</echo>
 	
-	<!-- Test: Gib den Inhalt der Datei aus -->
+
 
 
 	<!-- 3. Der eigentliche Kopiervorgang -->
-	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
+			
+		</when>
+		<otherwise>
+				<echo>Datei existiert NICHT: ${conf.copyGeneralFilePath}</echo>
+				<fl:fail message="Datei existiert NICHT: ${conf.copyGeneralFilePath}"/>
+		</otherwise>
+	</fl:choose>
 	
+	
+	
+
 </target>
 </project>
