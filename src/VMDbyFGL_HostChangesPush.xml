@@ -2,6 +2,25 @@
 <project name="FGLVmdGitPrepareHost" default="compile" basedir="."
    xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 
+   <!-- ### Einbinden von Ant-Contrib ### -->
+   <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!--    <taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="../lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	 <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	  <!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	  <!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	   <taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/../lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+   
   <!-- ######### Set global properties for this build ####################################################-->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
        <property name="build" value="${BUILDTARGET}"/> -->
@@ -181,10 +200,13 @@
 			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im V;D_Projekt 'src' ausgegangen -->
 			
 			<!-- Test: Gib den Inhalt der Datei aus -->
-			<echo>Dateiinhalt: ${myfile}</echo>
+			<echo>Dateiinhalt als Ganzes: ${myfile}</echo>
+			<echo>${myfile}</echo>
 	
-			<!-- Test: TODO GOON : Gib den Inhalt der Datei zeolenweise aus -->
-			<fl:for var="myline" in="${myfile}">
+			<!-- Test: TODO GOON : Gib den Inhalt der Datei zeilenweise aus -->
+			<echo>######################################</echo>
+			<echo>Dateiinhalt Zeile für Zeile:</echo>
+			<fl:for var="myline" in="split(${myfile},'\n\r')">
 				<echo>Zeileninhalt: ${myline}</echo>
 			</fl:for>
 
