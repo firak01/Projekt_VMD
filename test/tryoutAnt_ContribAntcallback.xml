@@ -1,0 +1,89 @@
+﻿<project name="tryoutAnt_ContribAntcallback"  default="compile" basedir="..">
+
+<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+  
+  <!-- ########################### -->
+  <target name="declaration"><!-- damit dies ncht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
+	<echo>##############################</echo>
+	<echo>In diesem Tryout werden folgende Punkte ausprobiert, die teilweise nur mit ant-contrib lösbar sind:</echo>
+	<echo>1) Eine Datei einlesen und Zeileweise parsen</echo>
+	<echo>2) In einer Schleife ein target aufrufen, als antcallback und somit Werte dahin und daraus zu übernehmen</echo>
+	<echo>   In einer Schleife ein target aufrufen, als antcallback und somit Werte dahin und daraus zu übernehmen</echo>
+	<echo>3) Anwendung des math Tasks</echo>
+	<!-- Ausprobieren von Ant-Contrib zum Datei parsen -->
+	<property name="userdir_sub"  value="testused" />
+	  
+	<!-- <var name="retCounter" value="0" datatype="int" /> var unterstützt kein datatype Attribut -->
+	<var name="retCounter" value="0" />
+  </target>
+  
+<!-- ################################################################################# -->
+ <target name="compile" depends="declaration, file_reader">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt und daher zuletzt ausgeführt wird. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+<target name="file_reader">
+	<echo>Im file_reader - Target... </echo>
+	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>
+	
+			<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
+			<loadfile property="myfile" srcFile ="${userdir_sub}/file_antcallbackBeispiel.txt" />
+			
+			
+			<!-- Gib den Inhalt der Datei als Ganzes aus -->
+			<echo>######################################</echo>
+			<echo>Dateiinhalt als Ganzes:</echo>
+			<echo>${myfile}</echo>
+	
+			<!-- Gib den Inhalt der Datei zeilenweise aus -->
+			<echo>######################################</echo>
+			<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
+
+			<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+			<for param="line">
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+					<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+				</tokens>
+				<sequential>
+					 <antcallback target="setVarCallback" return="retValue, retCounter">
+						<param name="lineFromFile" value="@{line}"/>
+					</antcallback>
+				</sequential>
+			</for>
+			<echo>Ergebnis: ${retCounter}. Wert: ${retValue}</echo>
+
+</target>  
+
+
+<target name="setVarCallback"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
+   <!-- Aber: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/> -->
+   <var name="retValue" value="${lineFromFile} das war's" />
+   <math result="result" operand1="${retCounter}" operation="+" operand2="1" datatype="int"/>
+   <var name="retCounter" value="${result}" />
+</target>
+
+  
+ </project>

@@ -28,6 +28,8 @@
   <property name="dest" value="target"/>
   <property name="src" value="src"/>
   -->
+  
+  <target name="declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
    
   <!-- Ausgangsverzeichnis: Das Repository -->
   <property name="dest.dirRepositoryVmdPath" value="c:/1fgl/repository/Projekt_VMD" />  
@@ -58,9 +60,10 @@
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
 	<fl:let>src.dirFglClientFilePath ::= '${src.dirFglClientFilePath}/${src.dirFglClientFileName}'</fl:let>
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
+	</target>
   
   <!-- ################################################################################# -->
-   <target name="compile" depends="init,FglRepositoryBackup,FglCopyClient2archive,FglCopyGeneral">
+   <target name="compile" depends="declaration, init,FglRepositoryBackup,FglCopyClient2archive,FglCopyGeneral">
 	<!-- WIRD NICHT BENÖTIGT -->
 	
     <!-- Compile the java code from ${src} into ${build} -->
@@ -155,6 +158,7 @@
 </target>
 
 <!-- ######################################################### -->
+<!-- Beispiel für ein antcallback, in dem aus einer Schleife ein Wert zurückgeliefert wird. -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
 <target name="FglCopyGeneral">
 	<!-- Schiebe die angegebenen Dateien von a nach b.
@@ -188,28 +192,48 @@
 
 			
 			
-			<!-- 2c. Lies den Inhalt der Datei als Properties-Datei ein. -->	
-			<loadproperties>
+			<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
+<!-- 			<loadproperties>
 				<file file="${conf.copyGeneralFilePath}"/>
 			</loadproperties> 
-			<echo>test1 hat den Wert: ${test1}</echo>
+			<echo>test1 hat den Wert: ${test1}</echo> -->
 			
 			
 				<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
 			<loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" />
-			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im V;D_Projekt 'src' ausgegangen -->
+			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im VMD_Projekt 'src' ausgegangen -->
 			
 			<!-- Test: Gib den Inhalt der Datei aus -->
-			<echo>Dateiinhalt als Ganzes: ${myfile}</echo>
+			<echo>Dateiinhalt als Ganzes:</echo>
 			<echo>${myfile}</echo>
 	
 			<!-- Test: TODO GOON : Gib den Inhalt der Datei zeilenweise aus -->
 			<echo>######################################</echo>
-			<echo>Dateiinhalt Zeile für Zeile:</echo>
-			<fl:for var="myline" in="split(${myfile},'\n\r')">
-				<echo>Zeileninhalt: ${myline}</echo>
-			</fl:for>
+			<echo>Dateiinhalt Zeile für Zeile:</echo>		
 
+			<!-- for, var und if kommen aus der ant-contrib Bibliothek -->
+			<for param="line">
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+					<file file="${conf.copyGeneralFilePath}" />
+				</tokens>
+				<sequential>
+					<var name="line.length" unset="true" />
+					<length string="@{line}" property="line.length" />
+					<if>
+						<equals arg1="${line.length}" arg2="0" />
+						<then>
+							<echo>Zeile: 
+							</echo>
+						</then>
+						<else>
+							<echo>Zeile: @{line}</echo>
+						</else>
+					</if>
+				</sequential>
+			</for>
+			
+			
+			
 
 	<!-- 3. Der eigentliche Kopiervorgang -->
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
@@ -220,9 +244,9 @@
 				<fl:fail message="Datei existiert NICHT: ${conf.copyGeneralFilePath}"/>
 		</otherwise>
 	</fl:choose>
-	
-	
-	
 
 </target>
+
+
+
 </project>
