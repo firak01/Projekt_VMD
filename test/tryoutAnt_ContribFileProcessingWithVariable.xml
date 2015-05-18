@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="tryoutAnt_ContribFileProcessing"  default="compile" basedir=".." 
+         xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+
+<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+  
+  <!-- ########################### -->
+  <!-- Ausprobieren von Ant-Contrib zum Datei parsen -->
+  <property name="userdir_sub"  value="testused" />
+  
+<!-- ################################################################################# -->
+ <target name="compile" depends="file_reader">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+<target name="file_reader">
+	<echo>Im file_reader - Target... </echo>
+	<echo>Parsing file: ${userdir_sub}/file_readerBeispielWithVariable.txt</echo>
+	
+			<echo>######################################</echo>
+			<echo>Dateiinhalt Zeile für Zeile:</echo>		
+
+			<!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
+			<for param="line">
+				 <tokens>
+					<file file="${userdir_sub}/file_readerBeispielWithVariable.txt" />
+				</tokens>
+				<sequential>
+					<var name="line.length" unset="true" />
+					<length string="@{line}" property="line.length" />
+					<if>
+						<equals arg1="${line.length}" arg2="0" />
+						<then>
+							<echo>Zeile: 
+							</echo>
+						</then>
+						<else>
+							<fl:when test="true">
+								<fl:echo>###### HALLO immer true fall ########</fl:echo>									
+							</fl:when>
+							<fl:when test="false">
+								<fl:echo>OHJE, immer false fall</fl:echo>									
+							</fl:when>
+							
+							<echo>Zeile: @{line}</echo>
+							
+						     <!-- Tryout: splitte die Zeile mit Flaka - Splitt funktion (steht in der Doku unter EL). -->
+							 <!-- Schreibe das in eine Flaka - Variable -->							 							 
+							 <!-- simple echo -->
+							<fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
+							<fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo>
+	
+							 <!-- <echo>Linker Teil: list('a','b')[0]}</echo> -->
+							 <!-- mal ne variable füllen -->
+							 <fl:let>myLeftPart ::= split('@{line}','=')[0]</fl:let>		
+							 <fl:let>myRightPart ::= split('@{line}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->
+							 
+							 <fl:echo>linke Variable => ${myLeftPart}</fl:echo>
+							 <fl:echo>rechte Variable => ${myRightPart}</fl:echo>
+														 							
+							 <fl:when test="matches('${myLeftPart}','test1')">
+								<fl:echo>HALLO ERSTER TEST</fl:echo>	
+								<fl:echo>Typ der rechten Variable: #{typeof('${myRightPart}')}</fl:echo>								
+							</fl:when>
+							
+							 <!-- In der Beispieldatei ist der 4. Fall der jenige mit einem leerstring rechts. -->
+							 <fl:when test="matches('${myLeftPart}','test4')">
+								<fl:echo>HALLO VIERTER TEST</fl:echo>	
+								<fl:echo>Typ der rechten Variable: #{typeof('${myRightPart}')}</fl:echo><!-- Immer String. Wenn die Variable nicht gefüllt ist, dann ist der Wert halt der String ${myRightPart} selbst -->
+							</fl:when>
+							<fl:when test="null('${myRightPart}')">
+								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+								<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+								<fl:echo>rechte Variable ist übernommen: ${myRightPart}</fl:echo>
+							</fl:when>							 						
+						</else>
+					</if>
+				</sequential>
+			</for>
+	
+	
+</target>  
+
+  
+ </project>

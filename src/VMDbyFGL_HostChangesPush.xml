@@ -181,7 +181,7 @@
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-	<fl:let>conf.copyGeneralFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBin}/${conf.copyGeneralFileName}'</fl:let>		
+	<fl:let>conf.copyGeneralFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBin}/${conf.copyGeneralFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte -->		
 	<echo>Copy files general, by property file:</echo>
 	<echo>${conf.copyGeneralFilePath}</echo>
 	
@@ -211,7 +211,7 @@
 			<echo>######################################</echo>
 			<echo>Dateiinhalt Zeile für Zeile:</echo>		
 
-			<!-- for, var und if kommen aus der ant-contrib Bibliothek -->
+			<!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
 			<for param="line">
 				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
 					<file file="${conf.copyGeneralFilePath}" />
@@ -226,7 +226,53 @@
 							</echo>
 						</then>
 						<else>
+							<fl:when test="true">
+								<fl:echo>###### HALLO immer true fall ########</fl:echo>									
+							</fl:when>
+							<fl:when test="false">
+								<fl:echo>OHJE, immer false fall</fl:echo>									
+							</fl:when>
+							
 							<echo>Zeile: @{line}</echo>
+							
+						     <!-- Tryout: splitte die Zeile mit Flaka - Splitt funktion (steht in der Doku unter EL). -->
+							 <!-- Schreibe das in eine Flaka - Variable -->							 							 
+							 <!-- simple echo -->
+							<fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
+							<fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo>
+	
+							 <!-- <echo>Linker Teil: list('a','b')[0]}</echo> -->
+							 <!-- mal ne variable füllen -->
+							 <fl:let>myLeftPart ::= split('@{line}','=')[0]</fl:let>		
+							 <fl:let>myRightPart ::= split('@{line}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->
+							 
+							 <fl:echo>linke Variable => ${myLeftPart}</fl:echo>
+							 <fl:echo>rechte Variable => ${myRightPart}</fl:echo>
+														 							
+							 <fl:when test="matches('${myLeftPart}','test1')">
+								<fl:echo>HALLO ERSTER TEST</fl:echo>	
+								<fl:echo>Typ der rechten Variable: #{typeof('${myRightPart}')}</fl:echo>								
+							</fl:when>
+							
+							 <fl:when test="matches('${myLeftPart}','test4')">
+								<fl:echo>HALLO VIERTER TEST</fl:echo>	
+								<fl:echo>Typ der rechten Variable: #{typeof('${myRightPart}')}</fl:echo><!-- Immer String. Wenn die Variable nicht gefüllt ist, dann ist der Wert halt der String ${myRightPart} selbst -->
+							</fl:when>
+							<fl:when test="null('${myRightPart}')">
+								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+								<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+								<fl:echo>rechte Variable ist übernommen: ${myRightPart}</fl:echo>
+							</fl:when>
+							 
+							
+							
+							<fl:when test="empty '${myRightPart}'">
+								<fl:echo>rechte Variable ist EMPTY, nimm den linken Teil.</fl:echo>
+								<fl:let> myRightPart ::= ${myLeftPart}</fl:let>
+								<fl:echo>rechte Variable ist übernommen: ${myRightPart}</fl:echo>
+							</fl:when>
+							
+							
 						</else>
 					</if>
 				</sequential>
