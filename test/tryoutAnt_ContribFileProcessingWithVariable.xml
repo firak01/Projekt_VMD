@@ -91,6 +91,8 @@
 								<fl:echo>HALLO VIERTER TEST</fl:echo>	
 								<fl:echo>Typ der rechten Variable: #{typeof('${myRightPart}')}</fl:echo><!-- Immer String. Wenn die Variable nicht gefüllt ist, dann ist der Wert halt der String ${myRightPart} selbst -->
 							</fl:when>
+							
+							<!-- Auf einen NULL Wert abprüfen. Merke: ='' also auf Leerstring abprüfen gent nicht, da das nicht definierte Listenelement zur Not immer als Wert den Namen der Variablen hat. -->
 							<fl:when test="null('${myRightPart}')">
 								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
 								<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>

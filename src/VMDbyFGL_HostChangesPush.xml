@@ -63,7 +63,7 @@
 	</target>
   
   <!-- ################################################################################# -->
-   <target name="compile" depends="declaration, init,FglRepositoryBackup,FglCopyClient2archive,FglCopyGeneral">
+   <target name="compile" depends="declaration, init,FglRepositoryBackup,FglCopyClient2archive,FglCopyLocal">
 	<!-- WIRD NICHT BENÖTIGT -->
 	
     <!-- Compile the java code from ${src} into ${build} -->
@@ -160,7 +160,9 @@
 <!-- ######################################################### -->
 <!-- Beispiel für ein antcallback, in dem aus einer Schleife ein Wert zurückgeliefert wird. -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
-<target name="FglCopyGeneral">
+<target name="FglCopyLocal">
+	<echo>######################################</echo>
+	
 	<!-- Schiebe die angegebenen Dateien von a nach b.
          Gesteuert wird das über eine Datei, die für jeden HOST-Rechner individuell ist.-->
 	
@@ -177,44 +179,40 @@
 	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
 
 	<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-    <property name="conf.copyGeneralFileName" value = "Fgl${env.COMPUTERNAME}_copy_general.properties"/>
+    <property name="conf.copyLocalFileName" value = "Fgl${env.COMPUTERNAME}_copy_local.properties"/>
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-	<fl:let>conf.copyGeneralFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBin}/${conf.copyGeneralFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte -->		
+	<fl:let>conf.copyLocalFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBin}/${conf.copyLocalFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
 	<echo>Copy files general, by property file:</echo>
-	<echo>${conf.copyGeneralFilePath}</echo>
+	<echo>${conf.copyLocalFilePath}</echo>
 	
-	<!-- 2a. Prüfe, ob die Datei überhaupt existiert -->
+	<!-- 2a. Prüfe, ob die Steuerungsdatei überhaupt existiert -->
 	<fl:choose>
-		<when test=" '${conf.copyGeneralFilePath}'.tofile.exists == true ">
-			<echo>Datei existiert: ${conf.copyGeneralFilePath}</echo>
+		<when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
+			<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>
 
-			
-			
 			<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
-<!-- 			<loadproperties>
+			<!--<loadproperties>
 				<file file="${conf.copyGeneralFilePath}"/>
 			</loadproperties> 
 			<echo>test1 hat den Wert: ${test1}</echo> -->
 			
 			
-				<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
-			<loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" />
+			<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
+			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" /> -->
 			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im VMD_Projekt 'src' ausgegangen -->
 			
 			<!-- Test: Gib den Inhalt der Datei aus -->
-			<echo>Dateiinhalt als Ganzes:</echo>
-			<echo>${myfile}</echo>
+			<!-- <echo>Dateiinhalt als Ganzes:</echo> -->
+			<!-- <echo>${myfile}</echo> -->
 	
-			<!-- Test: TODO GOON : Gib den Inhalt der Datei zeilenweise aus -->
-			<echo>######################################</echo>
+	
+			<!--2b. Werte den Inhalt der Datei zeilenweise aus -->			
 			<echo>Dateiinhalt Zeile für Zeile:</echo>		
-
-			<!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
-			<for param="line">
-				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
-					<file file="${conf.copyGeneralFilePath}" />
+			<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
+					<file file="${conf.copyLocalFilePath}" />
 				</tokens>
 				<sequential>
 					<var name="line.length" unset="true" />
@@ -225,69 +223,45 @@
 							<echo>Zeile: 
 							</echo>
 						</then>
-						<else>
-							<fl:when test="true">
-								<fl:echo>###### HALLO immer true fall ########</fl:echo>									
-							</fl:when>
-							<fl:when test="false">
-								<fl:echo>OHJE, immer false fall</fl:echo>									
-							</fl:when>
-							
+						<else>						
 							<echo>Zeile: @{line}</echo>
+							<!-- TODO GOON: Kommentarzeilen überspringen. Sie beginnen mit einem #  -->
 							
-						     <!-- Tryout: splitte die Zeile mit Flaka - Splitt funktion (steht in der Doku unter EL). -->
-							 <!-- Schreibe das in eine Flaka - Variable -->							 							 
-							 <!-- simple echo -->
-							<fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
-							<fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo>
+						     <!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
+							<!-- <fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo> --><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
+							<!-- <fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo> -->
 	
-							 <!-- <echo>Linker Teil: list('a','b')[0]}</echo> -->
-							 <!-- mal ne variable füllen -->
+							 <!-- Schreibe das in eine Flaka - Variable -->		
 							 <fl:let>myLeftPart ::= split('@{line}','=')[0]</fl:let>		
 							 <fl:let>myRightPart ::= split('@{line}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->
 							 
-							 <fl:echo>linke Variable => ${myLeftPart}</fl:echo>
-							 <fl:echo>rechte Variable => ${myRightPart}</fl:echo>
+							 <!-- <fl:echo>linke Variable => ${myLeftPart}</fl:echo> -->
+							 <!-- <fl:echo>rechte Variable => ${myRightPart}</fl:echo> -->
 														 							
-							 <fl:when test="matches('${myLeftPart}','test1')">
-								<fl:echo>HALLO ERSTER TEST</fl:echo>	
-								<fl:echo>Typ der rechten Variable: #{typeof('${myRightPart}')}</fl:echo>								
-							</fl:when>
-							
-							 <fl:when test="matches('${myLeftPart}','test4')">
-								<fl:echo>HALLO VIERTER TEST</fl:echo>	
-								<fl:echo>Typ der rechten Variable: #{typeof('${myRightPart}')}</fl:echo><!-- Immer String. Wenn die Variable nicht gefüllt ist, dann ist der Wert halt der String ${myRightPart} selbst -->
-							</fl:when>
 							<fl:when test="null('${myRightPart}')">
-								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+								<!-- TODO GOON: FEHLER, Datei nicht definiert -->
+								
+																						
+							<!-- Merke: Das wäre beim kopieren einer Datei an einen feststehendne Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. -->
+<!-- 								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
 								<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-								<fl:echo>rechte Variable ist übernommen: ${myRightPart}</fl:echo>
+								<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 							</fl:when>
-							 
+
+							<!-- TODO: Prüfe, ob Datei vom Linken Teil existiert -->
 							
-							
-							<fl:when test="empty '${myRightPart}'">
-								<fl:echo>rechte Variable ist EMPTY, nimm den linken Teil.</fl:echo>
-								<fl:let> myRightPart ::= ${myLeftPart}</fl:let>
-								<fl:echo>rechte Variable ist übernommen: ${myRightPart}</fl:echo>
-							</fl:when>
+							<!-- 3. Der eigentliche Kopiervorgang -->
+							<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
 							
 							
 						</else>
 					</if>
 				</sequential>
-			</for>
-			
-			
-			
-
-	<!-- 3. Der eigentliche Kopiervorgang -->
-	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
-			
+			</for>			
 		</when>
 		<otherwise>
-				<echo>Datei existiert NICHT: ${conf.copyGeneralFilePath}</echo>
-				<fl:fail message="Datei existiert NICHT: ${conf.copyGeneralFilePath}"/>
+				<echo>Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
+				<fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/>
 		</otherwise>
 	</fl:choose>
 
