@@ -3,7 +3,7 @@ REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht meh
 echo start testFlaka hello
 
 REM call ant -buildfile testFlaka_Patton.xml
-call ant -f testFlaka_ende.xml
+call ant -f testFlaka_hello.xml
 
 echo Ende testFlaka hello
 pause
