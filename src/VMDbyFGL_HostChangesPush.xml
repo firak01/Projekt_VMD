@@ -60,12 +60,15 @@
 	       dies passiert hier durch flaka´s install-property handler task -->
 	<fl:install-property-handler />  	
   	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+  	
+  	<!-- TODO GOON: Hier eine Fallunterscheidung machen, ob durch Eclipse oder durch Batch gestartet wurde !!! -->
   	<echo>VMD Properties Datei= ${env.VMD}</echo>
 	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
+  	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo>
   	
-	<echo>ECLIPSE ARGUMENTS= ${env}</echo>
   	<loadproperties>
-  		<file file="${env.VMD}"/>
+  		<file file="${vmd}"/>
+  		<!--<file file="${env.VMD}"/>-->
   	</loadproperties> 
   	<echo>test1 hat den Wert: ${test1}</echo>  	 
   	<echo>conf.dirRepositoryVmdPath hat den Wert: ${conf.dirRepositoryVmdPath}</echo>
