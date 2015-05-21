@@ -1,5 +1,6 @@
+@echo off
 REM Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist.
-REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
+REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgefï¿½hrt.
 echo start Copy Local to Repository HOST
 
 call ant -buildfile ..\src\VMDbyFGL_HostChangesPull.xml

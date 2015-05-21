@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>  
-<project name="FGLVmdGitPrepareHost" default="compile" basedir="."
+<project name="FGLVmdGitPrepareHost" default="compile" basedir=".."
    xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 
    <!-- ### Einbinden von Ant-Contrib ### -->
    <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
 	<!--    <taskdef resource="net/sf/antcontrib/antlib.xml">
 	  <classpath>
-		<pathelement location="../lib/ant-contrib-1.0b3.jar"/>
+		<pathelement location="lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
 	 <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
@@ -17,7 +17,7 @@
 	  <!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
 	   <taskdef resource="net/sf/antcontrib/antlib.xml">
 	  <classpath>
-		<pathelement location="${basedir}/../lib/ant-contrib-1.0b3.jar"/>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
 	
@@ -47,7 +47,21 @@
   -->
   
   <target name="declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
-   
+    <!-- An dieser Stelle Argumente entgegennehmen, entweder aus der Batch oder unter Eclipse aus der "external Configuration" des AntScripts  -->
+  	<!-- Merke: You can define an argument with the property file name to the build in the 'Arguments' section of the Run > External Tools > External Tools Configuration for your Ant Build. Something like:
+  	-Dproperties=Buildfile_test.properties
+
+  	You use this in your build.xml like this:
+  	<property file="${properties}"/>
+  	-->
+  	
+  	<loadproperties>
+  		<file file="${vmd}"/>
+  	</loadproperties> 
+  	<echo>test1 hat den Wert: ${test1}</echo>  	 
+  	<echo>conf.dirRepositoryVmdPath hat den Wert: ${conf.dirRepositoryVmdPath}</echo>
+
+  	
   <!-- Ausgangsverzeichnis: Das Repository -->
   <property name="dest.dirRepositoryVmdPath" value="c:/1fgl/repository/Projekt_VMD" />  
   <property name="dest.dirRepositoryVmdLib" value="lib" />
@@ -70,7 +84,7 @@
 	       dies passiert hier durch flaka´s install-property handler task -->
 	<fl:install-property-handler />
 	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
+	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}" />
     <property name="src.dirFglClientFileName" value = "Fgl${env.COMPUTERNAME}_Installationen.txt"/><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
