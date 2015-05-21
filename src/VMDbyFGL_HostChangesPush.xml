@@ -58,12 +58,14 @@
   	
 	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 	       dies passiert hier durch flaka´s install-property handler task -->
-	 <fl:install-property-handler />  	
+	<fl:install-property-handler />  	
   	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-  	<echo>VMD PRoperties: ${env.TRYOUT_ANT}</echo>
+  	<echo>VMD Properties Datei= ${env.VMD}</echo>
+	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
   	
+	<echo>ECLIPSE ARGUMENTS= ${env}</echo>
   	<loadproperties>
-  		<!--<file file="${vmd}"/>-->
+  		<file file="${env.VMD}"/>
   	</loadproperties> 
   	<echo>test1 hat den Wert: ${test1}</echo>  	 
   	<echo>conf.dirRepositoryVmdPath hat den Wert: ${conf.dirRepositoryVmdPath}</echo>
