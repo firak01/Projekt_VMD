@@ -66,23 +66,29 @@
 	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
   	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo>
   	
-  	<loadproperties>
-  		<file file="${vmd}"/>
-  		<!--<file file="${env.VMD}"/>-->
-  	</loadproperties> 
-  	<echo>test1 hat den Wert: ${test1}</echo>  	 
-  	<echo>conf.dirRepositoryVmdPath hat den Wert: ${conf.dirRepositoryVmdPath}</echo>
-
-  	
-  <!-- Ausgangsverzeichnis: Das Repository -->
-  <property name="dest.dirRepositoryVmdPath" value="c:/1fgl/repository/Projekt_VMD" />  
-  <property name="dest.dirRepositoryVmdLib" value="lib" />
+  
+    <!-- Ausgangsverzeichnis: Das Repository -->
+  	<!-- a) Feste Unterverzeichnisstruktur -->
+ <property name="dest.dirRepositoryVmdLib" value="lib" />
   <property name="dest.dirRepositoryVmdBat" value="bat" />
   <property name="dest.dirRepositoryVmdSrc" value="src" />
   <property name="dest.dirRepositoryVmdMisc" value="misc" />
   <property name="dest.dirRepositoryVmdTest" value="test" />
   <property name="dest.dirRepositoryVmdArchive" value="vmd" />
   
+  <!-- b) Als Umgebungsvarialbe (Batch) oder Argument (Eclipse) übergebene Konfigurationsdatei --> 
+  <!-- TODO GOON: Fallunterscheidung, je nachdem was existiert -->
+  <loadproperties>
+  	<file file="${vmd}"/>
+  	<!--<file file="${env.VMD}"/>-->
+  </loadproperties> 
+  <echo>test1 hat den Wert: ${test1}</echo>  	 
+  <echo>conf.dirRepositoryVmdPath hat den Wert: ${conf.dirRepositoryVmdPath}</echo>
+  <property name="dest.dirRepositoryVmdPath" value="c:/1fgl/repository/Projekt_VMD" />  
+ 
+  <!-- TODO GOON: Prüfe die Controldateien auf Existenz und Validität. Setze bGOON Variablen, die dann in den Targets abgeprüft werden. -->
+  	
+  	
   <!-- ######### CLIENT ############################################################################## -->
   <!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
   <!-- Achtung: verwende auch auf deutschen Systemen C:\Program Files (x86), Abaenderung in deutschen Namen Programme... bewirkt nur, das scheinbar das Verzeichnis doppelt angelegt wird. -->
