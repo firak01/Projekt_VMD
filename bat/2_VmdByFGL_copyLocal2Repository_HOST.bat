@@ -10,7 +10,7 @@ SET VMD="C:/1fgl/repository/Projekt_VMD"
 REM Variante B) Sowohl für Eclipse (Run Konfiguration) als auch Batch. 
 REM MERKE: Wenn die Batch auch aus Eclipse heraus gestartet werden soll, braucht man wohl ANT_HOME usw. als Umgebungsvariable. 
 
-call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD
+call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/projekt_vmd.properties
 
 echo Ende Copy Repository to Local HOST
 pause
