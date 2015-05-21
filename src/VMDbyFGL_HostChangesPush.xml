@@ -77,7 +77,7 @@
   <!-- Ausgangsverzeichnis: Das Repository -->
   <property name="dest.dirRepositoryVmdPath" value="c:/1fgl/repository/Projekt_VMD" />  
   <property name="dest.dirRepositoryVmdLib" value="lib" />
-  <property name="dest.dirRepositoryVmdBin" value="bin" />
+  <property name="dest.dirRepositoryVmdBat" value="bat" />
   <property name="dest.dirRepositoryVmdSrc" value="src" />
   <property name="dest.dirRepositoryVmdMisc" value="misc" />
   <property name="dest.dirRepositoryVmdTest" value="test" />
@@ -218,7 +218,7 @@
 	
 	 <!-- Todo: Eigentlich müssen oben erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
 	<property name="conf.dirRepositoryVmdPath" value="${dest.dirRepositoryVmdPath}" /> 
-	<property name="conf.dirRepositoryVmdBin" value="${dest.dirRepositoryVmdBin}" />
+	<property name="conf.dirRepositoryVmdBat" value="${dest.dirRepositoryVmdBat}" />
 	
 	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
 
@@ -227,7 +227,7 @@
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-	<fl:let>conf.copyLocalFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBin}/${conf.copyLocalFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+	<fl:let>conf.copyLocalFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBat}/${conf.copyLocalFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
 	<echo>Copy files general, by property file:</echo>
 	<echo>${conf.copyLocalFilePath}</echo>
 	
