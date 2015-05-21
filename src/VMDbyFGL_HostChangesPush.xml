@@ -55,8 +55,15 @@
   	<property file="${properties}"/>
   	-->
   	
+  	
+	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	       dies passiert hier durch flaka´s install-property handler task -->
+	 <fl:install-property-handler />  	
+  	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+  	<echo>VMD PRoperties: ${env.TRYOUT_ANT}</echo>
+  	
   	<loadproperties>
-  		<file file="${vmd}"/>
+  		<!--<file file="${vmd}"/>-->
   	</loadproperties> 
   	<echo>test1 hat den Wert: ${test1}</echo>  	 
   	<echo>conf.dirRepositoryVmdPath hat den Wert: ${conf.dirRepositoryVmdPath}</echo>
