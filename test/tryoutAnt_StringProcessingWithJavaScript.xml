@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="tryoutAnt_StringProcessingWithJavaScript"  default="compile" basedir="..">
+
+ <!-- ########################### -->
+ <scriptdef name="substring" language="javascript">
+     <attribute name="text" />
+     <attribute name="start" />
+     <attribute name="end" />
+     <attribute name="property" />
+     <![CDATA[
+       var text = attributes.get("text");
+       var start = attributes.get("start");
+       var end = attributes.get("end") || text.length();
+       project.setProperty(attributes.get("property"), text.substring(start, end));
+     ]]>
+  </scriptdef>
+  
+<!-- ################################################################################# -->
+ <target name="compile" depends="myTestStringSubstring">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+	<target name="myTestStringSubstring">
+		<echo>myTestStringSubstring: </echo>
+		
+		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+		<substring text="asdfasdfasdf" start="2" end="10" property="subtext" />
+		<echo message="subtext = ${subtext}" />
+		
+		<substring text="asdfasdfasdf" start="0" end="1" property="subtext" />
+		<echo message="subtext = ${subtext}" />
+	</target> 
+ </project>
