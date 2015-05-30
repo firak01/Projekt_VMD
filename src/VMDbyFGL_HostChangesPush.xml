@@ -24,18 +24,36 @@
 	
 	
 	<!-- ### ScriptDefs, u.a für die Stringverarbeitung ###-->
-	 <scriptdef name="substring" language="javascript">
-     <attribute name="text" />
-     <attribute name="start" />
-     <attribute name="end" />
-     <attribute name="property" />
-     <![CDATA[
-       var text = attributes.get("text");
-       var start = attributes.get("start");
-       var end = attributes.get("end") || text.length();
-       project.setProperty(attributes.get("property"), text.substring(start, end));
-     ]]>
-  </scriptdef>
+	<scriptdef name="substring" language="javascript">
+		 <attribute name="text" />
+		 <attribute name="start" />
+		 <attribute name="end" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   var text = attributes.get("text");
+		   var start = attributes.get("start");
+		   var end = attributes.get("end") || text.length();
+		   project.setProperty(attributes.get("property"), text.substring(start, end));
+		 ]]>
+	</scriptdef>
+		
+	<scriptdef name="isdirectory" language="javascript">
+		 <attribute name="text" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   var text = attributes.get("text");		 
+		   var fd = new java.io.File(text);
+		   var berg = false;
+		   if (fd.isDirectory()) {
+			   print("js true");
+		       berg = true;
+			} else {
+				print("js false");
+				berg = false;
+			}
+			project.setProperty(attributes.get("property"), berg);
+		 ]]>
+	</scriptdef>
 	
    
   <!-- ######### Set global properties for this build ####################################################-->
@@ -259,7 +277,7 @@
 	
 	
 			<!--2b. Werte den Inhalt der Datei zeilenweise aus -->			
-			<echo>Dateiinhalt Zeile für Zeile:</echo>		
+			<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
 			<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
 				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
 					<file file="${conf.copyLocalFilePath}" />
@@ -299,26 +317,43 @@
 									<fl:when test="null('${myRightPart}')">
 										<!-- TODO: Idee: in der initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
 										<!-- FEHLER, Datei nicht definiert -->
-										<echo>Rechter Teil der Steuereungsanweisung existiert nicht: @{line}</echo>
+										<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo>
 										<!-- <fl:fail message="Rechter Teil der Steuereungsanweisung existiert nicht: @{line}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 																								
-									<!-- Merke: Das wäre beim kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+									<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
 		<!-- 								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
 										<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
 										<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 									</fl:when>
 
-									<!-- TODO: Prüfe, ob Datei vom Linken Teil existiert -->
+									<!-- Prüfe, ob Datei vom Linken Teil existiert -->
 									<fl:choose>
 										<when test=" '${myLeftPart}'.tofile.exists == true ">
-											<echo>Datei existiert: ${myLeftPart}</echo>
+											<echo>Datei existiert (von...): ${myLeftPart}</echo>
+											<!-- Prüfe, ob es ein Verzeichnis ist -->
+											<isdirectory text="${myLeftPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+											<echo>linker Teil: isdirectory=${myisdirectory}</echo>
 											
-											<!-- 3. Der eigentliche Kopiervorgang -->
+											<!-- TODO: Prüfe, ob der rechte Teil ein Verzeichnis ist... -->
+											<!-- Falls JA: Hole vom linken Teil den Dateinamen und hänge ihn an das Verzeichnis an -->
+											<!-- Falls NEIN: Nimm das Verzeichnis, wie es ist. -->																												
+											<isdirectory text="${myRightPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+											<echo>recher Teil: isdirectory=${myisdirectory}</echo>											
+											<fl:choose>
+												<when test=" '${myisdirectory}' == true ">
+													<echo>Rechter Teil (nach...) ${myRightPart} ist ein Verzeichnis </echo>
+												</when>
+												<otherwise>
+													<echo>Rechter Teil (nach...) ${myRightPart} ist KEIN Verzeichnis </echo>
+												</otherwise>
+											</fl:choose>
+											
+											<!-- 4. Der eigentliche Kopiervorgang -->
 											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
 											
 										</when>
 										<otherwise>
-												<echo>Datei existiert NICHT: ${myLeftPart}</echo><!-- hier auch kein fail, sondern nur diese Warnung -->												
+												<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo><!-- hier auch kein fail, sondern nur diese Warnung -->												
 										</otherwise>
 									</fl:choose>			
 								</else>
