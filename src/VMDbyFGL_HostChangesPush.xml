@@ -333,24 +333,137 @@
 											<!-- Prüfe, ob es ein Verzeichnis ist -->
 											<isdirectory text="${myLeftPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 											<echo>linker Teil: isdirectory=${myisdirectory}</echo>
+											<!-- A) TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
+											
+											<!-- B) Dateipfad-Fall: Ermittle den Ausgangsdateipfad und den -namen -->
+											<fl:let>src.filedir ::= split('${myLeftPart}','\\')[0]</fl:let>
+											<fl:let>src.filename ::= split('${myLeftPart}','\\')[1]</fl:let>
 											
 											<!-- TODO: Prüfe, ob der rechte Teil ein Verzeichnis ist... -->
 											<!-- Falls JA: Hole vom linken Teil den Dateinamen und hänge ihn an das Verzeichnis an -->
 											<!-- Falls NEIN: Nimm das Verzeichnis, wie es ist. -->																												
 											<isdirectory text="${myRightPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<echo>recher Teil: isdirectory=${myisdirectory}</echo>											
+											<echo>recher Teil: isdirectory=${myisdirectory}</echo>																								
 											<fl:choose>
 												<when test=" '${myisdirectory}' == true ">
 													<echo>Rechter Teil (nach...) ${myRightPart} ist ein Verzeichnis </echo>
+													<fl:let>dest.filedir ::= ${myRightPart}</fl:let>
+													<fl:let>dest.filename ::= ${src.filename}</fl:let>
 												</when>
 												<otherwise>
 													<echo>Rechter Teil (nach...) ${myRightPart} ist KEIN Verzeichnis </echo>
+													<fl:let>dest.filedir ::= split('${myRightPart}','\\')[0]</fl:let>
+													<fl:let>dest.filename ::= split('${myRightPart}','\\')[1]</fl:let>
 												</otherwise>
 											</fl:choose>
 											
+											<echo>src.filedir = #{split('aabcc','b')[0]}</echo>
+											<!-- <fl:echo>src.filedir = #{split('aaabccc','b')[0]}</fl:echo> -->
+											<echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo><!-- 4 Backslashe um den Backslash zu escapen in der split - Funktion -->
+											<fl:let>src.fileadir ::= split('${myLeftPart}','\\\\')</fl:let>											
+											<!-- <echo>groesse src.fileadir = #{size('${src.fileadir}')}</echo> --><!-- ermittle die groesse der liste -->
+											<!-- <echo>groesse src.fileadir = #{size(${src.fileadir})}</echo> -->
+											<echo>groesse einer Liste mit size(...) = #{size(list(1,2))}</echo>
+											<echo>src.fileadir = #{'${src.fileadir}'}</echo>
+											<echo>src.fileadir[2] = #{'${src.fileadir}'}[2]</echo><!-- TODO GOON -->
+											<echo>src.fileadir[2] = #{'${src.fileadir}'[2]}</echo><!-- TODO GOON -->
+											<echo>src.fileadir[2] = #{'${src.fileadir}[2]'}</echo><!-- TODO GOON -->
+											<echo>src.fileadir[2] = #{'${src.fileadir[2]}'}</echo><!-- TODO GOON -->
+											
+											
+											<echo>groesse src.fileadir = #{size(src.fileadir)}</echo><!-- Ergebnis 0 -->
+											<echo>groesse src.fileadir = #{size(${src.fileadir})}</echo>											
+											<echo>groesse src.fileadir = #{size('${src.fileadir}')}</echo><!-- Ergebnis 69 -->
+											<echo>groesse src.fileadir = #{size(list('${src.fileadir}')}</echo>
+											<echo>groesse src.fileadir = #{size(list(${src.fileadir})}</echo>
+											
+											<echo>groesse src.fileadir = #{${src.fileadir}.length</echo>
+											<echo>groesse src.fileadir = #{${src.fileadir}.length</echo>
+											<echo>src.fileadir = #{'${src.fileadir}'.size}</echo><!-- Ergebnis 69 -->
+											<echo>src.fileadir = #{size(src.fileadir)}</echo>
+											<echo>src.fileadir = #{size(split('${myLeftPart}','\\\\'))}</echo>
+											<!-- FAZIT: Die ermittlung der Listengröße einer Variablne funktioniert nicht -->
+											<fl:let>tempa ::= list(1,2)</fl:let>	
+											<echo>groesse tempa  = #{size(tempa)}</echo>
+											
+											
+											
+											<!-- <fl:for var="mydir" in="list(${src.fileadir})"> -->
+											<!-- <fl:for var="mydir" in="list(1,2)"> -->
+											<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
+											<echo>#{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
+											</fl:for>
+											<!--
+											<c:let>
+    a = list('a','b','c')
+</c:let>
+
+How can i modify each elements for that list?
+
+I need something like:
+
+for (int i = 0; i < a.length; i++) {
+    a[i] += 'd';
+}
+
+I looked in the tutorial, but the examples show only how to retrieve a list element, not how to modify it.
+
+So, how can i modify list elements, iterating on it?
+											
+											ANTWORT: Es gibt noch keine Lösung, ausser:
+										
+
+There is (currently) no function which lets you manipulate lists. All you could do is
+
+<let>
+  a = list('a', 'b', .. )    ; your list
+  b = list()                 ; empty list 
+</let>
+<for var=" item " in=" a ">
+ <let>
+   x = some-el-expression( item ) ;     
+   b = append(b, x)
+ </let>
+</for>
+<let>
+ a = b
+</let>
+
+											-->
+											<fl:let>src.filedir ::= split('${myLeftPart}','X')[0]</fl:let>
+											<fl:let>src.filename ::= split(${myLeftPart},'V')[1]</fl:let>
+											<fl:let>dest.filedir ::= '${myRightPart}'</fl:let>
+											<fl:let>dest.filename ::= '${src.filename}'</fl:let>
+											<!-- <fl:let>dest.filedir ::= 'aaa'</fl:let>
+											<fl:let>dest.filename ::= 'bbb'</fl:let>	
+											<fl:let>src.filedir ::= 'ccc'</fl:let>
+											<fl:let>src.filename ::= 'ddd'</fl:let> -->
+											
 											<!-- 4. Der eigentliche Kopiervorgang -->
 											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
+											<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
+											<echo>Pushing File ${src.filedir}\${src.filename} to Repository: ${dest.filedir}\${dest.filename} </echo>
 											
+											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+											<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
+											  <fileset dir="//${src.dirFglClientPath}">	
+												 <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+												 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+												
+												<!--Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
+												<include name="${src.dirFglClientFileName}" />		
+											  </fileset>
+											</copy>
+											
+											<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
+											<echo>b) Misc Files:</echo>
+											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+											<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
+											  <fileset dir="//${src.dirFglClientPath}">	
+												 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
+												<include name="**.txt"/>
+											  </fileset>
+											</copy>
 										</when>
 										<otherwise>
 												<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo><!-- hier auch kein fail, sondern nur diese Warnung -->												
