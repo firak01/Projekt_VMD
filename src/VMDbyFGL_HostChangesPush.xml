@@ -55,6 +55,22 @@
 		 ]]>
 	</scriptdef>
 	
+	<scriptdef name="list_element_countzzz" language="javascript">
+		 <attribute name="lista" />
+		 <attribute name="iresult" />
+		 <![CDATA[
+		   var lista = attributes.get("lista");		 
+		   var iReturn = 2;
+		   print("typeof lista = " + typeof(lista));
+		   
+		   project.log("Hello FGL from script");
+		   project.log("Attribute lista = " + attributes.get("lista"));
+		   //project.log("First fileset basedir = "+ elements.get("fileset").get(0).getDir(project));
+		   
+		   project.setProperty(attributes.get("iresult"), iReturn);
+		 ]]>
+	</scriptdef>
+	
    
   <!-- ######### Set global properties for this build ####################################################-->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
@@ -393,6 +409,10 @@
 											<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
 											<echo>#{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
 											</fl:for>
+											
+											
+											<list_element_countzzz lista="${tempa}" iresult="mylistasize"></list_element_countzzz>
+											<echo>Ergebnis des scriptdef Aufrufs: ${mylistasize}</echo><!-- Aufruf der Variablen als EL Expression -->
 											<!--
 											<c:let>
     a = list('a','b','c')
