@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="tryoutAnt_JavaUsedByJavaScript"  default="compile" basedir="..">
+
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<!-- gebraucht wird das z.B. für den <for> </for> Task. -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+
+
+ <!-- ########################### -->
+ <scriptdef name="tryout_java_file_length" language="javascript">
+     <attribute name="filename_search" />
+     <attribute name="filenames" />
+	 <attribute name="filelengths" />
+	 <attribute name="tryout" />
+     <![CDATA[
+		   // import statements, funktionieren beide
+			importPackage(java.io);
+			//importClass(java.io.File);
+	 
+            //#### EINGABE ######	 
+			var file2search = attributes.get("filename_search");
+			
+			//#### Java, etc.
+			 // Access to Ant-Properties by their names
+			  dir      = project.getProperty("fs.dir");
+			 //funktioniert hier nicht.... includes = tryoutAnt_JavaUsedByJavaScript.getProperty("fs.includes"); //das ist der oben definierte Projektname, unter dem auf das PRojket zugegriffen werden kann
+			  includes = self.getProject().getProperty("fs.includes");
+			  excludes = self.getProject().getProperty("fs.excludes");
+
+			  // Create a <fileset dir="" includes=""/>
+			  fs = project.createDataType("fileset");
+			  fs.setDir( new File(dir) );
+			  fs.setIncludes(includes);
+			  fs.setExcludes(excludes);
+
+			  // Get the files (array) of that fileset
+			  ds = fs.getDirectoryScanner(project);
+			  srcFiles = ds.getIncludedFiles();
+
+			  // iterate over that array
+			  for (i=0; i<srcFiles.length; i++) {
+
+				// get the values via Java API
+				var basedir  = fs.getDir(project);
+				var filename = srcFiles[i];
+				var file = new File(basedir, filename);
+				var size = file.length();
+
+				// create and use a Task via Ant API
+				//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
+				echo = self.getProject().createTask("echo");
+				echo.setMessage(filename + ": " + size + " byte");
+				echo.perform();
+              }
+			  
+			var arrayFilenames=new Array();
+			var arrayFilelengths=new Array();
+			
+			arrayFilenames.push('Woa'); 
+			arrayFilenames.push('Wob'); 
+			arrayFilelengths.push(1234); 
+			
+			
+			//#### RÜCKGABE #####
+			project.setProperty(attributes.get("tryout"), "Konstanten Text zurueckgeben.");  
+			project.setProperty(attributes.get("filenames"), arrayFilenames);
+			project.setProperty(attributes.get("filelengths"), arrayFilelengths);  
+     ]]>
+  </scriptdef>
+  
+<!-- ################################################################################# -->
+ <target name="compile" depends="myTestJavaUsedByJavaScript">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+	<target name="myTestJavaUsedByJavaScript">
+		<echo>myTestJavaUsedByJavaScript: </echo>
+		<property name="fs.dir" value="../testused"/>
+		<property name="fs.includes" value="**/*.txt"/>
+		<property name="fs.excludes" value="**/*.tmp"/>
+
+		
+		<!-- Hier wird die scriptdef Methode tryout_java_file_length aufgerufen -->
+		<tryout_java_file_length filename_search="*" filenames="myfilenames" filelengths="myfilelengths" tryout="mytryout_string"/>
+		<echo message="mytryout_string = ${mytryout_string}" />
+		
+		<!-- Verwende antcontrib für eine Schleife über die Arrays -->
+		<for list="${myfilenames}" param="myelement">
+			<sequential>
+				<!-- do something with @{myelement} -->
+				<echo>myelement= @{myelement}</echo>
+			</sequential>
+		</for>
+		
+	</target> 
+ </project>
