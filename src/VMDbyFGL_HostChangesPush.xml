@@ -86,41 +86,51 @@
 		   project.setProperty(attributes.get("iresult"), iReturn);
 		 ]]>
 	</scriptdef>
-	<scriptdef name="listElementCountZZZ" language="javascript">
+	
+	
+	<scriptdef name="listElementCountFlakaZZZ" language="javascript">
+		 <!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+              Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
 		 <attribute name="lista" />
 		 <attribute name="iresult" />
 		 <![CDATA[
 		   var lista = attributes.get("lista");		 
 		   var iReturn = -1;
 		   		   
-		   print("typeof lista = " + typeof(lista));
-		   print("Objekt: " + lista);
+			//print("typeof lista = " + typeof(lista));
+			// print("Objekt: " + lista);
 		   
 		   //... DAS GIBT ALLE METHODEN ZURUECK !!!! 
-		   for(obj in lista){
-			print("obj=" + obj);
-		   }
-		   	
-			var objectArray = lista.split(',');	
-			for(x in objectArray){
-				print(x);		
-				print(typeof(x));
-			}
-			
-   if(typeof(objectArray)=="object"){
-				if(Array.isArray(objectArray)){
+		   //for(obj in lista){
+			//print("obj=" + obj);
+		   //}
+		   
+		   /*
+		   if(Array.isArray(objectArray)){
 					print("Array erzeugt.");
 					iReturn = objectArray.length;
 				}else{
 					print("kein Array erzeugt.");
 					iReturn=0;
-				}				
+				}
+			*/
+			
+			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+			var icount=0;
+			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein Array
+			if(typeof(objectArray)=="object"){
+				for(x in objectArray){
+					print(x);		
+					print(typeof(x));
+					icount++;
+				}							
 		   }else{
 				print("kein Objekt");
 				iReturn=0;
 		   }
 		   
-		   iReturn = lista.lastIndexOf('a');
+		   iReturn = icount;
 		   
 		   
 			
@@ -469,14 +479,26 @@
 											<!-- Fazit: Die so erzeugte liste wird nicht als JavaScript-Array erkannt -->
 											
 											<!-- 2. nutze auf src.fileadir den scriptdef aufruf -->
-											<listElementCountZZZ lista="${src.fileadir}" iresult="mylistasize"/>
-											<echo>groesse src.fieladir per scriptdef Aufruf: ${mylistasize}</echo>
+											<listElementCountFlakaZZZ lista="${src.fileadir}" iresult="mylistasize"/>
+											<echo>groesse src.fileadir per scriptdef Aufruf: ${mylistasize}</echo>
 											
 											<!-- <fl:for var="mydir" in="list(${src.fileadir})"> -->
 											<!-- <fl:for var="mydir" in="list(1,2)"> -->
 											<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
 											<echo>#{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
 											</fl:for>
+											
+											<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+											<var name="op1" value="${mylistasize}"/>
+											<var name="op2" value="1"/>
+											<var name="op" value="-"/>
+											<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+											<echo>errechneter wert: #{index}</echo>
+											<fl:let>
+												xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
+											</fl:let>
+											<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>
+											
 											
 											
 										
