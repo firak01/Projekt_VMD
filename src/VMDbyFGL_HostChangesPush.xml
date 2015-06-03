@@ -23,8 +23,8 @@
 	
 	
 	
-	<!-- ### ScriptDefs, u.a für die Stringverarbeitung ###-->
-	<scriptdef name="substring" language="javascript">
+	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
+	<scriptdef name="substringZZZ" language="javascript">
 		 <attribute name="text" />
 		 <attribute name="start" />
 		 <attribute name="end" />
@@ -37,12 +37,15 @@
 		 ]]>
 	</scriptdef>
 		
-	<scriptdef name="isdirectory" language="javascript">
+	<scriptdef name="isDirectoryZZZ" language="javascript">
 		 <attribute name="text" />
 		 <attribute name="property" />
 		 <![CDATA[
+		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist Package notwendig
+		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
 		   var text = attributes.get("text");		 
-		   var fd = new java.io.File(text);
+		   //var fd = new java.io.File(text);
+		   var fd = new File(text);
 		   var berg = false;
 		   if (fd.isDirectory()) {
 			   print("js true");
@@ -55,22 +58,92 @@
 		 ]]>
 	</scriptdef>
 	
-	<scriptdef name="list_element_countzzz" language="javascript">
+	<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+                     Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+                     Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					 Darum mit scriptdef behelfen. -->
+	<scriptdef name="arrayElementCountZZZ" language="javascript">
 		 <attribute name="lista" />
 		 <attribute name="iresult" />
 		 <![CDATA[
 		   var lista = attributes.get("lista");		 
-		   var iReturn = 2;
+		   var iReturn = -1;
+		   		   
 		   print("typeof lista = " + typeof(lista));
-		   
-		   project.log("Hello FGL from script");
-		   project.log("Attribute lista = " + attributes.get("lista"));
-		   //project.log("First fileset basedir = "+ elements.get("fileset").get(0).getDir(project));
-		   
+		   if(typeof(lista)=="object"){
+				if(Array.isArray(lista)){
+					print("Array vorhanden");
+					iReturn=lista.length;
+				}else{
+					print("kein Array vorhanden");
+					iReturn=0;
+				}
+		   }else{
+				print("kein Objekt");
+				iReturn=0;
+		   }
+		  	  
 		   project.setProperty(attributes.get("iresult"), iReturn);
 		 ]]>
 	</scriptdef>
-	
+	<scriptdef name="listElementCountZZZ" language="javascript">
+		 <attribute name="lista" />
+		 <attribute name="iresult" />
+		 <![CDATA[
+		   var lista = attributes.get("lista");		 
+		   var iReturn = -1;
+		   		   
+		   print("typeof lista = " + typeof(lista));
+		   print("Objekt: " + lista);
+		   
+		   //... DAS GIBT ALLE METHODEN ZURUECK !!!! 
+		   for(obj in lista){
+			print("obj=" + obj);
+		   }
+		   	
+			var objectArray = lista.split(',');	
+			for(x in objectArray){
+				print(x);		
+				print(typeof(x));
+			}
+			
+   if(typeof(objectArray)=="object"){
+				if(Array.isArray(objectArray)){
+					print("Array erzeugt.");
+					iReturn = objectArray.length;
+				}else{
+					print("kein Array erzeugt.");
+					iReturn=0;
+				}				
+		   }else{
+				print("kein Objekt");
+				iReturn=0;
+		   }
+		   
+		   iReturn = lista.lastIndexOf('a');
+		   
+		   
+			
+		  	  
+		   project.setProperty(attributes.get("iresult"), iReturn);
+		 ]]>
+	</scriptdef>
+	<!--
+	var objectArray = lista.toString().split(",");
+				
+		   if(typeof(objectArray)=="object"){
+				if(Array.isArray(objectArray)){
+					print("Array erzeugt.");
+					iReturn = objectArray.length;
+				}else{
+					print("kein Array erzeugt.");
+					iReturn=0;
+				}				
+		   }else{
+				print("kein Objekt");
+				iReturn=0;
+		   }
+		 -->
    
   <!-- ######### Set global properties for this build ####################################################-->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
@@ -310,7 +383,7 @@
 						<else>						
 							<echo>Zeile: @{line}</echo>
 							<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
-							<substring text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
+							<substringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
 							<!-- <echo message="subtext = ${subtext}" />	 -->						
 							<if>
 								<equals arg1="${subtext}" arg2="#" />
@@ -347,7 +420,7 @@
 										<when test=" '${myLeftPart}'.tofile.exists == true ">
 											<echo>Datei existiert (von...): ${myLeftPart}</echo>
 											<!-- Prüfe, ob es ein Verzeichnis ist -->
-											<isdirectory text="${myLeftPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 											<echo>linker Teil: isdirectory=${myisdirectory}</echo>
 											<!-- A) TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
 											
@@ -358,7 +431,7 @@
 											<!-- TODO: Prüfe, ob der rechte Teil ein Verzeichnis ist... -->
 											<!-- Falls JA: Hole vom linken Teil den Dateinamen und hänge ihn an das Verzeichnis an -->
 											<!-- Falls NEIN: Nimm das Verzeichnis, wie es ist. -->																												
-											<isdirectory text="${myRightPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+											<isDirectoryZZZ text="${myRightPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 											<echo>recher Teil: isdirectory=${myisdirectory}</echo>																								
 											<fl:choose>
 												<when test=" '${myisdirectory}' == true ">
@@ -373,36 +446,31 @@
 												</otherwise>
 											</fl:choose>
 											
-											<echo>src.filedir = #{split('aabcc','b')[0]}</echo>
-											<!-- <fl:echo>src.filedir = #{split('aaabccc','b')[0]}</fl:echo> -->
+											<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
+											<!-- <echo>src.filedir = #{split('aabcc','b')[0]}</echo> -->
+											
+											<!-- Z.B.: Hiermit holt man ggfs. den Laufwerksnamen -->
 											<echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo><!-- 4 Backslashe um den Backslash zu escapen in der split - Funktion -->
 											<fl:let>src.fileadir ::= split('${myLeftPart}','\\\\')</fl:let>											
 											<!-- <echo>groesse src.fileadir = #{size('${src.fileadir}')}</echo> --><!-- ermittle die groesse der liste -->
 											<!-- <echo>groesse src.fileadir = #{size(${src.fileadir})}</echo> -->
-											<echo>groesse einer Liste mit size(...) = #{size(list(1,2))}</echo>
-											<echo>src.fileadir = #{'${src.fileadir}'}</echo>
-											<echo>src.fileadir[2] = #{'${src.fileadir}'}[2]</echo><!-- TODO GOON -->
-											<echo>src.fileadir[2] = #{'${src.fileadir}'[2]}</echo><!-- TODO GOON -->
-											<echo>src.fileadir[2] = #{'${src.fileadir}[2]'}</echo><!-- TODO GOON -->
-											<echo>src.fileadir[2] = #{'${src.fileadir[2]}'}</echo><!-- TODO GOON -->
 											
-											
-											<echo>groesse src.fileadir = #{size(src.fileadir)}</echo><!-- Ergebnis 0 -->
-											<echo>groesse src.fileadir = #{size(${src.fileadir})}</echo>											
-											<echo>groesse src.fileadir = #{size('${src.fileadir}')}</echo><!-- Ergebnis 69 -->
-											<echo>groesse src.fileadir = #{size(list('${src.fileadir}')}</echo>
-											<echo>groesse src.fileadir = #{size(list(${src.fileadir})}</echo>
-											
-											<echo>groesse src.fileadir = #{${src.fileadir}.length</echo>
-											<echo>groesse src.fileadir = #{${src.fileadir}.length</echo>
-											<echo>src.fileadir = #{'${src.fileadir}'.size}</echo><!-- Ergebnis 69 -->
-											<echo>src.fileadir = #{size(src.fileadir)}</echo>
-											<echo>src.fileadir = #{size(split('${myLeftPart}','\\\\'))}</echo>
-											<!-- FAZIT: Die ermittlung der Listengröße einer Variablne funktioniert nicht -->
+										
+											<!-- TODO: Dies in ein tryout...Liste packen und nachvollziehbar machen -->		
+											<echo>groesse einer Liste mit size(...) = #{size(list(1,2))}</echo><!-- funktioniert -->
+											<echo>Groesse src.fileadir per size(...) = #{size(split('${myLeftPart}','\\\\'))}</echo><!-- Das ergibt 0 als Größe des "Objekts" nach dem split. Was falsch ist... -->
+																						
+											<!-- Beweis: Die ermittlung der Listengröße einer Variable funktioniert nicht -->
+											<!-- 1. mit list(...) erzeugte statische liste klappt -->
 											<fl:let>tempa ::= list(1,2)</fl:let>	
-											<echo>groesse tempa  = #{size(tempa)}</echo>
+											<echo>groesse tempa  per size auf list(...)= #{size(tempa)}</echo>
+											<arrayElementCountZZZ lista="${tempa}" iresult="mylistasize"/>
+											<echo>groesse tempa per scriptdef Aufruf auf list(...): ${mylistasize}</echo>
+											<!-- Fazit: Die so erzeugte liste wird nicht als JavaScript-Array erkannt -->
 											
-											
+											<!-- 2. nutze auf src.fileadir den scriptdef aufruf -->
+											<listElementCountZZZ lista="${src.fileadir}" iresult="mylistasize"/>
+											<echo>groesse src.fieladir per scriptdef Aufruf: ${mylistasize}</echo>
 											
 											<!-- <fl:for var="mydir" in="list(${src.fileadir})"> -->
 											<!-- <fl:for var="mydir" in="list(1,2)"> -->
@@ -411,8 +479,7 @@
 											</fl:for>
 											
 											
-											<list_element_countzzz lista="${tempa}" iresult="mylistasize"></list_element_countzzz>
-											<echo>Ergebnis des scriptdef Aufrufs: ${mylistasize}</echo><!-- Aufruf der Variablen als EL Expression -->
+										
 											<!--
 											<c:let>
     a = list('a','b','c')

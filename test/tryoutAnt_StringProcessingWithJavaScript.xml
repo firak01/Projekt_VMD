@@ -2,6 +2,7 @@
 <project name="tryoutAnt_StringProcessingWithJavaScript"  default="compile" basedir="..">
 
  <!-- ########################### -->
+ <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
  <scriptdef name="substring" language="javascript">
      <attribute name="text" />
      <attribute name="start" />

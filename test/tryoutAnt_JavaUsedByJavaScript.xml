@@ -12,6 +12,7 @@
 
 
  <!-- ########################### -->
+ <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
  <scriptdef name="tryout_java_file_length" language="javascript">
      <attribute name="filename_search" />
      <attribute name="filenames" />

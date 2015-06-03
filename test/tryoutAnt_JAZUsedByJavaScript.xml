@@ -12,12 +12,17 @@
 
 
  <!-- ########################### -->
+ <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
  <scriptdef name="tryout_jaz_string_camelcase" language="javascript">
      <attribute name="filename_search" />
      <attribute name="filenames" />
 	 <attribute name="filelengths" />
 	 <attribute name="tryout" />
      <![CDATA[
+		   //Allgemein für Import Statements gilt:
+		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
+		   //                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
+	 
 		   // import statements, funktionieren beide
 			//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
 			//importPackage(basic.zBasic.util.datatype.string);
