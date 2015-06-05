@@ -48,10 +48,10 @@
 		   var fd = new File(text);
 		   var berg = false;
 		   if (fd.isDirectory()) {
-			   print("js true");
+			   //print("js true");
 		       berg = true;
 			} else {
-				print("js false");
+				//print("js false");
 				berg = false;
 			}
 			project.setProperty(attributes.get("property"), berg);
@@ -107,10 +107,10 @@
 		   
 		   /*
 		   if(Array.isArray(objectArray)){
-					print("Array erzeugt.");
+					//print("Array erzeugt.");
 					iReturn = objectArray.length;
 				}else{
-					print("kein Array erzeugt.");
+					//print("kein Array erzeugt.");
 					iReturn=0;
 				}
 			*/
@@ -121,20 +121,17 @@
 			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein Array
 			if(typeof(objectArray)=="object"){
 				for(x in objectArray){
-					print(x);		
-					print(typeof(x));
+					//print(x);		
+					//print(typeof(x));
 					icount++;
 				}							
 		   }else{
-				print("kein Objekt");
+				//print("kein Objekt");
 				iReturn=0;
 		   }
 		   
 		   iReturn = icount;
 		   
-		   
-			
-		  	  
 		   project.setProperty(attributes.get("iresult"), iReturn);
 		 ]]>
 	</scriptdef>
@@ -410,14 +407,14 @@
 									<!-- Schreibe das in eine Flaka - Variable -->		
 									<fl:let>myLeftPart ::= split('@{line}','=')[0]</fl:let>		
 									<fl:let>myRightPart ::= split('@{line}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
-									<!-- <fl:echo>linke Variable => ${myLeftPart}</fl:echo> -->
-									<!-- <fl:echo>rechte Variable => ${myRightPart}</fl:echo> -->
+									<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
+									<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
 														 							
 									<fl:when test="null('${myRightPart}')">
 										<!-- TODO: Idee: in der initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
 										<!-- FEHLER, Datei nicht definiert -->
 										<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo>
-										<!-- <fl:fail message="Rechter Teil der Steuereungsanweisung existiert nicht: @{line}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+										<fl:fail message="Rechter Teil der Steuereungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 																								
 									<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
 		<!-- 								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
@@ -429,32 +426,42 @@
 									<fl:choose>
 										<when test=" '${myLeftPart}'.tofile.exists == true ">
 											<echo>Datei existiert (von...): ${myLeftPart}</echo>
+											
+											<!-- Erstelle / Initialisiere neu eine Liste der "Zieldateien", das kann nur eine sein oder auch alle Dateien eines Verzeichnisses -->
+											<fl:let>listaDestinationFiles ::= list()</fl:let>
+											
 											<!-- Prüfe, ob es ein Verzeichnis ist -->
 											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 											<echo>linker Teil: isdirectory=${myisdirectory}</echo>
-											<!-- A) TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
+											<!-- A) Linker Teil - Verzeichnis-Fall: TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
+											<fl:when test="true('${myisdirectory}')">
+												<fl:fail message="Linker Teil der Steuerungsanweisung ist ein Verzeichnis: ${myLeftPart}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+											</fl:when>
 											
-											<!-- B) Dateipfad-Fall: Ermittle den Ausgangsdateipfad und den -namen -->
-											<fl:let>src.filedir ::= split('${myLeftPart}','\\')[0]</fl:let>
-											<fl:let>src.filename ::= split('${myLeftPart}','\\')[1]</fl:let>
-											
+											<!-- B) Linker Teil - Dateipfad-Fall: Ermittle den Ausgangsdateipfad und den -namen -->
+																											
 											<!-- TODO: Prüfe, ob der rechte Teil ein Verzeichnis ist... -->
 											<!-- Falls JA: Hole vom linken Teil den Dateinamen und hänge ihn an das Verzeichnis an -->
 											<!-- Falls NEIN: Nimm das Verzeichnis, wie es ist. -->																												
 											<isDirectoryZZZ text="${myRightPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<echo>recher Teil: isdirectory=${myisdirectory}</echo>																								
+											<echo>Rechter Teil: isdirectory=${myisdirectory}</echo>																								
 											<fl:choose>
-												<when test=" '${myisdirectory}' == true ">
+												<!-- Die Vorgehensweise beim Kopieren erfordert es, dass es eine Variable für das Verzeichnis und eine Variable für die Datei gibt. (für das fileset include) -->
+												<when test=" '${myisdirectory}'=='true'">
 													<echo>Rechter Teil (nach...) ${myRightPart} ist ein Verzeichnis </echo>
 													<fl:let>dest.filedir ::= ${myRightPart}</fl:let>
-													<fl:let>dest.filename ::= ${src.filename}</fl:let>
+													<fl:let>dest.filename ::= ${src.filename}</fl:let>																									
 												</when>
 												<otherwise>
 													<echo>Rechter Teil (nach...) ${myRightPart} ist KEIN Verzeichnis </echo>
+													<!-- TODO GOON: Hole den Namen des Verzeichnisses (als Pfad), hole den Dateinamen -->
 													<fl:let>dest.filedir ::= split('${myRightPart}','\\')[0]</fl:let>
 													<fl:let>dest.filename ::= split('${myRightPart}','\\')[1]</fl:let>
 												</otherwise>
 											</fl:choose>
+											<fl:echo>dest.filedir => ${dest.filedir}</fl:echo>
+											<fl:echo>dest.filename => ${dest.filename}</fl:echo>
+											
 											
 											<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
 											<!-- <echo>src.filedir = #{split('aabcc','b')[0]}</echo> -->
@@ -466,7 +473,7 @@
 											<!-- <echo>groesse src.fileadir = #{size(${src.fileadir})}</echo> -->
 											
 										
-											<!-- TODO: Dies in ein tryout...Liste packen und nachvollziehbar machen -->		
+											<!-- TODO: Dies in ein tryout...Liste packen und nachvollziehbar machen tryoutAnt_FlakaListHandling-->		
 											<echo>groesse einer Liste mit size(...) = #{size(list(1,2))}</echo><!-- funktioniert -->
 											<echo>Groesse src.fileadir per size(...) = #{size(split('${myLeftPart}','\\\\'))}</echo><!-- Das ergibt 0 als Größe des "Objekts" nach dem split. Was falsch ist... -->
 																						
@@ -493,60 +500,14 @@
 											<var name="op2" value="1"/>
 											<var name="op" value="-"/>
 											<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-											<echo>errechneter wert: #{index}</echo>
+											<echo>errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
 											<fl:let>
 												xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
 											</fl:let>
 											<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>
 											
+											<!-- TODO: Hänge diesen Wert an das Zielverzeichnis an. Das ist der Zieldateipfad -->
 											
-											
-										
-											<!--
-											<c:let>
-    a = list('a','b','c')
-</c:let>
-
-How can i modify each elements for that list?
-
-I need something like:
-
-for (int i = 0; i < a.length; i++) {
-    a[i] += 'd';
-}
-
-I looked in the tutorial, but the examples show only how to retrieve a list element, not how to modify it.
-
-So, how can i modify list elements, iterating on it?
-											
-											ANTWORT: Es gibt noch keine Lösung, ausser:
-										
-
-There is (currently) no function which lets you manipulate lists. All you could do is
-
-<let>
-  a = list('a', 'b', .. )    ; your list
-  b = list()                 ; empty list 
-</let>
-<for var=" item " in=" a ">
- <let>
-   x = some-el-expression( item ) ;     
-   b = append(b, x)
- </let>
-</for>
-<let>
- a = b
-</let>
-
-											-->
-											<fl:let>src.filedir ::= split('${myLeftPart}','X')[0]</fl:let>
-											<fl:let>src.filename ::= split(${myLeftPart},'V')[1]</fl:let>
-											<fl:let>dest.filedir ::= '${myRightPart}'</fl:let>
-											<fl:let>dest.filename ::= '${src.filename}'</fl:let>
-											<!-- <fl:let>dest.filedir ::= 'aaa'</fl:let>
-											<fl:let>dest.filename ::= 'bbb'</fl:let>	
-											<fl:let>src.filedir ::= 'ccc'</fl:let>
-											<fl:let>src.filename ::= 'ddd'</fl:let> -->
 											
 											<!-- 4. Der eigentliche Kopiervorgang -->
 											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
