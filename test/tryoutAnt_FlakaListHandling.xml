@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
+	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+		
+ <!-- ########################### -->
+ <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
+ <scriptdef name="substring" language="javascript">
+     <attribute name="text" />
+     <attribute name="start" />
+     <attribute name="end" />
+     <attribute name="property" />
+     <![CDATA[
+       var text = attributes.get("text");
+       var start = attributes.get("start");
+       var end = attributes.get("end") || text.length();
+       project.setProperty(attributes.get("property"), text.substring(start, end));
+     ]]>
+  </scriptdef>
+  
+<!-- ################################################################################# -->
+ <target name="compile" depends="declaration,myTryoutFlakaListHandling,myTestListElementCountFlakaZZZ">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+  <target name="declaration">
+	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	  dies passiert hier durch flaka´s install-property handler task -->
+	  <fl:install-property-handler />	
+  </target>
+  
+<target name="myTryoutFlakaListHandling">
+	<fl:logo>myTryoutFlakaListHandling: list() und size()</fl:logo>
+	<!-- 1a. mit list(...) erzeugte statische liste klappt -->
+	<echo>groesse einer Liste mit size(...) = #{size(list(1,2))}</echo><!-- funktioniert -->
+	<echo> ####################### </echo>
+	<!-- 1b. In Kombination mit einer Variablen klappt es nicht!!! -->
+	<fl:let>tempa ::= list(1,2)</fl:let>
+	<echo>Liste: ${tempa}</echo>
+	<echo>1 groesse tempa  per size auf list(...) = #{size(tempa)}) (falsches Ergebnis 6)</echo>
+	<echo>2 groesse tempa  per size auf list(...) = #{size('${tempa}')} (falsches Ergebnis 6)</echo>
+	<echo>3 groesse tempa  per size auf list(...) = #{size(${'tempa'})} (kein Ergebnis)</echo><!-- kein Ergebnis wird noch nicht mal ausgegeben. muss also totaler Absturz sein -->
+	<echo>4 groesse tempa  per size auf list(...) = #{size(${tempa})} (kein Ergebnis)</echo>
+	<echo> ####################### </echo>
+	
+	<!-- 2a. Was als Alternative klappt ist: -->
+	<fl:let>tempaSize ::= size(list(1,2))</fl:let>
+	<echo>groesse tempaSize also in let(...) errechneter Variablen = ${tempaSize}</echo><!-- funktioniert -->
+	
+	<!-- 2b. Mal ein wenig mit Size(...) rumspielen!!! -->
+	<echo>1 groesse tempaSize auf Variable = #{size(tempaSize)} (das ist 1, ja, erwartbar)</echo>
+	<echo>2 groesse tempaSize auf Variable = #{size('tempaSize')} (das ist 9, also die Länge des Strings)</echo>
+	<echo>3 groesse tempaSize auf Variable = #{size(${tempaSize})} (das ist 0, also nicht die Liste!!!)</echo>
+	<echo>4 groesse tempaSize auf Variable = #{size(${'tempaSize'})} (Kein Ergebnis)</echo>
+	<echo>5 groesse tempaSize auf Variable = #{size('${tempaSize}')} (das ist 1, ja, erwartbar)</echo>
+	<echo> ####################### </echo>
+		
+	<!-- 3a. Wie nun die Liste erweitern? -->
+	<fl:let>tempa ::= append(tempa, 3)</fl:let>
+	<echo>Liste: ${tempa}</echo>
+	<echo>1 groesse tempa  per size auf list(...) = #{size(tempa)}) (falsches Ergebnis 11)</echo>
+	<echo>2 groesse tempa  per size auf list(...) = #{size('${tempa}')} (falsches Ergebnis 11)</echo>
+	<echo>3 groesse tempa  per size auf list(...) = #{size(${'tempa'})} (kein Ergebnis)</echo><!-- kein Ergebnis wird noch nicht mal ausgegeben. muss also totaler Absturz sein -->
+	<echo>4 groesse tempa  per size auf list(...) = #{size(${tempa})} (kein Ergebnis)</echo>
+	<echo> ####################### </echo>
+	
+	<!-- 3a. Wie nun die Liste erweitern? -->
+	<fl:let>tempa ::= list(1,2)</fl:let>
+	<fl:let>tempa ::= append('${tempa}', 3)</fl:let>
+	<echo>Liste: ${tempa}  (Fazit: Das Anhaengen an eine bestehende Liste funktioniert nicht)</echo>
+	<echo>1 groesse tempa  per size auf list(...) = #{size(tempa)}) (falsches Ergebnis 11)</echo>
+	<echo>2 groesse tempa  per size auf list(...) = #{size('${tempa}')} (falsches Ergebnis 11)</echo>
+	<echo>3 groesse tempa  per size auf list(...) = #{size(${'tempa'})} (kein Ergebnis)</echo><!-- kein Ergebnis wird noch nicht mal ausgegeben. muss also totaler Absturz sein -->
+	<echo>4 groesse tempa  per size auf list(...) = #{size(${tempa})} (kein Ergebnis)</echo>
+	<echo> ####################### </echo>
+	
+	<!-- #################################### -->
+	<fl:logo>myTryoutFlakaListHandling: list() mit 'foreach' durchgehen.</fl:logo>
+	<fl:let>
+<!-- 		a ::= list('a', 'b', 'c' )    ; your list -->
+		a ::= list(1,2,3)    ; your list
+		b ::= list()          ; empty list 
+	</fl:let>
+	<echo>Liste a: ${a}</echo>
+	<fl:for var = "item" in="list(1,2,3)">
+		<echo>item= #{${item}}</echo>
+		<echo>item= #{'${item}'}</echo>
+		<echo>item= ${item}</echo>
+		<echo>item= #{'@item'}</echo>
+		<fl:let>			
+			<!-- x ::= "1" ;  -->
+			<!-- x ::= 1 ; --> 			
+			b ::= append(b, item);
+		</fl:let>
+	</fl:for>
+	<echo>Liste b: ${b}</echo>
+	
+	<!-- #################################### -->
+	<fl:logo>myTryoutFlakaListHandling: list() Zugriff mit Index.</fl:logo>	
+	<echo>1) aa[1] = #{list('a','b','c')[1]}</echo><!-- das funktioniert -->
+	<fl:let>
+		aa ::= list('a', 'b', 'c' )    ; your list
+		<!-- aa ::= list(1,2,3)    ; your list -->		
+	</fl:let>
+	<echo>2) aa[1] = #{${aa}[1]}</echo>	
+	<echo>3) aa[1] = ${aa}[1]</echo>	
+	<echo>4) aa[1] = ${aa[1]}</echo>
+	<!-- FAZIT: LISTENOPPERATIONEN SIND SCHEISSE, erweitern und zugriff per Index in Kombination mit Variablen geht gar nicht, sowie Schleifen. -->
+</target>
+	
+	<target name="myTestListElementCountFlakaZZZ">
+		<fl:logo>myTestListElementCountFlakaZZZ: </fl:logo>
+		<fl:let>
+			aaa ::= list('a', 'b', 'c' )    ; your list
+			<!-- aa ::= list(1,2,3)    ; your list -->		
+		</fl:let>
+		<echo>liste: ${aaa}</echo>
+		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
+		<listElementCountFlakaZZZ lista="${aaa}" iresult="mylistasize"/>
+		<echo>groesse aaa per scriptdef Aufruf auf list(...): ${mylistasize}</echo>
+	</target> 
+	
+	
+		<scriptdef name="listElementCountFlakaZZZ" language="javascript">
+			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+			<attribute name="lista" />
+			<attribute name="iresult" />
+			<![CDATA[
+				var lista = attributes.get("lista");		 
+				var iReturn = -1;
+				
+				//print("typeof lista = " + typeof(lista));
+				// print("Objekt: " + lista);
+				
+				//... DAS GIBT ALLE METHODEN ZURUECK !!!! 
+				//for(obj in lista){
+				//print("obj=" + obj);
+				//}
+				
+				/*
+				if(Array.isArray(objectArray)){
+				//print("Array erzeugt.");
+				iReturn = objectArray.length;
+				}else{
+				//print("kein Array erzeugt.");
+				iReturn=0;
+				}
+			 */
+				
+				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+				
+				var icount=0;
+				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein Array
+				if(typeof(objectArray)=="object"){
+				for(x in objectArray){
+				//print(x);		
+				//print(typeof(x));
+				icount++;
+				}							
+				}else{
+				//print("kein Objekt");
+				iReturn=0;
+				}
+				
+				iReturn = icount;
+				
+				project.setProperty(attributes.get("iresult"), iReturn);
+			]]>
+		</scriptdef>
+ </project>

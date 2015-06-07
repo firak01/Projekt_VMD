@@ -1,6 +1,7 @@
 
 
-
+2015-06-07: Notepad++ und Plugins installiert. Insbesondere compare, explorer, XML Tools
+-----------------------------------------
 2015-01-04: KillNotes bereitgestellt.
 ------------------------------------------
 2014-10-28: Filesplitter Tool installiert
