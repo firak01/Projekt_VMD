@@ -79,11 +79,33 @@
 	<fl:let>tempa ::= list(1,2)</fl:let>
 	<fl:let>tempa ::= append('${tempa}', 3)</fl:let>
 	<echo>Liste: ${tempa}  (Fazit: Das Anhaengen an eine bestehende Liste funktioniert nicht)</echo>
+	<!-- entspricht der Dokumentation 
+		A function taking a arbitrary number of elements to create a list object. Returns the empty list when called without arguments.
+list()                ; []
+list('a',2)           ; ['a',2]
+list(list('a',2))     ; [['a',2]]   -##- siehe hier
+-->
 	<echo>1 groesse tempa  per size auf list(...) = #{size(tempa)}) (falsches Ergebnis 11)</echo>
 	<echo>2 groesse tempa  per size auf list(...) = #{size('${tempa}')} (falsches Ergebnis 11)</echo>
 	<echo>3 groesse tempa  per size auf list(...) = #{size(${'tempa'})} (kein Ergebnis)</echo><!-- kein Ergebnis wird noch nicht mal ausgegeben. muss also totaler Absturz sein -->
 	<echo>4 groesse tempa  per size auf list(...) = #{size(${tempa})} (kein Ergebnis)</echo>
 	<echo> ####################### </echo>
+
+
+
+	<echo> direktes append auf neue liste = #{append(1,list('a',2),true)} (	funktioniert, wie dokumentiert (1,'a',2,true) ) </echo>
+	<!-- MAL AUSPROBIEREN 
+
+
+append(T..):list
+
+This function is similar to list by creating a list based on given arguments. However, each argument being a list is treated in a special way by appending the list elements rather the list itself.
+
+append()                       ; list()
+append('a',2)                  ; list('a',2)
+
+-->
+
 	
 	<!-- #################################### -->
 	<fl:logo>myTryoutFlakaListHandling: list() mit 'foreach' durchgehen.</fl:logo>
