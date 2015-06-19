@@ -1,26 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>  
 <project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
-		
- <!-- ########################### -->
- <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-                     Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
- <scriptdef name="substring" language="javascript">
-     <attribute name="text" />
-     <attribute name="start" />
-     <attribute name="end" />
-     <attribute name="property" />
-     <![CDATA[
-       var text = attributes.get("text");
-       var start = attributes.get("start");
-       var end = attributes.get("end") || text.length();
-       project.setProperty(attributes.get("property"), text.substring(start, end));
-     ]]>
-  </scriptdef>
-  
+		 
 <!-- ################################################################################# -->
 <!-- Die einzelnen Tests im depends hinzufügen -->
- <target name="compile" depends="declaration,myTryoutFlakaListHandling,myTestListElementCountFlakaZZZ,myTestArrayInitJsZZZ">
+ <target name="compile" depends="declaration,myTryoutFlakaListHandling,myTestListElementCountFlakaZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -108,7 +92,6 @@ append('a',2)                  ; list('a',2)
 
 -->
 
-	
 	<!-- #################################### -->
 	<fl:logo>myTryoutFlakaListHandling: list() mit 'foreach' durchgehen.</fl:logo>
 	<fl:let>
@@ -143,7 +126,9 @@ append('a',2)                  ; list('a',2)
 	<!-- FAZIT: LISTENOPPERATIONEN SIND SCHEISSE, erweitern und zugriff per Index in Kombination mit Variablen geht gar nicht, sowie Schleifen. -->
 </target>
 	
-	<!-- #################################### -->
+	<!-- ################################################ -->
+	<!-- DARUM WERDEN STATT LISTEN JETZT JAVA SCRIPT ARRAYS VERWENDET -->
+	<!-- ################################################ -->
 	
 	<target name="myTestListElementCountFlakaZZZ">
 		<fl:logo>myTestListElementCountFlakaZZZ:
@@ -154,7 +139,7 @@ append('a',2)                  ; list('a',2)
 		</fl:let>
 		<echo>liste: ${aaa}</echo>
 		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
-		<listElementCountFlakaZZZ lista="${aaa}" iresult="mylistasize"/>
+		<listElementCountFlakaZZZ lista="${aaa}" ireturn="mylistasize"/>
 		<echo>groesse aaa per scriptdef Aufruf auf list(...): ${mylistasize}</echo>
 	</target> 
 	
@@ -163,7 +148,7 @@ append('a',2)                  ; list('a',2)
 			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
 			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
 			<attribute name="lista" />
-			<attribute name="iresult" />
+			<attribute name="ireturn" />
 			<![CDATA[
 				var lista = attributes.get("lista");		 
 				var iReturn = -1;
@@ -201,130 +186,16 @@ append('a',2)                  ; list('a',2)
 				iReturn=0;
 				}
 				
+					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 //for(yy in objectArray){
+					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+					//	};
+									
 				iReturn = icount;
 				
-				project.setProperty(attributes.get("iresult"), iReturn);
+				project.setProperty(attributes.get("ireturn"), iReturn);
 			]]>
 		</scriptdef>
-		
-		
-		<target name="myTestArrayInitJsZZZ">
-		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
-		<fl:logo>myTestArrayInitJsZZZ:
-		Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
-		<fl:let>
-			myArraySize::=1; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
-		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- nun daran etwas anhaengen -->
-		<testArrayAppendJsZZZ arrayinput="${myArray}" value="blabla" arrayreturn="myArray"/>
-		<echo>myArray nachher (2): ${myArray}</echo>
-	</target> 
-	
-		<scriptdef name="testArrayInitJsZZZ" language="javascript">
-			<!-- Hiermit faked man die Erstellung eines Arrays -->
-			
-			 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-                     Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-			<attribute name="isize" />
-			<attribute name="arrayreturn" />		
-			<![CDATA[		
-								 
-				var mySize = attributes.get("isize");	
-				print("iSize = '" + mySize + "'");
-				var myArrayReturn = new Array([mySize]);
-				//Definition eines Werts:
-				myArrayReturn[0]="kljlkj";
-				myArrayReturn[1]="ghfgh";
-				myArrayReturn[2]="tuztuz"; //Die über die ursprüngliche Dimensionierung hinausgehende Erweiterung ist egal...
-				
-				project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-			]]>
-		</scriptdef>
-		
-			<scriptdef name="testArrayAppendJsZZZ" language="javascript">
-			<!-- Hiermit versuche ich an ein vorher erstelltes JavaScript-Array einen Wert anzuhängen,
-                   was daran scheitert, das die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt			-->
-			
-			 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-                     Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-			<attribute name="arrayinput" />
-			<attribute name="value" />
-			<attribute name="arrayreturn" />		
-			<![CDATA[										 								
-				var myArray = attributes.get("arrayinput");					
-				var myValue = attributes.get("value");					
-				
-				
-				print("typeof myarray = " + typeof(myArray));
-						
-				
-				var iSize=0;
-				if(Array.isArray(myArray)){
-					print("Array uebergeben bekommen");
-					iSize = myArray.length;
-					print("Arraygroesse="+iSize);
-				}else{
-					print("kein Array uebergeben bekommen.");
-					
-					var icount=0;					
-					if(typeof(myArray)=="object"){
-					    print("Object uebergeben bekommen.");
-					
-					    //das listet alle Methoden des objekts auf.... scheint ein String zu sein....
-						for(x in myArray){
-							print(x);		
-							//print(typeof(x));
-							icount++;
-						}	
-						
-						print("myArray ist jetzt leider ein String ='"+myArray +"'");
-						//print"myArray[0]='"+myArray.[0]+"'");
-
-						var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
-						
-						//ABER: Damit bekommt man die Indizes und nicht die Werte!!!!						Man erzeugt also damit auch kein Array
-						for(x in objectArray){
-							print(x);		
-						//	print(typeof(x));
-						}	
-						    //for(y in x){
-							//	print(y);		
-							//	print(typeof(y));
-								//	icount++;
-							//}						
-						//}		
-						
-					}else{
-						print("kein Objekt");
-						//iReturn=0;
-					}
-					
-					//var objectArray = myArray.split(',');						//Merke: Man erzeugt damit auch kein Array
-					
-				}
-				
-			
-				//project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-			]]>
-		</scriptdef>
-		
-		<!-- Beispiel für JAVA Arrays
-		<scriptdef name="validateTimeZone" language="javascript">
-    <attribute name="zone" />
-    <![CDATA[
-        importClass(java.util.TimeZone);
-        importClass(java.util.Arrays);
-        var tz = attributes.get("zone"); //get attribute defined for scriptdef
-        println("    got attribute: " + tz);
-        var result = Arrays.asList(TimeZone.getAvailableIDs()).contains(tz); //testing if timezone is known
-        project.setProperty("zoneIsValid", result);
-    ]]> 
-</scriptdef> 
--->
-		
  </project>
