@@ -19,7 +19,11 @@
 				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
 				if(typeof(objectArray)=="object"){
 				for(x in objectArray){
-				icount++;
+					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+					if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					}else{
+						icount++;
+					};				
 				}							
 				}else{
 					iReturn=0;
@@ -89,12 +93,50 @@
 		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<testArrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
 		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
 		<listElementCountFlakaZZZ lista="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse: ${iSize}</echo>
+		<echo>ArrayGroesse von listElementCountFlakaZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		<fl:let>
+			myArraySize::=0; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<testArrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
+		<listElementCountFlakaZZZ lista="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von listElementCountFlakaZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+			<fl:let>
+			myArraySize::=1; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<testArrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
+		<listElementCountFlakaZZZ lista="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von listElementCountFlakaZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
 		
 		
-		<echo>myArray nachher (2): ${myArray}</echo>
 	</target>
   
 	<target name="myTestArrayDebugJsZZZ">
@@ -109,7 +151,8 @@
 		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 	
-		<!--TODO GOON -->	
+	
+		<!--TODO GOON:  -->	
 		<testArrayDebugJsZZZ arrayinput="${myArray}" value="blabla" arrayreturn="myArray"/>
 		
 		<!-- TODO: nun andere Arrays mit anderen Größen testen -->
@@ -130,34 +173,58 @@
 				var mySize = attributes.get("isize");	
 				print("iSize = '" + mySize + "'");
 				
-				//TODO: Prüfen, ob mySize eine Zahl ist. 
+				//Prüfen, ob mySize eine Zahl ist. 
 				//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
 				//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
-				
-				var myArrayReturn = new Array([mySize]);
+				if(isNumber(mySize)){
+					print("eine Zahl");
+					var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
+					
+					if(mySize==0){
+								//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+								myArrayReturn[0]="<#!!FGLEMPTY!!#>";
+					}
+					
 				//Definition eines Werts:
 				//myArrayReturn[0]="kljlkj";
 				//myArrayReturn[1]="ghfgh";
 				//myArrayReturn[2]="tuztuz"; //Die über die ursprüngliche Dimensionierung hinausgehende Erweiterung ist egal...
+									
+				}else{
+					print("KEINE Zahl");
+					var myArrayReturn = new Array();
+
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					myArrayReturn="<#!!FGLEMPTY!!#>";
+					}
 				
+			
 				project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+				
+				function isNumber(n) {
+					return !isNaN(parseFloat(n)) && isFinite(n);
+				}
 			]]>
 		</scriptdef>
 		
 			<scriptdef name="testArrayDebugJsZZZ" language="javascript">
-			<!-- Hiermit versuche ich an ein vorher erstelltes JavaScript-Array einen Wert anzuhängen,
-                   was daran scheitert, das die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt			-->
+			<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
+                   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
+				   - der Inhalt
+				   - die Größe des Arrays			-->
 			
 			 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
                      Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
 			<attribute name="arrayinput" />
-			<attribute name="value" />
-			<attribute name="arrayreturn" />		
+			<attribute name="ilevel" />	
 			<![CDATA[										 								
 				var myArray = attributes.get("arrayinput");					
-				var myValue = attributes.get("value");					
+				var myLevel = attributes.get("ilevel");					
+				if(myLevel<=0){
+					
+				}else{
 				
-				
+				<!-- Typausgabe -->
 				print("typeof myarray = " + typeof(myArray));
 						
 				
@@ -166,62 +233,66 @@
 					print("Array uebergeben bekommen");
 					iSize = myArray.length;
 					print("Arraygroesse="+iSize);
+					
+					//TODO: Die gleichen Ausgaben wie im KEIN ARRAY Fall.
+					//- Werte
 				}else{
 					print("kein Array uebergeben bekommen.");
 					
 					var icount=0;					
 					if(typeof(myArray)=="object"){
 					    print("Object uebergeben bekommen.");
-					
+						
+						if(myLevel>=2){
 					    //das listet alle Methoden des objekts auf.... scheint ein String zu sein....
-						for(x in myArray){
-							print(x);		
-							//print(typeof(x));
-							icount++;
-						};	
+						//print("ALLE METHODEN DES OBJEKTS:");
+						//for(x in myArray){
+						//	print(x);		
+						//};	
 						
-						print("myArray ist jetzt leider ein String ='"+ myArray +"'");
-						//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
-						
-
-						var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
-						for(x in objectArray){
-							print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
-						//	print(typeof(x));
-						};
-						
-						var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
-						for(x2 in objectArray02){
-							print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
-						//	print(typeof(x));
-						};
-						
-						var objectArrayString = myArray.toString();
-						var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
-						for(z in objectArray03){
-							print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
-						//	print(typeof(x));
-						};
-						
+						print("#################################");
+						print("ALLE METHODEN UND CODEINHALT DES OBJEKTS:");
 						for(xx in myArray){
 							print("xx: '"+ xx + "'");		//ABER: Damit bekommt man die Namen der Methoden
 							print("zugriff ueber xx: '" + myArray[xx] + "'"); //damit bekommt man codeinhalt der Methoden.
-							//	print(typeof(x));
+						};
+						};//myLevel>=2;
+						
+						print("#################################");
+						print("myArray ist jetzt leider ein String ='"+ myArray +"'");
+						//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
+						
+						print("splitte diesn String nach Komma.");
+						var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
+						for(x in objectArray){
+							print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
 						};
 						
-					//Merke: var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
-					 for(yy in objectArray){
-							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
-							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
-							//	print(typeof(x));
+						//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
+						//for(x2 in objectArray02){
+						//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
+						//};
+						
+						//var objectArrayString = myArray.toString();
+						//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
+						//for(z in objectArray03){
+						//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+						//};
+						
+						print("#################################");
+						print("Versuch die Werte auszugeben: ");	
+						//Merke: Voraussetzung ist:
+						//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+						 for(yy in objectArray){
+								print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+								print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+							};
+						}else{
+							print("kein Objekt");
+							//iReturn=0;
 						};
-					}else{
-						print("kein Objekt");
-						//iReturn=0;
-					};
 				};
-				
-				//project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+				};//myLevel <= 0;
 			]]>
 		</scriptdef>
 		
