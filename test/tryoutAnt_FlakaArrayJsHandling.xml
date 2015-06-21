@@ -4,7 +4,7 @@
 	
 		 <!-- ########################### -->
 		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
-		<scriptdef name="listElementCountFlakaZZZ" language="javascript">
+		<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
 			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
 			<attribute name="lista" />
@@ -20,7 +20,7 @@
 				if(typeof(objectArray)=="object"){
 				for(x in objectArray){
 					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-					if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
 					}else{
 						icount++;
 					};				
@@ -42,134 +42,69 @@
 			]]>
 		</scriptdef>
 		
-		 <!-- ########################### -->
-		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-							 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-		 <scriptdef name="substring" language="javascript">
-			 <attribute name="text" />
-			 <attribute name="start" />
-			 <attribute name="end" />
-			 <attribute name="property" />
-			 <![CDATA[
-			   var text = attributes.get("text");
-			   var start = attributes.get("start");
-			   var end = attributes.get("end") || text.length();
-			   project.setProperty(attributes.get("property"), text.substring(start, end));
-			 ]]>
-		  </scriptdef>
-		
-<!-- ################################################################################# -->
-<!-- Die einzelnen Tests im depends hinzufügen -->
- <target name="compile" depends="declaration,myTestArrayInitJsZZZ">
-    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
-	<!-- WIRD NICHT BENÖTIGT -->
-	
-    <!-- Compile the java code from ${src} into ${build} -->
-	<!-- example how to create a directory -->
-    <!-- <mkdir dir="${build}"/>
-	-->
-    
-	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
-	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
-    	<classpath refid="project.classpath"/>
-    </javac>
-	-->
-  </target>
-  
-  <target name="declaration">
-	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
-	  dies passiert hier durch flaka´s install-property handler task -->
-	  <fl:install-property-handler />	
-  </target>
-  
-	<target name="myTestArrayInitJsZZZ">
-		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
-		<fl:logo>myTestArrayInitJsZZZ:
-			Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
-		<fl:let>
-			myArraySize::=; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
-		<testArrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
-		
-		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
-		<listElementCountFlakaZZZ lista="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse von listElementCountFlakaZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
-		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLEMPTY!!#> drin stehen. -->
-		
-		<echo>#################################</echo>
-		<fl:let>
-			myArraySize::=0; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
-		<testArrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
-		
-		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
-		<listElementCountFlakaZZZ lista="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse von listElementCountFlakaZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
-		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLEMPTY!!#> drin stehen. -->
-		
-		<echo>#################################</echo>
-		
-			<fl:let>
-			myArraySize::=1; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
-		<testArrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
-		
-		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
-		<listElementCountFlakaZZZ lista="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse von listElementCountFlakaZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
-		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLEMPTY!!#> drin stehen. -->
-		
-		<echo>#################################</echo>
+		<scriptdef name="arrayValueTestFillZZZ" language="javascript">
+			<!-- Hiermit füllt man ein Array mit default-werten. Zu Testzwecken.
+			     TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
+				       Damit soll das Auffüllen der Testwerte auf einen bestimmten Indexbereich beschränkt werden. -->
+			
+            <!-- Merke: Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+				 
+			<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+                        Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+			<attribute name="arrayinput" />
+			<attribute name="ilbound" />
+			<attribute name="iubound" />
+			<attribute name="arrayreturn" />
+			<attribute name="ireturn" /><!-- true, false -->
+			<![CDATA[
+				var myArray = attributes.get("arrayinput");		 
+				var iReturn = "false";
+				var myArrayReturn = new Array();
+									
+				var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+				var icount=-1;
+				for(x in objectArray){
+					print("Wert vorher: '" + objectArray[x]+ "'");
+					icount++;
+				
+					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+					if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+						myArrayReturn[icount]="Wert "+ icount;
+					}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+						myArrayReturn[icount]="Neuer Wert "+ icount;
+					}else{
+						myArrayReturn[icount]=objectArray[x]+ " " + icount;
+					};				
+				}	
+
+				for(x in myArrayReturn){
+					print("Wert nachher: '" + myArrayReturn[x]+ "'");
+				}
+				
+					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 //for(yy in objectArray){
+					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+					//	};
+									
+				iReturn = "true";											
+			
+				project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+				project.setProperty(attributes.get("ireturn"), iReturn);
+			]]>
+		</scriptdef>
 		
 		
-	</target>
-  
-	<target name="myTestArrayDebugJsZZZ">
-		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
-		<fl:logo>myTestArrayDebugJsZZZ:
-		Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
-		<fl:let>
-			myArraySize::=; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
-		<testArrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-	
-	
-		<!--TODO GOON:  -->	
-		<testArrayDebugJsZZZ arrayinput="${myArray}" value="blabla" arrayreturn="myArray"/>
-		
-		<!-- TODO: nun andere Arrays mit anderen Größen testen -->
-		<echo>myArray nachher (2): ${myArray}</echo>
-		
-		<!-- TODO: nun testen etwas daran etwas anhaengen -->
-	</target> 
-	
-		<scriptdef name="testArrayInitJsZZZ" language="javascript">
-			<!-- Hiermit faked man die Erstellung eines Arrays -->
+		<scriptdef name="arrayInitJsZZZ" language="javascript">
+			<!-- Hiermit faked man die Erstellung eines Arrays.
+			     Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
 			
 			 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
                      Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
 			<attribute name="isize" />
 			<attribute name="arrayreturn" />		
-			<![CDATA[		
-								 
+			<![CDATA[										 
 				var mySize = attributes.get("isize");	
 				print("iSize = '" + mySize + "'");
 				
@@ -181,24 +116,28 @@
 					var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
 					
 					if(mySize==0){
-								//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-								myArrayReturn[0]="<#!!FGLEMPTY!!#>";
+						//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+						myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
 					}
-					
-				//Definition eines Werts:
-				//myArrayReturn[0]="kljlkj";
-				//myArrayReturn[1]="ghfgh";
-				//myArrayReturn[2]="tuztuz"; //Die über die ursprüngliche Dimensionierung hinausgehende Erweiterung ist egal...
-									
+					if(mySize>=1){
+						//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+						for(icount=0; icount<=mySize-1; icount++){
+							myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
+						}
+						
+						//Definition eines Werts:
+						//myArrayReturn[0]="kljlkj";
+						//myArrayReturn[1]="ghfgh";
+						//myArrayReturn[2]="tuztuz"; //Die über die ursprüngliche Dimensionierung hinausgehende Erweiterung ist egal...									
+					}								
 				}else{
 					print("KEINE Zahl");
 					var myArrayReturn = new Array();
 
 					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-					myArrayReturn="<#!!FGLEMPTY!!#>";
-					}
-				
-			
+					myArrayReturn="<#!!FGLUNDEFINED!!#>";
+				}
+							
 				project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
 				
 				function isNumber(n) {
@@ -207,7 +146,7 @@
 			]]>
 		</scriptdef>
 		
-			<scriptdef name="testArrayDebugJsZZZ" language="javascript">
+			<scriptdef name="arrayDebugJsZZZ" language="javascript">
 			<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
                    - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
 				   - der Inhalt
@@ -295,6 +234,153 @@
 				};//myLevel <= 0;
 			]]>
 		</scriptdef>
+		
+		 <!-- ########################### -->
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+							 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		 <scriptdef name="substring" language="javascript">
+			 <attribute name="text" />
+			 <attribute name="start" />
+			 <attribute name="end" />
+			 <attribute name="property" />
+			 <![CDATA[
+			   var text = attributes.get("text");
+			   var start = attributes.get("start");
+			   var end = attributes.get("end") || text.length();
+			   project.setProperty(attributes.get("property"), text.substring(start, end));
+			 ]]>
+		  </scriptdef>
+		
+<!-- ################################################################################# -->
+<!-- Die einzelnen Tests im depends hinzufügen -->
+<!-- <target name="compile" depends="declaration,myTestArrayInitJsZZZ"> -->
+<target name="compile" depends="declaration,myTestArrayDebugJsZZZ">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+  <target name="declaration">
+	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	  dies passiert hier durch flaka´s install-property handler task -->
+	  <fl:install-property-handler />	
+  </target>
+  
+	<target name="myTestArrayInitJsZZZ">
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayInitJsZZZ:
+			Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
+		<fl:let>
+			myArraySize::=; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		<fl:let>
+			myArraySize::=0; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+			<fl:let>
+			myArraySize::=1; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 1 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+				<fl:let>
+			myArraySize::=2; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 2 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+	</target>
+  
+	<target name="myTestArrayDebugJsZZZ">
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayDebugJsZZZ:
+		Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
+		<fl:let>
+			myArraySize::=2; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+	
+		<!-- TODO : Kopiere den wert in den ursprünglichen Variablennamen -->
+	
+		<!-- Unterschiedliche Debug - Level testen -->	
+		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="0"/>
+		
+		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="1"/>
+		
+		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="2"/>
+		
+	</target> 
+	
+	<target name="myTestArrayAppendJsZZZ">
+				<!-- TODO: nun testen etwas daran etwas anhaengen -->
+				<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+	</target>
+	
+		
 		
 		<!-- Beispiel für JAVA Arrays
 		<scriptdef name="validateTimeZone" language="javascript">

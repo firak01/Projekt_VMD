@@ -62,30 +62,45 @@
                      Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
                      Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
 					 Darum mit scriptdef behelfen. -->
-	<scriptdef name="arrayElementCountZZZ" language="javascript">
-		 <attribute name="lista" />
-		 <attribute name="iresult" />
-		 <![CDATA[
-		   var lista = attributes.get("lista");		 
-		   var iReturn = -1;
-		   		   
-		   print("typeof lista = " + typeof(lista));
-		   if(typeof(lista)=="object"){
-				if(Array.isArray(lista)){
-					print("Array vorhanden");
-					iReturn=lista.length;
+	 <!-- ########################### -->
+		 <!-- Verwende diese Scriptdef aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<scriptdef name="arrayElementCountJsZZZ" language="javascript">
+			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+			<attribute name="arrayinput" />
+			<attribute name="ireturn" />
+			<![CDATA[
+				var lista = attributes.get("arrayinput");		 
+				var iReturn = -1;
+											
+				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+				
+				var icount=0;
+				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+				if(typeof(objectArray)=="object"){
+				for(x in objectArray){
+					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+					if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+					}else{
+						icount++;
+					};				
+				}							
 				}else{
-					print("kein Array vorhanden");
 					iReturn=0;
 				}
-		   }else{
-				print("kein Objekt");
-				iReturn=0;
-		   }
-		  	  
-		   project.setProperty(attributes.get("iresult"), iReturn);
-		 ]]>
-	</scriptdef>
+				
+					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 //for(yy in objectArray){
+					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+					//	};
+									
+				iReturn = icount;
+				
+				project.setProperty(attributes.get("ireturn"), iReturn);
+			]]>
+		</scriptdef>
 	
 	
 	<scriptdef name="listElementCountFlakaZZZ" language="javascript">
@@ -481,7 +496,7 @@
 											<!-- 1. mit list(...) erzeugte statische liste klappt -->
 											<fl:let>tempa ::= list(1,2)</fl:let>	
 											<echo>groesse tempa  per size auf list(...)= #{size(tempa)}</echo>
-											<arrayElementCountZZZ lista="${tempa}" iresult="mylistasize"/>
+											<arrayElementCountJsZZZ arrayinput="${tempa}" iresult="mylistasize"/>
 											<echo>groesse tempa per scriptdef Aufruf auf list(...): ${mylistasize}</echo>
 											<!-- Fazit: Die so erzeugte liste wird nicht als JavaScript-Array erkannt -->
 											
