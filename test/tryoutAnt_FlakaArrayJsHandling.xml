@@ -2,259 +2,344 @@
 <project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 	
-		 <!-- ########################### -->
-		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
-		<scriptdef name="arrayElementCountJsZZZ" language="javascript">
-			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
-			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-			<attribute name="lista" />
-			<attribute name="ireturn" />
-			<![CDATA[
-				var lista = attributes.get("lista");		 
-				var iReturn = -1;
-											
-				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
-				
-				var icount=0;
-				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
-				if(typeof(objectArray)=="object"){
-				for(x in objectArray){
-					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-					if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-					}else{
-						icount++;
-					};				
-				}							
-				}else{
-					iReturn=0;
-				}
-				
-					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
-					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
-					 //for(yy in objectArray){
-					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
-					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
-					//	};
-									
-				iReturn = icount;
-				
-				project.setProperty(attributes.get("ireturn"), iReturn);
-			]]>
-		</scriptdef>
+	<scriptdef name="arrayAppendJsZZZ" language="javascript">
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
 		
-		<scriptdef name="arrayValueTestFillZZZ" language="javascript">
-			<!-- Hiermit füllt man ein Array mit default-werten. Zu Testzwecken.
-			     TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
-				       Damit soll das Auffüllen der Testwerte auf einen bestimmten Indexbereich beschränkt werden. -->
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="valueinput" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myValue = attributes.get("valueinput");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
 			
-            <!-- Merke: Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-				 
-			<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-                        Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-			<attribute name="arrayinput" />
-			<attribute name="ilbound" />
-			<attribute name="iubound" />
-			<attribute name="arrayreturn" />
-			<attribute name="ireturn" /><!-- true, false -->
-			<![CDATA[
-				var myArray = attributes.get("arrayinput");		 
-				var iReturn = "false";
-				var myArrayReturn = new Array();
-									
-				var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-				var icount=-1;
-				for(x in objectArray){
-					print("Wert vorher: '" + objectArray[x]+ "'");
-					icount++;
-				
-					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-					if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-						myArrayReturn[icount]="Wert "+ icount;
-					}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
-						myArrayReturn[icount]="Neuer Wert "+ icount;
-					}else{
-						myArrayReturn[icount]=objectArray[x]+ " " + icount;
-					};				
-				}	
-
-				for(x in myArrayReturn){
-					print("Wert nachher: '" + myArrayReturn[x]+ "'");
-				}
-				
-					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
-					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
-					 //for(yy in objectArray){
-					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
-					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
-					//	};
-									
-				iReturn = "true";											
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
 			
-				project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-				project.setProperty(attributes.get("ireturn"), iReturn);
-			]]>
-		</scriptdef>
-		
-		
-		<scriptdef name="arrayInitJsZZZ" language="javascript">
-			<!-- Hiermit faked man die Erstellung eines Arrays.
-			     Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			
-			 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-                     Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-			<attribute name="isize" />
-			<attribute name="arrayreturn" />		
-			<![CDATA[										 
-				var mySize = attributes.get("isize");	
-				print("iSize = '" + mySize + "'");
-				
-				//Prüfen, ob mySize eine Zahl ist. 
-				//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
-				//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
-				if(isNumber(mySize)){
-					print("eine Zahl");
-					var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
-					
-					if(mySize==0){
-						//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-						myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
 					}
-					if(mySize>=1){
-						//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-						for(icount=0; icount<=mySize-1; icount++){
-							myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
-						}
-						
-						//Definition eines Werts:
-						//myArrayReturn[0]="kljlkj";
-						//myArrayReturn[1]="ghfgh";
-						//myArrayReturn[2]="tuztuz"; //Die über die ursprüngliche Dimensionierung hinausgehende Erweiterung ist egal...									
-					}								
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
 				}else{
-					print("KEINE Zahl");
-					var myArrayReturn = new Array();
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
 
-					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-					myArrayReturn="<#!!FGLUNDEFINED!!#>";
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
+			icount=-1; icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					myArrayReturn[icount]=objectArray[x];
+				}else{
+					//nix
 				}
-							
-				project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-				
-				function isNumber(n) {
-					return !isNaN(parseFloat(n)) && isFinite(n);
-				}
-			]]>
-		</scriptdef>
-		
-			<scriptdef name="arrayDebugJsZZZ" language="javascript">
-			<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
-                   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
-				   - der Inhalt
-				   - die Größe des Arrays			-->
+			}
+						
+			//3. Erweitere das Array
+			icountGlobal++;
+			//print("Wert anhängen an position " + icountGlobal + ": '" + myValue + "'");
 			
-			 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-                     Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-			<attribute name="arrayinput" />
-			<attribute name="ilevel" />	
-			<![CDATA[										 								
-				var myArray = attributes.get("arrayinput");					
-				var myLevel = attributes.get("ilevel");					
-				if(myLevel<=0){
-					
-				}else{
-				
-				<!-- Typausgabe -->
-				print("typeof myarray = " + typeof(myArray));
-						
-				
-				var iSize=0;
-				if(Array.isArray(myArray)){
-					print("Array uebergeben bekommen");
-					iSize = myArray.length;
-					print("Arraygroesse="+iSize);
-					
-					//TODO: Die gleichen Ausgaben wie im KEIN ARRAY Fall.
-					//- Werte
-				}else{
-					print("kein Array uebergeben bekommen.");
-					
-					var icount=0;					
-					if(typeof(myArray)=="object"){
-					    print("Object uebergeben bekommen.");
-						
-						if(myLevel>=2){
-					    //das listet alle Methoden des objekts auf.... scheint ein String zu sein....
-						//print("ALLE METHODEN DES OBJEKTS:");
-						//for(x in myArray){
-						//	print(x);		
-						//};	
-						
-						print("#################################");
-						print("ALLE METHODEN UND CODEINHALT DES OBJEKTS:");
-						for(xx in myArray){
-							print("xx: '"+ xx + "'");		//ABER: Damit bekommt man die Namen der Methoden
-							print("zugriff ueber xx: '" + myArray[xx] + "'"); //damit bekommt man codeinhalt der Methoden.
-						};
-						};//myLevel>=2;
-						
-						print("#################################");
-						print("myArray ist jetzt leider ein String ='"+ myArray +"'");
-						//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
-						
-						print("splitte diesn String nach Komma.");
-						var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
-						for(x in objectArray){
-							print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
-						};
-						
-						//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
-						//for(x2 in objectArray02){
-						//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
-						//};
-						
-						//var objectArrayString = myArray.toString();
-						//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
-						//for(z in objectArray03){
-						//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
-						//};
-						
-						print("#################################");
-						print("Versuch die Werte auszugeben: ");	
-						//Merke: Voraussetzung ist:
-						//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
-						 for(yy in objectArray){
-								print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
-								print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
-							};
-						}else{
-							print("kein Objekt");
-							//iReturn=0;
-						};
-				};
-				};//myLevel <= 0;
-			]]>
-		</scriptdef>
+			//TODO An dieser Stelle bei der Erweiterung arrays anzuhängen: Prüfen, ob das ein Einzelwert oder ein Array ist.
+			myArrayReturn[icountGlobal]=myValue;
+																						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	<!-- ############################################################-->
+	<scriptdef name="arrayCopyJsZZZ" language="javascript">
+		<!-- Hiermit man ein Array in eine anderes neues Array.
+             Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
+             man aber noch mit dem alten 'Variablennamen' weiterarbeiten möchte.			 -->
 		
-		 <!-- ########################### -->
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			
+			//Kopiervorgang, noch ohne irgendwelche FlagControl Erweiterungen.			
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+				myArrayReturn[icount]=objectArray[x];
+			};
+															
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ########################### -->
+	<scriptdef name="arrayDebugJsZZZ" language="javascript">
+		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
+			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
+			   - der Inhalt
+			   - die Größe des Arrays			-->
+		
 		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-							 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-		 <scriptdef name="substring" language="javascript">
-			 <attribute name="text" />
-			 <attribute name="start" />
-			 <attribute name="end" />
-			 <attribute name="property" />
-			 <![CDATA[
-			   var text = attributes.get("text");
-			   var start = attributes.get("start");
-			   var end = attributes.get("end") || text.length();
-			   project.setProperty(attributes.get("property"), text.substring(start, end));
-			 ]]>
-		  </scriptdef>
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="arrayinput" />
+		<attribute name="ilevel" />	
+		<![CDATA[										 								
+			var myArray = attributes.get("arrayinput");					
+			var myLevel = attributes.get("ilevel");					
+			if(myLevel<=0){
+				
+			}else{
+			
+			<!-- Typausgabe -->
+			print("typeof myarray = " + typeof(myArray));
+					
+			
+			var iSize=0;
+			if(Array.isArray(myArray)){
+				print("Array uebergeben bekommen");
+				iSize = myArray.length;
+				print("Arraygroesse="+iSize);
+				
+				//TODO: Die gleichen Ausgaben wie im KEIN ARRAY Fall.
+				//- Werte
+			}else{
+				print("kein Array uebergeben bekommen.");
+				
+				var icount=0;					
+				if(typeof(myArray)=="object"){
+					print("Object uebergeben bekommen.");
+					
+					if(myLevel>=2){
+					//das listet alle Methoden des objekts auf.... scheint ein String zu sein....
+					//print("ALLE METHODEN DES OBJEKTS:");
+					//for(x in myArray){
+					//	print(x);		
+					//};	
+					
+					print("#################################");
+					print("ALLE METHODEN UND CODEINHALT DES OBJEKTS:");
+					for(xx in myArray){
+						print("xx: '"+ xx + "'");		//ABER: Damit bekommt man die Namen der Methoden
+						print("zugriff ueber xx: '" + myArray[xx] + "'"); //damit bekommt man codeinhalt der Methoden.
+					};
+					};//myLevel>=2;
+					
+					print("#################################");
+					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
+					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
+					
+					print("splitte diesn String nach Komma.");
+					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
+					for(x in objectArray){
+						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					};
+					
+					//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
+					//for(x2 in objectArray02){
+					//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
+					//};
+					
+					//var objectArrayString = myArray.toString();
+					//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
+					//for(z in objectArray03){
+					//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					//};
+					
+					print("#################################");
+					print("Versuch die Werte auszugeben: ");	
+					//Merke: Voraussetzung ist:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 for(yy in objectArray){
+							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+						};
+					}else{
+						//print("kein Objekt");
+					};
+			};
+			};//myLevel <= 0;
+		]]>
+	</scriptdef>
+	
+	 <!-- ########################### -->
+	 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		<attribute name="lista" />
+		<attribute name="ireturn" />
+		<![CDATA[
+			var lista = attributes.get("lista");		 
+			var iReturn = -1;
+										
+			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+			var icount=0;
+			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+			if(typeof(objectArray)=="object"){
+			for(x in objectArray){
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				}else{
+					icount++;
+				};				
+			}							
+			}else{
+				iReturn=0;
+			}
+			
+			iReturn = icount;
+			
+			project.setProperty(attributes.get("ireturn"), iReturn);
+		]]>
+	</scriptdef>
+		
+		
+		
+		
+	<scriptdef name="arrayInitJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Erstellung eines Arrays.
+			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="isize" />
+		<attribute name="arrayreturn" />		
+		<![CDATA[										 
+			var mySize = attributes.get("isize");	
+			//print("iSize = '" + mySize + "'");
+			
+			//Prüfen, ob mySize eine Zahl ist. 
+			//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
+			//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
+			if(isNumber(mySize)){
+				//print("eine Zahl");
+				var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
+				
+				if(mySize==0){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+				}
+				if(mySize>=1){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					for(icount=0; icount<=mySize-1; icount++){
+						myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
+					}												
+				}								
+			}else{
+				//print("KEINE Zahl");
+				var myArrayReturn = new Array();
+
+				//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+				myArrayReturn="<#!!FGLUNDEFINED!!#>";
+			}
+						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
+		]]>
+	</scriptdef>
+		
+		
+		
+	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
+		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
+			 TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
+				   Damit soll das Auffüllen der Testwerte auf einen bestimmten Indexbereich beschränkt werden. -->
+		
+		<!-- Merke: Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="arrayinput" />
+		<attribute name="ilbound" />
+		<attribute name="iubound" />
+		<attribute name="arrayreturn" />
+		<attribute name="ireturn" /><!-- true, false -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var iReturn = false;
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			for(x in objectArray){
+				//print("Wert vorher: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+					myArrayReturn[icount]="<#!!FGLUNDEFINED!!#>";		//Wenn undefiniert, dann bleibt der Wert undefiniert.
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					myArrayReturn[icount]="Neuer Wert "+ icount; 		//Leere Werte werden automatisch erzeugt.
+				}else{
+					myArrayReturn[icount]=objectArray[x]+ " " + icount; //Bestehende Werte werden verändert.
+				};				
+			}	
+
+			//for(x in myArrayReturn){
+			//	print("Wert nachher: '" + myArrayReturn[x]+ "'");
+			//}														
+			iReturn = true;											
+		
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			project.setProperty(attributes.get("ireturn"), iReturn);
+		]]>
+	</scriptdef>
+		
+		
+		
+	 <!-- ########################### -->
+	 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+						 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+	 <scriptdef name="substring" language="javascript">
+		 <attribute name="text" />
+		 <attribute name="start" />
+		 <attribute name="end" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   var text = attributes.get("text");
+		   var start = attributes.get("start");
+		   var end = attributes.get("end") || text.length();
+		   project.setProperty(attributes.get("property"), text.substring(start, end));
+		 ]]>
+	  </scriptdef>
 		
 <!-- ################################################################################# -->
 <!-- Die einzelnen Tests im depends hinzufügen -->
-<!-- <target name="compile" depends="declaration,myTestArrayInitJsZZZ"> -->
-<target name="compile" depends="declaration,myTestArrayDebugJsZZZ">
+<!-- <target name="compile" depends="declaration,myTestArrayInitJsZZZ,myTestArrayDebugJsZZZ"> -->
+<target name="compile" depends="declaration,myTestArrayAppendJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -352,7 +437,7 @@
 	<target name="myTestArrayDebugJsZZZ">
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
 		<fl:logo>myTestArrayDebugJsZZZ:
-		Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
+		Meine Loesung: Scriptdef arrayDebugJsZZZ</fl:logo>		
 		<fl:let>
 			myArraySize::=2; 
 		</fl:let>
@@ -362,7 +447,7 @@
 		<echo>myArray nachher: ${myArray}</echo>
 	
 		<!-- Werte eingeben -->
-		<arrayValueTestFillZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
 	
 		<!-- TODO : Kopiere den wert in den ursprünglichen Variablennamen -->
 	
@@ -376,9 +461,140 @@
 	</target> 
 	
 	<target name="myTestArrayAppendJsZZZ">
-				<!-- TODO: nun testen etwas daran etwas anhaengen -->
-				<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<!-- Testen etwas an ein Array anzuhaengen -->
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayAppendJsZZZ:
+		Meine Loesung: Scriptdef arrayAppendJsZZZ</fl:logo>	
+
+
+		<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array mit 3 'initialisieren' -->
+		<fl:let>
+			myArraySize::=3; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Wert an das Array anhängen -->
+		<fl:let>
+			mySingleValue::= "angehängter Wert"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+		
+		<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array mit 2 'initialisieren' -->	
+		<fl:let>
+			myArraySize::=2; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+	
+		<!-- Wert an das Array anhängen -->
+		<fl:let>
+			mySingleValue::= "angehängter Wert"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+		
+		
+		<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array mit 1 'initialisieren' -->
+		<fl:let>
+			myArraySize::=1; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+	
+		<!-- Wert an das Array anhängen -->
+		<fl:let>
+			mySingleValue::= "angehängter Wert"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+		
+		
+		<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array mit 0 'initialisieren' -->
+		<fl:let>
+			myArraySize::=0; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />	
+	
+		<!-- Wert an das Array anhängen -->
+		<fl:let>
+			mySingleValue::= "angehängter Wert"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+			
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+				
+	<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array nur 'initialisieren' -->
+		<fl:let>
+			myArraySize::=; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		
+		<!-- Wert an das Array anhängen -->
+		<fl:let>
+			mySingleValue::= "angehängter Wert"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+				
 	</target>
+		
+		
 	
 		
 		
