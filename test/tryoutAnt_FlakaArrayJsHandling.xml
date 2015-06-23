@@ -206,7 +206,7 @@
 		<attribute name="arrayinput" />
 		<attribute name="ireturn" />
 		<![CDATA[
-			var lista = attributes.get("lista");		 
+			var lista = attributes.get("arrayinput");		 
 			var iReturn = -1;
 										
 			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert

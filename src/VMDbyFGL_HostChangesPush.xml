@@ -31,7 +31,7 @@
 		<attribute name="arrayinput" />
 		<attribute name="ireturn" />
 		<![CDATA[
-			var lista = attributes.get("lista");		 
+			var lista = attributes.get("arrayinput");		 
 			var iReturn = -1;
 										
 			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
@@ -368,15 +368,12 @@
 									<fl:choose>
 										<when test=" '${myLeftPart}'.tofile.exists == true ">
 											<echo>Datei existiert (von...): ${myLeftPart}</echo>
-											
-											<!-- Erstelle / Initialisiere neu eine Liste der "Zieldateien", das kann nur eine sein oder auch alle Dateien eines Verzeichnisses -->
-											<fl:let>listaDestinationFiles ::= list()</fl:let>
-											
+																																	
 											<!-- Prüfe, ob es ein Verzeichnis ist -->
-											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<echo>linker Teil: isdirectory=${myisdirectory}</echo>
+											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+											<echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo>
 											<!-- A) Linker Teil - Verzeichnis-Fall: TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
-											<fl:when test="true('${myisdirectory}')">
+											<fl:when test="true('${myisdirectoryLeftPart}')">
 												<fl:fail message="Linker Teil der Steuerungsanweisung ist ein Verzeichnis: ${myLeftPart}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 											</fl:when>
 											
@@ -385,22 +382,77 @@
 											<!-- TODO: Prüfe, ob der rechte Teil ein Verzeichnis ist... -->
 											<!-- Falls JA: Hole vom linken Teil den Dateinamen und hänge ihn an das Verzeichnis an -->
 											<!-- Falls NEIN: Nimm das Verzeichnis, wie es ist. -->																												
-											<isDirectoryZZZ text="${myRightPart}" property="myisdirectory" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<echo>Rechter Teil: isdirectory=${myisdirectory}</echo>																								
+											<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+											<echo>Rechter Teil: isdirectory=${myisdirectoryRightPart}</echo>																								
 											<fl:choose>
 												<!-- Die Vorgehensweise beim Kopieren erfordert es, dass es eine Variable für das Verzeichnis und eine Variable für die Datei gibt. (für das fileset include) -->
-												<when test=" '${myisdirectory}'=='true'">
+												<when test=" '${myisdirectoryRightPart}'=='true'">
+												
+													<!-- wenn der rechte Teil nun ein Verzeichnis ist... -->
+													<!-- Erstelle / Initialisiere neu eine Liste der "Zieldateien", das kann nur eine sein oder auch alle Dateien eines Verzeichnisses -->
+													<!-- <fl:let>listaDestinationFiles ::= list()</fl:let> -->
+												
 													<echo>Rechter Teil (nach...) ${myRightPart} ist ein Verzeichnis </echo>
 													<fl:let>dest.filedir ::= ${myRightPart}</fl:let>
-													<fl:let>dest.filename ::= ${src.filename}</fl:let>																									
+													<fl:let>dest.filename ::= ${src.filename}</fl:let>
+
+													
+											
 												</when>
-												<otherwise>
+												<otherwise>													
 													<echo>Rechter Teil (nach...) ${myRightPart} ist KEIN Verzeichnis </echo>
 													<!-- TODO GOON: Hole den Namen des Verzeichnisses (als Pfad), hole den Dateinamen -->
-													<fl:let>dest.filedir ::= split('${myRightPart}','\\')[0]</fl:let>
-													<fl:let>dest.filename ::= split('${myRightPart}','\\')[1]</fl:let>
+													<!-- TODO GOON: 20150622 HIER die Indexberechnung und ggfs. sogar das holen des letzten Werts als Scriptdef.
+																				Momentan bestehende Scriptdefs anwenden -->													
+													<fl:let>dest.fileapath ::= split('${myRightPart}','\\\\')</fl:let>													
+													<echo>Nach dem split: ${dest.fileapath}</echo>
+													
+													<arrayElementCountJsZZZ arrayinput="${dest.fileapath}" ireturn="myaFilePathSize"/>
+													<echo>Groesse dest.fileapath per scriptdef Aufruf: ${myaFilePathSize}</echo>
+																						
+													<!-- <fl:for var="mydir" in="split('${myLeftPart}','\\\\')"> -->
+													<!-- <echo>Pfadbestandteil: #{mydir}</echo -->><!-- Aufruf der Variablen als EL Expression -->
+													<!-- </fl:for> -->
+													
+																																																													
 												</otherwise>
 											</fl:choose>
+											
+											<!-- Merke: choose ineinander zu verschachteln ist nicht erlaubt. -->
+											<fl:choose>
+												<when test=" '${myaFilePathSize}'=='1' and '${myisdirectoryRightPart}'=='true'">
+													<echo>Rechts steht nur ein Wert... das sollte der Dateiname sein: ${myRightPart}</echo>
+												</when>
+												<otherwise>
+													<echo>Rechts steht ein Dateiname: ${myRightPart}</echo>
+												
+													<!-- 3. Ermittle die letzte Indexposition und damit den Dateinamen -->
+													<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
+															   Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
+													<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+													<var name="op1" value="${myaFilePathSize}"/>
+													<var name="op2" value="1"/>
+													<var name="op" value="-"/>
+													<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+													<echo>Errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
+													<fl:let>
+														xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
+													</fl:let>
+													<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>	
+													<fl:let>dest.filename ::= ${xtractedvalue}</fl:let>
+													
+													<!-- 4. Füge den Dateinamen hinter den Pfad, der von der linken Seite kommt hinzu, 
+													wenn auf der rechten Seite kein Pfad vorhanden ist. -->
+													
+													<!-- 4.1 mache aus dem linken Teil nun ein Array. -->
+													<fl:let>src.fileapath ::= split('${myLeftPart}','\\\\')</fl:let>
+													<echo>Nach dem split: ${src.fileapath}</echo>
+																																			
+													<!-- TODO: Array Aufaddieren von indexposition x bis zu einer anderen Indexposition
+																arrayStringImplode mit den Parametern sSeparator, ilBound, iuBound -->
+													<!-- TODO: An den so implodierten String das \\extractedvalue anhängen. -->
+												</otherwise>
+											</fl:choose>	
 											<fl:echo>dest.filedir => ${dest.filedir}</fl:echo>
 											<fl:echo>dest.filename => ${dest.filename}</fl:echo>
 											
@@ -419,7 +471,7 @@
 											<echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</echo>
 																						
 											<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
-											<echo>#{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
+											<echo>Pfadbestandteil: #{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
 											</fl:for>
 											
 											<!-- 3. Ermittle die Indexposition -->
