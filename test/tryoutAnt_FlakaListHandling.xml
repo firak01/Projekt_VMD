@@ -123,7 +123,8 @@ append('a',2)                  ; list('a',2)
 	<echo>2) aa[1] = #{${aa}[1]}</echo>	
 	<echo>3) aa[1] = ${aa}[1]</echo>	
 	<echo>4) aa[1] = ${aa[1]}</echo>
-	<!-- FAZIT: LISTENOPPERATIONEN SIND SCHEISSE, erweitern und zugriff per Index in Kombination mit Variablen geht gar nicht, sowie Schleifen. -->
+	<!-- FAZIT: LISTENOPPERATIONEN SIND SCHEISSE, erweitern und zugriff per Index in Kombination mit Variablen geht gar nicht, sowie Schleifen. 
+	            Darum entwickle ich meine eigenen Array...JsZZZ Scriptdef Tags.-->
 </target>
 	
 	<!-- ################################################ -->
@@ -143,8 +144,10 @@ append('a',2)                  ; list('a',2)
 		<echo>groesse aaa per scriptdef Aufruf auf list(...): ${mylistasize}</echo>
 	</target> 
 	
-	
+	    
 		<scriptdef name="listElementCountFlakaZZZ" language="javascript">
+			<!-- MEreke: Veraltete Version: Die aktuelle Version wird immer im tryoutAnt_FlakaArrayJsHandling weiterentwickelt -->
+			
 			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
 			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
 			<attribute name="lista" />

@@ -2,6 +2,7 @@
 <project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 	
+	<!-- ############################################################-->
 	<scriptdef name="arrayAppendJsZZZ" language="javascript">
 		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
 		
@@ -69,6 +70,7 @@
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
 		]]>
 	</scriptdef>
+	
 	<!-- ############################################################-->
 	<scriptdef name="arrayCopyJsZZZ" language="javascript">
 		<!-- Hiermit man ein Array in eine anderes neues Array.
@@ -190,12 +192,18 @@
 		]]>
 	</scriptdef>
 	
-	 <!-- ########################### -->
-	 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+	 <!-- ########################### -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
 		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-		<attribute name="lista" />
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
+		<attribute name="arrayinput" />
 		<attribute name="ireturn" />
 		<![CDATA[
 			var lista = attributes.get("lista");		 
@@ -222,10 +230,8 @@
 			project.setProperty(attributes.get("ireturn"), iReturn);
 		]]>
 	</scriptdef>
-		
-		
-		
-		
+			
+	<!-- ############################################################-->		
 	<scriptdef name="arrayInitJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Erstellung eines Arrays.
 			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
@@ -270,9 +276,8 @@
 			}
 		]]>
 	</scriptdef>
-		
-		
-		
+				
+	<!-- ############################################################-->	
 	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
 		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
 			 TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
@@ -317,13 +322,11 @@
 			project.setProperty(attributes.get("ireturn"), iReturn);
 		]]>
 	</scriptdef>
-		
-		
-		
-	 <!-- ########################### -->
-	 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			
+	<!-- ########################### -->	
+	<scriptdef name="substring" language="javascript">
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 						 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-	 <scriptdef name="substring" language="javascript">
 		 <attribute name="text" />
 		 <attribute name="start" />
 		 <attribute name="end" />
@@ -376,7 +379,7 @@
 		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
 		
 		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
 		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
 		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
 		
@@ -392,7 +395,7 @@
 		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
 		
 		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
 		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
 		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
 		
@@ -409,7 +412,7 @@
 		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
 		
 		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
 		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 1 zurückgeben. -->
 		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
 		
@@ -426,7 +429,7 @@
 		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
 		
 		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ lista="${myArray}" ireturn="iSize"/>
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
 		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 2 zurückgeben. -->
 		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
 		

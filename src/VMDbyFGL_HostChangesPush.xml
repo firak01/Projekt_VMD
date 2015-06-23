@@ -20,23 +20,43 @@
 		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
-	
-	
-	
-	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
-	<scriptdef name="substringZZZ" language="javascript">
-		 <attribute name="text" />
-		 <attribute name="start" />
-		 <attribute name="end" />
-		 <attribute name="property" />
-		 <![CDATA[
-		   var text = attributes.get("text");
-		   var start = attributes.get("start");
-		   var end = attributes.get("end") || text.length();
-		   project.setProperty(attributes.get("property"), text.substring(start, end));
-		 ]]>
-	</scriptdef>
 		
+    <!-- ######## Scriptdefs ############################################################################--> 		
+	<!-- ########################### -->	
+	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<attribute name="arrayinput" />
+		<attribute name="ireturn" />
+		<![CDATA[
+			var lista = attributes.get("lista");		 
+			var iReturn = -1;
+										
+			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+			var icount=0;
+			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+			if(typeof(objectArray)=="object"){
+			for(x in objectArray){
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				}else{
+					icount++;
+				};				
+			}							
+			}else{
+				iReturn=0;
+			}
+			
+			iReturn = icount;
+			
+			project.setProperty(attributes.get("ireturn"), iReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ########################### -->		
 	<scriptdef name="isDirectoryZZZ" language="javascript">
 		 <attribute name="text" />
 		 <attribute name="property" />
@@ -58,115 +78,22 @@
 		 ]]>
 	</scriptdef>
 	
-	<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
-                     Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
-                     Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
-					 Darum mit scriptdef behelfen. -->
-	 <!-- ########################### -->
-		 <!-- Verwende diese Scriptdef aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
-		<scriptdef name="arrayElementCountJsZZZ" language="javascript">
-			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
-			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-			<attribute name="arrayinput" />
-			<attribute name="ireturn" />
-			<![CDATA[
-				var lista = attributes.get("arrayinput");		 
-				var iReturn = -1;
-											
-				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
-				
-				var icount=0;
-				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
-				if(typeof(objectArray)=="object"){
-				for(x in objectArray){
-					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-					if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-					}else{
-						icount++;
-					};				
-				}							
-				}else{
-					iReturn=0;
-				}
-				
-					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
-					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
-					 //for(yy in objectArray){
-					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
-					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
-					//	};
-									
-				iReturn = icount;
-				
-				project.setProperty(attributes.get("ireturn"), iReturn);
-			]]>
-		</scriptdef>
-	
-	
-	<scriptdef name="listElementCountFlakaZZZ" language="javascript">
-		 <!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
-              Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-		 <attribute name="lista" />
-		 <attribute name="iresult" />
+	<!-- ########################### -->
+	<scriptdef name="substringZZZ" language="javascript">
+	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
+		 <attribute name="text" />
+		 <attribute name="start" />
+		 <attribute name="end" />
+		 <attribute name="property" />
 		 <![CDATA[
-		   var lista = attributes.get("lista");		 
-		   var iReturn = -1;
-		   		   
-			//print("typeof lista = " + typeof(lista));
-			// print("Objekt: " + lista);
-		   
-		   //... DAS GIBT ALLE METHODEN ZURUECK !!!! 
-		   //for(obj in lista){
-			//print("obj=" + obj);
-		   //}
-		   
-		   /*
-		   if(Array.isArray(objectArray)){
-					//print("Array erzeugt.");
-					iReturn = objectArray.length;
-				}else{
-					//print("kein Array erzeugt.");
-					iReturn=0;
-				}
-			*/
-			
-			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
-			
-			var icount=0;
-			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein Array
-			if(typeof(objectArray)=="object"){
-				for(x in objectArray){
-					//print(x);		
-					//print(typeof(x));
-					icount++;
-				}							
-		   }else{
-				//print("kein Objekt");
-				iReturn=0;
-		   }
-		   
-		   iReturn = icount;
-		   
-		   project.setProperty(attributes.get("iresult"), iReturn);
+		   var text = attributes.get("text");
+		   var start = attributes.get("start");
+		   var end = attributes.get("end") || text.length();
+		   project.setProperty(attributes.get("property"), text.substring(start, end));
 		 ]]>
 	</scriptdef>
-	<!--
-	var objectArray = lista.toString().split(",");
-				
-		   if(typeof(objectArray)=="object"){
-				if(Array.isArray(objectArray)){
-					print("Array erzeugt.");
-					iReturn = objectArray.length;
-				}else{
-					print("kein Array erzeugt.");
-					iReturn=0;
-				}				
-		   }else{
-				print("kein Objekt");
-				iReturn=0;
-		   }
-		 -->
-   
+
+	   
   <!-- ######### Set global properties for this build ####################################################-->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
        <property name="build" value="${BUILDTARGET}"/> -->
@@ -481,35 +408,23 @@
 											<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
 											<!-- <echo>src.filedir = #{split('aabcc','b')[0]}</echo> -->
 											
-											<!-- Z.B.: Hiermit holt man ggfs. den Laufwerksnamen -->
-											<echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo><!-- 4 Backslashe um den Backslash zu escapen in der split - Funktion -->
-											<fl:let>src.fileadir ::= split('${myLeftPart}','\\\\')</fl:let>											
-											<!-- <echo>groesse src.fileadir = #{size('${src.fileadir}')}</echo> --><!-- ermittle die groesse der liste -->
-											<!-- <echo>groesse src.fileadir = #{size(${src.fileadir})}</echo> -->
+											<!-- Z.B.: Hiermit holt man ggfs. den Laufwerksnamen, oder auch das letzte Element -->
+											<!-- <echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo> -->
+											<fl:let>src.fileadir ::= split('${myLeftPart}','\\\\')</fl:let><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
 											
-										
-											<!-- TODO: Dies in ein tryout...Liste packen und nachvollziehbar machen tryoutAnt_FlakaListHandling-->		
-											<echo>groesse einer Liste mit size(...) = #{size(list(1,2))}</echo><!-- funktioniert -->
-											<echo>Groesse src.fileadir per size(...) = #{size(split('${myLeftPart}','\\\\'))}</echo><!-- Das ergibt 0 als Größe des "Objekts" nach dem split. Was falsch ist... -->
+											<!-- 2. ermittle die groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
+											<!--    Merke: #{size(${src.fileadir})} funktioniert nicht. Siehe tryoutAnt_FlakaListHandling -->																													
+											<!-- 			Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
+											<arrayElementCountJsZZZ arrayinput="${src.fileadir}" ireturn="mylistasize"/>
+											<echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</echo>
 																						
-											<!-- Beweis: Die ermittlung der Listengröße einer Variable funktioniert nicht -->
-											<!-- 1. mit list(...) erzeugte statische liste klappt -->
-											<fl:let>tempa ::= list(1,2)</fl:let>	
-											<echo>groesse tempa  per size auf list(...)= #{size(tempa)}</echo>
-											<arrayElementCountJsZZZ arrayinput="${tempa}" iresult="mylistasize"/>
-											<echo>groesse tempa per scriptdef Aufruf auf list(...): ${mylistasize}</echo>
-											<!-- Fazit: Die so erzeugte liste wird nicht als JavaScript-Array erkannt -->
-											
-											<!-- 2. nutze auf src.fileadir den scriptdef aufruf -->
-											<listElementCountFlakaZZZ lista="${src.fileadir}" iresult="mylistasize"/>
-											<echo>groesse src.fileadir per scriptdef Aufruf: ${mylistasize}</echo>
-											
-											<!-- <fl:for var="mydir" in="list(${src.fileadir})"> -->
-											<!-- <fl:for var="mydir" in="list(1,2)"> -->
 											<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
 											<echo>#{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
 											</fl:for>
 											
+											<!-- 3. Ermittle die Indexposition -->
+											<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
+											           Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
 											<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
 											<var name="op1" value="${mylistasize}"/>
 											<var name="op2" value="1"/>
