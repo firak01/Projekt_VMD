@@ -383,7 +383,23 @@
 											<!-- Falls JA: Hole vom linken Teil den Dateinamen und hänge ihn an das Verzeichnis an -->
 											<!-- Falls NEIN: Nimm das Verzeichnis, wie es ist. -->																												
 											<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<echo>Rechter Teil: isdirectory=${myisdirectoryRightPart}</echo>																								
+											<echo>Rechter Teil: isdirectory=${myisdirectoryRightPart}</echo>			
+											<!-- snipp - Auslagerung der Choose-Abfragen-->
+						
+											
+										</when>
+										<otherwise>
+												<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo><!-- hier auch kein fail, sondern nur diese Warnung -->												
+										</otherwise>
+									</fl:choose>
+
+
+									<!-- START: codeschnipsel wieder eingefügt... 
+									      Aber: Vielleicht ist eine if - Consturktion besser als "when"... 
+										           wegen der Verschachtelung -->
+												   
+												   
+												   <!-- Merke: Choose ineineander zu verschachteln ist nicht erlaubt. -->
 											<fl:choose>
 												<!-- Die Vorgehensweise beim Kopieren erfordert es, dass es eine Variable für das Verzeichnis und eine Variable für die Datei gibt. (für das fileset include) -->
 												<when test=" '${myisdirectoryRightPart}'=='true'">
@@ -516,11 +532,19 @@
 												<include name="**.txt"/>
 											  </fileset>
 											</copy>
-										</when>
-										<otherwise>
-												<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo><!-- hier auch kein fail, sondern nur diese Warnung -->												
-										</otherwise>
-									</fl:choose>			
+												   
+												   
+												   
+												   
+												   
+												   
+												   
+												   
+												   
+											<!-- ENDE: codeschnipsel wieder eingefügt... 
+									      Aber: Vielleicht ist eine if - Consturktion besser als "when"... 
+										           wegen der Verschachtelung -->
+
 								</else>
 							</if>											
 						</else>
