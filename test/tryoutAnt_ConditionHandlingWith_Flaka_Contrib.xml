@@ -30,23 +30,54 @@
 		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
 		<attribute name="valueinput" />
-		 <attribute name="valuereturn" />
-		 <attribute name="isboolean" />
-		 <![CDATA[		   		  
-		   var berg = false;
-		   var breturn = false;
+		<attribute name="valuereturn" />
+		<attribute name="isboolean" />
+		<![CDATA[		   		  
+		   var bBooleanValue = null;
+		   var bIsBoolean = null;
 		   
 		   var myValueInput = attributes.get("valueinput");
-		   print("myValueInput='"+myValueInput+"'");
-		   if (myValueInput=='true') {			   
-		       berg = true;
-			   breturn = true;
-			};
-
+		   print("myValueInput='"+myValueInput+"'");		   			
+			if(isNumber(myValueInput)){
+				print("boolean liegt als Zahl vor.");	
+				if (myValueInput=='1') {			   
+					bBooleanValue = true;
+					bIsBoolean = true;
+				}else if(myValueInput=='0'){
+					bBooleanValue = false;
+					bIsBoolean = true;
+				}else{
+					bBooleanValue = null;
+					bIsBoolean = false;
+				};
+			}else{			
+				print("boolean liegt als String vor.");	
+				if (myValueInput=='true') {			   
+				   bBooleanValue = true;
+				   bIsBoolean = true;
+				}else if(myValueInput=='false') {
+					bBooleanValue = false;
+					bIsBoolean = true;				
+				}else{					
+					bIsBoolean = false;
+				};			
+			}
+						
+			project.setProperty(attributes.get("valuereturn"), bBooleanValue);
+			project.setProperty(attributes.get("isboolean"), bIsBoolean);
 			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
 			
-			project.setProperty(attributes.get("valuereturn"), berg);
-			project.setProperty(attributes.get("isboolean"), breturn)
+			//TODO: Diese Funktion in JSZ-Kernel Bibliotheken packen. 
+			//TODO: In einer entsprechenden Scriptdef Funktion nutzen.
+			function convertBoolToInt()
+			{
+				var testBool = true;
+				result = (testBool)?1:0;
+				alert(result);
+			}
 		 ]]>
 	</scriptdef>
 	   
@@ -80,7 +111,7 @@
 </target>
   
   <!-- ################################################################################# -->
- <target name="compile" depends="declaration, init,myTestAntcontribIf,myTestFlakaChoose">
+ <target name="compile" depends="declaration, init,myTestIsBoolean,myTestAntcontribIf,myTestFlakaChoose">
 
 	<!-- WIRD NICHT BENOETIGT -->
 	
@@ -110,6 +141,56 @@
 	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
 </target>
   
+ <!-- ######################################################### -->  
+<target name="myTestIsBoolean">
+	<echo>######################################</echo>
+	<fl:let>mytestBool ::= 'true'</fl:let>
+	<echo>mytestBool, String = ${mytestBool}</echo>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueIsBoolean = ${myValueIsBoolean} </echo>
+	
+	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBooleanß2 = ${myValueIsBoolean02} </echo>
+	
+	<echo>---------------------------------------------------------------------------------------------</echo>
+	<fl:let>mytestBool ::= 'bloedsinn'</fl:let>
+	<echo>mytestBool, String = ${mytestBool}</echo>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueA" isboolean="myValueIsBooleanA" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValueA = ${myBooleanValueA} | myValueIsBooleanA = ${myValueIsBooleanA} </echo>
+	
+	<isBooleanZZZ valueinput="${myBooleanValueA}" valuereturn="myBooleanValue02A" isboolean="myValueIsBoolean02A" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02A = ${myBooleanValue02A} | myValueIsBoolean02A = ${myValueIsBoolean02A} </echo>
+	
+	<echo>---------------------------------------------------------------------------------------------</echo>
+	<fl:let>mytestBool ::= '1'</fl:let>
+	<echo>mytestBool, String = ${mytestBool}</echo>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueB" isboolean="myValueIsBooleanB" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValueB = ${myBooleanValueB} | myValueIsBooleanB = ${myValueIsBooleanB} </echo>
+	
+	<isBooleanZZZ valueinput="${myBooleanValueB}" valuereturn="myBooleanValue02B" isboolean="myValueIsBoolean02B" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02B = ${myBooleanValue02B} | myValueIsBoolean02B = ${myValueIsBoolean02B} </echo>
+	
+	<echo>---------------------------------------------------------------------------------------------</echo>
+	<fl:let>mytestBool ::= 'eins'</fl:let>
+	<echo>mytestBool, String = ${mytestBool}</echo>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueC" isboolean="myValueIsBooleanC" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValueC = ${myBooleanValueC} | myValueIsBooleanC = ${myValueIsBooleanC} </echo>
+	
+	<isBooleanZZZ valueinput="${myBooleanValueC}" valuereturn="myBooleanValue02C" isboolean="myValueIsBoolean02C" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02C = ${myBooleanValue02C} | myValueIsBoolean02C = ${myValueIsBoolean02C} </echo>
+	
+	<echo>---------------------------------------------------------------------------------------------</echo>
+	<fl:let>mytestBool ::= '0'</fl:let>
+	<echo>mytestBool, String = ${mytestBool}</echo>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueD" isboolean="myValueIsBooleanD" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValueD = ${myBooleanValueD} | myValueIsBooleanD = ${myValueIsBooleanD} </echo>
+	
+	<isBooleanZZZ valueinput="${myBooleanValueD}" valuereturn="myBooleanValue02D" isboolean="myValueIsBoolean02D" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02D = ${myBooleanValue02D} | myValueIsBoolean02D = ${myValueIsBoolean02D} </echo>
+	
+	<!-- TODO: Ein Untertarget machen, in dem über paramter die Variablen übergeben werden. 
+	           Dann dieses Target in einer Schleife aufrufen, für die einzelnen Testwerte. -->
+ </target>
   
  <!-- ######################################################### -->  
 <target name="myTestAntcontribIf">
