@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="FGLVmdGitPrepareHost" default="compile" basedir=".."
+   xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man fue FLAKA einen eigenen Namespace -->
+
+   <!-- ### Einbinden von Ant-Contrib ### -->
+   <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen moechte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!--    <taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	 <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	  <!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so waehlen, wie sie in der ant-contrib Doku benannt sind ### -->
+	  <!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	 <taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+		
+		  <!-- ######## Scriptdefs ############################################################################--> 		
+ 	   <!-- ########################### -->		
+	<scriptdef name="isBooleanZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->
+				
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="valueinput" />
+		 <attribute name="valuereturn" />
+		 <attribute name="isboolean" />
+		 <![CDATA[		   		  
+		   var berg = false;
+		   var breturn = false;
+		   
+		   var myValueInput = attributes.get("valueinput");
+		   print("myValueInput='"+myValueInput+"'");
+		   if (myValueInput=='true') {			   
+		       berg = true;
+			   breturn = true;
+			};
+
+			
+			
+			project.setProperty(attributes.get("valuereturn"), berg);
+			project.setProperty(attributes.get("isboolean"), breturn)
+		 ]]>
+	</scriptdef>
+	   
+	   
+  <!-- ######### Set global properties for this build ####################################################-->
+  <!-- Example for using an environment variable, which is defined e.g. in windows: 
+       <property name="build" value="${BUILDTARGET}"/> -->
+  <!-- Beispiele fuer relative Pfade
+  <property name="dest" value="target"/>
+  <property name="src" value="src"/>
+  -->
+  
+  <target name="declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafuer sorgen dass die Deklaration vor allen anderen Targets ausgefuehrt wird. -->
+    <!-- An dieser Stelle Argumente entgegennehmen, entweder aus der Batch oder unter Eclipse aus der "external Configuration" des AntScripts  -->
+  	<!-- Merke: You can define an argument with the property file name to the build in the 'Arguments' section of the Run > External Tools > External Tools Configuration for your Ant Build. Something like:
+  	-Dproperties=Buildfile_test.properties
+
+  	You use this in your build.xml like this:
+  	<property file="${properties}"/>
+  	-->
+  	
+	 <!-- um EL referencen zusatzlich zu den normalen Ant Referencen anzustellen (ausserhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	       dies passiert hier durch flaksss install-property handler task -->
+	<fl:install-property-handler />  	
+  	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+  	
+  	<!-- TODO GOON: Hier eine Fallunterscheidung machen, ob durch Eclipse oder durch Batch gestartet wurde !!! -->
+  	<echo>VMD Properties Datei= ${env.VMD}</echo>
+	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
+  	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo>
+</target>
+  
+  <!-- ################################################################################# -->
+ <target name="compile" depends="declaration, init,myTestAntcontribIf,myTestFlakaChoose">
+
+	<!-- WIRD NICHT BENOETIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+ </target>
+ 
+  <target name="init">
+    <!-- Create the time stamp -->
+	<echo>Receiving timestamp:</echo>
+    <!--<tstamp/>-->
+	<tstamp>
+	<format property="current.time" pattern="yyyyMMdd_HHmmss" locale="en,GB"/>
+	<!--<format property="backup_archive.name" pattern="'EinArchiv'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>-->
+	<format property="backup_RepositoryArchive.name" pattern="'${dest.dirRepositoryVmdArchive}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
+	<format property="backup_RepositoryMisc.name" pattern="'${dest.dirRepositoryVmdMisc}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
+	</tstamp>
+	<echo>Current Timestamp: ${current.time}</echo>
+	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
+</target>
+  
+  
+ <!-- ######################################################### -->  
+<target name="myTestAntcontribIf">
+	<echo>######################################</echo>
+	<fl:let>mytest01 ::= '0'</fl:let>
+	<fl:let>mytest02 ::= '0'</fl:let>
+	<if>
+		<equals arg1="${mytest01}" arg2="0" />
+		<then>
+			<echo>mytest01 ist 'null' </echo>
+		</then>
+		<else>						
+			<echo>mytest01 ist ungleich 'null' </echo>
+			
+			<!-- AntContrib if duerfen verschachtelt sein  -->						
+			<if>
+				<equals arg1="${mytest02}" arg2="0" />
+				<then>
+					<echo>mytest02 ist 'null' </echo>
+				</then>
+				<else>
+					<echo>mytest02 ist ungleich 'null' </echo>
+				</else>
+			</if>	
+		</else>
+	</if>		
+ </target>
+ 
+ 
+  
+<!-- ######################################################### -->  
+<target name="myTestFlakaChoose">
+	<echo>######################################</echo>
+	<!-- Prüfe, ob es ein Verzeichnis ist -->
+	<!-- <fl:let>mytestBool ::= '0'</fl:let> -->
+	<fl:let>mytestBool ::= 'true'</fl:let>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<fl:let>mytest01 ::= '0'</fl:let>
+	<fl:let>mytest02 ::= '0'</fl:let>
+	<fl:when test="true('${myValueIsBoolean}')">
+			<echo>When:  Ein boolean Wert wurde gefunden.</echo>
+	</fl:when>
+	
+	<!-- Merke: nur antrib - If darf darin enthalten sein, kein weiteres Flaka - Choose-->
+<!-- 	<fl:choose>
+		<when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
+			<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>		
+		</when>
+		<otherwise>
+				<echo>Datei existiert NICHT: ${conf.copyLocalFilePath}</echo> -->
+				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird.  -->
+	<!--	</otherwise>
+	</fl:choose> -->
+
+</target>
+
+</project>
