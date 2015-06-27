@@ -143,7 +143,9 @@
   
  <!-- ######################################################### -->  
 <target name="myTestIsBoolean">
-	<echo>######################################</echo>
+	<fl:logo>
+		myTestIsBoolean
+	</fl:logo>
 	<fl:let>mytestBool ::= 'true'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -194,8 +196,11 @@
   
  <!-- ######################################################### -->  
 <target name="myTestAntcontribIf">
-	<echo>######################################</echo>
+<fl:logo>
+		myTestAntcontribIf
+  </fl:logo>	
 	<fl:let>mytest01 ::= '0'</fl:let>
+	<fl:let>mytest02 ::= '1'</fl:let>
 	<fl:let>mytest02 ::= '0'</fl:let>
 	<if>
 		<equals arg1="${mytest01}" arg2="0" />
@@ -213,6 +218,16 @@
 				</then>
 				<else>
 					<echo>mytest02 ist ungleich 'null' </echo>
+					
+					<if>
+						<equals arg1="${mytest03}" arg2="0" />
+						<then>
+							<echo>mytest03 ist 'null' </echo>
+						</then>
+						<else>
+							<echo>mytest03 ist ungleich 'null' </echo>
+						</else>						
+					</if>
 				</else>
 			</if>	
 		</else>
@@ -223,27 +238,55 @@
   
 <!-- ######################################################### -->  
 <target name="myTestFlakaChoose">
-	<echo>######################################</echo>
-	<!-- Prüfe, ob es ein Verzeichnis ist -->
-	<!-- <fl:let>mytestBool ::= '0'</fl:let> -->
+	<fl:logo>
+		myTestFlakaChoose
+  </fl:logo>
+  <fl:install-property-handler />
+	
+	<!-- 1. Einfaches 'when' testen und die true(...) Funktion ausprobieren mit einem echten boolean - Wert. -->
 	<fl:let>mytestBool ::= 'true'</fl:let>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<fl:let>mytest01 ::= '0'</fl:let>
-	<fl:let>mytest02 ::= '0'</fl:let>
-	<fl:when test="true('${myValueIsBoolean}')">
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueX" isboolean="myValueIsBooleanX" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValueX = ${myBooleanValueX} | myValueIsBooleanX = ${myValueIsBooleanX} </echo>
+	
+	<!-- TODO GOON Warum funktioniert hier die funktion(true) nicht ???-->	
+	<fl:echo>true(...) = '#{true('${myValueIsBooleanX}')}'</fl:echo>
+	<fl:echo>nativetype = '#{nativetype(true)}'</fl:echo>
+	<fl:echo>nativetype = '#{nativetype(${myValueIsBooleanX})}'</fl:echo>
+	<fl:echo>nativetype = '#{nativetype(true(${myValueIsBooleanX})}'</fl:echo>
+	
+	<fl:when test="true('${myValueIsBooleanX}')">
 			<echo>When:  Ein boolean Wert wurde gefunden.</echo>
+			
+			<!-- die Verschachtelung innerhalb der When's testen -->
+<!-- 			<fl:when test="true('${myValueIsBooleanX}')">
+			<echo>When:  Ein boolean 'true' Wert wurde gefunden.</echo>
+			</fl:when>
+			<fl:when test="false('${myValueIsBooleanX}')">
+					<echo>When:  Ein boolean 'false' Wert wurde gefunden.</echo>
+			</fl:when> -->
+			
+	</fl:when>
+	<fl:when test="false('${myValueIsBooleanX}')">
+			<echo>When:  KEIN boolean Wert gefunden.</echo>
 	</fl:when>
 	
+	
+	
+	<!-- 2. Verschachtelung von 'choose' testen. -->
+	<fl:let>mytest01 ::= '0'</fl:let>
+	<fl:let>mytest02 ::= '1'</fl:let>
+	<fl:let>mytest02 ::= '0'</fl:let>
+	
 	<!-- Merke: nur antrib - If darf darin enthalten sein, kein weiteres Flaka - Choose-->
-<!-- 	<fl:choose>
-		<when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
-			<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>		
+ 	<fl:choose>
+		<when test=" '${mytest01}' == '0' ">
+			<echo>mytest01 ist 'null' </echo>	
 		</when>
 		<otherwise>
-				<echo>Datei existiert NICHT: ${conf.copyLocalFilePath}</echo> -->
+				<echo>mytest01 ist ungleich'null' </echo>
 				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird.  -->
-	<!--	</otherwise>
-	</fl:choose> -->
+		</otherwise>
+	</fl:choose>
 
 </target>
 
