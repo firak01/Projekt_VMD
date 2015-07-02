@@ -373,8 +373,8 @@
 											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 											<echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo>
 											<!-- A) Linker Teil - Verzeichnis-Fall: TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
-											<!-- TODO Warum funktioniert hier die Funktion true( ) ??? -->
-											<fl:when test="true('${myisdirectoryLeftPart}')">
+											<fl:when test="'${myisdirectoryLeftPart}' == true">
+												 <echo>ABBRUCH</echo>
 												<fl:fail message="Linker Teil der Steuerungsanweisung ist ein Verzeichnis: ${myLeftPart}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 											</fl:when>
 											

@@ -29,6 +29,11 @@
 				
 		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+					
+					
+		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
+		       Es werden Strings 0, 1 in boolean umgesetzt. -->
+				
 		<attribute name="valueinput" />
 		<attribute name="valuereturn" />
 		<attribute name="isboolean" />
@@ -143,27 +148,99 @@
   
  <!-- ######################################################### -->  
 <target name="myTestIsBoolean">
-	<fl:logo>
-		myTestIsBoolean
-	</fl:logo>
+	<!-- Merke: Eine Funktion true(...) funktioniert in Ant gar nicht. gibt´s gar nicht, weiss nicht woher sie kommen soll ! -->
+	<!-- Merke2: <fl:fail message="blablabla"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+	
+	<!-- TODO: Ein Untertarget machen, in dem über paramter die Variablen übergeben werden. 
+	                  Dann dieses Target in einer Schleife aufrufen, für die einzelnen Testwerte.
+                      Die Testwerte kämen dann aus einem Array.  -->
+	<fl:logo>myTestIsBoolean</fl:logo>
+	
+	<echo>-- true Fall -------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'true'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueIsBoolean = ${myValueIsBoolean} </echo>
 	
-	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBooleanß2 = ${myValueIsBoolean02} </echo>
+	<!-- ein wenig Hintergrundinformationen -->
+	<fl:echo>true -> nativetype = '#{nativetype(true)}'</fl:echo>
+	<fl:echo>myBooleanValue -> nativetype = '#{nativetype(${myBooleanValue})}'</fl:echo>	
+	<fl:echo>myValueIsBoolean -> nativetype = '#{nativetype(${myValueIsBoolean})}'</fl:echo>
 	
-	<echo>---------------------------------------------------------------------------------------------</echo>
+	<fl:when test="'${myBooleanValue}'==true">
+		<echo>true Fall erkannt.</echo>
+	</fl:when>
+	<fl:when test="'${myBooleanValue}'!=true">
+		<echo>false oder undefiniert Fall erkannt.</echo>
+	</fl:when>
+	
+	<!-- TODO GOON: In diesem Fall wird der Wert SOOO als TRUE erkannt. DAS DARF NICHT SEIN. -->	
+	<fl:when test="'${myBooleanValueGIBTSNICHT}'==true">
+		<echo>true Fall erkannt.</echo>
+	</fl:when>
+	<fl:when test="'${myBooleanValueGIBTSNICHT}'!=true">
+		<echo>false oder undefiniert Fall erkannt.</echo>
+	</fl:when>
+	
+	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
+	
+	<echo>-- false Fall -------------------------------------------------------------------------------------</echo>
+	<fl:let>mytestBool ::= 'false'</fl:let>
+	<echo>mytestBool, String = ${mytestBool}</echo>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueIsBoolean = ${myValueIsBoolean} </echo>
+	
+	<!-- ein wenig Hintergrundinformationen -->
+	<fl:echo>true -> nativetype = '#{nativetype(true)}'</fl:echo>
+	<fl:echo>myBooleanValue -> nativetype = '#{nativetype(${myBooleanValue})}'</fl:echo>	
+	<fl:echo>myValueIsBoolean -> nativetype = '#{nativetype(${myValueIsBoolean})}'</fl:echo>
+	
+	<fl:when test="'${myBooleanValue}'==true">
+		<echo>true Fall erkannt.</echo>
+	</fl:when>
+	<fl:when test="'${myBooleanValue}'!=true">
+		<echo>false oder undefiniert Fall erkannt.</echo>
+	</fl:when>
+	
+	<!-- TODO GOON: In diesem Fall wird der Wert SOOO als TRUE erkannt. DAS DARF NICHT SEIN. -->	
+	<fl:when test="'${myBooleanValueGIBTSNICHT}'==true">
+		<echo>true Fall erkannt.</echo>
+	</fl:when>
+	<fl:when test="'${myBooleanValueGIBTSNICHT}'!=true">
+		<echo>false oder undefiniert Fall erkannt.</echo>
+	</fl:when>
+	
+	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
+	
+	
+	
+	
+	<echo>----bleodsinn Fall --------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'bloedsinn'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueA" isboolean="myValueIsBooleanA" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<echo>es gilt: myBooleanValueA = ${myBooleanValueA} | myValueIsBooleanA = ${myValueIsBooleanA} </echo>
 	
+	<!-- ein wenig Hintergrundinformationen -->
+	<fl:echo>myBooleanValueA -> nativetype = '#{nativetype(${myBooleanValueA})}'</fl:echo>	<!-- Merke: Das hintersete Hochkomma wird nicht angezeigt. Flaka bricht vorher ab. -->
+	<fl:echo>myValueIsBooleanA -> nativetype = '#{nativetype(${myValueIsBooleanA})}'</fl:echo>
+
+    <!-- TODO GOON: In diesem Fall wird der Wert SOOO als TRUE erkannt. DAS DARF NICHT SEIN. -->	
+	<fl:when test="'${myBooleanValueA}'==true">
+		<echo>true Fall erkannt.</echo>
+	</fl:when>
+	<fl:when test="'${myBooleanValueA}'!=true">
+		<echo>false oder undefiniert Fall erkannt.</echo>
+	</fl:when>
+	
+	
+	
 	<isBooleanZZZ valueinput="${myBooleanValueA}" valuereturn="myBooleanValue02A" isboolean="myValueIsBoolean02A" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02A = ${myBooleanValue02A} | myValueIsBoolean02A = ${myValueIsBoolean02A} </echo>
 	
-	<echo>---------------------------------------------------------------------------------------------</echo>
+	<echo>---1 Fall          -------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= '1'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueB" isboolean="myValueIsBooleanB" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -172,7 +249,7 @@
 	<isBooleanZZZ valueinput="${myBooleanValueB}" valuereturn="myBooleanValue02B" isboolean="myValueIsBoolean02B" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02B = ${myBooleanValue02B} | myValueIsBoolean02B = ${myValueIsBoolean02B} </echo>
 	
-	<echo>---------------------------------------------------------------------------------------------</echo>
+	<echo>----eins Fall  ------------------------wird nicht als boolean erkannt -------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'eins'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueC" isboolean="myValueIsBooleanC" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -181,7 +258,7 @@
 	<isBooleanZZZ valueinput="${myBooleanValueC}" valuereturn="myBooleanValue02C" isboolean="myValueIsBoolean02C" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02C = ${myBooleanValue02C} | myValueIsBoolean02C = ${myValueIsBoolean02C} </echo>
 	
-	<echo>---------------------------------------------------------------------------------------------</echo>
+	<echo>---0 Fall ---------------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= '0'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueD" isboolean="myValueIsBooleanD" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -190,8 +267,14 @@
 	<isBooleanZZZ valueinput="${myBooleanValueD}" valuereturn="myBooleanValue02D" isboolean="myValueIsBoolean02D" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02D = ${myBooleanValue02D} | myValueIsBoolean02D = ${myValueIsBoolean02D} </echo>
 	
-	<!-- TODO: Ein Untertarget machen, in dem über paramter die Variablen übergeben werden. 
-	           Dann dieses Target in einer Schleife aufrufen, für die einzelnen Testwerte. -->
+	<echo>----null Fall  -------------------------- wird nicht als boolean erkannt -------------------------------------------------</echo>
+	<fl:let>mytestBool ::= 'null'</fl:let>
+	<echo>mytestBool, String = ${mytestBool}</echo>
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueE" isboolean="myValueIsBooleanE" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValueE = ${myBooleanValueE} | myValueIsBooleanE = ${myValueIsBooleanE} </echo>
+	
+	<isBooleanZZZ valueinput="${myBooleanValueE}" valuereturn="myBooleanValue02E" isboolean="myValueIsBoolean02E" /><!-- anwenden der oben definierten scriptdef funktion -->	
+	<echo>es gilt: myBooleanValue02E = ${myBooleanValue02E} | myValueIsBoolean02E = ${myValueIsBoolean02E} </echo>
  </target>
   
  <!-- ######################################################### -->  
@@ -245,29 +328,24 @@
 	
 	<!-- 1. Einfaches 'when' testen und die true(...) Funktion ausprobieren mit einem echten boolean - Wert. -->
 	<fl:let>mytestBool ::= 'true'</fl:let>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueX" isboolean="myValueIsBooleanX" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<echo>es gilt: myBooleanValueX = ${myBooleanValueX} | myValueIsBooleanX = ${myValueIsBooleanX} </echo>
-	
-	<!-- TODO GOON Warum funktioniert hier die funktion(true) nicht ???-->	
-	<fl:echo>true(...) = '#{true('${myValueIsBooleanX}')}'</fl:echo>
-	<fl:echo>nativetype = '#{nativetype(true)}'</fl:echo>
-	<fl:echo>nativetype = '#{nativetype(${myValueIsBooleanX})}'</fl:echo>
-	<fl:echo>nativetype = '#{nativetype(true(${myValueIsBooleanX})}'</fl:echo>
-	
-	<fl:when test="true('${myValueIsBooleanX}')">
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueIsBoolean = ${myValueIsBoolean} </echo>
+	<fl:when test="'${myValueIsBoolean}'==true">
 			<echo>When:  Ein boolean Wert wurde gefunden.</echo>
 			
 			<!-- die Verschachtelung innerhalb der When's testen -->
-<!-- 			<fl:when test="true('${myValueIsBooleanX}')">
-			<echo>When:  Ein boolean 'true' Wert wurde gefunden.</echo>
+			<fl:let>mytestBool ::= 'true'</fl:let>
+			<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- anwenden der oben definierten scriptdef funktion -->
+ 			<fl:when test="'${myValueIsBoolean02}')==true">
+				<echo>02 When:  Ein boolean 'true' Wert wurde gefunden.</echo>
 			</fl:when>
-			<fl:when test="false('${myValueIsBooleanX}')">
-					<echo>When:  Ein boolean 'false' Wert wurde gefunden.</echo>
-			</fl:when> -->
+			<fl:when test="'${myValueIsBoolean02}'!=true">
+				<echo>02 When:  Ein boolean 'false' Wert wurde oder undefiniert wurde gefunden.</echo>
+			</fl:when> 
 			
 	</fl:when>
-	<fl:when test="false('${myValueIsBooleanX}')">
-			<echo>When:  KEIN boolean Wert gefunden.</echo>
+	<fl:when test="'${myValueIsBoolean}'!=true">
+			<echo>When:  KEIN boolean Wert oder undefiniert gefunden.</echo>
 	</fl:when>
 	
 	
@@ -283,8 +361,7 @@
 			<echo>mytest01 ist 'null' </echo>	
 		</when>
 		<otherwise>
-				<echo>mytest01 ist ungleich'null' </echo>
-				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird.  -->
+				<echo>mytest01 ist ungleich'null' </echo>				
 		</otherwise>
 	</fl:choose>
 
