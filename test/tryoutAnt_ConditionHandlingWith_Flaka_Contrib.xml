@@ -1,9 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>  
 <project name="FGLVmdGitPrepareHost" default="compile" basedir=".."
-   xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man fue FLAKA einen eigenen Namespace -->
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka">
+	
+   <!-- ### Einbinden von flaka ### -->
+   <!--xmlns:fl="antlib:it.haefelinger.flaka"> --><!-- damit definiert man fuer FLAKA einen eigenen Namespace -->
 
    <!-- ### Einbinden von Ant-Contrib ### -->
-   <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen moechte, z.B. <if-contrib> verwenden statt <if> ### -->
+   <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen moechte, 
+            z.B. <if-contrib> verwenden statt <if> UND das Einbinden des Namespace von AntContrib nicht macht.### -->
 	<!--    <taskdef resource="net/sf/antcontrib/antlib.xml">
 	  <classpath>
 		<pathelement location="lib/ant-contrib-1.0b3.jar"/>
@@ -12,6 +17,19 @@
 	 <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
 	 <taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
 	 <taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" /> -->
+	 
+	 
+	 <!-- man kann Ant-Contrib auch mit einem Namespace definieren, trotzdem kann man die ant-contrib Tasks auch ohne Namespace ansprechen.-->
+	 <!-- xmlns:ac="antlib://net/sf/antcontrib">
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml"
+         uri="antlib://net/sf/antcontrib">
+        <classpath>
+            <fileset dir="${basedir}/antlib/antcontrib"/>
+        </classpath>
+    </taskdef> -->
+	 
+	 
  
 	  <!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so waehlen, wie sie in der ant-contrib Doku benannt sind ### -->
 	  <!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
@@ -86,7 +104,49 @@
 		 ]]>
 	</scriptdef>
 	   
-	   
+  <!-- ######### AntContrib: Callback Targets, quasi als ausgelagerte Unterfunktionen ################################-->
+  <target name="booleanDebugCallbackZZZ"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
+   <!-- Aber: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/> -->   
+   <var name="myInputBooleanValue" value="${inputBooleanValue}" />
+     	
+	<!-- ein wenig Hintergrundinformationen --> 
+	<fl:echo>true -> nativetype = '#{nativetype(true)}'</fl:echo>
+	<fl:echo>myInputBooleanValue -> nativetype = '#{nativetype(${myInputBooleanValue})}'</fl:echo><!-- Merke: Bei einem undefinierten myInputBooleanValue wird das zweite Hochkomma nicht ausgegeben -->	
+	 		
+   <!-- Auswertung der Rückgabewerte von isBooleanZZZ -->
+   <!-- Prüfe zuerst ab, ob die Variable gesetzt ist, Kombination aus antcontrib und standard ant -->
+	<ac:if>
+	  <!-- TODO: isset funktioniert nicht im callback. Dort sind die Variablen immer gesetzt, auch mit dem unset-Attribut -->	  
+      <isset property="myInputBooleanValue"/><!-- dieser isset - teil funktioniert nicht im Callback -->
+      <ac:then>
+        <echo message="myInputBooleanValue exists: '${myInputBooleanValue}'" />
+		
+		<!-- TODO: Hier noch auf den Wert prüfen. Wenn es mit $ beginnt, dann ist der Wert auch in einem antcallback als 'undefined' anzusehen -->
+		
+		<!-- Danach erst kann der test auf den Property Wert funktionieren -->
+		<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
+		<!-- <fl:when test="'${myInputBooleanValue}'==true"> -->
+		<fl:when test="${myInputBooleanValue}==true">
+		<echo>true Fall erkannt.</echo>
+		<fl:let>myResult ::= 'true'</fl:let>
+		</fl:when>
+		<!-- <fl:when test="'${myInputBooleanValue}'!=true"> -->
+		<fl:when test="${myInputBooleanValue}!=true">
+			<echo>false Fall erkannt.</echo>
+			<fl:let>myResult ::= 'false'</fl:let>
+		</fl:when>
+      </ac:then>
+      <ac:else>
+        <echo message="myInputBooleanValue does NOT exist"/>	
+		<fl:let>myResult ::= 'undefined'</fl:let>		
+      </ac:else>
+    </ac:if>
+	<!-- aber: die Properties sind unveraenderbar, darum macht eine Rückgabe keinen Sinn. -->
+    <var name="returnBooleanValue" value="${myResult}" /> <!-- Mach folgendes in dem aufrufenden Target, dann klappts <var name="returnBooleanValue" unset="true"/> -->
+	<!-- <fl:let>returnBooleanValue ::= ${myResult}</fl:let> -->
+   
+ </target>
+	 
   <!-- ######### Set global properties for this build ####################################################-->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
        <property name="build" value="${BUILDTARGET}"/> -->
@@ -154,8 +214,11 @@
 	<!-- TODO: Ein Untertarget machen, in dem über paramter die Variablen übergeben werden. 
 	                  Dann dieses Target in einer Schleife aufrufen, für die einzelnen Testwerte.
                       Die Testwerte kämen dann aus einem Array.  -->
+					  
+	<!-- TODO: Den Test auf den Boolean-Wert in eine zentrale Unterfunktion auslagern, wie ? -->
 	<fl:logo>myTestIsBoolean</fl:logo>
 	
+	<echo>--------------------------------------------------------------------------------------------------</echo>
 	<echo>-- true Fall -------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'true'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
@@ -167,28 +230,32 @@
 	<fl:echo>myBooleanValue -> nativetype = '#{nativetype(${myBooleanValue})}'</fl:echo>	
 	<fl:echo>myValueIsBoolean -> nativetype = '#{nativetype(${myValueIsBoolean})}'</fl:echo>
 	
-	<fl:when test="'${myBooleanValue}'==true">
-		<echo>true Fall erkannt.</echo>
-	</fl:when>
-	<fl:when test="'${myBooleanValue}'!=true">
-		<echo>false oder undefiniert Fall erkannt.</echo>
-	</fl:when>
-	
-	<!-- TODO GOON: In diesem Fall wird der Wert SOOO als TRUE erkannt. DAS DARF NICHT SEIN. -->	
+	<!-- Test zur Auswertung der Rückgabewerte von isBooleanZZZ:
+         Wenn die Property nicht gesetzt wurde oder NULL ist, wird der Wert SOOO als TRUE erkannt. DAS DARF NICHT SEIN. -->	
 	<fl:when test="'${myBooleanValueGIBTSNICHT}'==true">
-		<echo>true Fall erkannt.</echo>
+		<echo>ungesetzte property: true Fall erkannt.</echo>
 	</fl:when>
 	<fl:when test="'${myBooleanValueGIBTSNICHT}'!=true">
-		<echo>false oder undefiniert Fall erkannt.</echo>
+		<echo>ungesetzte property: false oder undefiniert Fall erkannt.</echo><!-- dieses wird eben nicht ausgeführt -->
 	</fl:when>
+		
+	<!-- Auswertung der Rückgabewerte von isBooleanZZZ, per antcallback, wg. der Wiederverwertbarkeit und Reduzierung der Codezeilen -->
+	<var name="returnBooleanValue" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
+	<var name="inputBooleanValue" unset="true"/>
+	<antcallback target="booleanDebugCallbackZZZ" return="returnBooleanValue">
+		<param name="inputBooleanValue" value="${myBooleanValue}"/>		
+	</antcallback>
+	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
 	
-	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- anwenden der oben definierten scriptdef funktion -->	
+		
+	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- Anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
 	
-	<echo>-- false Fall -------------------------------------------------------------------------------------</echo>
+	<echo>--------------------------------------------------------------------------------------------------</echo>
+	<echo>-- false Fall ------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'false'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- Anwenden der oben definierten scriptdef funktion -->
 	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueIsBoolean = ${myValueIsBoolean} </echo>
 	
 	<!-- ein wenig Hintergrundinformationen -->
@@ -196,51 +263,87 @@
 	<fl:echo>myBooleanValue -> nativetype = '#{nativetype(${myBooleanValue})}'</fl:echo>	
 	<fl:echo>myValueIsBoolean -> nativetype = '#{nativetype(${myValueIsBoolean})}'</fl:echo>
 	
-	<fl:when test="'${myBooleanValue}'==true">
-		<echo>true Fall erkannt.</echo>
-	</fl:when>
-	<fl:when test="'${myBooleanValue}'!=true">
-		<echo>false oder undefiniert Fall erkannt.</echo>
-	</fl:when>
+	<!-- Auswertung der Rückgabewerte von isBooleanZZZ, per antcallback, wg. der Wiederverwertbarkeit und Reduzierung der Codezeilen -->
+	<var name="returnBooleanValue" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
+	<var name="inputBooleanValue" unset="true"/>
+	<antcallback target="booleanDebugCallbackZZZ" return="returnBooleanValue">
+		<param name="inputBooleanValue" value="${myBooleanValue}"/>		
+	</antcallback>
+	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
 	
-	<!-- TODO GOON: In diesem Fall wird der Wert SOOO als TRUE erkannt. DAS DARF NICHT SEIN. -->	
-	<fl:when test="'${myBooleanValueGIBTSNICHT}'==true">
-		<echo>true Fall erkannt.</echo>
-	</fl:when>
-	<fl:when test="'${myBooleanValueGIBTSNICHT}'!=true">
-		<echo>false oder undefiniert Fall erkannt.</echo>
-	</fl:when>
-	
-	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- anwenden der oben definierten scriptdef funktion -->	
+		
+	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- Anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
-	
-	
-	
-	
-	<echo>----bleodsinn Fall --------------------------------------------------------------------------------</echo>
+		
+	<echo>--------------------------------------------------------------------------------------------------</echo>
+	<echo>----bloedsinn Fall -------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'bloedsinn'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueA" isboolean="myValueIsBooleanA" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<echo>es gilt: myBooleanValueA = ${myBooleanValueA} | myValueIsBooleanA = ${myValueIsBooleanA} </echo>
 	
 	<!-- ein wenig Hintergrundinformationen -->
-	<fl:echo>myBooleanValueA -> nativetype = '#{nativetype(${myBooleanValueA})}'</fl:echo>	<!-- Merke: Das hintersete Hochkomma wird nicht angezeigt. Flaka bricht vorher ab. -->
+	<fl:echo>myBooleanValueA -> nativetype = '#{nativetype(${myBooleanValueA})}'</fl:echo>	<!-- Merke: Das hinterste Hochkomma wird nicht angezeigt. Flaka bricht vorher ab. -->	
 	<fl:echo>myValueIsBooleanA -> nativetype = '#{nativetype(${myValueIsBooleanA})}'</fl:echo>
-
-    <!-- TODO GOON: In diesem Fall wird der Wert SOOO als TRUE erkannt. DAS DARF NICHT SEIN. -->	
-	<fl:when test="'${myBooleanValueA}'==true">
+	
+	<!-- Merke: Weil in dem bloedsinn Fall, der Rückgabewert der Variablen nicht gesetzt ist, ist die Auswertung besonders interessant -->
+	<!-- Auswertung der Rückgabewerte von isBooleanZZZ -->
+	<!-- Prüfe zuerst ab, ob die Variable gesetzt ist, Kombination aus antcontrib und standard ant -->
+	<ac:if>
+      <isset property="myBooleanValueA"/><!-- dieser isset - teil funktioniert nicht im Callback, weil dort die Variable mehrfach verwendet wird. Selbst das 'unset' Attribut wirkt nicht. -->
+      <then>
+        <echo message="myBooleanValueA exists"/>
+		
+		<!-- Danach erst kann der test auf den Property Wert funktionieren -->
+		<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
+		<fl:when test="'${myBooleanValueA}'==true">
 		<echo>true Fall erkannt.</echo>
-	</fl:when>
-	<fl:when test="'${myBooleanValueA}'!=true">
-		<echo>false oder undefiniert Fall erkannt.</echo>
-	</fl:when>
+		</fl:when>
+		<fl:when test="'${myBooleanValueA}'!=true">
+			<echo>false oder undefiniert Fall erkannt.</echo>
+		</fl:when>
+      </then>
+      <else>
+        <echo message="myBooleanValueA does NOT exist"/>		
+      </else>
+    </ac:if>
 	
-	
-	
+	<!-- Auswertung der Rückgabewerte von isBooleanZZZ, per antcallback, wg. der Wiederverwertbarkeit und Reduzierung der Codezeilen -->
+	<var name="returnBooleanValue" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
+	<var name="inputBooleanValue" unset="true"/>
+	<antcallback target="booleanDebugCallbackZZZ" return="returnBooleanValue">
+		<param name="inputBooleanValue" value="${myBooleanValueA}"/>
+	</antcallback>
+	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
+		
+	<!-- ACHTUNG: Hier wird eine nicht existierende Property an die isBooleanZZZ Funktion übergeben -->
 	<isBooleanZZZ valueinput="${myBooleanValueA}" valuereturn="myBooleanValue02A" isboolean="myValueIsBoolean02A" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02A = ${myBooleanValue02A} | myValueIsBoolean02A = ${myValueIsBoolean02A} </echo>
 	
-	<echo>---1 Fall          -------------------------------------------------------------------------------------</echo>
+	<!-- Merke: Weil eine nicht existierende Property an die isBooleanZZZ Funktion überben wurde, ist die Auswertung besonders interessant -->
+	<!-- Auswertung der Rückgabewerte von isBooleanZZZ -->
+	<!-- Prüfe zuerst ab, ob die Variable gesetzt ist, Kombination aus antcontrib und standard ant -->
+	<ac:if>
+      <isset property="myBooleanValue02A"/>
+      <then>
+        <echo message="myBooleanValue02A exists"/>
+		
+		<!-- Danach erst kann der test auf den Property Wert funktionieren -->
+		<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
+		<fl:when test="'${myBooleanValue02A}'==true">
+		<echo>true Fall erkannt.</echo>
+		</fl:when>
+		<fl:when test="'${myBooleanValue02A}'!=true">
+			<echo>false oder undefiniert Fall erkannt.</echo>
+		</fl:when>
+      </then>
+      <else>
+        <echo message="myBooleanValue02A does NOT exist"/>		
+      </else>
+    </ac:if>
+	
+	<echo>--------------------------------------------------------------------------------------------------</echo>
+	<echo>---1 Fall          -------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= '1'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueB" isboolean="myValueIsBooleanB" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -249,7 +352,8 @@
 	<isBooleanZZZ valueinput="${myBooleanValueB}" valuereturn="myBooleanValue02B" isboolean="myValueIsBoolean02B" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02B = ${myBooleanValue02B} | myValueIsBoolean02B = ${myValueIsBoolean02B} </echo>
 	
-	<echo>----eins Fall  ------------------------wird nicht als boolean erkannt -------------------------------------------------</echo>
+	<echo>--------------------------------------------------------------------------------------------------</echo>
+	<echo>----eins Fall  ------------------------wird nicht als boolean erkannt ----------------------------</echo>
 	<fl:let>mytestBool ::= 'eins'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueC" isboolean="myValueIsBooleanC" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -258,7 +362,8 @@
 	<isBooleanZZZ valueinput="${myBooleanValueC}" valuereturn="myBooleanValue02C" isboolean="myValueIsBoolean02C" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02C = ${myBooleanValue02C} | myValueIsBoolean02C = ${myValueIsBoolean02C} </echo>
 	
-	<echo>---0 Fall ---------------------------------------------------------------------------------------------</echo>
+	<echo>--------------------------------------------------------------------------------------------------</echo>
+	<echo>---0 Fall ----------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= '0'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueD" isboolean="myValueIsBooleanD" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -267,7 +372,8 @@
 	<isBooleanZZZ valueinput="${myBooleanValueD}" valuereturn="myBooleanValue02D" isboolean="myValueIsBoolean02D" /><!-- anwenden der oben definierten scriptdef funktion -->	
 	<echo>es gilt: myBooleanValue02D = ${myBooleanValue02D} | myValueIsBoolean02D = ${myValueIsBoolean02D} </echo>
 	
-	<echo>----null Fall  -------------------------- wird nicht als boolean erkannt -------------------------------------------------</echo>
+	<echo>--------------------------------------------------------------------------------------------------</echo>
+	<echo>----null Fall  -------------------------- wird nicht als boolean erkannt -------------------------</echo>
 	<fl:let>mytestBool ::= 'null'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
 	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueE" isboolean="myValueIsBooleanE" /><!-- anwenden der oben definierten scriptdef funktion -->

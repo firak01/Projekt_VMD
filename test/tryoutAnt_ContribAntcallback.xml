@@ -77,7 +77,7 @@
 
 </target>  
 
-
+<!-- TODO: Mache vor dem Aufruf des antcallback ein unset der variablen. Dann funktioniert es. Siehe tryoutAnt_ConditionHandlingWith_Flaka_Contrib.xml -->
 <target name="setVarCallback"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
    <!-- Aber: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/> -->
    <var name="retValue" value="${lineFromFile} das war's" />
