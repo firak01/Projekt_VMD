@@ -43,15 +43,22 @@
  	   <!-- ########################### -->		
 	<scriptdef name="isBooleanZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->
-				
+		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
+		
+		    In boolean umgesetzt werden:
+			- Strings 0, 1 
+			- Strings true, false
+			
+			TODO: 
+			- Zahlen 0, 1
+		-->
+			
+			
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
 		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-					
-					
-		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
-		       Es werden Strings 0, 1 in boolean umgesetzt. -->
-				
+												
 		<attribute name="valueinput" />
 		<attribute name="valuereturn" />
 		<attribute name="isboolean" />
@@ -103,10 +110,29 @@
 			}
 		 ]]>
 	</scriptdef>
+	
+	
+<!-- ########################### -->
+<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+ <scriptdef name="substring" language="javascript">
+     <attribute name="text" />
+     <attribute name="start" />
+     <attribute name="end" />
+     <attribute name="property" />
+     <![CDATA[
+       var text = attributes.get("text");
+       var start = attributes.get("start");
+       var end = attributes.get("end") || text.length();
+       project.setProperty(attributes.get("property"), text.substring(start, end));
+     ]]>
+  </scriptdef>
 	   
   <!-- ######### AntContrib: Callback Targets, quasi als ausgelagerte Unterfunktionen ################################-->
   <target name="booleanDebugCallbackZZZ"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
-   <!-- Aber: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/> -->   
+	<!-- Merke: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/>
+				Darum: Mach folgendes in dem aufrufenden Target, dann klappts <var name="returnBooleanValue" unset="true"/> -->   
    <var name="myInputBooleanValue" value="${inputBooleanValue}" />
      	
 	<!-- ein wenig Hintergrundinformationen --> 
@@ -121,30 +147,41 @@
       <ac:then>
         <echo message="myInputBooleanValue exists: '${myInputBooleanValue}'" />
 		
-		<!-- TODO: Hier noch auf den Wert prüfen. Wenn es mit $ beginnt, dann ist der Wert auch in einem antcallback als 'undefined' anzusehen -->
-		
-		<!-- Danach erst kann der test auf den Property Wert funktionieren -->
-		<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
-		<!-- <fl:when test="'${myInputBooleanValue}'==true"> -->
-		<fl:when test="${myInputBooleanValue}==true">
-		<echo>true Fall erkannt.</echo>
-		<fl:let>myResult ::= 'true'</fl:let>
-		</fl:when>
-		<!-- <fl:when test="'${myInputBooleanValue}'!=true"> -->
-		<fl:when test="${myInputBooleanValue}!=true">
-			<echo>false Fall erkannt.</echo>
-			<fl:let>myResult ::= 'false'</fl:let>
-		</fl:when>
+		<!-- Hier noch auf den Wert prüfen. Wenn es mit $ beginnt, dann ist der Wert auch in einem antcallback als 'undefined' anzusehen -->		
+		<substring text="${myInputBooleanValue}" start="0" end="1" property="subtext" /><!-- Es wird die scriptdef Methode substring aufgerufen -->
+		<echo message="Pruefe auf $ am Anfang: subtext = ${subtext}" />
+		<ac:if>
+			<equals arg1="${subtext}" arg2="$" />
+			<ac:then>
+				<!-- TODO: es müsste noch auf eine Laenge >=2 geprueft werden -->
+				<echo message="$ am Anfang -> undefined Wert" />				
+				<fl:let>myResult ::= 'undefined'</fl:let>
+			</ac:then>
+			<ac:else>
+				<echo message="kein $ am Anfang -> defined Wert" />
+				
+				<!-- Danach erst kann der test auf den Property Wert funktionieren -->
+				<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
+				<!-- <fl:when test="'${myInputBooleanValue}'==true"> -->
+				<fl:when test="${myInputBooleanValue}==true">
+				<echo>true Fall erkannt.</echo>
+				<fl:let>myResult ::= 'true'</fl:let>
+				</fl:when>
+				<!-- <fl:when test="'${myInputBooleanValue}'!=true"> -->
+				<fl:when test="${myInputBooleanValue}!=true">
+					<echo>false Fall erkannt.</echo>
+					<fl:let>myResult ::= 'false'</fl:let>
+				</fl:when>
+					</ac:else>
+				</ac:if>
+				
       </ac:then>
       <ac:else>
-        <echo message="myInputBooleanValue does NOT exist"/>	
+        <echo message="myInputBooleanValue does NOT exist -> undefined Wert"/>	
 		<fl:let>myResult ::= 'undefined'</fl:let>		
       </ac:else>
     </ac:if>
-	<!-- aber: die Properties sind unveraenderbar, darum macht eine Rückgabe keinen Sinn. -->
-    <var name="returnBooleanValue" value="${myResult}" /> <!-- Mach folgendes in dem aufrufenden Target, dann klappts <var name="returnBooleanValue" unset="true"/> -->
-	<!-- <fl:let>returnBooleanValue ::= ${myResult}</fl:let> -->
-   
+    <var name="returnBooleanValue" value="${myResult}" />
  </target>
 	 
   <!-- ######### Set global properties for this build ####################################################-->
@@ -286,28 +323,7 @@
 	<fl:echo>myBooleanValueA -> nativetype = '#{nativetype(${myBooleanValueA})}'</fl:echo>	<!-- Merke: Das hinterste Hochkomma wird nicht angezeigt. Flaka bricht vorher ab. -->	
 	<fl:echo>myValueIsBooleanA -> nativetype = '#{nativetype(${myValueIsBooleanA})}'</fl:echo>
 	
-	<!-- Merke: Weil in dem bloedsinn Fall, der Rückgabewert der Variablen nicht gesetzt ist, ist die Auswertung besonders interessant -->
-	<!-- Auswertung der Rückgabewerte von isBooleanZZZ -->
-	<!-- Prüfe zuerst ab, ob die Variable gesetzt ist, Kombination aus antcontrib und standard ant -->
-	<ac:if>
-      <isset property="myBooleanValueA"/><!-- dieser isset - teil funktioniert nicht im Callback, weil dort die Variable mehrfach verwendet wird. Selbst das 'unset' Attribut wirkt nicht. -->
-      <then>
-        <echo message="myBooleanValueA exists"/>
-		
-		<!-- Danach erst kann der test auf den Property Wert funktionieren -->
-		<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
-		<fl:when test="'${myBooleanValueA}'==true">
-		<echo>true Fall erkannt.</echo>
-		</fl:when>
-		<fl:when test="'${myBooleanValueA}'!=true">
-			<echo>false oder undefiniert Fall erkannt.</echo>
-		</fl:when>
-      </then>
-      <else>
-        <echo message="myBooleanValueA does NOT exist"/>		
-      </else>
-    </ac:if>
-	
+	<!-- Merke: Weil in dem bloedsinn Fall, der Rückgabewert der Variablen nicht gesetzt ist, ist die Auswertung besonders interessant -->	
 	<!-- Auswertung der Rückgabewerte von isBooleanZZZ, per antcallback, wg. der Wiederverwertbarkeit und Reduzierung der Codezeilen -->
 	<var name="returnBooleanValue" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
 	<var name="inputBooleanValue" unset="true"/>
@@ -324,22 +340,22 @@
 	<!-- Auswertung der Rückgabewerte von isBooleanZZZ -->
 	<!-- Prüfe zuerst ab, ob die Variable gesetzt ist, Kombination aus antcontrib und standard ant -->
 	<ac:if>
-      <isset property="myBooleanValue02A"/>
-      <then>
+      <isset property="myBooleanValue02A"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <ac:then>
         <echo message="myBooleanValue02A exists"/>
 		
 		<!-- Danach erst kann der test auf den Property Wert funktionieren -->
 		<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
 		<fl:when test="'${myBooleanValue02A}'==true">
-		<echo>true Fall erkannt.</echo>
+		<echo>ohne antcallback: true Fall erkannt.</echo>
 		</fl:when>
 		<fl:when test="'${myBooleanValue02A}'!=true">
-			<echo>false oder undefiniert Fall erkannt.</echo>
+			<echo>ohne antcallback: false oder undefiniert Fall erkannt.</echo>
 		</fl:when>
-      </then>
-      <else>
-        <echo message="myBooleanValue02A does NOT exist"/>		
-      </else>
+      </ac:then>
+      <ac:else>
+        <echo message="ohne antcallback: myBooleanValue02A does NOT exist"/>		
+      </ac:else>
     </ac:if>
 	
 	<echo>--------------------------------------------------------------------------------------------------</echo>

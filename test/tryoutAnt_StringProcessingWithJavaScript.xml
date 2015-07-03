@@ -2,7 +2,9 @@
 <project name="tryoutAnt_StringProcessingWithJavaScript"  default="compile" basedir="..">
 
  <!-- ########################### -->
- <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
+<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
  <scriptdef name="substring" language="javascript">
      <attribute name="text" />
      <attribute name="start" />

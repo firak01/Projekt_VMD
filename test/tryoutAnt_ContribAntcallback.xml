@@ -12,6 +12,28 @@
 		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
+	
+	
+	
+<!-- ######### AntContrib: Callback Targets, quasi als ausgelagerte Unterfunktionen ################################-->
+
+<!-- ############################################################################### -->
+<!-- Beweis, das Property Werte normaleweise nicht veraenderbar sind. -->
+<!-- TODO: Mache den gleichen Beweis, mit veränderbaren PRoeprty Wertend
+     Mache vor dem Aufruf des antcallback ein unset der variablen. Dann funktioniert es. Siehe tryoutAnt_ConditionHandlingWith_Flaka_Contrib.xml -->
+<target name="setVarCallback"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
+   <!-- Merke: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/>
+				Darum: Mach folgendes in dem aufrufenden Target, dann klappts <var name="retValue" unset="true"/> -->   
+   <var name="retValue" value="${lineFromFile} das war's" />     
+   
+   <property name="out.file" value="${in.file}"/><!-- DIESE PROPERTY IST OHNE UNSET NICHT VERAENDERBAR -->
+   
+   <math result="result" operand1="${retCounter}" operation="+" operand2="1" datatype="int"/>
+   <var name="retCounter" value="${result}" />
+  <!--  <var name="out.file" value="${MyOut.file}" /> -->
+</target>
+
+  
   
   <!-- ########################### -->
   <target name="declaration"><!-- damit dies ncht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
@@ -29,7 +51,7 @@
   </target>
   
 <!-- ################################################################################# -->
- <target name="compile" depends="declaration, file_reader">
+ <target name="compile" depends="declaration, file_reader_total, file_reader_correct, file_reader_wrong">
     <echo>Im default - Target..., das von allen anderen Targets abhängt und daher zuletzt ausgeführt wird. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -44,22 +66,22 @@
     </javac>
 	-->
   </target>
-  
-<target name="file_reader">
-	<echo>Im file_reader - Target... </echo>
-	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>
-	
+ <target name="file_reader_total">
 			<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
 			<loadfile property="myfile" srcFile ="${userdir_sub}/file_antcallbackBeispiel.txt" />
 			
-			
-			<!-- Gib den Inhalt der Datei als Ganzes aus -->
-			<echo>######################################</echo>
+  			<!-- Gib den Inhalt der Datei als Ganzes aus -->
+			<echo>-----------------------------------------------------------------------------------</echo>
 			<echo>Dateiinhalt als Ganzes:</echo>
 			<echo>${myfile}</echo>
-	
+ </target> 
+ 
+<target name="file_reader_wrong">
+	<echo>#########################################################################################</echo>
+	<echo>Im file_reader - Target... </echo>
+	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>			
 			<!-- Gib den Inhalt der Datei zeilenweise aus -->
-			<echo>######################################</echo>
+			<echo>1. Lauf ------------------------------------------------------</echo>
 			<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
 
 			<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
@@ -68,22 +90,82 @@
 					<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
 				</tokens>
 				<sequential>
-					 <antcallback target="setVarCallback" return="retValue, retCounter">
+					<!-- lass hier aus Testzwecken das unset weg --><!-- var name="out.file" unset="true"/> --><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
+					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
 						<param name="lineFromFile" value="@{line}"/>
+						<param name="in.file" value="TestWrong_1"/>
 					</antcallback>
+					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
 				</sequential>
 			</for>
-			<echo>Ergebnis: ${retCounter}. Wert: ${retValue}</echo>
+			<echo>Ende von: ${out.file}.</echo>
+			
+			
+			<!-- Gib den Inhalt der Datei zeilenweise aus -->
+			<echo>2. Lauf ------------------------------------------------------</echo>
+			<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
+
+			<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+			<for param="line">
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+					<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+				</tokens>
+				<sequential>
+					<!-- lass hier aus Testzwecken das unset weg --><!-- var name="out.file" unset="true"/> --><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
+					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
+						<param name="lineFromFile" value="@{line}"/>
+						<param name="in.file" value="TestWrong_2"/>
+					</antcallback>
+					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
+				</sequential>
+			</for>
+			<echo>Ende von: ${out.file}.</echo>
 
 </target>  
+<target name="file_reader_correct">
+	<echo>#########################################################################################</echo>
+	<echo>Im file_reader - Target... </echo>
+	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>
+				
+			<!-- Gib den Inhalt der Datei zeilenweise aus -->
+			<echo>1. Lauf -----------------------------------------------------------------------------</echo>
+			<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
 
-<!-- TODO: Mache vor dem Aufruf des antcallback ein unset der variablen. Dann funktioniert es. Siehe tryoutAnt_ConditionHandlingWith_Flaka_Contrib.xml -->
-<target name="setVarCallback"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
-   <!-- Aber: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/> -->
-   <var name="retValue" value="${lineFromFile} das war's" />
-   <math result="result" operand1="${retCounter}" operation="+" operand2="1" datatype="int"/>
-   <var name="retCounter" value="${result}" />
-</target>
+			<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+			<for param="line">
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+					<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+				</tokens>
+				<sequential>					 
+					 <var name="out.file" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar--><!-- mache HIER KORREKTERWEISE DAS UNSET -->					 					 
+					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
+						<param name="lineFromFile" value="@{line}"/>
+						<param name="in.file" value="TestKorrekt_1"/>
+					</antcallback>
+					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
+				</sequential>
+			</for>
+			<echo>Ende von: ${out.file}.</echo>
 
-  
+			
+			<!-- Gib den Inhalt der Datei zeilenweise aus -->
+			<echo>2. Lauf -----------------------------------------------------------------------------</echo>
+			<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
+
+			<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+			<for param="line">
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+					<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+				</tokens>
+				<sequential>					 
+					 <var name="out.file" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar--><!-- mache HIER KORREKTERWEISE DAS UNSET -->					 					 
+					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
+						<param name="lineFromFile" value="@{line}"/>
+						<param name="in.file" value="TestKorrekt_2"/>
+					</antcallback>
+					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
+				</sequential>
+			</for>
+			<echo>Ende von: ${out.file}.</echo>
+</target> 
  </project>
