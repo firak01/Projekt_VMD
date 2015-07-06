@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>  
 <project name="FGLVmdGitPrepareHost" default="compile" basedir=".."
-   xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka">
+   <!-- damit definiert man für antcontrib einen eigenen Namespace -->
+   <!-- damit definiert man für FLAKA einen eigenen Namespace -->
 
    <!-- ### Einbinden von Ant-Contrib ### -->
    <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
@@ -54,6 +57,78 @@
 			
 			project.setProperty(attributes.get("ireturn"), iReturn);
 		]]>
+	</scriptdef>
+	
+	<!-- ######## Scriptdefs ############################################################################--> 		
+ 	<!-- ########################### -->		
+	<scriptdef name="isBooleanZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
+		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
+		
+		    In boolean umgesetzt werden:
+			- Strings 0, 1 
+			- Strings true, false
+			
+			TODO: 
+			- Zahlen 0, 1
+		-->
+			
+			
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+												
+		<attribute name="valueinput" />
+		<attribute name="valuereturn" />
+		<attribute name="isboolean" />
+		<![CDATA[		   		  
+		   var bBooleanValue = null;
+		   var bIsBoolean = null;
+		   
+		   var myValueInput = attributes.get("valueinput");
+		   print("myValueInput='"+myValueInput+"'");		   			
+			if(isNumber(myValueInput)){
+				print("boolean liegt als Zahl vor.");	
+				if (myValueInput=='1') {			   
+					bBooleanValue = true;
+					bIsBoolean = true;
+				}else if(myValueInput=='0'){
+					bBooleanValue = false;
+					bIsBoolean = true;
+				}else{
+					bBooleanValue = null;
+					bIsBoolean = false;
+				};
+			}else{			
+				print("boolean liegt als String vor.");	
+				if (myValueInput=='true') {			   
+				   bBooleanValue = true;
+				   bIsBoolean = true;
+				}else if(myValueInput=='false') {
+					bBooleanValue = false;
+					bIsBoolean = true;				
+				}else{					
+					bIsBoolean = false;
+				};			
+			}
+						
+			project.setProperty(attributes.get("valuereturn"), bBooleanValue);
+			project.setProperty(attributes.get("isboolean"), bIsBoolean);
+			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
+			
+			//TODO: Diese Funktion in JSZ-Kernel Bibliotheken packen. 
+			//TODO: In einer entsprechenden Scriptdef Funktion nutzen.
+			function convertBoolToInt()
+			{
+				var testBool = true;
+				result = (testBool)?1:0;
+				alert(result);
+			}
+		 ]]>
 	</scriptdef>
 	
 	<!-- ########################### -->		
@@ -168,7 +243,7 @@
 	</target>
   
   <!-- ################################################################################# -->
-   <target name="compile" depends="declaration, init,FglRepositoryBackup,FglCopyClient2archive,FglCopyLocal">
+   <target name="compile" depends="declaration, init,FglRepositoryBackup,FglCopyClient2archive,FglCopyLocal_FillPropertyArrays">
 	<!-- WIRD NICHT BENÖTIGT -->
 	
     <!-- Compile the java code from ${src} into ${build} -->
@@ -265,7 +340,7 @@
 <!-- ######################################################### -->
 <!-- Beispiel für ein antcallback, in dem aus einer Schleife ein Wert zurückgeliefert wird. -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
-<target name="FglCopyLocal">
+<target name="FglCopyLocal_FillPropertyArrays">
 	<echo>######################################</echo>
 	
 	<!-- Schiebe die angegebenen Dateien von a nach b auf dem lokalen Rechner -->
@@ -295,7 +370,7 @@
 	
 	<!-- 2a. Prüfe, ob die Steuerungsdatei überhaupt existiert -->
 	<fl:choose>
-		<when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
+		<fl:when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
 			<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>
 
 			<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
@@ -323,23 +398,23 @@
 				<sequential>
 					<var name="line.length" unset="true" />
 					<length string="@{line}" property="line.length" />
-					<if>
-						<equals arg1="${line.length}" arg2="0" />
-						<then>
-							<echo>Zeile: 
+					<ac:if>
+						<ac:equals arg1="${line.length}" arg2="0" />
+						<ac:then>
+							<echo>Leerzeile...
 							</echo>
-						</then>
-						<else>						
+						</ac:then>
+						<ac:else>						
 							<echo>Zeile: @{line}</echo>
 							<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
 							<substringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
 							<!-- <echo message="subtext = ${subtext}" />	 -->						
-							<if>
-								<equals arg1="${subtext}" arg2="#" />
-								<then>
+							<ac:if>
+								<ac:equals arg1="${subtext}" arg2="#" />
+								<ac:then>
 									<echo>Kommentarzeile, wird uebersprungen...</echo>
-								</then>
-								<else>
+								</ac:then>
+								<ac:else>
 									<echo>Steuerungszeile, wird ausgewertet...</echo>
 									
 									<!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
@@ -356,67 +431,45 @@
 										<!-- TODO: Idee: in der initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
 										<!-- FEHLER, Datei nicht definiert -->
 										<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo>
-										<fl:fail message="Rechter Teil der Steuereungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+										<fl:fail message="Rechter Teil der Steueerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 																								
-									<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-		<!-- 								<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-										<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-										<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
+										<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+										<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+											 <fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+										     <fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 									</fl:when>
 
 									<!-- Prüfe, ob Datei vom Linken Teil existiert -->
 									<fl:choose>
-										<when test=" '${myLeftPart}'.tofile.exists == true ">
+										<fl:when test=" '${myLeftPart}'.tofile.exists == true ">
 											<echo>Datei existiert (von...): ${myLeftPart}</echo>
 																																	
 											<!-- Prüfe, ob es ein Verzeichnis ist -->
 											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 											<echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo>
 											<!-- A) Linker Teil - Verzeichnis-Fall: TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
-											<fl:when test="'${myisdirectoryLeftPart}' == true">
-												 <echo>ABBRUCH</echo>
+											<fl:when test="${myisdirectoryLeftPart} == true">
+												<echo>ABBRUCH</echo>
 												<fl:fail message="Linker Teil der Steuerungsanweisung ist ein Verzeichnis: ${myLeftPart}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 											</fl:when>
 											
 											<!-- B) Linker Teil - Dateipfad-Fall: Ermittle den Ausgangsdateipfad und den -namen -->
 																											
-											<!-- TODO: Prüfe, ob der rechte Teil ein Verzeichnis ist... -->
+											<!-- Prüfe, ob der rechte Teil ein Verzeichnis ist... -->
 											<!-- Falls JA: Hole vom linken Teil den Dateinamen und hänge ihn an das Verzeichnis an -->
 											<!-- Falls NEIN: Nimm das Verzeichnis, wie es ist. -->																												
 											<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 											<echo>Rechter Teil: isdirectory=${myisdirectoryRightPart}</echo>			
-											<!-- snipp - Auslagerung der Choose-Abfragen-->
-						
-											
-										</when>
-										<otherwise>
-												<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo><!-- hier auch kein fail, sondern nur diese Warnung -->												
-										</otherwise>
-									</fl:choose>
-
-
-									<!-- START: codeschnipsel wieder eingefügt... 
-									      Aber: Vielleicht ist eine if - Consturktion besser als "when"... 
-										           wegen der Verschachtelung -->
-												   
-												   
-												   <!-- Merke: Choose ineineander zu verschachteln ist nicht erlaubt. -->
-											<fl:choose>
-												<!-- Die Vorgehensweise beim Kopieren erfordert es, dass es eine Variable für das Verzeichnis und eine Variable für die Datei gibt. (für das fileset include) -->
-												<when test=" '${myisdirectoryRightPart}'=='true'">
-												
-													<!-- wenn der rechte Teil nun ein Verzeichnis ist... -->
-													<!-- Erstelle / Initialisiere neu eine Liste der "Zieldateien", das kann nur eine sein oder auch alle Dateien eines Verzeichnisses -->
-													<!-- <fl:let>listaDestinationFiles ::= list()</fl:let> -->
-												
+										
+											<isBooleanZZZ valueinput="${myisdirectoryRightPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+											<ac:if>
+												<ac:equals arg1="${myBooleanValue}" arg2="true"/>
+												<ac:then>
 													<echo>Rechter Teil (nach...) ${myRightPart} ist ein Verzeichnis </echo>
 													<fl:let>dest.filedir ::= ${myRightPart}</fl:let>
 													<fl:let>dest.filename ::= ${src.filename}</fl:let>
-
-													
-											
-												</when>
-												<otherwise>													
+												</ac:then>
+												<ac:else>
 													<echo>Rechter Teil (nach...) ${myRightPart} ist KEIN Verzeichnis </echo>
 													<!-- TODO GOON: Hole den Namen des Verzeichnisses (als Pfad), hole den Dateinamen -->
 													<!-- TODO GOON: 20150622 HIER die Indexberechnung und ggfs. sogar das holen des letzten Werts als Scriptdef.
@@ -428,139 +481,145 @@
 													<echo>Groesse dest.fileapath per scriptdef Aufruf: ${myaFilePathSize}</echo>
 																						
 													<!-- <fl:for var="mydir" in="split('${myLeftPart}','\\\\')"> -->
-													<!-- <echo>Pfadbestandteil: #{mydir}</echo -->><!-- Aufruf der Variablen als EL Expression -->
+													<!-- <echo>Pfadbestandteil: #{mydir}</echo --><!-- Aufruf der Variablen als EL Expression -->
 													<!-- </fl:for> -->
 													
-																																																													
-												</otherwise>
-											</fl:choose>
+															
+												</ac:else>
+											</ac:if>
 											
-											<!-- Merke: choose ineinander zu verschachteln ist nicht erlaubt. -->
-											<fl:choose>
-												<when test=" '${myaFilePathSize}'=='1' and '${myisdirectoryRightPart}'=='true'">
-													<echo>Rechts steht nur ein Wert... das sollte der Dateiname sein: ${myRightPart}</echo>
-												</when>
-												<otherwise>
-													<echo>Rechts steht ein Dateiname: ${myRightPart}</echo>
-												
-													<!-- 3. Ermittle die letzte Indexposition und damit den Dateinamen -->
-													<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
-															   Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
-													<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
-													<var name="op1" value="${myaFilePathSize}"/>
-													<var name="op2" value="1"/>
-													<var name="op" value="-"/>
-													<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-													<echo>Errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
-													<fl:let>
-														xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
-													</fl:let>
-													<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>	
-													<fl:let>dest.filename ::= ${xtractedvalue}</fl:let>
-													
-													<!-- 4. Füge den Dateinamen hinter den Pfad, der von der linken Seite kommt hinzu, 
-													wenn auf der rechten Seite kein Pfad vorhanden ist. -->
-													
-													<!-- 4.1 mache aus dem linken Teil nun ein Array. -->
-													<fl:let>src.fileapath ::= split('${myLeftPart}','\\\\')</fl:let>
-													<echo>Nach dem split: ${src.fileapath}</echo>
-																																			
-													<!-- TODO: Array Aufaddieren von indexposition x bis zu einer anderen Indexposition
-																arrayStringImplode mit den Parametern sSeparator, ilBound, iuBound -->
-													<!-- TODO: An den so implodierten String das \\extractedvalue anhängen. -->
-												</otherwise>
-											</fl:choose>	
-											<fl:echo>dest.filedir => ${dest.filedir}</fl:echo>
-											<fl:echo>dest.filename => ${dest.filename}</fl:echo>
+											<!-- TODO GOON: jeweils ein Array mit den werten des Ausgangsdateipfads und des Zieldateipfads erstellen -->
 											
-											
-											<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
-											<!-- <echo>src.filedir = #{split('aabcc','b')[0]}</echo> -->
-											
-											<!-- Z.B.: Hiermit holt man ggfs. den Laufwerksnamen, oder auch das letzte Element -->
-											<!-- <echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo> -->
-											<fl:let>src.fileadir ::= split('${myLeftPart}','\\\\')</fl:let><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
-											
-											<!-- 2. ermittle die groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
-											<!--    Merke: #{size(${src.fileadir})} funktioniert nicht. Siehe tryoutAnt_FlakaListHandling -->																													
-											<!-- 			Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
-											<arrayElementCountJsZZZ arrayinput="${src.fileadir}" ireturn="mylistasize"/>
-											<echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</echo>
-																						
-											<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
-											<echo>Pfadbestandteil: #{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
-											</fl:for>
-											
-											<!-- 3. Ermittle die Indexposition -->
-											<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
-											           Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
-											<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
-											<var name="op1" value="${mylistasize}"/>
-											<var name="op2" value="1"/>
-											<var name="op" value="-"/>
-											<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-											<echo>errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
-											<fl:let>
-												xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
-											</fl:let>
-											<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>
-											
-											<!-- TODO: Hänge diesen Wert an das Zielverzeichnis an. Das ist der Zieldateipfad -->
-											
-											
-											<!-- 4. Der eigentliche Kopiervorgang -->
-											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
-											<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-											<echo>Pushing File ${src.filedir}\${src.filename} to Repository: ${dest.filedir}\${dest.filename} </echo>
-											
-											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-											<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
-											  <fileset dir="//${src.dirFglClientPath}">	
-												 <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
-												 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
-												
-												<!--Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
-												<include name="${src.dirFglClientFileName}" />		
-											  </fileset>
-											</copy>
-											
-											<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
-											<echo>b) Misc Files:</echo>
-											<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-											<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
-											  <fileset dir="//${src.dirFglClientPath}">	
-												 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
-												<include name="**.txt"/>
-											  </fileset>
-											</copy>
-												   
-												   
-												   
-												   
-												   
-												   
-												   
-												   
-												   
-											<!-- ENDE: codeschnipsel wieder eingefügt... 
-									      Aber: Vielleicht ist eine if - Consturktion besser als "when"... 
-										           wegen der Verschachtelung -->
+											<!-- todo codeschnipsel unten teilweise hier wieder einfügen -->
+										</fl:when>
+										<fl:otherwise>
+												<echo>Linke Datei existiert NICHT (d.h. von... Teil): ${myLeftPart}</echo><!-- hier auch kein fail, sondern nur diese Warnung -->												
+										</fl:otherwise>
+									</fl:choose>
 
-								</else>
-							</if>											
-						</else>
-					</if>
+										
+
+									
+								</ac:else>
+							</ac:if>											
+						</ac:else>
+					</ac:if>
 				</sequential>
 			</for>			
-		</when>
-		<otherwise>
+		</fl:when>
+		<fl:otherwise>
 				<echo>Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
 				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-		</otherwise>
+		</fl:otherwise>
 	</fl:choose>
 
 </target>
 
+<target name="FglCopyLocal_CopyUsingPropertyArrays">
+<!-- START: codeschnipsel wieder eingefügt... -->
+<fl:choose>
+	<when test=" '${myaFilePathSize}'=='1' and '${myisdirectoryRightPart}'=='true'">
+		<echo>Rechts steht nur ein Wert... das sollte der Dateiname sein: ${myRightPart}</echo>
+	</when>
+	<otherwise>
+		<echo>Rechts steht ein Dateiname: ${myRightPart}</echo>
+												
+		<!-- 3. Ermittle die letzte Indexposition und damit den Dateinamen -->
+		<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
+				   Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
+		<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+		<var name="op1" value="${myaFilePathSize}"/>
+		<var name="op2" value="1"/>
+		<var name="op" value="-"/>
+		<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+		<echo>Errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
+		<fl:let>
+			xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
+		</fl:let>
+		<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>	
+		<fl:let>dest.filename ::= ${xtractedvalue}</fl:let>
+													
+		<!-- 4. Füge den Dateinamen hinter den Pfad, der von der linken Seite kommt hinzu, wenn auf der rechten Seite kein Pfad vorhanden ist. -->
+													
+		<!-- 4.1 mache aus dem linken Teil nun ein Array. -->
+		<fl:let>src.fileapath ::= split('${myLeftPart}','\\\\')</fl:let>
+		<echo>Nach dem split: ${src.fileapath}</echo>
+																																
+		<!-- TODO: Array Aufaddieren von indexposition x bis zu einer anderen Indexposition
+					arrayStringImplode mit den Parametern sSeparator, ilBound, iuBound -->
+		<!-- TODO: An den so implodierten String das \\extractedvalue anhängen. -->
+	</otherwise>
+</fl:choose>	
+<fl:echo>dest.filedir => ${dest.filedir}</fl:echo>
+<fl:echo>dest.filename => ${dest.filename}</fl:echo>
+											
+											
+<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
+<!-- <echo>src.filedir = #{split('aabcc','b')[0]}</echo> -->
+<!-- Z.B.: Hiermit holt man ggfs. den Laufwerksnamen, oder auch das letzte Element -->
+<!-- <echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo> -->
+<fl:let>src.fileadir ::= split('${myLeftPart}','\\\\')</fl:let><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
+											
+<!-- 2. ermittle die groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
+<!--    Merke: #{size(${src.fileadir})} funktioniert nicht. Siehe tryoutAnt_FlakaListHandling -->																	
 
+												
+<!-- 			Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
+<arrayElementCountJsZZZ arrayinput="${src.fileadir}" ireturn="mylistasize"/>
+<echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</echo>
 
+<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
+<echo>Pfadbestandteil: #{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
+</fl:for>
+											
+<!-- 3. Ermittle die Indexposition -->
+<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
+		Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
+
+<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+<var name="op1" value="${mylistasize}"/>
+<var name="op2" value="1"/>
+<var name="op" value="-"/>
+<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+<echo>errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
+<fl:let>
+	xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; 
+
+<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
+</fl:let>
+<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>
+<!-- TODO: Hänge diesen Wert an das Zielverzeichnis an. Das ist der Zieldateipfad -->
+											
+											
+<!-- 4. Der eigentliche Kopiervorgang -->
+<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
+<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
+<echo>Pushing File ${src.filedir}\${src.filename} to Repository: ${dest.filedir}\${dest.filename} </echo>
+											
+<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
+<fileset dir="//${src.dirFglClientPath}">	
+<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
+<!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+												
+<!--Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
+	<include name="${src.dirFglClientFileName}" />		
+</fileset>
+</copy>
+										
+<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
+<echo>b) Misc Files:</echo>
+<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+<copy todir="//${dest.dirRepositoryVmdPath}/
+
+${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
+<fileset dir="//${src.dirFglClientPath}">	
+ <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
+	<include name="**.txt"/>
+  </fileset>
+</copy>
+												   						   
+<!-- ENDE: codeschnipsel wieder eingefügt... -->
+</target>
 </project>

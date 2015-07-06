@@ -39,8 +39,8 @@
 	  </classpath>
 	</taskdef>
 		
-		  <!-- ######## Scriptdefs ############################################################################--> 		
- 	   <!-- ########################### -->		
+	<!-- ######## Scriptdefs ############################################################################--> 		
+ 	<!-- ########################### -->		
 	<scriptdef name="isBooleanZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
 		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
@@ -462,7 +462,7 @@
 				<echo>02 When:  Ein boolean 'true' Wert wurde gefunden.</echo>
 			</fl:when>
 			<fl:when test="'${myValueIsBoolean02}'!=true">
-				<echo>02 When:  Ein boolean 'false' Wert wurde oder undefiniert wurde gefunden.</echo>
+				<echo>02 When:  Ein boolean 'false' Wert oder 'undefiniert' wurde gefunden.</echo>
 			</fl:when> 
 			
 	</fl:when>
@@ -475,16 +475,19 @@
 	<!-- 2. Verschachtelung von 'choose' testen. -->
 	<fl:let>mytest01 ::= '0'</fl:let>
 	<fl:let>mytest02 ::= '1'</fl:let>
-	<fl:let>mytest02 ::= '0'</fl:let>
-	
-	<!-- Merke: nur antrib - If darf darin enthalten sein, kein weiteres Flaka - Choose-->
+	<fl:let>mytest02 ::= '0'</fl:let>	
  	<fl:choose>
-		<when test=" '${mytest01}' == '0' ">
+		<fl:when test=" '${mytest01}' == '0' ">
 			<echo>mytest01 ist 'null' </echo>	
-		</when>
-		<otherwise>
-				<echo>mytest01 ist ungleich'null' </echo>				
-		</otherwise>
+			
+			<!-- TODO: Verschachtelungsebenen einfügen -->
+			
+		</fl:when>
+		<fl:otherwise>		
+			<echo>mytest01 ist ungleich'null' </echo>				
+			
+			<!-- TODO: Verschachtelungsebenen einfügen -->
+		</fl:otherwise>
 	</fl:choose>
 
 </target>
