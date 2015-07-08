@@ -17,10 +17,12 @@
   
   <!-- ########################### -->
   <!-- Ausprobieren von Ant-Contrib zum Datei parsen -->
-  <property name="userdir_sub"  value="testused" />
+  <property name="userdir_sub" value="testused" />
   
 <!-- ################################################################################# -->
- <target name="compile" depends="file_reader">
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-file_reader">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -36,7 +38,7 @@
 	-->
   </target>
   
-<target name="file_reader">
+<target name="-file_reader">
 	<echo>Im file_reader - Target... </echo>
 	<echo>Parsing file: ${userdir_sub}/file_readerBeispielWithVariable.txt</echo>
 	

@@ -341,8 +341,11 @@
 		
 <!-- ################################################################################# -->
 <!-- Die einzelnen Tests im depends hinzufügen -->
+<!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+			 
 <!-- <target name="compile" depends="declaration,myTestArrayInitJsZZZ,myTestArrayDebugJsZZZ"> -->
-<target name="compile" depends="declaration,myTestArrayAppendJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayAppendJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -358,13 +361,13 @@
 	-->
   </target>
   
-  <target name="declaration">
+  <target name="-declaration">
 	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 	  dies passiert hier durch flaka´s install-property handler task -->
 	  <fl:install-property-handler />	
   </target>
   
-	<target name="myTestArrayInitJsZZZ">
+	<target name="-myTestArrayInitJsZZZ">
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
 		<fl:logo>myTestArrayInitJsZZZ:
 			Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
@@ -437,7 +440,7 @@
 		
 	</target>
   
-	<target name="myTestArrayDebugJsZZZ">
+	<target name="-myTestArrayDebugJsZZZ">
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
 		<fl:logo>myTestArrayDebugJsZZZ:
 		Meine Loesung: Scriptdef arrayDebugJsZZZ</fl:logo>		

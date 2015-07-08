@@ -2,9 +2,71 @@
 <project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 		 
+	<!-- ######## Scriptdefs ############################################################################--> 		
+ 	<!-- ########################### -->		 
+<scriptdef name="listElementCountFlakaZZZ" language="javascript">
+			<!-- MEreke: Veraltete Version: Die aktuelle Version wird immer im tryoutAnt_FlakaArrayJsHandling weiterentwickelt -->
+			
+			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+			<attribute name="lista" />
+			<attribute name="ireturn" />
+			<![CDATA[
+				var lista = attributes.get("lista");		 
+				var iReturn = -1;
+				
+				//print("typeof lista = " + typeof(lista));
+				// print("Objekt: " + lista);
+				
+				//... DAS GIBT ALLE METHODEN ZURUECK !!!! 
+				//for(obj in lista){
+				//print("obj=" + obj);
+				//}
+				
+				/*
+				if(Array.isArray(objectArray)){
+				//print("Array erzeugt.");
+				iReturn = objectArray.length;
+				}else{
+				//print("kein Array erzeugt.");
+				iReturn=0;
+				}
+			 */
+				
+				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+				
+				var icount=0;
+				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein Array
+				if(typeof(objectArray)=="object"){
+				for(x in objectArray){
+				//print(x);		
+				//print(typeof(x));
+				icount++;
+				}							
+				}else{
+				//print("kein Objekt");
+				iReturn=0;
+				}
+				
+					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 //for(yy in objectArray){
+					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+					//	};
+									
+				iReturn = icount;
+				
+				project.setProperty(attributes.get("ireturn"), iReturn);
+			]]>
+		</scriptdef>		 
+		 
+		 
 <!-- ################################################################################# -->
 <!-- Die einzelnen Tests im depends hinzufügen -->
- <target name="compile" depends="declaration,myTryoutFlakaListHandling,myTestListElementCountFlakaZZZ">
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-declaration,-myTryoutFlakaListHandling,-myTestListElementCountFlakaZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -20,13 +82,13 @@
 	-->
   </target>
   
-  <target name="declaration">
+  <target name="-declaration">
 	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 	  dies passiert hier durch flaka´s install-property handler task -->
 	  <fl:install-property-handler />	
   </target>
   
-<target name="myTryoutFlakaListHandling">
+<target name="-myTryoutFlakaListHandling">
 	<fl:logo>myTryoutFlakaListHandling: list() und size()</fl:logo>
 	<!-- 1a. mit list(...) erzeugte statische liste klappt -->
 	<echo>groesse einer Liste mit size(...) = #{size(list(1,2))}</echo><!-- funktioniert -->
@@ -131,7 +193,7 @@ append('a',2)                  ; list('a',2)
 	<!-- DARUM WERDEN STATT LISTEN JETZT JAVA SCRIPT ARRAYS VERWENDET -->
 	<!-- ################################################ -->
 	
-	<target name="myTestListElementCountFlakaZZZ">
+	<target name="-myTestListElementCountFlakaZZZ">
 		<fl:logo>myTestListElementCountFlakaZZZ:
 		Meine Lösung: Scriptdef listElementCountFlakaZZZ</fl:logo>
 		<fl:let>
@@ -142,63 +204,5 @@ append('a',2)                  ; list('a',2)
 		<!-- Hier wird die scriptdef Methode listElementCountFlakaZZZ aufgerufen -->
 		<listElementCountFlakaZZZ lista="${aaa}" ireturn="mylistasize"/>
 		<echo>groesse aaa per scriptdef Aufruf auf list(...): ${mylistasize}</echo>
-	</target> 
-	
-	    
-		<scriptdef name="listElementCountFlakaZZZ" language="javascript">
-			<!-- MEreke: Veraltete Version: Die aktuelle Version wird immer im tryoutAnt_FlakaArrayJsHandling weiterentwickelt -->
-			
-			<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
-			Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-			<attribute name="lista" />
-			<attribute name="ireturn" />
-			<![CDATA[
-				var lista = attributes.get("lista");		 
-				var iReturn = -1;
-				
-				//print("typeof lista = " + typeof(lista));
-				// print("Objekt: " + lista);
-				
-				//... DAS GIBT ALLE METHODEN ZURUECK !!!! 
-				//for(obj in lista){
-				//print("obj=" + obj);
-				//}
-				
-				/*
-				if(Array.isArray(objectArray)){
-				//print("Array erzeugt.");
-				iReturn = objectArray.length;
-				}else{
-				//print("kein Array erzeugt.");
-				iReturn=0;
-				}
-			 */
-				
-				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
-				
-				var icount=0;
-				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein Array
-				if(typeof(objectArray)=="object"){
-				for(x in objectArray){
-				//print(x);		
-				//print(typeof(x));
-				icount++;
-				}							
-				}else{
-				//print("kein Objekt");
-				iReturn=0;
-				}
-				
-					//Merke: Zugriff auf die Bestandteile des Array bekäme man so:
-					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
-					 //for(yy in objectArray){
-					//		print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
-					//		print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
-					//	};
-									
-				iReturn = icount;
-				
-				project.setProperty(attributes.get("ireturn"), iReturn);
-			]]>
-		</scriptdef>
+	</target> 		    		
  </project>

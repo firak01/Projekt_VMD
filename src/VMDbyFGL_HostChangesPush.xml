@@ -177,7 +177,7 @@
   <property name="src" value="src"/>
   -->
   
-  <target name="declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
+  <target name="-declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
     <!-- An dieser Stelle Argumente entgegennehmen, entweder aus der Batch oder unter Eclipse aus der "external Configuration" des AntScripts  -->
   	<!-- Merke: You can define an argument with the property file name to the build in the 'Arguments' section of the Run > External Tools > External Tools Configuration for your Ant Build. Something like:
   	-Dproperties=Buildfile_test.properties
@@ -243,7 +243,10 @@
 	</target>
   
   <!-- ################################################################################# -->
-   <target name="compile" depends="declaration, init,FglRepositoryBackup,FglCopyClient2archive,FglCopyLocal_FillPropertyArrays">
+  <!-- Die einzelnen Tests im depends hinzufügen -->
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+   <target name="compile" depends="-declaration, -init,-FglRepositoryBackup,-FglCopyClient2archive,-FglCopyLocal_FillPropertyArrays">
 	<!-- WIRD NICHT BENÖTIGT -->
 	
     <!-- Compile the java code from ${src} into ${build} -->
@@ -259,7 +262,7 @@
   </target>
   
   
-  <target name="init">
+  <target name="-init">
     <!-- Create the time stamp -->
 	<echo>Receiving timestamp:</echo>
     <!--<tstamp/>-->
@@ -273,7 +276,7 @@
 	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
 </target>
        
-<target name="FglRepositoryBackup">
+<target name="-FglRepositoryBackup">
 	<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
 	<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
   
@@ -311,7 +314,7 @@
 </target>
 	
 	
-<target name="FglCopyClient2archive">
+<target name="-FglCopyClient2archive">
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
 	<echo>Pushing Files to Repository:</echo>
 	<echo>a) VMD File:</echo>
@@ -340,7 +343,7 @@
 <!-- ######################################################### -->
 <!-- Beispiel für ein antcallback, in dem aus einer Schleife ein Wert zurückgeliefert wird. -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
-<target name="FglCopyLocal_FillPropertyArrays">
+<target name="-FglCopyLocal_FillPropertyArrays">
 	<echo>######################################</echo>
 	
 	<!-- Schiebe die angegebenen Dateien von a nach b auf dem lokalen Rechner -->
@@ -396,26 +399,26 @@
 					<file file="${conf.copyLocalFilePath}" />
 				</tokens>
 				<sequential>
+					<fl:let>myCase ::= "neue Zeile"</fl:let><!-- für jede Zeile wird der mögliche Verarbeitungsfall neu ermittelt -->
 					<var name="line.length" unset="true" />
 					<length string="@{line}" property="line.length" />
 					<ac:if>
 						<ac:equals arg1="${line.length}" arg2="0" />
 						<ac:then>
-							<echo>Leerzeile...
-							</echo>
+							<!-- <echo>Leerzeile...</echo> -->
 						</ac:then>
-						<ac:else>						
-							<echo>Zeile: @{line}</echo>
+						<ac:else>													
 							<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
 							<substringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
 							<!-- <echo message="subtext = ${subtext}" />	 -->						
 							<ac:if>
 								<ac:equals arg1="${subtext}" arg2="#" />
 								<ac:then>
-									<echo>Kommentarzeile, wird uebersprungen...</echo>
+									<!-- <echo>Kommentarzeile, wird uebersprungen...</echo> -->
 								</ac:then>
 								<ac:else>
-									<echo>Steuerungszeile, wird ausgewertet...</echo>
+									<echo>Zeile: @{line}</echo>
+									<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->
 									
 									<!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
 									<!-- <fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo> --><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
@@ -457,19 +460,24 @@
 																																	
 											<!-- Prüfe, ob es ein Verzeichnis ist -->
 											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo>
+											<!-- <echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo> -->
 																						
 											<fl:when test="${myisdirectoryLeftPart} == true">
 													<!-- A) Linker Teil - Verzeichnis-Fall: -->
 													<echo>Linker Teil: ist Verzeichnis</echo>
-													<fl:let>myCase ::= "A"</fl:let>																								 
+													<fl:let>myCase ::= "V"</fl:let>																								 
 											</fl:when>
 											<fl:when test="${myisdirectoryLeftPart} != true">
 													<!-- B) Linker Teil - Dateipfad-Fall:-->
 													<echo>Linker Teil: ist KEIN Verzeichnis</echo>
-													<fl:let>myCase ::= "B"</fl:let>
+													<fl:let>myCase ::= "D"</fl:let>
 											</fl:when>
 										</fl:when>
+										<fl:otherwise>
+											<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo>
+											<fl:let>myCase ::= "X"</fl:let>
+											<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+										</fl:otherwise>
 									</fl:choose>
 									
 										<!-- Prüfe, ob Datei vom Rechten Teil existiert -->
@@ -479,26 +487,31 @@
 																																	
 											<!-- Prüfe, ob es ein Verzeichnis ist -->
 											<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<echo>rechter Teil: isdirectory=${myisdirectoryRightPart}</echo>
+											<!-- <echo>rechter Teil: isdirectory=${myisdirectoryRightPart}</echo> -->
 																						
 											<fl:when test="${myisdirectoryRightPart} == true">
-													<!-- A) Linker Teil - Verzeichnis-Fall: -->
+													<!-- A) Rechter Teil - Verzeichnis-Fall: -->
 													<echo>Rechter Teil: ist Verzeichnis</echo>
-													<fl:let>myCase ::= "myCase + A"</fl:let>																								 
+													<fl:let>myCase ::= "${myCase}A"</fl:let>																								 
 											</fl:when>
-											<fl:when test="${myisdirectoryLeftPart} != true">
-													<!-- B) Linker Teil - Dateipfad-Fall:-->
-													<echo>Linker Teil: ist KEIN Verzeichnis</echo>
-													<fl:let>myCase ::= "myCase + B"</fl:let>
+											<fl:when test="${myisdirectoryRightPart} != true">
+													<!-- B) Rechter Teil - Dateipfad-Fall:-->
+													<echo>Rechter Teil: ist KEIN Verzeichnis</echo>
+													<fl:let>myCase ::= "${myCase}B"</fl:let>
 											</fl:when>
 										</fl:when>
+										<fl:otherwise>
+											<echo>Datei existiert NICHT (nach...): ${myRightPart}</echo>
+											<fl:let>myCase ::= "${myCase}X"</fl:let>
+											<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+										</fl:otherwise>
 									</fl:choose>	
-			
-									
-									<!-- todo codeschnipsel unten teilweise hier wieder einfügen -->
-									<!-- TODO GOON: jeweils ein Array mit den werten des Ausgangsdateipfads und des Zieldateipfads erstellen -->
-									<echo>Soweit ermitelter Fall: ${myCase}</echo>
-									
+									<echo>Soweit ermittelter Fall: ${myCase}</echo>
+												
+												
+									<!-- TODO GOON: Je nach Fall ein anderes Target aufrufen. Dadurch ist der Code modularer --> 	
+									<!-- todo codeschnipsel unten teilweise hier wieder einfügen oder in ein extra Target packen -->
+									<!-- TODO: jeweils ein Array mit den werten des Ausgangsdateipfads und des Zieldateipfads erstellen -->
 									
 									
 						</ac:else>

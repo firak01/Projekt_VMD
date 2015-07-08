@@ -1,0 +1,194 @@
+﻿<project name="tryoutAnt_StandardAntcallback"  default="compile" basedir=".."
+		xmlns:fl="antlib:it.haefelinger.flaka"
+		xmlns:ac="antlib://net/sf/antcontrib"><!-- damit bindet man antcontrib, bzw. flaka ein -->
+
+		 
+	  <!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so waehlen, wie sie in der ant-contrib Doku benannt sind ### -->
+	  <!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	 <taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+		
+		
+<!-- Merke: Es gibt auch von AntContrib callbacks, die wir hier aber nicht nutzen.-->	
+<!-- hier als Standard wird folgendes verwendet:
+	<target name="testCallback" description="Test CallBack">
+        <taskdef name="antcallback" classname="ise.antelope.tasks.AntCallBack" classpath="${antelope.home}/build" />
+        <antcallback target="-testcb" return="a, b"/>
+        <echo>a = ${a}</echo>
+        <echo>b = ${b}</echo>
+    </target>
+
+    <target name="-testcb">
+        <property name="a" value="A"/>
+        <property name="b" value="B"/>
+    </target>
+	
+	########################################
+	Parameter übergibt man wie folgt:
+	
+	<target name="default">
+  <antcall target="doSomethingElse">
+    <param name="param1" value="value"/>
+  </antcall>
+</target>
+
+<target name="doSomethingElse">
+  <echo message="param1=${param1}"/>
+</target>
+	-->
+	
+	
+<target name="-setVarCallback"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
+   <fl:let>retValue ::= "${lineFromFile} das war's"</fl:let>
+   <fl:let>out.fileByLet ::= "${in.file}"</fl:let>
+   
+   <property name="out.file" value="${in.file}"/><!-- DIESE PROPERTY IST OHNE UNSET NICHT VERAENDERBAR -->
+   
+   <math result="result" operand1="${retCounter}" operation="+" operand2="1" datatype="int"/>  	  
+	<fl:let>retCounter ::= ${result}</fl:let>
+</target>
+
+  
+  
+  <!-- ########################### -->
+  <target name="-declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
+	<echo>##############################</echo>
+	<echo>In diesem Tryout werden folgende Punkte ausprobiert, die teilweise nur mit ant-contrib lösbar sind:</echo>
+	<echo>1) Eine Datei einlesen und Zeileweise parsen</echo>
+	<echo>2) In einer Schleife ein target aufrufen, als antcallback und somit Werte dahin und daraus zu übernehmen</echo>
+	<echo>   In einer Schleife ein target aufrufen, als antcallback und somit Werte dahin und daraus zu übernehmen</echo>
+	<echo>3) Anwendung des math Tasks</echo>
+	<echo></echo>
+	<echo>Desweiteren wird bewiesen, das Proeprties nicht änderbar sind, wohl aber Variablen mit Flaka - Let verändert werden können.</echo>
+	<echo>Letzteres ist als Ergaenzung zu der unset - Loesung bei antcontrib zu sehen.</echo>
+	
+	<!-- Ausprobieren zum Datei parsen -->
+	<property name="userdir_sub"  value="testused" />
+	  
+	<fl:let>retCounter ::= 0</fl:let>
+  </target>
+  
+<!-- ################################################################################# -->
+<!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-declaration, -file_reader_total, -file_reader_correct, -file_reader_wrong">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt und daher zuletzt ausgeführt wird. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+ <target name="-file_reader_total">
+			<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
+			<loadfile property="myfile" srcFile ="${userdir_sub}/file_antcallbackBeispiel.txt" />
+			
+  			<!-- Gib den Inhalt der Datei als Ganzes aus -->
+			<echo>-----------------------------------------------------------------------------------</echo>
+			<echo>Dateiinhalt als Ganzes:</echo>
+			<echo>${myfile}</echo>
+ </target> 
+ 
+<target name="-file_reader_wrong">
+	<echo>#########################################################################################</echo>
+	<echo>Im file_reader - Target... </echo>
+	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>			
+			
+	<!-- Gib den Inhalt der Datei zeilenweise aus -->
+	<echo>1. Lauf ------------------------------------------------------</echo>
+	<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
+
+	<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+	<ac:for param="line">
+		<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+			<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+		</tokens>
+		<sequential>				
+			 <antcallback target="-setVarCallback" return="retValue, retCounter, out.file, out.fileByLet">
+				<param name="lineFromFile" value="@{line}"/>
+				<param name="in.file" value="TestWrong_1"/>
+			</antcallback>				
+			<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
+			<echo>Ergebnis 'by Let': ${out.fileByLet} - ${retCounter}. Wert: ${retValue}</echo>
+		</sequential>
+	</ac:for>
+	<echo>Ende von: ${out.file}.</echo>
+	
+	
+	<!-- Gib den Inhalt der Datei zeilenweise aus -->
+	<echo>2. Lauf ------------------------------------------------------</echo>
+	<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
+
+	<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+	<ac:for param="line">
+		<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+			<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+		</tokens>
+		<sequential>
+			<antcallback target="-setVarCallback" return="retValue, retCounter, out.file, out.fileByLet">
+				<param name="lineFromFile" value="@{line}"/>
+				<param name="in.file" value="TestWrong_2"/>
+			</antcallback>
+			<echo>Ergebnis Property: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
+			<echo>Ergebnis 'by Let': ${out.fileByLet} - ${retCounter}. Wert: ${retValue}</echo>
+		</sequential>
+	</ac:for>
+	<echo>Ende von: ${out.file}.</echo>
+</target>  
+<target name="-file_reader_correct">
+	<echo>#########################################################################################</echo>
+	<echo>Im file_reader - Target... </echo>
+	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>
+				
+			<!-- Gib den Inhalt der Datei zeilenweise aus -->
+			<echo>1. Lauf -----------------------------------------------------------------------------</echo>
+			<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
+
+			<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+			<ac:for param="line">
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+					<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+				</tokens>
+				<sequential>					 					
+					<antcallback target="-setVarCallback" return="retValue, retCounter, out.file, out.fileByLet">
+						<param name="lineFromFile" value="@{line}"/>
+						<param name="in.file" value="Testkorrekt_1"/>
+					</antcallback>
+					<echo>Ergebnis Property: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
+					<echo>Ergebnis 'by Let': ${out.fileByLet} - ${retCounter}. Wert: ${retValue}</echo>
+				</sequential>
+			</ac:for>
+			<echo>Ende von: ${out.file}.</echo>
+
+			
+			<!-- Gib den Inhalt der Datei zeilenweise aus -->
+			<echo>2. Lauf -----------------------------------------------------------------------------</echo>
+			<echo>Dateiinhalt Zeile für Zeile mit einem Returnwert:</echo>		
+
+			<!-- for, var und if kommen aus der ant-contrib Bibliothek, Merke: Man kann aus einer Schleife keinen Wert zurückliefern, normalerweise. -->
+			<ac:for param="line">
+				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. sichtbarkeit-->
+					<file file="${userdir_sub}/file_antcallbackBeispiel.txt" />
+				</tokens>
+				<sequential>					 				
+					<antcallback target="-setVarCallback" return="retValue, retCounter, out.file, out.fileByLet">
+						<param name="lineFromFile" value="@{line}"/>
+						<param name="in.file" value="Testkorrekt_2"/>
+					</antcallback>
+					<echo>Ergebnis Property: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
+					<echo>Ergebnis 'by Let': ${out.fileByLet} - ${retCounter}. Wert: ${retValue}</echo>
+				</sequential>
+			</ac:for>
+			<echo>Ende von: ${out.file}.</echo>
+</target> 
+ </project>

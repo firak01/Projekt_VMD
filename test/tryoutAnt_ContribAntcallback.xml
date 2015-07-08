@@ -1,4 +1,5 @@
-﻿<project name="tryoutAnt_ContribAntcallback"  default="compile" basedir="..">
+﻿<project name="tryoutAnt_ContribAntcallback"  default="compile" basedir=".."
+		xmlns:ac="antlib://net/sf/antcontrib"><!-- Damit definiert man für AntContrib einen eigenen Namespace -->
 
 <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
 	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
@@ -16,12 +17,13 @@
 	
 	
 <!-- ######### AntContrib: Callback Targets, quasi als ausgelagerte Unterfunktionen ################################-->
+<!--           Merke: Es gibt auch im Standard eine AntCall und AntCallBack Task -->
 
 <!-- ############################################################################### -->
 <!-- Beweis, das Property Werte normaleweise nicht veraenderbar sind. -->
 <!-- TODO: Mache den gleichen Beweis, mit veränderbaren PRoeprty Wertend
      Mache vor dem Aufruf des antcallback ein unset der variablen. Dann funktioniert es. Siehe tryoutAnt_ConditionHandlingWith_Flaka_Contrib.xml -->
-<target name="setVarCallback"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
+<target name="-setVarCallback"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
    <!-- Merke: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/>
 				Darum: Mach folgendes in dem aufrufenden Target, dann klappts <var name="retValue" unset="true"/> -->   
    <var name="retValue" value="${lineFromFile} das war's" />     
@@ -36,7 +38,7 @@
   
   
   <!-- ########################### -->
-  <target name="declaration"><!-- damit dies ncht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
+  <target name="-declaration"><!-- damit dies ncht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
 	<echo>##############################</echo>
 	<echo>In diesem Tryout werden folgende Punkte ausprobiert, die teilweise nur mit ant-contrib lösbar sind:</echo>
 	<echo>1) Eine Datei einlesen und Zeileweise parsen</echo>
@@ -51,7 +53,9 @@
   </target>
   
 <!-- ################################################################################# -->
- <target name="compile" depends="declaration, file_reader_total, file_reader_correct, file_reader_wrong">
+<!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-declaration, -file_reader_total, -file_reader_correct, -file_reader_wrong">
     <echo>Im default - Target..., das von allen anderen Targets abhängt und daher zuletzt ausgeführt wird. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -66,7 +70,7 @@
     </javac>
 	-->
   </target>
- <target name="file_reader_total">
+ <target name="-file_reader_total">
 			<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
 			<loadfile property="myfile" srcFile ="${userdir_sub}/file_antcallbackBeispiel.txt" />
 			
@@ -76,7 +80,7 @@
 			<echo>${myfile}</echo>
  </target> 
  
-<target name="file_reader_wrong">
+<target name="-file_reader_wrong">
 	<echo>#########################################################################################</echo>
 	<echo>Im file_reader - Target... </echo>
 	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>			
@@ -91,10 +95,10 @@
 				</tokens>
 				<sequential>
 					<!-- lass hier aus Testzwecken das unset weg --><!-- var name="out.file" unset="true"/> --><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
-					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
-						<param name="lineFromFile" value="@{line}"/>
-						<param name="in.file" value="TestWrong_1"/>
-					</antcallback>
+					 <ac:antcallback target="-setVarCallback" return="retValue, retCounter, out.file">
+						<ac:param name="lineFromFile" value="@{line}"/>
+						<ac:param name="in.file" value="TestWrong_1"/>
+					</ac:antcallback>
 					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
 				</sequential>
 			</for>
@@ -112,17 +116,17 @@
 				</tokens>
 				<sequential>
 					<!-- lass hier aus Testzwecken das unset weg --><!-- var name="out.file" unset="true"/> --><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
-					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
-						<param name="lineFromFile" value="@{line}"/>
-						<param name="in.file" value="TestWrong_2"/>
-					</antcallback>
+					 <ac:antcallback target="-setVarCallback" return="retValue, retCounter, out.file">
+						<ac:param name="lineFromFile" value="@{line}"/>
+						<ac:param name="in.file" value="TestWrong_2"/>
+					</ac:antcallback>
 					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
 				</sequential>
 			</for>
 			<echo>Ende von: ${out.file}.</echo>
 
 </target>  
-<target name="file_reader_correct">
+<target name="-file_reader_correct">
 	<echo>#########################################################################################</echo>
 	<echo>Im file_reader - Target... </echo>
 	<echo>Parsing file line by line: ${userdir_sub}/file_antcallbackBeispiel.txt</echo>
@@ -138,10 +142,10 @@
 				</tokens>
 				<sequential>					 
 					 <var name="out.file" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar--><!-- mache HIER KORREKTERWEISE DAS UNSET -->					 					 
-					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
-						<param name="lineFromFile" value="@{line}"/>
-						<param name="in.file" value="TestKorrekt_1"/>
-					</antcallback>
+					 <ac:antcallback target="-setVarCallback" return="retValue, retCounter, out.file">
+						<ac:param name="lineFromFile" value="@{line}"/>
+						<ac:param name="in.file" value="TestKorrekt_1"/>
+					</ac:antcallback>
 					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
 				</sequential>
 			</for>
@@ -159,10 +163,10 @@
 				</tokens>
 				<sequential>					 
 					 <var name="out.file" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar--><!-- mache HIER KORREKTERWEISE DAS UNSET -->					 					 
-					 <antcallback target="setVarCallback" return="retValue, retCounter, out.file">
-						<param name="lineFromFile" value="@{line}"/>
-						<param name="in.file" value="TestKorrekt_2"/>
-					</antcallback>
+					 <ac:antcallback target="-setVarCallback" return="retValue, retCounter, out.file">
+						<ac:param name="lineFromFile" value="@{line}"/>
+						<ac:param name="in.file" value="TestKorrekt_2"/>
+					</ac:antcallback>
 					<echo>Ergebnis: ${out.file} - ${retCounter}. Wert: ${retValue}</echo>
 				</sequential>
 			</for>

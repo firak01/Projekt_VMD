@@ -130,7 +130,7 @@
   </scriptdef>
 	   
   <!-- ######### AntContrib: Callback Targets, quasi als ausgelagerte Unterfunktionen ################################-->
-  <target name="booleanDebugCallbackZZZ"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
+  <target name="-booleanDebugCallbackZZZ"><!-- das target dient nur als callback und soll so nicht aufgerufen werden -->
 	<!-- Merke: Property Werte sind nicht veränderbar, egal wie oft man den Callback aufruft <property name="retValue" value="${lineFromFile}xxxxxx"/>
 				Darum: Mach folgendes in dem aufrufenden Target, dann klappts <var name="returnBooleanValue" unset="true"/> -->   
    <var name="myInputBooleanValue" value="${inputBooleanValue}" />
@@ -192,7 +192,7 @@
   <property name="src" value="src"/>
   -->
   
-  <target name="declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafuer sorgen dass die Deklaration vor allen anderen Targets ausgefuehrt wird. -->
+  <target name="-declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafuer sorgen dass die Deklaration vor allen anderen Targets ausgefuehrt wird. -->
     <!-- An dieser Stelle Argumente entgegennehmen, entweder aus der Batch oder unter Eclipse aus der "external Configuration" des AntScripts  -->
   	<!-- Merke: You can define an argument with the property file name to the build in the 'Arguments' section of the Run > External Tools > External Tools Configuration for your Ant Build. Something like:
   	-Dproperties=Buildfile_test.properties
@@ -213,7 +213,9 @@
 </target>
   
   <!-- ################################################################################# -->
- <target name="compile" depends="declaration, init,myTestIsBoolean,myTestAntcontribIf,myTestFlakaChoose">
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-declaration, -init,-myTestIsBoolean,-myTestAntcontribIf,-myTestFlakaChoose">
 
 	<!-- WIRD NICHT BENOETIGT -->
 	
@@ -229,7 +231,7 @@
 	-->
  </target>
  
-  <target name="init">
+  <target name="-init">
     <!-- Create the time stamp -->
 	<echo>Receiving timestamp:</echo>
     <!--<tstamp/>-->
@@ -244,7 +246,7 @@
 </target>
   
  <!-- ######################################################### -->  
-<target name="myTestIsBoolean">
+<target name="-myTestIsBoolean">
 	<!-- Merke: Eine Funktion true(...) funktioniert in Ant gar nicht. gibt´s gar nicht, weiss nicht woher sie kommen soll ! -->
 	<!-- Merke2: <fl:fail message="blablabla"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 	
@@ -279,7 +281,7 @@
 	<!-- Auswertung der Rückgabewerte von isBooleanZZZ, per antcallback, wg. der Wiederverwertbarkeit und Reduzierung der Codezeilen -->
 	<var name="returnBooleanValue" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
 	<var name="inputBooleanValue" unset="true"/>
-	<antcallback target="booleanDebugCallbackZZZ" return="returnBooleanValue">
+	<antcallback target="-booleanDebugCallbackZZZ" return="returnBooleanValue">
 		<param name="inputBooleanValue" value="${myBooleanValue}"/>		
 	</antcallback>
 	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
@@ -303,9 +305,9 @@
 	<!-- Auswertung der Rückgabewerte von isBooleanZZZ, per antcallback, wg. der Wiederverwertbarkeit und Reduzierung der Codezeilen -->
 	<var name="returnBooleanValue" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
 	<var name="inputBooleanValue" unset="true"/>
-	<antcallback target="booleanDebugCallbackZZZ" return="returnBooleanValue">
+	<ac:antcallback target="-booleanDebugCallbackZZZ" return="returnBooleanValue">
 		<param name="inputBooleanValue" value="${myBooleanValue}"/>		
-	</antcallback>
+	</ac:antcallback>
 	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
 	
 		
@@ -327,9 +329,9 @@
 	<!-- Auswertung der Rückgabewerte von isBooleanZZZ, per antcallback, wg. der Wiederverwertbarkeit und Reduzierung der Codezeilen -->
 	<var name="returnBooleanValue" unset="true"/><!-- Merke: In einem Callback sind ohne das unset die Werte nicht veränderbar-->
 	<var name="inputBooleanValue" unset="true"/>
-	<antcallback target="booleanDebugCallbackZZZ" return="returnBooleanValue">
+	<ac:antcallback target="-booleanDebugCallbackZZZ" return="returnBooleanValue">
 		<param name="inputBooleanValue" value="${myBooleanValueA}"/>
-	</antcallback>
+	</ac:antcallback>
 	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
 		
 	<!-- ACHTUNG: Hier wird eine nicht existierende Property an die isBooleanZZZ Funktion übergeben -->
@@ -400,7 +402,7 @@
  </target>
   
  <!-- ######################################################### -->  
-<target name="myTestAntcontribIf">
+<target name="-myTestAntcontribIf">
 <fl:logo>
 		myTestAntcontribIf
   </fl:logo>	
@@ -442,7 +444,7 @@
  
   
 <!-- ######################################################### -->  
-<target name="myTestFlakaChoose">
+<target name="-myTestFlakaChoose">
 	<fl:logo>
 		myTestFlakaChoose
   </fl:logo>
