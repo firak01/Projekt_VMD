@@ -246,7 +246,7 @@
   <!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
-   <target name="compile" depends="-declaration, -init,-FglRepositoryBackup,-FglCopyClient2archive,-FglCopyLocal_FillPropertyArrays">
+   <target name="compile" depends="-declaration, -init,-FglRepositoryBackup,-FglCopyClient2archive,-FglCopyLocal_Main">
 	<!-- WIRD NICHT BENÖTIGT -->
 	
     <!-- Compile the java code from ${src} into ${build} -->
@@ -343,7 +343,7 @@
 <!-- ######################################################### -->
 <!-- Beispiel für ein antcallback, in dem aus einer Schleife ein Wert zurückgeliefert wird. -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
-<target name="-FglCopyLocal_FillPropertyArrays">
+<target name="-FglCopyLocal_Main">
 	<echo>######################################</echo>
 	
 	<!-- Schiebe die angegebenen Dateien von a nach b auf dem lokalen Rechner -->
@@ -405,19 +405,19 @@
 					<ac:if>
 						<ac:equals arg1="${line.length}" arg2="0" />
 						<ac:then>
-							<!-- <echo>Leerzeile...</echo> -->
+							<!-- <fl:echo>Leerzeile...</fl:echo> -->
 						</ac:then>
 						<ac:else>													
 							<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
 							<substringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
-							<!-- <echo message="subtext = ${subtext}" />	 -->						
+							<!-- <fl:echo message="subtext = ${subtext}" />	 -->						
 							<ac:if>
 								<ac:equals arg1="${subtext}" arg2="#" />
 								<ac:then>
-									<!-- <echo>Kommentarzeile, wird uebersprungen...</echo> -->
+									<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
 								</ac:then>
 								<ac:else>
-									<echo>Zeile: @{line}</echo>
+									<fl:echo>Zeile: @{line}</fl:echo>
 									<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->
 									
 									<!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
@@ -433,7 +433,7 @@
 									<!-- TODO: Idee: in der initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
 									<fl:when test="null('${myRightPart}')">
 										<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo>
-										<fl:fail message="Rechter Teil der Steueerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+										<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 																								
 										<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
 										<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
@@ -442,7 +442,7 @@
 									</fl:when>
 									<fl:when test="null('${myLeftPart}')">
 										<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): @{line}</echo>
-										<fl:fail message="Linker Teil der Steueerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+										<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 																								
 										<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
 										<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
@@ -453,67 +453,36 @@
 									<!-- TODO: Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
 									<fl:let>myCase ::= "undefined"</fl:let>
 									
-									<!-- Prüfe, ob Datei vom Linken Teil existiert -->
-									<fl:choose>
-										<fl:when test=" '${myLeftPart}'.tofile.exists == true ">
-											<echo>Datei existiert (von...): ${myLeftPart}</echo>
-																																	
-											<!-- Prüfe, ob es ein Verzeichnis ist -->
-											<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<!-- <echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo> -->
-																						
-											<fl:when test="${myisdirectoryLeftPart} == true">
-													<!-- A) Linker Teil - Verzeichnis-Fall: -->
-													<echo>Linker Teil: ist Verzeichnis</echo>
-													<fl:let>myCase ::= "V"</fl:let>																								 
-											</fl:when>
-											<fl:when test="${myisdirectoryLeftPart} != true">
-													<!-- B) Linker Teil - Dateipfad-Fall:-->
-													<echo>Linker Teil: ist KEIN Verzeichnis</echo>
-													<fl:let>myCase ::= "D"</fl:let>
-											</fl:when>
-										</fl:when>
-										<fl:otherwise>
-											<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo>
-											<fl:let>myCase ::= "X"</fl:let>
-											<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-										</fl:otherwise>
-									</fl:choose>
-									
-										<!-- Prüfe, ob Datei vom Rechten Teil existiert -->
-									<fl:choose>
-										<fl:when test=" '${myRightPart}'.tofile.exists == true ">
-											<echo>Datei existiert (nach...): ${myRightPart}</echo>
-																																	
-											<!-- Prüfe, ob es ein Verzeichnis ist -->
-											<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-											<!-- <echo>rechter Teil: isdirectory=${myisdirectoryRightPart}</echo> -->
-																						
-											<fl:when test="${myisdirectoryRightPart} == true">
-													<!-- A) Rechter Teil - Verzeichnis-Fall: -->
-													<echo>Rechter Teil: ist Verzeichnis</echo>
-													<fl:let>myCase ::= "${myCase}A"</fl:let>																								 
-											</fl:when>
-											<fl:when test="${myisdirectoryRightPart} != true">
-													<!-- B) Rechter Teil - Dateipfad-Fall:-->
-													<echo>Rechter Teil: ist KEIN Verzeichnis</echo>
-													<fl:let>myCase ::= "${myCase}B"</fl:let>
-											</fl:when>
-										</fl:when>
-										<fl:otherwise>
-											<echo>Datei existiert NICHT (nach...): ${myRightPart}</echo>
-											<fl:let>myCase ::= "${myCase}X"</fl:let>
-											<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-										</fl:otherwise>
-									</fl:choose>	
-									<echo>Soweit ermittelter Fall: ${myCase}</echo>
-												
-												
+									<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
+										<param name="leftPart" value="${myLeftPart}"/>
+										<param name="rightPart" value="${myRightPart}"/>
+									</antcallback>
+											
+									<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
+									<fl:let>myAnalyze ::= ${returnString}</fl:let>
 									<!-- TODO GOON: Je nach Fall ein anderes Target aufrufen. Dadurch ist der Code modularer --> 	
 									<!-- todo codeschnipsel unten teilweise hier wieder einfügen oder in ein extra Target packen -->
 									<!-- TODO: jeweils ein Array mit den werten des Ausgangsdateipfads und des Zieldateipfads erstellen -->
 									
-									
+									<!--### START: Aufruf der verschiedenen Fälle ####################-->
+									<!-- F=file, D=directory,X=not existing-->
+									<ac:if>
+										<ac:equals arg1="${myAnalyze}" arg2="XX"/>										
+										<ac:then>
+											<echo>Fall: links nicht existent, rechts nicht existent</echo>
+										</ac:then>
+									<ac:elseif>
+										<ac:equals arg1="${myAnalyze}" arg2="DF"/>										
+										<ac:then>
+											<echo>Fall: links Verzeichnis, rechts Datei</echo>
+										</ac:then>
+									</ac:elseif>
+									<ac:else>
+										<!-- TODO GOON 20150709: hier den String ausgeben im Fehlerfall... -->
+										<fl:fail message="Ungueltiges Analyseergebnis: #{myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+									</ac:else>											
+									</ac:if>																	
+									<!--### ENDE: Aufruf der verschiedenen Fälle #####################-->
 						</ac:else>
 					</ac:if>
 					</ac:else>
@@ -527,6 +496,69 @@
 		</fl:otherwise>
 	</fl:choose>
 
+</target>
+
+
+<target name="-FGLCopyLocal_Analyze">
+	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
+	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
+
+	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
+	<fl:choose>
+		<fl:when test=" '${myLeftPart}'.tofile.exists == true ">
+			<echo>Datei existiert (von...): ${myLeftPart}</echo>
+																									
+			<!-- Prüfe, ob es ein Verzeichnis ist -->
+			<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+			<!-- <echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo> -->
+														
+			<fl:when test="${myisdirectoryLeftPart} == true">
+					<!-- A) Linker Teil - Verzeichnis-Fall: -->
+					<echo>Linker Teil: ist Verzeichnis</echo>
+					<fl:let>myCase ::= "D"</fl:let>	<!-- D=directory-->																						 
+			</fl:when>
+			<fl:when test="${myisdirectoryLeftPart} != true">
+					<!-- B) Linker Teil - Dateipfad-Fall:-->
+					<echo>Linker Teil: ist KEIN Verzeichnis</echo>
+					<fl:let>myCase ::= "F"</fl:let><!-- F=file-->
+			</fl:when>
+		</fl:when>
+		<fl:otherwise>
+			<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo>
+			<fl:let>myCase ::= "X"</fl:let>
+			<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+		</fl:otherwise>
+	</fl:choose>
+	
+		<!-- Prüfe, ob Datei vom Rechten Teil existiert -->
+	<fl:choose>
+		<fl:when test=" '${myRightPart}'.tofile.exists == true ">
+			<echo>Datei existiert (nach...): ${myRightPart}</echo>
+																									
+			<!-- Prüfe, ob es ein Verzeichnis ist -->
+			<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+			<!-- <echo>rechter Teil: isdirectory=${myisdirectoryRightPart}</echo> -->
+														
+			<fl:when test="${myisdirectoryRightPart} == true">
+					<!-- A) Rechter Teil - Verzeichnis-Fall: -->
+					<echo>Rechter Teil: ist Verzeichnis</echo>
+					<fl:let>myCase ::= "${myCase}D"</fl:let>	<!-- D=directory-->																								 
+			</fl:when>
+			<fl:when test="${myisdirectoryRightPart} != true">
+					<!-- B) Rechter Teil - Dateipfad-Fall:-->
+					<echo>Rechter Teil: ist KEIN Verzeichnis</echo>
+					<fl:let>myCase ::= "${myCase}F"</fl:let><!-- F=file-->
+			</fl:when>
+		</fl:when>
+		<fl:otherwise>
+			<echo>Datei existiert NICHT (nach...): ${myRightPart}</echo>
+			<fl:let>myCase ::= "${myCase}X"</fl:let>
+			<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+		</fl:otherwise>
+	</fl:choose>	
+	<echo>Soweit ermittelter Fall: ${myCase}</echo>
+	<fl:let>returnAnalyze ::= true</fl:let>
+	<fl:let>returnString ::= "${myCase}"</fl:let>										
 </target>
 
 </project>

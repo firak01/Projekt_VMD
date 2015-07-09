@@ -409,11 +409,20 @@
 	<fl:let>mytest01 ::= '0'</fl:let>
 	<fl:let>mytest02 ::= '1'</fl:let>
 	<fl:let>mytest02 ::= '0'</fl:let>
+	
+	<!-- and / or / not werden wie im condition task gemacht -->
+	<!-- es gibt noch weitere conditions in antcontrib, z.B.:   <isgreaterthan arg1="100" arg2="10"/> -->
 	<if>
 		<equals arg1="${mytest01}" arg2="0" />
 		<then>
 			<echo>mytest01 ist 'null' </echo>
 		</then>
+		<elseif><!-- dann ist eine nested condition Pflicht -->
+			<equals arg1="${mytest01}" arg2="-1" />
+		<then>
+			<echo>mytest01 ist '-1'. Darf nicht sein. </echo>
+		</then>			
+		</elseif>
 		<else>						
 			<echo>mytest01 ist ungleich 'null' </echo>
 			
