@@ -450,7 +450,7 @@
 										     <fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 									</fl:when>
 
-									<!-- TODO: Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
+									<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
 									<fl:let>myCase ::= "undefined"</fl:let>
 									
 									<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
@@ -459,36 +459,28 @@
 									</antcallback>
 											
 									<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
-									<fl:let>myAnalyze ::= ${returnString}</fl:let>
-									<!-- TODO GOON: Je nach Fall ein anderes Target aufrufen. Dadurch ist der Code modularer --> 	
-									<!-- todo codeschnipsel unten teilweise hier wieder einfügen oder in ein extra Target packen -->
-									<!-- TODO: jeweils ein Array mit den werten des Ausgangsdateipfads und des Zieldateipfads erstellen -->
+									<fl:let>myAnalyze ::= "${returnString}"</fl:let>
 									
-									<!--### START: Aufruf der verschiedenen Fälle ####################-->
-									<!-- F=file, D=directory,X=not existing-->
-									<ac:if>
-										<ac:equals arg1="${myAnalyze}" arg2="XX"/>										
-										<ac:then>
-											<echo>Fall: links nicht existent, rechts nicht existent</echo>
-										</ac:then>
-									<ac:elseif>
-										<ac:equals arg1="${myAnalyze}" arg2="DF"/>										
-										<ac:then>
-											<echo>Fall: links Verzeichnis, rechts Datei</echo>
-										</ac:then>
-									</ac:elseif>
-									<ac:else>
-										<!-- TODO GOON 20150709: hier den String ausgeben im Fehlerfall... -->
-										<fl:fail message="Ungueltiges Analyseergebnis: #{myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
-									</ac:else>											
-									</ac:if>																	
-									<!--### ENDE: Aufruf der verschiedenen Fälle #####################-->
+                                    <!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
+									<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnStringaLeft, returnStringaRight">
+												<param name="leftPart" value="${myLeftPart}"/>
+												<param name="rightPart" value="${myRightPart}"/>												
+									</antcallback>
+									<fl:let>myStringaLeft ::= "${returnStringaLeft}"</fl:let>
+									<fl:let>myStringaRight ::= "${returnStringaRight}"</fl:let>
+									<!-- TODO: Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
+									<!-- myStringaLeftTotal
+									     myStringaRightTotal
+									-->
 						</ac:else>
 					</ac:if>
 					</ac:else>
 					</ac:if>
 				</sequential>
 			</for>			
+			
+			<!--### Kopiere die Dateien der beiden Arrays #####################-->
+			
 		</fl:when>
 		<fl:otherwise>
 				<echo>Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
@@ -524,7 +516,7 @@
 			</fl:when>
 		</fl:when>
 		<fl:otherwise>
-			<echo>Datei existiert NICHT (von...): ${myLeftPart}</echo>
+			<echo>Datei/Verzeichnis existiert NICHT (von...): ${myLeftPart}</echo>
 			<fl:let>myCase ::= "X"</fl:let>
 			<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
 		</fl:otherwise>
@@ -551,7 +543,7 @@
 			</fl:when>
 		</fl:when>
 		<fl:otherwise>
-			<echo>Datei existiert NICHT (nach...): ${myRightPart}</echo>
+			<echo>Datei/Verzeichnis existiert NICHT (nach...): ${myRightPart}</echo>
 			<fl:let>myCase ::= "${myCase}X"</fl:let>
 			<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
 		</fl:otherwise>
@@ -561,4 +553,90 @@
 	<fl:let>returnString ::= "${myCase}"</fl:let>										
 </target>
 
+<target name="-FGLCopyLocal_Control">
+	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
+	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
+	
+	<!--### START: Aufruf der verschiedenen Fälle ####################-->
+	<!-- F=file, D=directory,X=not existing. Es geht nicht um die Konfiguration, sondern darum, dass die Dateien / Verzeichnisse existieren -->
+	
+	<!-- TODO GOON: Je nach Fall ein anderes Target aufrufen. Dadurch ist der Code modularer --> 	
+	<!-- TODO: jeweils ein Array erstellen 1) mit den Werten des Ausgangsdateipfads, 2) mit den Werten des Zieldateipfads -->
+	<!-- todo codeschnipsel unten teilweise hier wieder einfügen oder in ein extra Target packen -->
+										
+	<ac:if>
+		<ac:equals arg1="${myAnalyze}" arg2="XX"/>										
+		<ac:then>
+			<echo>Fall: Datei/Verzeichnis links nicht existent, Datei/Verzeichnis rechts nicht existent</echo>
+			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+		</ac:then>
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="XD"/>										
+		<ac:then>
+			<echo>Fall: Datei/Verzeichnis links nicht existent, rechts Datei</echo>
+			<fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+		</ac:then>
+	</ac:elseif>
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="DX"/>										
+		<ac:then>
+			<echo>Fall: links Datei, Datei/Verzeichnis rechts nicht existent</echo>
+			<!-- TODO: Prüfe, ob rechts ein Verzeichnisname ist. Kopiere von links nach rechts. mache ggfs. fehlende Unterverzeichnisse. -->
+		</ac:then>
+	</ac:elseif>									
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="DF"/>										
+		<ac:then>
+			<echo>Fall: links Verzeichnis, rechts Datei</echo>
+			<!-- TODO: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
+		</ac:then>
+	</ac:elseif>
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="FD"/>										
+		<ac:then>
+			<echo>Fall: links Datei, rechts Verzeichnis</echo>
+			<!-- TODO: Kopiere die links benannte Datei in das rechts angegebenen Verzeichnis -->
+		</ac:then>
+	</ac:elseif>
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="DD"/>										
+		<ac:then>
+			<echo>Fall: links Verzeichnis, rechts Verzeichnis</echo>
+			<!-- TODO: Kopiere alle Dateien aus dem einen Verzeichnis in das andere -->
+		</ac:then>
+	</ac:elseif>
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="FF"/>										
+		<ac:then>
+			<echo>Fall: links Datei, rechts Datei</echo>
+			<antcallback target="-FGLCopyLocal_Control_FF" return="returnControl, returnStringaLeft, returnStringaRight">
+				<param name="leftPart" value="${myLeftPart}"/>
+				<param name="rightPart" value="${myRightPart}"/>
+			</antcallback>
+			
+			<fl:echo>Ergebnis des Controll_FF aufrufs: ${returnControl}</fl:echo>
+			<fl:let>myStringaLeft ::= "${returnStringaLeft}"</fl:let>
+			<fl:let>myStringaRight ::= "${returnStringaRight}"</fl:let>
+		</ac:then>
+	</ac:elseif>									
+	<ac:else>
+		<fl:fail message="Ungueltiges Analyseergebnis: ${myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+	</ac:else>											
+	</ac:if>
+	
+	<fl:let>returnControll ::= true</fl:let>
+	<fl:let>returnStringaLeft ::= "${myReturnStringaLeft}"</fl:let>
+	<fl:let>returnStringaRight ::= "${myReturnStringaRight}"</fl:let>
+</target>
+
+
+<target name="-FGLCopyLocal_Control_FF">
+	<!-- TODO GOON: 20150710 -->
+	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->
+	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
+	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
+
+	
+	
+</target>
 </project>
