@@ -410,8 +410,19 @@
 	<fl:let>mytest02 ::= '1'</fl:let>
 	<fl:let>mytest02 ::= '0'</fl:let>
 	
-	<!-- and / or / not werden wie im condition task gemacht -->
-	<!-- es gibt noch weitere conditions in antcontrib, z.B.:   <isgreaterthan arg1="100" arg2="10"/> -->
+	<!-- für if oder elseif gilt: 
+	      and / or / not werden wie im condition task gemacht.
+		  mehrere werden unter einem Tag zusammengefasst. mehrere <or> Tags  darf es nicht geben. Z.B.	
+	<if>
+	<or>
+		<equals arg1="${var}" arg2="one"/>
+		<equals arg1="${var}" arg2="two"/>
+		<equals arg1="${var}" arg2="three"/>
+		<equals arg1="${var}" arg2="four"/>
+	</or>
+   <then>
+   -->
+	<!-- es gibt zusätzlich zu <equals> noch weitere conditions in antcontrib, z.B.:   <isgreaterthan arg1="100" arg2="10"/> -->
 	<if>
 		<equals arg1="${mytest01}" arg2="0" />
 		<then>

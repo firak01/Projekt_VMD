@@ -12,7 +12,7 @@
 	</taskdef>
 		
 		
-<!-- Merke: Es gibt auch von AntContrib callbacks, die wir hier aber nicht nutzen.-->	
+<!-- Merke: Es gibt auch von AntContrib callbacks, die wir hier aber explizit nicht nutzen.-->	
 <!-- hier als Standard wird folgendes verwendet:
 	<target name="testCallback" description="Test CallBack">
         <taskdef name="antcallback" classname="ise.antelope.tasks.AntCallBack" classpath="${antelope.home}/build" />

@@ -94,35 +94,7 @@
 <!-- TODO: Hänge diesen Wert an das Zielverzeichnis an. Das ist der Zieldateipfad -->
 											
 											
-<!-- 4. Der eigentliche Kopiervorgang -->
-<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
-<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-<echo>Pushing File ${src.filedir}\${src.filename} to Repository: ${dest.filedir}\${dest.filename} </echo>
-											
-<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
-<fileset dir="//${src.dirFglClientPath}">	
-<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
-<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
-<!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
-												
-<!--Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
-	<include name="${src.dirFglClientFileName}" />		
-</fileset>
-</copy>
-										
-<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
-<echo>b) Misc Files:</echo>
-<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-<copy todir="//${dest.dirRepositoryVmdPath}/
-
-${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
-<fileset dir="//${src.dirFglClientPath}">	
- <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
-	<include name="**.txt"/>
-  </fileset>
-</copy>
-												   						   
+								   						   
 <!-- ENDE: codeschnipsel wieder eingefügt... -->
 </target>
 

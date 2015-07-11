@@ -480,7 +480,12 @@
 			</for>			
 			
 			<!--### Kopiere die Dateien der beiden Arrays #####################-->
-			
+			<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnCopy">
+					<param name="srca.filedir" value="${mySrca.filedir}"/>
+					<param name="srca.filename" value="${mySrca.filename}"/>
+					<param name="desta.filedir" value="${myDesta.filedir}"/>
+					<param name="desta.filename" value="${myDesta.filename}"/>					
+			</antcallback>
 		</fl:when>
 		<fl:otherwise>
 				<echo>Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
@@ -491,9 +496,40 @@
 </target>
 
 
+<!-- ######################################################################### -->
+<target name = "-FGLCopyLocal_CopyFileByFile">
+	<fl:let>mySrca.filedir ::= "${srca.filedir}"</fl:let>
+	<fl:let>mySrca.filename ::= "${srca.filename}"</fl:let>
+	<fl:let>myDesta.filedir ::= "${desta.filedir}"</fl:let>
+	<fl:let>myDesta.filename ::= "${desta.filename}"</fl:let>
+	
+	<!-- Todo: Alle arrays sollen gleich lang sein, prüfen -->
+	<!-- Todo: Schleife über alle Arraypositionenen-->
+	<!-- Todo: Hole die Werte der aktuellen Arrayposition -->
+		
+		
+	<!-- 4. Der eigentliche Kopiervorgang -->
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
+	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
+	<echo>Pushing File ${src.filedir}\${src.filename} to Repository: ${dest.filedir}\${dest.filename} </echo>
+												
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
+	<copy todir="//${dest.filedir}" overwrite="false"  preservelastmodified="true"> 
+	<fileset dir="//${src.filedir}">	
+	<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+	<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
+	<!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+													
+		<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
+		<include name="${src.filename}" />		
+	</fileset>
+	</copy>									
+</target>
+
+
 <target name="-FGLCopyLocal_Analyze">
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
-	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
+	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
 
 	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
 	<fl:choose>
@@ -605,10 +641,13 @@
 			<!-- TODO: Kopiere alle Dateien aus dem einen Verzeichnis in das andere -->
 		</ac:then>
 	</ac:elseif>
-	<ac:elseif>
-		<ac:equals arg1="${myAnalyze}" arg2="FF"/>										
+	<ac:elseif>		
+		<ac:or>
+			<ac:equals arg1="${myAnalyze}" arg2="FF"/>
+			<ac:equals arg1="${myAnalyze}" arg2="FX"/>
+		</ac:or>
 		<ac:then>
-			<echo>Fall: links Datei, rechts Datei</echo>
+			<echo>Fall: links Datei, rechts Datei (oder noch nicht existent)</echo>
 			<antcallback target="-FGLCopyLocal_Control_FF" return="returnControl, returnStringaLeft, returnStringaRight">
 				<param name="leftPart" value="${myLeftPart}"/>
 				<param name="rightPart" value="${myRightPart}"/>
@@ -635,7 +674,27 @@
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
+	<fl:echo>Start von FGLCopyLocal_Control_FF</fl:echo><!-- TODO tryoutAnt_Reflection - currentTarget name
+	siehe mein Dokument:
+	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )
+	
+	
+I think you can't, unless you spend some time coding your own custom tasks (http://ant.apache.org/manual/tutorial-writing-tasks.html)
 
+The built-in properties you can display are: basedir, ant.file, ant.version, ant.project.name, ant.java.version
+
+
+
+Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lösen.
+	
+	target name="test">
+  <script language="javascript">
+    project.setNewProperty("current_target", self.getOwningTarget());
+  </script>
+  <echo>${current_target}</echo>
+</target>
+
+	-->
 	
 	
 </target>
