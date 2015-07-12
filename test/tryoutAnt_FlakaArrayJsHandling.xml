@@ -159,7 +159,7 @@
 					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
 					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
 					
-					print("splitte diesn String nach Komma.");
+					print("splitte diesen String nach Komma.");
 					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
 					for(x in objectArray){
 						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
@@ -466,7 +466,7 @@
 		
 	</target> 
 	
-	<target name="myTestArrayAppendJsZZZ">
+	<target name="-myTestArrayAppendJsZZZ">
 		<!-- Testen etwas an ein Array anzuhaengen -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->

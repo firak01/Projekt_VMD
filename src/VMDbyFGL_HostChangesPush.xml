@@ -26,11 +26,207 @@
 		
     <!-- ######## Scriptdefs ############################################################################--> 		
 	<!-- ########################### -->	
+	<!-- ############################################################-->
+	<scriptdef name="arrayAppendJsZZZ" language="javascript">
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="valueinput" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myValue = attributes.get("valueinput");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+			
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					}
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
+			icount=-1; icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					myArrayReturn[icount]=objectArray[x];
+				}else{
+					//nix
+				}
+			}
+						
+			//3. Erweitere das Array
+			icountGlobal++;
+			//print("Wert anhängen an position " + icountGlobal + ": '" + myValue + "'");
+			
+			//TODO An dieser Stelle bei der Erweiterung arrays anzuhängen: Prüfen, ob das ein Einzelwert oder ein Array ist.
+			myArrayReturn[icountGlobal]=myValue;
+																						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->
+	<scriptdef name="arrayCopyJsZZZ" language="javascript">
+		<!-- Hiermit man ein Array in eine anderes neues Array.
+             Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
+             man aber noch mit dem alten 'Variablennamen' weiterarbeiten möchte.			 -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			
+			//Kopiervorgang, noch ohne irgendwelche FlagControl Erweiterungen.			
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+				myArrayReturn[icount]=objectArray[x];
+			};
+															
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ########################### -->
+	<scriptdef name="arrayDebugJsZZZ" language="javascript">
+		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
+			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
+			   - der Inhalt
+			   - die Größe des Arrays			-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="arrayinput" />
+		<attribute name="ilevel" />	
+		<![CDATA[										 								
+			var myArray = attributes.get("arrayinput");					
+			var myLevel = attributes.get("ilevel");					
+			if(myLevel<=0){
+				
+			}else{
+			
+			<!-- Typausgabe -->
+			print("typeof myarray = " + typeof(myArray));
+					
+			
+			var iSize=0;
+			if(Array.isArray(myArray)){
+				print("Array uebergeben bekommen");
+				iSize = myArray.length;
+				print("Arraygroesse="+iSize);
+				
+				//TODO: Die gleichen Ausgaben wie im KEIN ARRAY Fall.
+				//- Werte
+			}else{
+				print("kein Array uebergeben bekommen.");
+				
+				var icount=0;					
+				if(typeof(myArray)=="object"){
+					print("Object uebergeben bekommen.");
+					
+					if(myLevel>=2){
+					//das listet alle Methoden des objekts auf.... scheint ein String zu sein....
+					//print("ALLE METHODEN DES OBJEKTS:");
+					//for(x in myArray){
+					//	print(x);		
+					//};	
+					
+					print("#################################");
+					print("ALLE METHODEN UND CODEINHALT DES OBJEKTS:");
+					for(xx in myArray){
+						print("xx: '"+ xx + "'");		//ABER: Damit bekommt man die Namen der Methoden
+						print("zugriff ueber xx: '" + myArray[xx] + "'"); //damit bekommt man codeinhalt der Methoden.
+					};
+					};//myLevel>=2;
+					
+					print("#################################");
+					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
+					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
+					
+					print("splitte diesn String nach Komma.");
+					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
+					for(x in objectArray){
+						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					};
+					
+					//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
+					//for(x2 in objectArray02){
+					//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
+					//};
+					
+					//var objectArrayString = myArray.toString();
+					//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
+					//for(z in objectArray03){
+					//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					//};
+					
+					print("#################################");
+					print("Versuch die Werte auszugeben: ");	
+					//Merke: Voraussetzung ist:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 for(yy in objectArray){
+							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+						};
+					}else{
+						//print("kein Objekt");
+					};
+			};
+			};//myLevel <= 0;
+		]]>
+	</scriptdef>
+	
+	 <!-- ########################### -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
 		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
 		
 		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
 		<attribute name="arrayinput" />
 		<attribute name="ireturn" />
 		<![CDATA[
@@ -58,6 +254,53 @@
 			project.setProperty(attributes.get("ireturn"), iReturn);
 		]]>
 	</scriptdef>
+			
+	<!-- ############################################################-->		
+	<scriptdef name="arrayInitJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Erstellung eines Arrays.
+			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="isize" />
+		<attribute name="arrayreturn" />		
+		<![CDATA[										 
+			var mySize = attributes.get("isize");	
+			//print("iSize = '" + mySize + "'");
+			
+			//Prüfen, ob mySize eine Zahl ist. 
+			//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
+			//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
+			if(isNumber(mySize)){
+				//print("eine Zahl");
+				var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
+				
+				if(mySize==0){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+				}
+				if(mySize>=1){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					for(icount=0; icount<=mySize-1; icount++){
+						myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
+					}												
+				}								
+			}else{
+				//print("KEINE Zahl");
+				var myArrayReturn = new Array();
+
+				//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+				myArrayReturn="<#!!FGLUNDEFINED!!#>";
+			}
+						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
+		]]>
+	</scriptdef>
+	
 	
 	<!-- ######## Scriptdefs ############################################################################--> 		
  	<!-- ########################### -->		
@@ -479,10 +722,44 @@
 				</sequential>
 			</for>			
 			
+			<!-- ### TEST Hier erst einmal das kopieren der Arrayinhalte testen -->	
+			<fl:logo>TEST ARRAYBEHANDLUNG UND KOPIEREN</fl:logo>
+			<fl:let>myArraySize ::= 0</fl:let>
+			
+			<fl:let>mySrc.filedir ::= "C:\VMWare\FGLXPHannibalVideoPlay3_768MB "</fl:let>			
+			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />			
+			<fl:let>mySrca.filedir::="${myArray}"</fl:let>
+			<arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+			
+			<fl:let>mySrc.filename ::= "FGLXPHannibalVideoPlay1VM.txt "</fl:let>
+			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+			<fl:let>mySrca.filename ::="${myArray}"</fl:let>					
+			<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			
+			<fl:let>myDest.filedir ::= "C:\1fgl\repository\Projekt_VMD\vmd "</fl:let>			
+			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+			<fl:let>myDesta.filedir ::="${myArray}"</fl:let>
+			<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			
+			
+			<fl:let>myDest.filename ::= "FGLXPHannibalVideoPlay1VM.txt"</fl:let>
+			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+			<fl:let>myDesta.filename ::="${myArray}"</fl:let>
+			<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			
+
 			<!--### Kopiere die Dateien der beiden Arrays #####################-->
-			<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnCopy">
-					<param name="srca.filedir" value="${mySrca.filedir}"/>
+			<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnCopy">					
 					<param name="srca.filename" value="${mySrca.filename}"/>
+					<param name="srca.filedir" value="${mySrca.filedir}"/>
 					<param name="desta.filedir" value="${myDesta.filedir}"/>
 					<param name="desta.filename" value="${myDesta.filename}"/>					
 			</antcallback>
@@ -502,26 +779,54 @@
 	<fl:let>mySrca.filename ::= "${srca.filename}"</fl:let>
 	<fl:let>myDesta.filedir ::= "${desta.filedir}"</fl:let>
 	<fl:let>myDesta.filename ::= "${desta.filename}"</fl:let>
+	<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 	
-	<!-- Todo: Alle arrays sollen gleich lang sein, prüfen -->
+	
+			
+	
+	<!-- Prüfen: Alle Arrays sollen gleich lang sein.-->
+	<arrayElementCountJsZZZ arrayinput="${mySrca.filedir}" ireturn="iSize.Srca.filedir"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<arrayElementCountJsZZZ arrayinput="${mySrca.filename}" ireturn="iSize.Srca.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<arrayElementCountJsZZZ arrayinput="${myDesta.filedir}" ireturn="iSize.Desta.filedir"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<arrayElementCountJsZZZ arrayinput="${myDesta.filename}" ireturn="iSize.Desta.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<ac:if>
+		<and>
+			<equals arg1="${iSize.Srca.filedir}" arg2="${iSize.Srca.filename}" />
+			<equals arg1="${iSize.Srca.filedir}" arg2="${iSize.Desta.filename}" />
+			<equals arg1="${iSize.Srca.filedir}" arg2="${iSize.Desta.filedir}" />
+		</and>
+		<ac:then>		
+				<fl:echo message="Alle Arrays sind gleich lang: ${iSize.Srca.filedir} " />				
+		</ac:then>
+		<ac:else>
+				<fl:fail message="Unterschiedliche Arraylaengen: iSize.Srca.filedir={$iSize.Srca.filedir} | iSize.Srca.filename=${iSize.Srca.filename} | iSize.Desta.filedir=${iSize.Desta.filedir} | iSize.Desta.filename=${iSize.Desta.filename}  "/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+		</ac:else>
+	</ac:if>
+	
+	
+	
 	<!-- Todo: Schleife über alle Arraypositionenen-->
-	<!-- Todo: Hole die Werte der aktuellen Arrayposition -->
+	<!-- Todo GOON 20150711: Hole die Werte der aktuellen Arrayposition -->
 		
 		
 	<!-- 4. Der eigentliche Kopiervorgang -->
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-	<echo>Pushing File ${src.filedir}\${src.filename} to Repository: ${dest.filedir}\${dest.filename} </echo>
+	<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Repository: ${myDest.filedir}\${myDest.filename} </echo>
 												
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${dest.filedir}" overwrite="false"  preservelastmodified="true"> 
-	<fileset dir="//${src.filedir}">	
+	<!-- TODO: ACHTUNG: WIE WIRD DER NEUE DATEINAME GESETZT ? innerhalb von <fileset dir=...><globmapper from="*" to="*.bak"/> </fileset>-->
+	<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
+	<fileset dir="//${mySrc.filedir}">		
 	<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 	<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
 	<!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
 													
 		<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
-		<include name="${src.filename}" />		
+		<include name="${mySrc.filename}" />		
+		<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
 	</fileset>
 	</copy>									
 </target>
