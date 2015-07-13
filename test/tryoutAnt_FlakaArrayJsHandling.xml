@@ -192,6 +192,8 @@
 		]]>
 	</scriptdef>
 	
+	
+	
 	 <!-- ########################### -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
@@ -215,6 +217,62 @@
 			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
 			if(typeof(objectArray)=="object"){
 			for(x in objectArray){
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				}else{
+					icount++;
+				};				
+			}							
+			}else{
+				iReturn=0;
+			}
+			
+			iReturn = icount;
+			
+			project.setProperty(attributes.get("ireturn"), iReturn);
+		]]>
+	</scriptdef>
+			
+		 <!-- ########################### -->	
+	<scriptdef name="arrayGetJsZZZ" language="javascript">
+		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
+		<attribute name="arrayinput" />
+		<attribute name="index" />
+		<attribute name="arrayget" />
+		<![CDATA[
+			var lista = attributes.get("arrayinput");		 
+			var iIndex = -attributes.get("index");
+			
+		
+			
+			
+			
+			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+			var icount=-1;
+			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+			if(typeof(objectArray)=="object"){
+			for(x in objectArray){
+				
+				//Undefinierte, d.h. nur initialisierte Arrays abfangen
+				//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
+				if(objectArray.length==1 && objArray[x]== "<#!!FGLUNDEFINED!!#>")
+					break
+				}else{
+					icount++;
+				
+				
+				}
+			
+				
 				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
 				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
 				}else{
