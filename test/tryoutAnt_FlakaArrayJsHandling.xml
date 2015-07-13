@@ -250,42 +250,31 @@
 		<![CDATA[
 			var lista = attributes.get("arrayinput");		 
 			var iIndex = -attributes.get("index");
-			
-		
-			
-			
-			
-			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
-			
-			var icount=-1;
-			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
-			if(typeof(objectArray)=="object"){
-			for(x in objectArray){
+			var objReturn;
+			main:{
+				if(iIndex <= -1) break main;
 				
-				//Undefinierte, d.h. nur initialisierte Arrays abfangen
-				//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
-				if(objectArray.length==1 && objArray[x]== "<#!!FGLUNDEFINED!!#>")
-					break
-				}else{
-					icount++;
-				
-				
-				}
+				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
 			
+				var icount=-1;
+				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+				if(typeof(objectArray)=="object"){
+				for(x in objectArray){
 				
-				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-				}else{
-					icount++;
-				};				
-			}							
-			}else{
-				iReturn=0;
-			}
-			
-			iReturn = icount;
-			
-			project.setProperty(attributes.get("ireturn"), iReturn);
+					//Undefinierte, d.h. nur initialisierte Arrays abfangen
+					//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
+					if(objectArray.length==1 && objArray[x]== "<#!!FGLUNDEFINED!!#>")
+						break main;
+					}else{
+						icount++;
+						if(icount==iIndex){
+							objReturn = x;
+							break main;
+						}				
+					}
+				}; //end for
+			}; //end main:
+			project.setProperty(attributes.get("arrayget"), objReturn);
 		]]>
 	</scriptdef>
 			
