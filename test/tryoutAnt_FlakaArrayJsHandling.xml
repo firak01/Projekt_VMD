@@ -192,8 +192,6 @@
 		]]>
 	</scriptdef>
 	
-	
-	
 	 <!-- ########################### -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
@@ -249,8 +247,8 @@
 		<attribute name="arrayget" />
 		<![CDATA[
 			var lista = attributes.get("arrayinput");		 
-			var iIndex = -attributes.get("index");
-			var objReturn;
+			var iIndex = attributes.get("index");
+			var objReturn="<#!!FGLUNDEFINED!!#>";
 			main:{
 				if(iIndex <= -1) break main;
 				
@@ -260,19 +258,23 @@
 				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
 				if(typeof(objectArray)=="object"){
 				for(x in objectArray){
-				
+					print("x="+x);
+					print("objectArray[x]="+objectArray[x]);
 					//Undefinierte, d.h. nur initialisierte Arrays abfangen
 					//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
-					if(objectArray.length==1 && objArray[x]== "<#!!FGLUNDEFINED!!#>")
+					if(objectArray.length<=1 && objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+						print("1");
 						break main;
 					}else{
+						print("2");
 						icount++;
 						if(icount==iIndex){
-							objReturn = x;
+							objReturn = objectArray[x];
 							break main;
 						}				
-					}
-				}; //end for
+					}; //end if
+					}; //end for
+				}; //end if(typeof(objectArray)=="object")				
 			}; //end main:
 			project.setProperty(attributes.get("arrayget"), objReturn);
 		]]>
@@ -313,7 +315,7 @@
 				var myArrayReturn = new Array();
 
 				//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-				myArrayReturn="<#!!FGLUNDEFINED!!#>";
+				myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
 			}
 						
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
@@ -391,8 +393,8 @@
 <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 
-<!-- <target name="compile" depends="declaration,myTestArrayInitJsZZZ,myTestArrayDebugJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayAppendJsZZZ">
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayGetJsZZZ> -->
+<target name="compile" depends="-declaration,-myTestArrayGetJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -414,106 +416,7 @@
 	  <fl:install-property-handler />	
   </target>
   
-	<target name="-myTestArrayInitJsZZZ">
-		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
-		<fl:logo>myTestArrayInitJsZZZ:
-			Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
-		<fl:let>
-			myArraySize::=; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
-		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
-		
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
-		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
-		
-		<echo>#################################</echo>
-		<fl:let>
-			myArraySize::=0; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
-		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
-		
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
-		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
-		
-		<echo>#################################</echo>
-		
-			<fl:let>
-			myArraySize::=1; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
-		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
-		
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 1 zurückgeben. -->
-		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
-		
-		<echo>#################################</echo>
-		
-				<fl:let>
-			myArraySize::=2; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-		
-		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
-		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
-		
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
-		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 2 zurückgeben. -->
-		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
-		
-		<echo>#################################</echo>
-		
-	</target>
-  
-	<target name="-myTestArrayDebugJsZZZ">
-		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
-		<fl:logo>myTestArrayDebugJsZZZ:
-		Meine Loesung: Scriptdef arrayDebugJsZZZ</fl:logo>		
-		<fl:let>
-			myArraySize::=2; 
-		</fl:let>
-		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-		<echo>myArray nachher: ${myArray}</echo>
-	
-		<!-- Werte eingeben -->
-		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
-	
-		<!-- TODO : Kopiere den wert in den ursprünglichen Variablennamen -->
-	
-		<!-- Unterschiedliche Debug - Level testen -->	
-		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="0"/>
-		
-		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="1"/>
-		
-		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="2"/>
-		
-	</target> 
-	
-	<target name="-myTestArrayAppendJsZZZ">
+  <target name="-myTestArrayAppendJsZZZ">
 		<!-- Testen etwas an ein Array anzuhaengen -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
@@ -646,11 +549,171 @@
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 				
 	</target>
+  
+	<target name="-myTestArrayGetJsZZZ">
+		<!-- Teste einen Wert aus dem Array auszulesen. -->
 		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayGetJsZZZ:
+		Meine Loesung: Scriptdef arrayGetJsZZZ</fl:logo>	
+
+		<echo>### 1. Testaufbau: Array blanko 'initialisieren' ########################################################</echo>
+		<fl:let>
+			myArraySize::=; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArrayNew"/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<echo>myArray nachher: ${myArray}</echo>
 		
+		<!-- Hole Wert an den Stellen -1, 0, 1 -->
+		<arrayGetJsZZZ arrayinput="$myArray" index="-1" arrayget="myValue"/>
+		<echo>-1: Geholter Wert: ${myValue}</echo> 
+		
+		<arrayGetJsZZZ arrayinput="$myArray" index="0" arrayget="myValue"/>
+		<echo> 0: Geholter Wert: ${myValue}</echo>
+		
+		<arrayGetJsZZZ arrayinput="$myArray" index="1" arrayget="myValue"/>
+		<echo> 1: Geholter Wert: ${myValue}</echo>
+			
+		<echo>###  2. Testaufbau: Array mit 3 'initialisieren'  ########################################################</echo>
+		<fl:let>
+			myArraySize::=3; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Hole Wert an den Stellen 1 -->		
+		<arrayGetJsZZZ arrayinput="$myArray" index="1" arrayget="myValue"/>
+		<echo>Geholter Wert: ${myValue}</echo>
 	
+		<echo>### 3. Testaufbau: Werte eingeben ########################################################</echo>
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+	
+		<!-- Hole Wert an den Stellen 1 -->		
+		<arrayGetJsZZZ arrayinput="$myArray" index="1" arrayget="myValue"/>
+		<echo>Geholter Wert: ${myValue}</echo>
 		
+		<echo>###  4. Testaufbau: Wert an das Array anhängen ########################################################</echo>
+		<fl:let>
+			mySingleValue::= "angehängter Wert"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
+		<!-- Hole Wert an den Stellen 3 -->		
+		<arrayGetJsZZZ arrayinput="$myArray" index="3" arrayget="myValue"/>
+		<echo>Geholter Wert: ${myValue}</echo>	
+				
+	</target>
+
+	<target name="-myTestArrayDebugJsZZZ">
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayDebugJsZZZ:
+		Meine Loesung: Scriptdef arrayDebugJsZZZ</fl:logo>		
+		<fl:let>
+			myArraySize::=2; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+	
+		<!-- TODO : Kopiere den wert in den ursprünglichen Variablennamen -->
+	
+		<!-- Unterschiedliche Debug - Level testen -->	
+		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="0"/>
+		
+		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="1"/>
+		
+		<arrayDebugJsZZZ arrayinput="${myArrayNew}" ilevel="2"/>
+		
+	</target> 
+	
+	
+  <target name="-myTestArrayInitJsZZZ">
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayInitJsZZZ:
+			Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
+		<fl:let>
+			myArraySize::=; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		<fl:let>
+			myArraySize::=0; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+			<fl:let>
+			myArraySize::=1; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 1 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+				<fl:let>
+			myArraySize::=2; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 2 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+	</target>
+  
+
 		<!-- Beispiel für JAVA Arrays
 		<scriptdef name="validateTimeZone" language="javascript">
     <attribute name="zone" />
