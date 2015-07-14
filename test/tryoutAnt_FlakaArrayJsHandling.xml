@@ -258,15 +258,14 @@
 				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
 				if(typeof(objectArray)=="object"){
 				for(x in objectArray){
-					print("x="+x);
-					print("objectArray[x]="+objectArray[x]);
+					//print("x="+x);
+					//print("objectArray[x]="+objectArray[x]);
+					
 					//Undefinierte, d.h. nur initialisierte Arrays abfangen
 					//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
-					if(objectArray.length<=1 && objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-						print("1");
+					if(objectArray.length<=1 && objectArray[x]=="<#!!FGLUNDEFINED!!#>"){						
 						break main;
 					}else{
-						print("2");
 						icount++;
 						if(icount==iIndex){
 							objReturn = objectArray[x];
@@ -568,13 +567,13 @@
 		<echo>myArray nachher: ${myArray}</echo>
 		
 		<!-- Hole Wert an den Stellen -1, 0, 1 -->
-		<arrayGetJsZZZ arrayinput="$myArray" index="-1" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="-1" arrayget="myValue"/>
 		<echo>-1: Geholter Wert: ${myValue}</echo> 
 		
-		<arrayGetJsZZZ arrayinput="$myArray" index="0" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="0" arrayget="myValue"/>
 		<echo> 0: Geholter Wert: ${myValue}</echo>
 		
-		<arrayGetJsZZZ arrayinput="$myArray" index="1" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="1" arrayget="myValue"/>
 		<echo> 1: Geholter Wert: ${myValue}</echo>
 			
 		<echo>###  2. Testaufbau: Array mit 3 'initialisieren'  ########################################################</echo>
@@ -586,18 +585,18 @@
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 		
-		<!-- Hole Wert an den Stellen 1 -->		
-		<arrayGetJsZZZ arrayinput="$myArray" index="1" arrayget="myValue"/>
-		<echo>Geholter Wert: ${myValue}</echo>
+		<!-- Hole Wert an Stelle 1 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="1" arrayget="myValue"/>
+		<echo> 1: Geholter Wert: ${myValue}</echo>
 	
 		<echo>### 3. Testaufbau: Werte eingeben ########################################################</echo>
 		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 	
-		<!-- Hole Wert an den Stellen 1 -->		
-		<arrayGetJsZZZ arrayinput="$myArray" index="1" arrayget="myValue"/>
-		<echo>Geholter Wert: ${myValue}</echo>
+		<!-- Hole Wert an Stelle 1 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="1" arrayget="myValue"/>
+		<echo> 1: Geholter Wert: ${myValue}</echo>
 		
 		<echo>###  4. Testaufbau: Wert an das Array anhängen ########################################################</echo>
 		<fl:let>
@@ -607,10 +606,14 @@
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
-		<!-- Hole Wert an den Stellen 3 -->		
-		<arrayGetJsZZZ arrayinput="$myArray" index="3" arrayget="myValue"/>
-		<echo>Geholter Wert: ${myValue}</echo>	
+		<!-- Hole Wert an Stelle 3 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="3" arrayget="myValue"/>
+		<echo> 3: Geholter Wert: ${myValue}</echo>	
 				
+		<!-- Hole Wert an Stellen 4 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue"/>
+		<echo> 4: Geholter Wert: ${myValue}</echo>
+		
 	</target>
 
 	<target name="-myTestArrayDebugJsZZZ">
