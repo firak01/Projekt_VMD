@@ -231,7 +231,7 @@
 		]]>
 	</scriptdef>
 			
-		 <!-- ########################### -->	
+	<!-- ########################### -->	
 	<scriptdef name="arrayGetJsZZZ" language="javascript">
 		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
 		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->

@@ -254,7 +254,55 @@
 			project.setProperty(attributes.get("ireturn"), iReturn);
 		]]>
 	</scriptdef>
+	
+	<!-- ########################### -->	
+	<scriptdef name="arrayGetJsZZZ" language="javascript">
+		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
+		<attribute name="arrayinput" />
+		<attribute name="index" />
+		<attribute name="arrayget" />
+		<![CDATA[
+			var lista = attributes.get("arrayinput");		 
+			var iIndex = attributes.get("index");
+			var objReturn="<#!!FGLUNDEFINED!!#>";
+			main:{
+				if(iIndex <= -1) break main;
+				
+				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
 			
+				var icount=-1;
+				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+				if(typeof(objectArray)=="object"){
+				for(x in objectArray){
+					//print("x="+x);
+					//print("objectArray[x]="+objectArray[x]);
+					
+					//Undefinierte, d.h. nur initialisierte Arrays abfangen
+					//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
+					if(objectArray.length<=1 && objectArray[x]=="<#!!FGLUNDEFINED!!#>"){						
+						break main;
+					}else{
+						icount++;
+						if(icount==iIndex){
+							objReturn = objectArray[x];
+							break main;
+						}				
+					}; //end if
+					}; //end for
+				}; //end if(typeof(objectArray)=="object")				
+			}; //end main:
+			project.setProperty(attributes.get("arrayget"), objReturn);
+		]]>
+	</scriptdef>
+	
 	<!-- ############################################################-->		
 	<scriptdef name="arrayInitJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Erstellung eines Arrays.
@@ -705,12 +753,17 @@
 									<fl:let>myAnalyze ::= "${returnString}"</fl:let>
 									
                                     <!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
-									<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnStringaLeft, returnStringaRight">
+									<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
+												<param name="analyze" value="${myAnalyze}"/>
 												<param name="leftPart" value="${myLeftPart}"/>
 												<param name="rightPart" value="${myRightPart}"/>												
 									</antcallback>
-									<fl:let>myStringaLeft ::= "${returnStringaLeft}"</fl:let>
-									<fl:let>myStringaRight ::= "${returnStringaRight}"</fl:let>
+									<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
+									<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
+									<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
+									<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>
+									
+									
 									<!-- TODO: Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
 									<!-- myStringaLeftTotal
 									     myStringaRightTotal
@@ -722,25 +775,28 @@
 				</sequential>
 			</for>			
 			
-			<!-- ### TEST Hier erst einmal das kopieren der Arrayinhalte testen -->	
+			<!-- ### NOCH TESTPHASe Hier erst einmal das Kopieren der Arrayinhalte testen -->	
 			<fl:logo>TEST ARRAYBEHANDLUNG UND KOPIEREN</fl:logo>
 			<fl:let>myArraySize ::= 0</fl:let>
-			
-			<fl:let>mySrc.filedir ::= "C:\VMWare\FGLXPHannibalVideoPlay3_768MB "</fl:let>			
+					
+			<!-- <fl:let>mySrc.filedir ::= "C:\VMWare\FGLXPHannibalVideoPlay3_768MB "</fl:let> -->	
+			<fl:let>mySrc.filedir ::= "C:\1fgl\repository\Projekt_VMD\testused"</fl:let>			
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />			
 			<fl:let>mySrca.filedir::="${myArray}"</fl:let>
-			<arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
 			
-			<fl:let>mySrc.filename ::= "FGLXPHannibalVideoPlay1VM.txt "</fl:let>
+			<!-- <fl:let>mySrc.filename ::= "FGLXPHannibalVideoPlay1VM.txt "</fl:let> -->
+			<fl:let>mySrc.filename ::= "file_copyBeispiel00.txt"</fl:let>
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 			<fl:let>mySrca.filename ::="${myArray}"</fl:let>					
-			<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 			
-			<fl:let>myDest.filedir ::= "C:\1fgl\repository\Projekt_VMD\vmd "</fl:let>			
+			<!-- <fl:let>myDest.filedir ::= "C:\1fgl\repository\Projekt_VMD\vmd "</fl:let> -->
+			<fl:let>myDest.filedir ::= "C:\temp"</fl:let>			
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
@@ -748,12 +804,13 @@
 			<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 			
 			
-			<fl:let>myDest.filename ::= "FGLXPHannibalVideoPlay1VM.txt"</fl:let>
+			<!-- <fl:let>myDest.filename ::= "FGLXPHannibalVideoPlay1VM.txt"</fl:let> -->
+			<fl:let>myDest.filename ::= "file_copyBeispiel00.txt"</fl:let>
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 			<fl:let>myDesta.filename ::="${myArray}"</fl:let>
-			<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 			
 
 			<!--### Kopiere die Dateien der beiden Arrays #####################-->
@@ -765,7 +822,7 @@
 			</antcallback>
 		</fl:when>
 		<fl:otherwise>
-				<echo>Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
+				<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
 				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
 		</fl:otherwise>
 	</fl:choose>
@@ -779,9 +836,9 @@
 	<fl:let>mySrca.filename ::= "${srca.filename}"</fl:let>
 	<fl:let>myDesta.filedir ::= "${desta.filedir}"</fl:let>
 	<fl:let>myDesta.filename ::= "${desta.filename}"</fl:let>
-	<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
-	<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
-	<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	
 	
 			
@@ -809,15 +866,20 @@
 	
 	<!-- Todo: Schleife über alle Arraypositionenen-->
 	<!-- Todo GOON 20150711: Hole die Werte der aktuellen Arrayposition -->
-		
+	<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="0" arrayget="mySrc.filedir"/>	
+	<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="0" arrayget="mySrc.filename"/>	
+	<arrayGetJsZZZ arrayinput="${myDesta.filedir}" index="0" arrayget="myDest.filedir"/>	
+	<arrayGetJsZZZ arrayinput="${myDesta.filename}" index="0" arrayget="myDest.filename"/>	
 		
 	<!-- 4. Der eigentliche Kopiervorgang -->
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-	<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Repository: ${myDest.filedir}\${myDest.filename} </echo>
+	<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Destination: ${myDest.filedir}\${myDest.filename} </echo>
 												
-	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<!-- TODO: ACHTUNG: WIE WIRD DER NEUE DATEINAME GESETZT ? innerhalb von <fileset dir=...><globmapper from="*" to="*.bak"/> </fileset>-->
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	 
+	<!-- ACHTUNG: Existiert die Quelldatei nicht, kommt es hier zu einem BUILD Fehler.
+	              TODO: Diesen abfangen (try ... catch), protokollieren und weiter zum nächsten in der Schleife -->
+	<!-- Merke: WIE WIRD DER NEUE DATEINAME GESETZT ? innerhalb von <copy><fileset dir=...> </fileset><globmapper from="*" to="*.bak"/></copy>-->
 	<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
 	<fileset dir="//${mySrc.filedir}">		
 	<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
@@ -825,9 +887,9 @@
 	<!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
 													
 		<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
-		<include name="${mySrc.filename}" />		
-		<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
+		<include name="${mySrc.filename}" />				
 	</fileset>
+	<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
 	</copy>									
 </target>
 
@@ -895,6 +957,7 @@
 </target>
 
 <target name="-FGLCopyLocal_Control">
+	<fl:let>myAnalyze ::= "${analyze}"</fl:let>
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
 	
@@ -953,14 +1016,16 @@
 		</ac:or>
 		<ac:then>
 			<echo>Fall: links Datei, rechts Datei (oder noch nicht existent)</echo>
-			<antcallback target="-FGLCopyLocal_Control_FF" return="returnControl, returnStringaLeft, returnStringaRight">
+			<antcallback target="-FGLCopyLocal_Control_FF" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
 				<param name="leftPart" value="${myLeftPart}"/>
 				<param name="rightPart" value="${myRightPart}"/>
 			</antcallback>
 			
-			<fl:echo>Ergebnis des Controll_FF aufrufs: ${returnControl}</fl:echo>
-			<fl:let>myStringaLeft ::= "${returnStringaLeft}"</fl:let>
-			<fl:let>myStringaRight ::= "${returnStringaRight}"</fl:let>
+			<fl:echo>Ergebnis des Controll_FF Aufrufs: ${returnControl}</fl:echo>
+			<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
+			<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
+			<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
+			<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>
 		</ac:then>
 	</ac:elseif>									
 	<ac:else>
@@ -969,14 +1034,16 @@
 	</ac:if>
 	
 	<fl:let>returnControll ::= true</fl:let>
-	<fl:let>returnStringaLeft ::= "${myReturnStringaLeft}"</fl:let>
-	<fl:let>returnStringaRight ::= "${myReturnStringaRight}"</fl:let>
+	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
+	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
+	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
+	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>
 </target>
 
 
 <target name="-FGLCopyLocal_Control_FF">
 	<!-- TODO GOON: 20150710 -->
-	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->
+	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
 	<fl:echo>Start von FGLCopyLocal_Control_FF</fl:echo><!-- TODO tryoutAnt_Reflection - currentTarget name
@@ -1001,6 +1068,11 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 
 	-->
 	
-	
+	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+	<fl:let>returnControll ::= true</fl:let>
+	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
+	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
+	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
+	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	
 </target>
 </project>
