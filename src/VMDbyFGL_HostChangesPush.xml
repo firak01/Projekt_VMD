@@ -444,6 +444,29 @@
 		 ]]>
 	</scriptdef>
 	
+	 <!-- ########################### -->
+	 <scriptdef name="stringLeftString" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="text" />
+    <attribute name="matchstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	   var text = attributes.get("text");
+       var match = attributes.get("matchstring");
+       
+       sReturn = getStrLeftStr(text, match);
+	   
+       project.setProperty(attributes.get("returnstring"), sReturn);
+	   
+	   //aus JSZ - Kernel 
+	   function getStrLeftStr(sourceStr, keyStr){
+		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
+		}
+     ]]>
+  </scriptdef>
+	
 	<!-- ########################### -->
 	<scriptdef name="substringZZZ" language="javascript">
 	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
@@ -862,9 +885,9 @@
 		</ac:else>
 	</ac:if>
 	
+	<!-- Merke es gibt ein antcontrib Target 'Pathtofileset' dies hier vielleicht anwenden ? -->
 	
-	
-	<!-- Todo: Schleife über alle Arraypositionenen-->
+	<!-- Todo: Schleife über alle Arraypositionen-->
 	<!-- Todo GOON 20150711: Hole die Werte der aktuellen Arrayposition -->
 	<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="0" arrayget="mySrc.filedir"/>	
 	<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="0" arrayget="mySrc.filename"/>	
@@ -1046,27 +1069,39 @@
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myLeftPart ::= "${rightPart}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_FF</fl:echo><!-- TODO tryoutAnt_Reflection - currentTarget name
+	<fl:echo>Start von FGLCopyLocal_Control_FF</fl:echo>
+	<!-- TODO tryoutAnt_Reflection - currentTarget name
 	siehe mein Dokument:
-	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )
-	
-	
+	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )		
 I think you can't, unless you spend some time coding your own custom tasks (http://ant.apache.org/manual/tutorial-writing-tasks.html)
-
 The built-in properties you can display are: basedir, ant.file, ant.version, ant.project.name, ant.java.version
 
-
-
-Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lösen.
-	
+Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lösen.	
 	target name="test">
   <script language="javascript">
     project.setNewProperty("current_target", self.getOwningTarget());
   </script>
   <echo>${current_target}</echo>
 </target>
-
 	-->
+	
+	
+	<!-- TODO GOON: "Part"-Behandlung durch Aufruf der Targets -->
+	<echo>Behandle linken Fall</echo>
+	<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
+		<param name="sPart" value="${myLeftPart}"/>
+	</antcallback>
+	<fl:let>mySrca.filedir ::= "${returnA.filedir}"</fl:let>
+	<fl:let>mySrca.filename ::= "${returnA.filename}"</fl:let>
+	
+	
+	<echo>Behandle rechten Fall</echo>
+	<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
+		<param name="sPart" value="${myLeftPart}"/>
+	</antcallback>
+	<fl:let>myDesta.filedir ::= "${returnA.filedir}"</fl:let>
+	<fl:let>myDesta.filename ::= "${returnA.filename}"</fl:let>
+	
 	
 	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<fl:let>returnControll ::= true</fl:let>
@@ -1075,4 +1110,55 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
 	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	
 </target>
+
+<target name="-FGLCopyLocal_Control_FF_Part">
+	<!-- TODO GOON: 20150710 -->
+	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
+	<fl:let>myPart ::= "${sPart}"</fl:let>
+	<fl:echo>Start von FGLCopyLocal_Control_FF_Part</fl:echo>
+	
+	
+	<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
+	<!-- <echo>src.filedir = #{split('aabcc','b')[0]}</echo> -->
+	<!-- Z.B.: Hiermit holt man ggfs. den Laufwerksnamen, oder auch das letzte Element -->
+	<!-- <echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo> -->
+	<fl:let>sfileadir ::= split('${myPart}','\\\\')</fl:let><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
+											
+	<!-- 2. ermittle die groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
+	<!--    Merke: #{size(${src.fileadir})} funktioniert nicht. Siehe tryoutAnt_FlakaListHandling -->																	
+
+												
+	<!-- Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
+	<arrayElementCountJsZZZ arrayinput="${sfileadir}" ireturn="mylistasize"/>
+	<echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</echo>
+
+	<fl:for var="mydir" in="split('${myPart}','\\\\')">
+		<echo>Pfadbestandteil: #{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
+	</fl:for>
+											
+	<!-- 3. Ermittle die Indexposition -->	
+	<!-- TODO: Dieses in einen Dateibehandlungs Scriptdef packen -->
+	<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+	<var name="op1" value="${mylistasize}"/>
+	<var name="op2" value="1"/>
+	<var name="op" value="-"/>
+	<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+	<echo>errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
+	<fl:let>xtractedvalue ::= split('${myPart}','\\\\')[${index}]; 
+		<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
+	</fl:let>
+	<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>
+
+	<!-- TODO GOON 20150717: Hole den Pfad, als Teil links vom Dateinamen -->
+	<stringLeftString text="${myPart}" matchstring="${xtractedvalue}" returnstring="myPath" />
+	<echo>Der Pfad ist: ${myPath}</echo>
+
+						
+
+	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+	<fl:let>returnControll ::= true</fl:let>
+	<fl:let>returnA.filedir ::= "${filedir}"</fl:let>
+	<fl:let>returnA.filename ::= "${filename}"</fl:let>
+</target>
+
 </project>

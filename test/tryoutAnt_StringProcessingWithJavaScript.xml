@@ -3,6 +3,30 @@
 
 <!-- ######## Scriptdefs ############################################################################--> 
 
+
+ <!-- ########################### -->
+<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+ <scriptdef name="stringLeftString" language="javascript">
+	<attribute name="text" />
+    <attribute name="matchstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	   var text = attributes.get("text");
+       var match = attributes.get("matchstring");
+       
+       sReturn = getStrLeftStr(text, match);
+	   
+       project.setProperty(attributes.get("returnstring"), sReturn);
+	   
+	   //aus JSZ - Kernel 
+	   function getStrLeftStr(sourceStr, keyStr){
+		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
+		}
+     ]]>
+  </scriptdef>
+
  <!-- ########################### -->
 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -24,7 +48,7 @@
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <target name="compile" depends="-myTestStringSubstring">
+ <target name="compile" depends="-myTestStringSubstring,-myTestStringLeft">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -49,5 +73,16 @@
 		
 		<substring text="asdfasdfasdf" start="0" end="1" property="subtext" />
 		<echo message="subtext = ${subtext}" />
+	</target> 
+	
+	<target name="-myTestStringLeft">
+		<echo>myTestStringLeft: </echo>
+		
+		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+		<stringLeftString text="asdfasdfasdf" matchstring="fas" returnstring="lefttext" />
+		<echo message="lefttext = ${lefttext}" />
+		
+		<stringLeftString text="asdfasdfasdf" matchstring="sdf" returnstring="lefttext" />
+		<echo message="lefttext = ${lefttext}" />
 	</target> 
  </project>

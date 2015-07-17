@@ -1,54 +1,54 @@
 <target name = "snippet_b">
 
-													<fl:choose>
-														<fl:when test=" '${myaFilePathSize}'=='1'>">
-															<!-- AB) Links Verzeichnis = Rechts nur ein Eintrag -->
-															<echo>Rechts steht nur ein Wert... : ${myRightPart}</echo>
-															<ac:if> 
-																<ac:equals arg1="${myisdirectoryRightPart}" arg2="true" />
-																<ac:then>
-																		<echo>Links Dateipfad / Rechts Verzeichnisname.</echo>
-																		
-																			<!-- Erst wenn der rechte Teil auch keinen Dateinamen hat: ABBRUCH -->
-																			<!-- TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
-																			<echo>ABBRUCH: Keinen Dateinamen gefunden.</echo>
-																			<fl:fail message="Keinen Dateinamen gefunden. Linker Teil der Steuerungsanweisung ist ein Verzeichnis '${myLeftPart}' und rechter Teil ebenfalls '${myRightPart}'."  /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-																</ac:then>
-																<ac:else>
-																		<echo>Links Dateipfad / Rechts Dateiname.</echo>																		
-																</ac:else>
-															</ac:if>
-														</fl:when>
-														<fl:otherwise>
-															<!-- BBB) Links Dateipfad = Rechts Dateipfad -->
-															<echo>Links Dateipfad / Rechts steht ein Dateiname inklusive Pfad: ${myRightPart}</echo>
-																									
-															<!-- 3. Ermittle die letzte Indexposition und damit den Dateinamen -->
-															<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
-																	   Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
-															<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
-															<var name="op1" value="${myaFilePathSize}"/>
-															<var name="op2" value="1"/>
-															<var name="op" value="-"/>
-															<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-															<echo>Errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
-															<fl:let>
-																xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
-															</fl:let>
-															<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>	
-															<fl:let>dest.filename ::= ${xtractedvalue}</fl:let>
-																										
-															<!-- 4. Füge den Dateinamen hinter den Pfad, der von der linken Seite kommt hinzu, wenn auf der rechten Seite kein Pfad vorhanden ist. -->
-																										
-															<!-- 4.1 mache aus dem linken Teil nun ein Array. -->
-															<fl:let>src.fileapath ::= split('${myLeftPart}','\\\\')</fl:let>
-															<echo>Nach dem split: ${src.fileapath}</echo>
-																																													
-															<!-- TODO: Array Aufaddieren von indexposition x bis zu einer anderen Indexposition
-																		arrayStringImplode mit den Parametern sSeparator, ilBound, iuBound -->
-															<!-- TODO: An den so implodierten String das \\extractedvalue anhängen. -->
-														</fl:otherwise>
-													</fl:choose>	
+			<fl:choose>
+		<fl:when test=" '${myaFilePathSize}'=='1'>">
+			<!-- AB) Links Verzeichnis = Rechts nur ein Eintrag -->
+			<echo>Rechts steht nur ein Wert... : ${myRightPart}</echo>
+			<ac:if> 
+				<ac:equals arg1="${myisdirectoryRightPart}" arg2="true" />
+				<ac:then>
+						<echo>Links Dateipfad / Rechts Verzeichnisname.</echo>
+						
+							<!-- Erst wenn der rechte Teil auch keinen Dateinamen hat: ABBRUCH -->
+							<!-- TODO: Wenn der linke Teil ein Verzeichnis ist, alle Dateien darin kopieren, sofern der rechte Teil auch ein Verzeichnis ist. -->
+							<echo>ABBRUCH: Keinen Dateinamen gefunden.</echo>
+							<fl:fail message="Keinen Dateinamen gefunden. Linker Teil der Steuerungsanweisung ist ein Verzeichnis '${myLeftPart}' und rechter Teil ebenfalls '${myRightPart}'."  /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+				</ac:then>
+				<ac:else>
+						<echo>Links Dateipfad / Rechts Dateiname.</echo>																		
+				</ac:else>
+			</ac:if>
+		</fl:when>
+		<fl:otherwise>
+			<!-- BBB) Links Dateipfad = Rechts Dateipfad -->
+			<echo>Links Dateipfad / Rechts steht ein Dateiname inklusive Pfad: ${myRightPart}</echo>
+													
+			<!-- 3. Ermittle die letzte Indexposition und damit den Dateinamen -->
+			<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
+					   Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
+			<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+			<var name="op1" value="${myaFilePathSize}"/>
+			<var name="op2" value="1"/>
+			<var name="op" value="-"/>
+			<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+			<echo>Errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
+			<fl:let>
+				xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; <!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
+			</fl:let>
+			<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>	
+			<fl:let>dest.filename ::= ${xtractedvalue}</fl:let>
+														
+			<!-- 4. Füge den Dateinamen hinter den Pfad, der von der linken Seite kommt hinzu, wenn auf der rechten Seite kein Pfad vorhanden ist. -->
+														
+			<!-- 4.1 mache aus dem linken Teil nun ein Array. -->
+			<fl:let>src.fileapath ::= split('${myLeftPart}','\\\\')</fl:let>
+			<echo>Nach dem split: ${src.fileapath}</echo>
+																																	
+			<!-- TODO: Array Aufaddieren von indexposition x bis zu einer anderen Indexposition
+						arrayStringImplode mit den Parametern sSeparator, ilBound, iuBound -->
+			<!-- TODO: An den so implodierten String das \\extractedvalue anhängen. -->
+		</fl:otherwise>
+	</fl:choose>											
 											
 
 
@@ -57,42 +57,7 @@
 <target name="FglCopyLocal_CopyUsingPropertyArrays">
 <!-- START: codeschnipsel wieder eingefügt... -->
 											
-<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
-<!-- <echo>src.filedir = #{split('aabcc','b')[0]}</echo> -->
-<!-- Z.B.: Hiermit holt man ggfs. den Laufwerksnamen, oder auch das letzte Element -->
-<!-- <echo>src.filedir = #{split('${myLeftPart}','\\\\')[0]}</echo> -->
-<fl:let>src.fileadir ::= split('${myLeftPart}','\\\\')</fl:let><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
-											
-<!-- 2. ermittle die groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
-<!--    Merke: #{size(${src.fileadir})} funktioniert nicht. Siehe tryoutAnt_FlakaListHandling -->																	
-
-												
-<!-- 			Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
-<arrayElementCountJsZZZ arrayinput="${src.fileadir}" ireturn="mylistasize"/>
-<echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</echo>
-
-<fl:for var="mydir" in="split('${myLeftPart}','\\\\')">
-<echo>Pfadbestandteil: #{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
-</fl:for>
-											
-<!-- 3. Ermittle die Indexposition -->
-<!-- TODO: Array Scriptdef, um den wert an einer Indexposition zu bekommen,
-		Array Scriptdef, um den Wert an der letzten Indexposition zu bekommen. -->													   
-
-<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
-<var name="op1" value="${mylistasize}"/>
-<var name="op2" value="1"/>
-<var name="op" value="-"/>
-<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-<echo>errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
-<fl:let>
-	xtractedvalue ::= split('${myLeftPart}','\\\\')[${index}]; 
-
-<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
-</fl:let>
-<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>
-<!-- TODO: Hänge diesen Wert an das Zielverzeichnis an. Das ist der Zieldateipfad -->
-											
+					
 											
 								   						   
 <!-- ENDE: codeschnipsel wieder eingefügt... -->
