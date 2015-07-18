@@ -765,8 +765,7 @@
 									</fl:when>
 
 									<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
-									<fl:let>myCase ::= "undefined"</fl:let>
-									
+									<fl:let>myCase ::= "undefined"</fl:let>																										
 									<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
 										<param name="leftPart" value="${myLeftPart}"/>
 										<param name="rightPart" value="${myRightPart}"/>
@@ -1039,6 +1038,7 @@
 		</ac:or>
 		<ac:then>
 			<echo>Fall: links Datei, rechts Datei (oder noch nicht existent)</echo>
+
 			<antcallback target="-FGLCopyLocal_Control_FF" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
 				<param name="leftPart" value="${myLeftPart}"/>
 				<param name="rightPart" value="${myRightPart}"/>
@@ -1056,7 +1056,7 @@
 	</ac:else>											
 	</ac:if>
 	
-	<fl:let>returnControll ::= true</fl:let>
+	<fl:let>returnControl ::= true</fl:let>
 	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
 	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
 	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
@@ -1116,6 +1116,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
 	<fl:let>myPart ::= "${sPart}"</fl:let>
 	<fl:echo>Start von FGLCopyLocal_Control_FF_Part</fl:echo>
+	<fl:echo>fuer: ${myPart}</fl:echo>
 	
 	
 	<!-- TODO: Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->
@@ -1130,11 +1131,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 												
 	<!-- Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
 	<arrayElementCountJsZZZ arrayinput="${sfileadir}" ireturn="mylistasize"/>
-	<echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</echo>
-
-	<fl:for var="mydir" in="split('${myPart}','\\\\')">
-		<echo>Pfadbestandteil: #{mydir}</echo><!-- Aufruf der Variablen als EL Expression -->
-	</fl:for>
+	<fl:echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</fl:echo>								
+	<echo>Pfadbestandteilausgabe</echo>
+	<ac:for param="mydiry" list="${sfileadir}">
+		<sequential>
+			<echo>Pfadbestandteil: @{mydiry}</echo>
+		</sequential>				
+	</ac:for>
+									
+									
 											
 	<!-- 3. Ermittle die Indexposition -->	
 	<!-- TODO: Dieses in einen Dateibehandlungs Scriptdef packen -->
@@ -1143,20 +1148,23 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<var name="op2" value="1"/>
 	<var name="op" value="-"/>
 	<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-	<echo>errechneter wert fuer Index des letzten Pfadteils: #{index}</echo>
+	<echo>errechneter wert fuer Index des letzten Pfadteils: ${index}</echo>
 	<fl:let>xtractedvalue ::= split('${myPart}','\\\\')[${index}]; 
 		<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
 	</fl:let>
-	<echo>An letzter Stelle gefundener wert: #{xtractedvalue}</echo>
+	<echo>An letzter Stelle gefundener wert: ${xtractedvalue}</echo>
 
 	<!-- TODO GOON 20150717: Hole den Pfad, als Teil links vom Dateinamen -->
-	<stringLeftString text="${myPart}" matchstring="${xtractedvalue}" returnstring="myPath" />
+	<!-- format('\\%s', userdir_sub) -->
+	<!-- <stringLeftString text="${myPart}" matchstring="${xtractedvalue}" returnstring="myPath" /> -->
+	<fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo><!-- Das muss man machen um den Backslash in den String zu bekommen -->
+	<stringLeftString text="${myPart}" matchstring="format('\\%s', xtractedvalue)" returnstring="myPath" />
 	<echo>Der Pfad ist: ${myPath}</echo>
 
 						
 
 	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
-	<fl:let>returnControll ::= true</fl:let>
+	<fl:let>returnControl ::= true</fl:let>
 	<fl:let>returnA.filedir ::= "${filedir}"</fl:let>
 	<fl:let>returnA.filename ::= "${filename}"</fl:let>
 </target>
