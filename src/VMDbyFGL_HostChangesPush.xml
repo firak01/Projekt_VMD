@@ -453,13 +453,22 @@
     <attribute name="matchstring" />
     <attribute name="returnstring" />     
      <![CDATA[
+	 //TODO: Die Encoding Aenderung in den JSZ - Kernel bringen.
+	 
 	   var text = attributes.get("text");
        var match = attributes.get("matchstring");
       print("matchstring="+match);
 	   //! FEHLER BEI EINEM BEGINNENDEN BACKSLASH
+	   var matchToEncode=match;
+	   var matchEncoded = encodeMyHtml(matchToEncode);
+	   print("encoded matchstring=" + matchEncoded);
 	   
+	    var textToEncode=text;
+		var textEncoded = encodeMyHtml(textToEncode);
+	   print("encoded textstring=" + textEncoded);
+       sReturn = getStrLeftStr(textEncoded, matchEncoded);
 	   
-       sReturn = getStrLeftStr(text, match);
+	   sReturn = unescape(sReturn);
 	   print("sReturn="+sReturn);
 	   
        project.setProperty(attributes.get("returnstring"), sReturn);
@@ -468,6 +477,18 @@
 	   function getStrLeftStr(sourceStr, keyStr){
 		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
 		}
+		
+		//TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String
+	   }
      ]]>
   </scriptdef>
 	
