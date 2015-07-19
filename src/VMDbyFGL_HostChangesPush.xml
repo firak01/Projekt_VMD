@@ -183,7 +183,7 @@
 					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
 					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
 					
-					print("splitte diesn String nach Komma.");
+					print("splitte diesen String nach Komma.");
 					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
 					for(x in objectArray){
 						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
@@ -455,8 +455,12 @@
      <![CDATA[
 	   var text = attributes.get("text");
        var match = attributes.get("matchstring");
-       
+      print("matchstring="+match);
+	   //! FEHLER BEI EINEM BEGINNENDEN BACKSLASH
+	   
+	   
        sReturn = getStrLeftStr(text, match);
+	   print("sReturn="+sReturn);
 	   
        project.setProperty(attributes.get("returnstring"), sReturn);
 	   
@@ -786,7 +790,7 @@
 									<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>
 									
 									
-									<!-- TODO: Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
+									<!-- TODO GOON 20150719: Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
 									<!-- myStringaLeftTotal
 									     myStringaRightTotal
 									-->
@@ -802,37 +806,37 @@
 			<fl:let>myArraySize ::= 0</fl:let>
 					
 			<!-- <fl:let>mySrc.filedir ::= "C:\VMWare\FGLXPHannibalVideoPlay3_768MB "</fl:let> -->	
-			<fl:let>mySrc.filedir ::= "C:\1fgl\repository\Projekt_VMD\testused"</fl:let>			
+<!-- 			<fl:let>mySrc.filedir ::= "C:\1fgl\repository\Projekt_VMD\testused"</fl:let>			
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />			
-			<fl:let>mySrca.filedir::="${myArray}"</fl:let>
-			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
+			<fl:let>mySrca.filedir::="${myArray}"</fl:let> -->
+			<arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 			
 			<!-- <fl:let>mySrc.filename ::= "FGLXPHannibalVideoPlay1VM.txt "</fl:let> -->
-			<fl:let>mySrc.filename ::= "file_copyBeispiel00.txt"</fl:let>
+<!-- 			<fl:let>mySrc.filename ::= "file_copyBeispiel00.txt"</fl:let>
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
-			<fl:let>mySrca.filename ::="${myArray}"</fl:let>					
-			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<fl:let>mySrca.filename ::="${myArray}"</fl:let>					 -->
+			<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 			
 			<!-- <fl:let>myDest.filedir ::= "C:\1fgl\repository\Projekt_VMD\vmd "</fl:let> -->
-			<fl:let>myDest.filedir ::= "C:\temp"</fl:let>			
+<!-- 			<fl:let>myDest.filedir ::= "C:\temp"</fl:let>			
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
-			<fl:let>myDesta.filedir ::="${myArray}"</fl:let>
+			<fl:let>myDesta.filedir ::="${myArray}"</fl:let> -->
 			<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 			
 			
 			<!-- <fl:let>myDest.filename ::= "FGLXPHannibalVideoPlay1VM.txt"</fl:let> -->
-			<fl:let>myDest.filename ::= "file_copyBeispiel00.txt"</fl:let>
+<!-- 			<fl:let>myDest.filename ::= "file_copyBeispiel00.txt"</fl:let>
 			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
-			<fl:let>myDesta.filename ::="${myArray}"</fl:let>
-			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<fl:let>myDesta.filename ::="${myArray}"</fl:let> -->
+			<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 			
 
 			<!--### Kopiere die Dateien der beiden Arrays #####################-->
@@ -1043,6 +1047,12 @@
 				<param name="leftPart" value="${myLeftPart}"/>
 				<param name="rightPart" value="${myRightPart}"/>
 			</antcallback>
+			<arrayDebugJsZZZ arrayinput="${returnSrca.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			<arrayDebugJsZZZ arrayinput="${returnSrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			<arrayDebugJsZZZ arrayinput="${returnDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			<arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+			
+			
 			
 			<fl:echo>Ergebnis des Controll_FF Aufrufs: ${returnControl}</fl:echo>
 			<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
@@ -1091,6 +1101,11 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
 		<param name="sPart" value="${myLeftPart}"/>
 	</antcallback>
+	
+		<!-- TODO GOON: Rueckgabewerte sind jetzt kaputt. WARUM ? -->
+		<arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+			<echo> KAPUTT !</echo>
+	<arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 	<fl:let>mySrca.filedir ::= "${returnA.filedir}"</fl:let>
 	<fl:let>mySrca.filename ::= "${returnA.filename}"</fl:let>
 	
@@ -1099,11 +1114,26 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
 		<param name="sPart" value="${myLeftPart}"/>
 	</antcallback>
+	
+	
+	
+	
+	
+	
+	
+	<!-- TODO GOON: Rueckgabewerte sind jetzt kaputt. WARUM ? -->
+	<arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->		
+	<echo> KAPUTT !</echo>
+	<arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->		
 	<fl:let>myDesta.filedir ::= "${returnA.filedir}"</fl:let>
 	<fl:let>myDesta.filename ::= "${returnA.filename}"</fl:let>
-	
-	
+
 	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+	<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+	
 	<fl:let>returnControll ::= true</fl:let>
 	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
 	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
@@ -1133,15 +1163,13 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<arrayElementCountJsZZZ arrayinput="${sfileadir}" ireturn="mylistasize"/>
 	<fl:echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</fl:echo>								
 	<echo>Pfadbestandteilausgabe</echo>
-	<ac:for param="mydiry" list="${sfileadir}">
+	<ac:for param="mydiry" list="${sfileadir}"><!-- Beachte das for nur für sequential funktioniert und darin mit @ auf die Param-Variable zugegriffen werden kann. -->
 		<sequential>
 			<echo>Pfadbestandteil: @{mydiry}</echo>
 		</sequential>				
 	</ac:for>
-									
-									
-											
-	<!-- 3. Ermittle die Indexposition -->	
+																	
+	<!-- 3. Ermittle die Indexposition, den Dateinamen und den Dateipfad -->	
 	<!-- TODO: Dieses in einen Dateibehandlungs Scriptdef packen -->
 	<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
 	<var name="op1" value="${mylistasize}"/>
@@ -1155,18 +1183,31 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<echo>An letzter Stelle gefundener wert: ${xtractedvalue}</echo>
 
 	<!-- TODO GOON 20150717: Hole den Pfad, als Teil links vom Dateinamen -->
-	<!-- format('\\%s', userdir_sub) -->
-	<!-- <stringLeftString text="${myPart}" matchstring="${xtractedvalue}" returnstring="myPath" /> -->
-	<fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo><!-- Das muss man machen um den Backslash in den String zu bekommen -->
-	<stringLeftString text="${myPart}" matchstring="format('\\%s', xtractedvalue)" returnstring="myPath" />
+	<!-- Merke: Format muss man verwenden um den Backslash in den String zu bekommen -->
+	<!--Merke: hier den format ausdruck noch mit #{ } umgeben, sonst wird er nicht ausgerechnet sondern als Text übergeben. -->
+	<!-- Merke: das in eine Variable packen, sonst kann man es nicht an 'stringLeftString' uebergeben. -->
+	<fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo> 
+	<fl:let>xtractedvalueTemp ::= #{"format('\\%s', xtractedvalue)"}	</fl:let>
+	
+	<!-- DETAILKAPUTT: Hier sollte der letze backslash weg sein -->
+	<echo>DETAILKAPUTT !</echo>
+	<stringLeftString text="${myPart}" matchstring="${xtractedvalueTemp}" returnstring="myPath" />
 	<echo>Der Pfad ist: ${myPath}</echo>
-
-						
-
+	
+	<!-- 4. Packe die Werte in ein Array -->
+	<arrayInitJsZZZ isize="0" arrayreturn="myfileaname"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" -->
+	<arrayAppendJsZZZ arrayinput="${myfileaname}" valueinput="${xtractedvalue}" arrayreturn="fileaname" sflagcontrol="" />
+	<arrayDebugJsZZZ arrayinput="${fileaname}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	
+	<arrayInitJsZZZ isize="0" arrayreturn="myfileadir"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" -->
+	<arrayAppendJsZZZ arrayinput="${myfileadir}" valueinput="${myPath}" arrayreturn="fileadir" sflagcontrol="" />
+	<arrayDebugJsZZZ arrayinput="${fileadir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	
+	
 	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<fl:let>returnControl ::= true</fl:let>
-	<fl:let>returnA.filedir ::= "${filedir}"</fl:let>
-	<fl:let>returnA.filename ::= "${filename}"</fl:let>
+	<fl:let>returnA.filedir ::= "${fileadir}"</fl:let>
+	<fl:let>returnA.filename ::= "${fileaname}"</fl:let>
 </target>
 
 </project>
