@@ -72,6 +72,76 @@
 	</scriptdef>
 	
 	<!-- ############################################################-->
+	<scriptdef name="arrayAppendArrayJsZZZ" language="javascript">
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="array2append" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myArray2append = attributes.get("array2append");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+			
+			var objectArray2append = myArray2append.split(',');  //Merke: Versuche so ein Array zu machen.							
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+						
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					};
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugebende Array
+			icount=-1; 
+			var icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					myArrayReturn[icount]=objectArray[x];
+				}else{
+					//nix
+				};
+			};
+						
+			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
+			for(z in objectArray2append){
+				icountGlobal++;
+				print("Wert anhängen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
+				myArrayReturn[icountGlobal]=objectArray2append[z];
+			};			
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->
 	<scriptdef name="arrayCopyJsZZZ" language="javascript">
 		<!-- Hiermit man ein Array in eine anderes neues Array.
              Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
@@ -392,8 +462,8 @@
 <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 
-<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayGetJsZZZ> -->
-<target name="compile" depends="-declaration,-myTestArrayGetJsZZZ">
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
+<target name="compile" depends="-declaration,-myTestArrayAppendArrayJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -547,6 +617,42 @@
 		<!-- Ausgabe des neuen Arrays -->	
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 				
+	</target>
+	
+	<target name="-myTestArrayAppendArrayJsZZZ">
+		<!-- Testen etwas an ein Array anzuhaengen -->
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayAppendArrayJsZZZ:
+		Meine Loesung: Scriptdef arrayAppendArrayJsZZZ</fl:logo>	
+
+
+		<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array mit 3 'initialisieren' -->
+		<fl:let>myArraySize::=3;</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<fl:let>myArraySize::=2;</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray2append"/>
+		<echo>myArray nachher: ${myArray2append}</echo>
+	
+		<arrayValueTestFillJsZZZ arrayinput="${myArray2append}" ilbound="0" iubound="" arrayreturn="myArray2appendNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArray2appendNew}" arrayreturn="myArray2append" sflagcontrol="" />
+		
+		<!-- Wert des zweiten Arrays an das erste Array anhängen -->		
+		<arrayAppendArrayJsZZZ arrayinput="${myArray}" array2append="${myArray2append}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>				
 	</target>
   
 	<target name="-myTestArrayGetJsZZZ">

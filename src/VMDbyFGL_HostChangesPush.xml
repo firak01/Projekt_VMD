@@ -96,6 +96,76 @@
 	</scriptdef>
 	
 	<!-- ############################################################-->
+	<scriptdef name="arrayAppendArrayJsZZZ" language="javascript">
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="array2append" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myArray2append = attributes.get("array2append");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+			
+			var objectArray2append = myArray2append.split(',');  //Merke: Versuche so ein Array zu machen.							
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+						
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					};
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugebende Array
+			icount=-1; 
+			var icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					myArrayReturn[icount]=objectArray[x];
+				}else{
+					//nix
+				};
+			};
+						
+			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
+			for(z in objectArray2append){
+				icountGlobal++;
+				print("Wert anhängen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
+				myArrayReturn[icountGlobal]=objectArray2append[z];
+			};			
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->
 	<scriptdef name="arrayCopyJsZZZ" language="javascript">
 		<!-- Hiermit man ein Array in eine anderes neues Array.
              Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
@@ -716,6 +786,13 @@
 		<fl:when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
 			<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>
 
+			<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
+			<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filename"/>
+			<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filedir"/>
+			<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filename"/>
+			<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filedir"/>
+	
+		
 			<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
 			<!--<loadproperties>
 				<file file="${conf.copyGeneralFilePath}"/>
@@ -816,6 +893,26 @@
 									<!-- myStringaLeftTotal
 									     myStringaRightTotal
 									-->
+									<ac:if>
+										<equals arg1="${returnControl}" arg2="true"/>
+										<ac:then>
+											<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
+											<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
+											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
+			
+											<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
+											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
+			
+											<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
+											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
+												
+											<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
+											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
+										</ac:then>
+										<ac:else>
+											<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, kein Arraywert anzuhaengen.</fl:echo>
+										</ac:else>
+									</ac:if>
 						</ac:else>
 					</ac:if>
 					</ac:else>
@@ -823,51 +920,29 @@
 				</sequential>
 			</for>			
 			
-			<!-- ### NOCH TESTPHASe Hier erst einmal das Kopieren der Arrayinhalte testen -->	
-			<fl:logo>TEST ARRAYBEHANDLUNG UND KOPIEREN</fl:logo>
-			<!-- <fl:let>myArraySize ::= 0</fl:let> -->
-					
-			<!-- <fl:let>mySrc.filedir ::= "C:\VMWare\FGLXPHannibalVideoPlay3_768MB "</fl:let> -->	
-<!-- 			<fl:let>mySrc.filedir ::= "C:\1fgl\repository\Projekt_VMD\testused"</fl:let>			
-			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />			
-			<fl:let>mySrca.filedir::="${myArray}"</fl:let> -->
-			<arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
-			
-			<!-- <fl:let>mySrc.filename ::= "FGLXPHannibalVideoPlay1VM.txt "</fl:let> -->
-<!-- 			<fl:let>mySrc.filename ::= "file_copyBeispiel00.txt"</fl:let>
-			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySrc.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
-			<fl:let>mySrca.filename ::="${myArray}"</fl:let>					 -->
-			<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
-			
-			<!-- <fl:let>myDest.filedir ::= "C:\1fgl\repository\Projekt_VMD\vmd "</fl:let> -->
-<!-- 			<fl:let>myDest.filedir ::= "C:\temp"</fl:let>			
-			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filedir}" arrayreturn="myArrayNew" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
-			<fl:let>myDesta.filedir ::="${myArray}"</fl:let> -->
-			<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
-			
-			
-			<!-- <fl:let>myDest.filename ::= "FGLXPHannibalVideoPlay1VM.txt"</fl:let> -->
-<!-- 			<fl:let>myDest.filename ::= "file_copyBeispiel00.txt"</fl:let>
-			<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
-			<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${myDest.filename}" arrayreturn="myArrayNew" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
-			<fl:let>myDesta.filename ::="${myArray}"</fl:let> -->
-			<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
-			
-
 			<!--### Kopiere die Dateien der beiden Arrays #####################-->
+			<arrayElementCountJsZZZ arrayinput="${mySrcaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+			<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
+			<ac:if>				
+			<equals arg1="1" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich ein Fallunterscheidung einbauen, da in ac:for nicht beide Parameter 0 (also gleich) sein dürfen. -->
+			<ac:then>			
+				<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnCopy">					
+						<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+						<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+						<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+						<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+				</antcallback>					
+			</ac:then>
+			<ac:else> 
 			<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnCopy">					
-					<param name="srca.filename" value="${mySrca.filename}"/>
-					<param name="srca.filedir" value="${mySrca.filedir}"/>
-					<param name="desta.filedir" value="${myDesta.filedir}"/>
-					<param name="desta.filename" value="${myDesta.filename}"/>					
-			</antcallback>
+						<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+						<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+						<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+						<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+				</antcallback>
+			</ac:else>
+			</ac:if> 
+			
 		</fl:when>
 		<fl:otherwise>
 				<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
@@ -920,33 +995,75 @@
 	<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
 	<echo>errechneter ubound wert des Arrays: ${iubound}</echo>
 	
-	<!-- Hole die Werte der aktuellen Arrayposition -->
-	<!-- KAPUTT: ohje, muss man doch tatsächlich eine Fallunterscheidung einbauen, wenn param und end gleich sind -->
-	<echo>KAPUTT !</echo>
-	<ac:for param="icounter" end="${iubound}">
-	<!-- <ac:for param="icounter" end="${iSize.Srca.filename}"> -->
-	<sequential>
-		<echo>icounter is @{icounter}</echo> 
-		<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="@{icounter}" arrayget="mySrc.filedir"/>	
-		<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="@{icounter}" arrayget="mySrc.filename"/>	
-		<arrayGetJsZZZ arrayinput="${myDesta.filedir}" index="@{icounter}" arrayget="myDest.filedir"/>	
-		<arrayGetJsZZZ arrayinput="${myDesta.filename}" index="@{icounter}" arrayget="myDest.filename"/>	
+	<!-- Hole die Werte der aktuellen Arrayposition, das geht nur wenn iubound > icounter, darum muss man doch tatsächlich eine Fallunterscheidung einbauen, wenn param und end gleich sind -->
+	<ac:for param="icounter" end="${iubound}">			
+		<sequential>
+			<echo>icounter is @{icounter}</echo> 
+			<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="@{icounter}" arrayget="mySrc.filedir"/>	
+			<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="@{icounter}" arrayget="mySrc.filename"/>	
+			<arrayGetJsZZZ arrayinput="${myDesta.filedir}" index="@{icounter}" arrayget="myDest.filedir"/>	
+			<arrayGetJsZZZ arrayinput="${myDesta.filename}" index="@{icounter}" arrayget="myDest.filename"/>	
+				
+			<!-- 4. Der eigentliche Kopiervorgang -->
+			<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
+			<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
+			<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Destination: ${myDest.filedir}\${myDest.filename} </echo>
+														
+			<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	 
+			<!-- ACHTUNG: Existiert die Quelldatei nicht, kommt es hier zu einem BUILD Fehler.
+						  TODO: Diesen abfangen (try ... catch), protokollieren und weiter zum nächsten in der Schleife -->
+			<!-- Merke: WIE WIRD DER NEUE DATEINAME GESETZT ? innerhalb von <copy><fileset dir=...> </fileset><globmapper from="*" to="*.bak"/></copy>-->
+			<!-- 	Relative Pfade verwenden:
+			<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
+			<fileset dir="//${mySrc.filedir}">		 -->
 			
-		<!-- 4. Der eigentliche Kopiervorgang -->
-		<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
-		<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-		<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Destination: ${myDest.filedir}\${myDest.filename} </echo>
+			<!-- absolute Pfade verwenden: -->
+			<copy todir="${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
+				<fileset dir="${mySrc.filedir}">		
+				<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+				<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
+				<!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+																
+					<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
+					<include name="${mySrc.filename}" />				
+				</fileset>
+				<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
+			</copy>
+		</sequential>
+		</ac:for>			
+</target>
+<target name="-FGLCopyLocal_CopyFileSingle">
+	<fl:let>mySrca.filedir ::= "${srca.filedir}"</fl:let>
+	<fl:let>mySrca.filename ::= "${srca.filename}"</fl:let>
+	<fl:let>myDesta.filedir ::= "${desta.filedir}"</fl:let>
+	<fl:let>myDesta.filename ::= "${desta.filename}"</fl:let>
+	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> -->
+	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	
+
+	<!-- ###### KOPIERE NUR EINEN WERT ############## -->
+	<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="0" arrayget="mySrc.filedir"/>	
+	<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="0" arrayget="mySrc.filename"/>	
+	<arrayGetJsZZZ arrayinput="${myDesta.filedir}" index="0" arrayget="myDest.filedir"/>	
+	<arrayGetJsZZZ arrayinput="${myDesta.filename}" index="0" arrayget="myDest.filename"/>	
+			
+	<!-- 4. Der eigentliche Kopiervorgang -->
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
+	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
+	<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Destination: ${myDest.filedir}\${myDest.filename} </echo>
 													
-		<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	 
-		<!-- ACHTUNG: Existiert die Quelldatei nicht, kommt es hier zu einem BUILD Fehler.
-					  TODO: Diesen abfangen (try ... catch), protokollieren und weiter zum nächsten in der Schleife -->
-		<!-- Merke: WIE WIRD DER NEUE DATEINAME GESETZT ? innerhalb von <copy><fileset dir=...> </fileset><globmapper from="*" to="*.bak"/></copy>-->
-		<!-- 	Relative Pfade verwenden:
-		<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
-		<fileset dir="//${mySrc.filedir}">		 -->
-		
-		<!-- absolute Pfade verwenden: -->
-		<copy todir="${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
+	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	 
+	<!-- ACHTUNG: Existiert die Quelldatei nicht, kommt es hier zu einem BUILD Fehler.
+				  TODO: Diesen abfangen (try ... catch), protokollieren und weiter zum nächsten in der Schleife -->
+	<!-- Merke: WIE WIRD DER NEUE DATEINAME GESETZT ? innerhalb von <copy><fileset dir=...> </fileset><globmapper from="*" to="*.bak"/></copy>-->
+	<!-- 	Relative Pfade verwenden:
+	<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
+	<fileset dir="//${mySrc.filedir}">		 -->
+	
+	<!-- absolute Pfade verwenden: -->
+	<copy todir="${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
 		<fileset dir="${mySrc.filedir}">		
 		<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 		<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
@@ -956,9 +1073,8 @@
 			<include name="${mySrc.filename}" />				
 		</fileset>
 		<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
-		</copy>
-	</sequential>
-	</ac:for>
+	</copy>
+	
 </target>
 
 <target name="-FGLCopyLocal_Analyze">
@@ -1040,6 +1156,7 @@
 		<ac:then>
 			<echo>Fall: Datei/Verzeichnis links nicht existent, Datei/Verzeichnis rechts nicht existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>returnControl ::= false</fl:let>
 		</ac:then>
 	<ac:elseif>
 		<ac:equals arg1="${myAnalyze}" arg2="XD"/>										
@@ -1053,6 +1170,7 @@
 		<ac:then>
 			<echo>Fall: links Datei, Datei/Verzeichnis rechts nicht existent</echo>
 			<!-- TODO: Prüfe, ob rechts ein Verzeichnisname ist. Kopiere von links nach rechts. mache ggfs. fehlende Unterverzeichnisse. -->
+			<fl:let>returnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>									
 	<ac:elseif>
@@ -1060,6 +1178,7 @@
 		<ac:then>
 			<echo>Fall: links Verzeichnis, rechts Datei</echo>
 			<!-- TODO: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
+			<fl:let>returnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
@@ -1067,6 +1186,7 @@
 		<ac:then>
 			<echo>Fall: links Datei, rechts Verzeichnis</echo>
 			<!-- TODO: Kopiere die links benannte Datei in das rechts angegebenen Verzeichnis -->
+			<fl:let>returnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
@@ -1074,6 +1194,7 @@
 		<ac:then>
 			<echo>Fall: links Verzeichnis, rechts Verzeichnis</echo>
 			<!-- TODO: Kopiere alle Dateien aus dem einen Verzeichnis in das andere -->
+			<fl:let>returnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>		
@@ -1098,18 +1219,20 @@
 			<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
 			<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
 			<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>
+			
+			
+			<fl:let>returnControl ::= true</fl:let>
+			<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
+			<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
+			<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
+			<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>
+			
 		</ac:then>
 	</ac:elseif>									
 	<ac:else>
 		<fl:fail message="Ungueltiges Analyseergebnis: ${myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
 	</ac:else>											
-	</ac:if>
-	
-	<fl:let>returnControl ::= true</fl:let>
-	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
-	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
-	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
-	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>
+	</ac:if>		
 </target>
 
 <target name="-FGLCopyLocal_Control_FF">
