@@ -910,7 +910,7 @@
 											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
 										</ac:then>
 										<ac:else>
-											<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, kein Arraywert anzuhaengen.</fl:echo>
+											<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
 										</ac:else>
 									</ac:if>
 						</ac:else>
@@ -923,26 +923,33 @@
 			<!--### Kopiere die Dateien der beiden Arrays #####################-->
 			<arrayElementCountJsZZZ arrayinput="${mySrcaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 			<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
-			<ac:if>				
-			<equals arg1="1" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich ein Fallunterscheidung einbauen, da in ac:for nicht beide Parameter 0 (also gleich) sein dürfen. -->
-			<ac:then>			
-				<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnCopy">					
-						<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-						<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-						<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-						<param name="desta.filename" value="${myDestaTotal.filename}"/>					
-				</antcallback>					
-			</ac:then>
-			<ac:else> 
-			<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnCopy">					
-						<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-						<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-						<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-						<param name="desta.filename" value="${myDestaTotal.filename}"/>					
-				</antcallback>
-			</ac:else>
-			</ac:if> 
-			
+			<ac:if>
+				<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
+				<ac:then>
+					<echo>Keine Dateien im Array => keine Verarbeitung</echo>
+				</ac:then>
+				<ac:else>
+					<ac:if>				
+					<equals arg1="1" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich ein Fallunterscheidung einbauen, da in ac:for (des aufzurufenden copy Targets) nicht beide Parameter 0 (also gleich) sein dürfen. -->
+					<ac:then>			
+						<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnCopy">					
+								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+						</antcallback>					
+					</ac:then>
+					<ac:else> 
+					<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnCopy">					
+								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+						</antcallback>
+					</ac:else>
+					</ac:if> 
+				</ac:else>
+			</ac:if>
 		</fl:when>
 		<fl:otherwise>
 				<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
@@ -1156,7 +1163,7 @@
 		<ac:then>
 			<echo>Fall: Datei/Verzeichnis links nicht existent, Datei/Verzeichnis rechts nicht existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
-			<fl:let>returnControl ::= false</fl:let>
+			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	<ac:elseif>
 		<ac:equals arg1="${myAnalyze}" arg2="XD"/>										
@@ -1170,7 +1177,7 @@
 		<ac:then>
 			<echo>Fall: links Datei, Datei/Verzeichnis rechts nicht existent</echo>
 			<!-- TODO: Prüfe, ob rechts ein Verzeichnisname ist. Kopiere von links nach rechts. mache ggfs. fehlende Unterverzeichnisse. -->
-			<fl:let>returnControl ::= false</fl:let>
+			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>									
 	<ac:elseif>
@@ -1178,15 +1185,28 @@
 		<ac:then>
 			<echo>Fall: links Verzeichnis, rechts Datei</echo>
 			<!-- TODO: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
-			<fl:let>returnControl ::= false</fl:let>
+			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
 		<ac:equals arg1="${myAnalyze}" arg2="FD"/>										
 		<ac:then>
 			<echo>Fall: links Datei, rechts Verzeichnis</echo>
-			<!-- TODO: Kopiere die links benannte Datei in das rechts angegebenen Verzeichnis -->
-			<fl:let>returnControl ::= false</fl:let>
+			<antcallback target="-FGLCopyLocal_Control_FD" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
+				<param name="leftPart" value="${myLeftPart}"/>
+				<param name="rightPart" value="${myRightPart}"/>
+			</antcallback>
+			<!-- <arrayDebugJsZZZ arrayinput="${returnSrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${returnSrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+
+			<fl:echo>Ergebnis des Controll_FD Aufrufs: ${returnControl}</fl:echo>
+			<fl:let>myReturnControl ::= "${returnControl}"</fl:let>
+			<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
+			<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
+			<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
+			<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>			
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
@@ -1194,7 +1214,7 @@
 		<ac:then>
 			<echo>Fall: links Verzeichnis, rechts Verzeichnis</echo>
 			<!-- TODO: Kopiere alle Dateien aus dem einen Verzeichnis in das andere -->
-			<fl:let>returnControl ::= false</fl:let>
+			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>		
@@ -1215,28 +1235,86 @@
 			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 			<fl:echo>Ergebnis des Controll_FF Aufrufs: ${returnControl}</fl:echo>
+			<fl:let>myReturnControl ::= "${returnControl}"</fl:let>
 			<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
 			<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
 			<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
 			<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>
-			
-			
-			<fl:let>returnControl ::= true</fl:let>
-			<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
-			<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
-			<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
-			<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>
-			
 		</ac:then>
 	</ac:elseif>									
 	<ac:else>
 		<fl:fail message="Ungueltiges Analyseergebnis: ${myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
 	</ac:else>											
-	</ac:if>		
+	</ac:if>	
+	<fl:let>returnControl ::= "${myReturnControl}"</fl:let>
+	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
+	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
+	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
+	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	
+</target>
+
+<target name="-FGLCopyLocal_Control_FD">
+	<!-- TODO GOON: 20150722 -->
+	<!-- Fall: Kopiere die benannte Datei von links nach rechts in das benannte Verzeichnis. -->	
+	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
+	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
+	<fl:echo>Start von FGLCopyLocal_Control_FD</fl:echo>
+	<!-- TODO: Dynamisch auf den aktuellen TargetNamen zugreifen.... tryoutAnt_Reflection - currentTarget name
+	siehe mein Dokument:
+	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )		
+I think you can't, unless you spend some time coding your own custom tasks (http://ant.apache.org/manual/tutorial-writing-tasks.html)
+The built-in properties you can display are: basedir, ant.file, ant.version, ant.project.name, ant.java.version
+
+Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lösen.	
+	target name="test">
+  <script language="javascript">
+    project.setNewProperty("current_target", self.getOwningTarget());
+  </script>
+  <echo>${current_target}</echo>
+</target>
+	-->
+	
+	<!--  "Part"-Behandlung durch Aufruf der Targets -->
+	<echo>Behandle linken Fall</echo>
+	<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
+		<param name="sPart" value="${myLeftPart}"/>
+	</antcallback>
+	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
+	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<fl:let>mySrca.filedir ::= "${returnA.filedir}"</fl:let>
+	<fl:let>mySrca.filename ::= "${returnA.filename}"</fl:let>
+	<fl:let>returnControl ::= "${returnControl}</fl:let>
+	<ac:if>
+		<ac:equals arg1="${returnControl}" arg2="false"/>										
+		<ac:then>
+			<echo>Linker Fall=false => Ueberspringe rechten Fall</echo>
+		</ac:then>
+		<ac:else>
+			<echo>Behandle rechten Fall: Uebernimm dabei die Datei Angabe vom linken Fall</echo>
+			<antcallback target="-FGLCopyLocal_Control_FD_Part" return="returnControl, returnA.filedir, returnA.filename">
+				<param name="sPart" value="${myRightPart}"/>
+				<param name="saFilename" value="${mySrca.filename}"/>
+			</antcallback>
+			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			<fl:let>myDesta.filedir ::= "${returnA.filedir}"</fl:let>
+			<fl:let>myDesta.filename ::= "${returnA.filename}"</fl:let>
+			<fl:let>returnControl ::= "${returnControl}</fl:let>
+			
+			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+		</ac:else>
+	</ac:if>
+	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
+	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
+	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
+	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	
 </target>
 
 <target name="-FGLCopyLocal_Control_FF">
-	<!-- TODO GOON: 20150710 -->
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
@@ -1265,23 +1343,30 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<fl:let>mySrca.filedir ::= "${returnA.filedir}"</fl:let>
 	<fl:let>mySrca.filename ::= "${returnA.filename}"</fl:let>
-	
-	
-	<echo>Behandle rechten Fall</echo>
-	<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
-		<param name="sPart" value="${myRightPart}"/>
-	</antcallback>
-	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
-	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
-	<fl:let>myDesta.filedir ::= "${returnA.filedir}"</fl:let>
-	<fl:let>myDesta.filename ::= "${returnA.filename}"</fl:let>
+	<fl:let>returnControl ::= "${returnControl}</fl:let>
+	<ac:if>
+		<ac:equals arg1="${returnControl}" arg2="false"/>										
+		<ac:then>
+			<echo>Linker Fall=false => Ueberspringe rechten Fall</echo>
+		</ac:then>
+		<ac:else>			
+			<echo>Behandle rechten Fall</echo>
+			<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
+				<param name="sPart" value="${myRightPart}"/>
+			</antcallback>
+			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			<fl:let>myDesta.filedir ::= "${returnA.filedir}"</fl:let>
+			<fl:let>myDesta.filename ::= "${returnA.filename}"</fl:let>
 
-	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
-	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
-	<fl:let>returnControll ::= true</fl:let>
+			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
+			<fl:let>returnControl ::= true</fl:let>
+		</ac:else>
+	</ac:if>
 	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
 	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
 	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
@@ -1289,7 +1374,6 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 </target>
 
 <target name="-FGLCopyLocal_Control_FF_Part">
-	<!-- TODO GOON: 20150710 -->
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
 	<fl:let>myPart ::= "${sPart}"</fl:let>
 	<fl:echo>Start von FGLCopyLocal_Control_FF_Part</fl:echo>
@@ -1350,6 +1434,32 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<fl:let>returnControl ::= true</fl:let>
+	<fl:let>returnA.filedir ::= "${fileadir}"</fl:let>
+	<fl:let>returnA.filename ::= "${fileaname}"</fl:let>
+</target>
+
+<target name="-FGLCopyLocal_Control_FD_Part">
+	<!-- Fall: Hole den Verzeichnisnamen aus dem Rechten Teil und verwende die ermittelten Dateinamen aus dem linken Teil. -->	
+	<fl:let>myPart ::= "${sPart}"</fl:let>
+	<fl:let>myAFilename ::= "${saFilename}"</fl:let>
+	<fl:echo>Start von FGLCopyLocal_Control_FD_Part</fl:echo>
+	<fl:echo>fuer: ${myPart}</fl:echo>
+	<fl:echo>fuer: ${myAFilename}</fl:echo>
+	
+	<!-- TODO GOON 20150722 - Noch KAPUTT -->
+	
+	<!-- 4. Packe die Werte in ein Array -->
+	<!-- <arrayInitJsZZZ isize="0" arrayreturn="myfileaname"/> --><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
+	<!-- <arrayAppendJsZZZ arrayinput="${myfileaname}" valueinput="${xtractedvalue}" arrayreturn="fileaname" sflagcontrol="" /> -->
+	<!-- <arrayDebugJsZZZ arrayinput="${fileaname}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	
+	<!-- <arrayInitJsZZZ isize="0" arrayreturn="myfileadir"/> --><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt. -->
+	<!-- <arrayAppendJsZZZ arrayinput="${myfileadir}" valueinput="${myPath}" arrayreturn="fileadir" sflagcontrol="" /> -->
+	<!-- <arrayDebugJsZZZ arrayinput="${fileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	
+	
+	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+	<fl:let>returnControl ::= false</fl:let>
 	<fl:let>returnA.filedir ::= "${fileadir}"</fl:let>
 	<fl:let>returnA.filename ::= "${fileaname}"</fl:let>
 </target>
