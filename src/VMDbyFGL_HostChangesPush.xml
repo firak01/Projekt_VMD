@@ -25,7 +25,6 @@
 	</taskdef>
 		
     <!-- ######## Scriptdefs ############################################################################--> 		
-	<!-- ########################### -->	
 	<!-- ############################################################-->
 	<scriptdef name="arrayAppendJsZZZ" language="javascript">
 		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
@@ -197,7 +196,7 @@
 		]]>
 	</scriptdef>
 	
-	<!-- ########################### -->
+	<!-- ############################################################ -->
 	<scriptdef name="arrayDebugJsZZZ" language="javascript">
 		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
 			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
@@ -286,7 +285,7 @@
 		]]>
 	</scriptdef>
 	
-	 <!-- ########################### -->	
+	 <!-- ############################################################ -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
 		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
@@ -325,7 +324,7 @@
 		]]>
 	</scriptdef>
 	
-	<!-- ########################### -->	
+	<!-- ############################################################ -->	
 	<scriptdef name="arrayGetJsZZZ" language="javascript">
 		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
 		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
@@ -419,9 +418,7 @@
 		]]>
 	</scriptdef>
 	
-	
-	<!-- ######## Scriptdefs ############################################################################--> 		
- 	<!-- ########################### -->		
+ 	<!-- ############################################################ -->		
 	<scriptdef name="isBooleanZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
 		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
@@ -492,7 +489,7 @@
 		 ]]>
 	</scriptdef>
 	
-	<!-- ########################### -->		
+	<!-- ############################################################ -->		
 	<scriptdef name="isDirectoryZZZ" language="javascript">
 		 <attribute name="text" />
 		 <attribute name="property" />
@@ -514,8 +511,8 @@
 		 ]]>
 	</scriptdef>
 	
-	 <!-- ########################### -->
-	 <scriptdef name="stringLeftString" language="javascript">
+	 <!-- ########################################################### -->
+	 <scriptdef name="stringLeftStringZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
@@ -563,8 +560,8 @@
      ]]>
   </scriptdef>
 	
-	<!-- ########################### -->
-	<scriptdef name="substringZZZ" language="javascript">
+	<!-- ############################################################ -->
+	<scriptdef name="stringSubStringZZZ" language="javascript">
 	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
 		 <attribute name="text" />
 		 <attribute name="start" />
@@ -826,7 +823,7 @@
 						</ac:then>
 						<ac:else>													
 							<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
-							<substringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
+							<stringSubStringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
 							<!-- <fl:echo message="subtext = ${subtext}" />	 -->						
 							<ac:if>
 								<ac:equals arg1="${subtext}" arg2="#" />
@@ -1416,10 +1413,10 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- Hole den Pfad, als Teil links vom Dateinamen -->
 	<!-- Merke: Format muss man verwenden um den Backslash in den String zu bekommen -->
 	<!-- Merke: hier den format ausdruck noch mit #{ } umgeben, sonst wird er nicht ausgerechnet sondern als Text übergeben. -->
-	<!-- Merke: das in eine Variable packen, sonst kann man es nicht an 'stringLeftString' uebergeben. -->
+	<!-- Merke: das in eine Variable packen, sonst kann man es nicht an 'stringLeftStringZZZ' uebergeben. -->
 	<fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo> 
 	<fl:let>xtractedvalueTemp ::= #{"format('\\%s', xtractedvalue)"}	</fl:let>
-	<stringLeftString text="${myPart}" matchstring="${xtractedvalueTemp}" returnstring="myPath" />
+	<stringLeftStringZZZ text="${myPart}" matchstring="${xtractedvalueTemp}" returnstring="myPath" />
 	<echo>Der Pfad ist: ${myPath}</echo>
 	
 	<!-- 4. Packe die Werte in ein Array -->
@@ -1431,7 +1428,6 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<arrayAppendJsZZZ arrayinput="${myfileadir}" valueinput="${myPath}" arrayreturn="fileadir" sflagcontrol="" />
 	<!-- <arrayDebugJsZZZ arrayinput="${fileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	
-	
 	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<fl:let>returnControl ::= true</fl:let>
 	<fl:let>returnA.filedir ::= "${fileadir}"</fl:let>
@@ -1439,7 +1435,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 </target>
 
 <target name="-FGLCopyLocal_Control_FD_Part">
-	<!-- Fall: Hole den Verzeichnisnamen aus dem Rechten Teil und verwende die ermittelten Dateinamen aus dem linken Teil. -->	
+	<!-- Fall: Hole den Verzeichnisnamen aus dem rechten Teil und verwende die ermittelten Dateinamen aus dem linken Teil. -->	
 	<fl:let>myPart ::= "${sPart}"</fl:let>
 	<fl:let>myAFilename ::= "${saFilename}"</fl:let>
 	<fl:echo>Start von FGLCopyLocal_Control_FD_Part</fl:echo>
@@ -1458,8 +1454,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- <arrayDebugJsZZZ arrayinput="${fileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	
 	
-	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
-	<fl:let>returnControl ::= false</fl:let>
+	<!-- Rückgabewerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+	<fl:let>returnControl ::= true</fl:let>
 	<fl:let>returnA.filedir ::= "${fileadir}"</fl:let>
 	<fl:let>returnA.filename ::= "${fileaname}"</fl:let>
 </target>

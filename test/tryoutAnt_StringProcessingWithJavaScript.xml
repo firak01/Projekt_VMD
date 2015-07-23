@@ -8,7 +8,7 @@
 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
- <scriptdef name="stringLeftString" language="javascript">
+ <scriptdef name="stringLeftStringZZZ" language="javascript">
 	<attribute name="text" />
     <attribute name="matchstring" />
     <attribute name="returnstring" />     
@@ -31,7 +31,7 @@
 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
- <scriptdef name="substring" language="javascript">
+ <scriptdef name="stringSubStringZZZ" language="javascript">
      <attribute name="text" />
      <attribute name="start" />
      <attribute name="end" />
@@ -68,10 +68,10 @@
 		<echo>myTestStringSubstring: </echo>
 		
 		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
-		<substring text="asdfasdfasdf" start="2" end="10" property="subtext" />
+		<stringSubstringZZZ text="asdfasdfasdf" start="2" end="10" property="subtext" />
 		<echo message="subtext = ${subtext}" />
 		
-		<substring text="asdfasdfasdf" start="0" end="1" property="subtext" />
+		<stringSubStringZZZ text="asdfasdfasdf" start="0" end="1" property="subtext" />
 		<echo message="subtext = ${subtext}" />
 	</target> 
 	
@@ -79,10 +79,10 @@
 		<echo>myTestStringLeft: </echo>
 		
 		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
-		<stringLeftString text="asdfasdfasdf" matchstring="fas" returnstring="lefttext" />
+		<stringLeftStringZZZ text="asdfasdfasdf" matchstring="fas" returnstring="lefttext" />
 		<echo message="lefttext = ${lefttext}" />
 		
-		<stringLeftString text="asdfasdfasdf" matchstring="sdf" returnstring="lefttext" />
+		<stringLeftStringZZZ text="asdfasdfasdf" matchstring="sdf" returnstring="lefttext" />
 		<echo message="lefttext = ${lefttext}" />
 	</target> 
  </project>
