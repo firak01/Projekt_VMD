@@ -396,6 +396,145 @@
 	</scriptdef>
 				
 	<!-- ############################################################-->	
+	<scriptdef name="arrayLeftBackStringJsZZZ" language="javascript">
+		<!-- Hiermit schneodet man von den Werten eines Arrays einen Stringwert ab. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="sinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'before' von vorne bzw. 'behind' von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myValue = attributes.get("sinput");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+			
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					}
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
+			//   UND erweitere jeden Arrayeintrag um den gewünschten String.
+			//   TODO: sFlagControl auswerten, zum unterscheiden ob der String vorangestellt oder angehängt wird.
+			icount=-1; icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					print("Wert wird kopiert und abgeschnitten: '" + objectArray[x]+ "' leftback von '" + myValue + "'");
+					myArrayReturn[icount]=getStrLeftBackStr(objectArray[x], myValue);
+				}else{
+					//nix
+				}
+			}
+						
+													
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			
+			//äquivalent zu JSZ - Kernel
+			//@LeftBack equivalent, !!! casesensitive
+			function getStrLeftBackStr(sourceStr, keyStr){
+				arr = sourceStr.split(keyStr)
+				arr.pop();
+				return (keyStr==null | keyStr=='') ? '' : arr.join(keyStr)
+			}
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->	
+	<scriptdef name="arrayPlusStringJsZZZ" language="javascript">
+		<!-- Hiermit häng man an die Werte eines Arrays einen Stringwert an. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="sinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'before' von vorne bzw. 'behind' von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myValue = attributes.get("sinput");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+			
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					}
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
+			//   UND erweitere jeden Arrayeintrag um den gewünschten String.
+			//   TODO: sFlagControl auswerten, zum unterscheiden ob der String vorangestellt oder angehängt wird.
+			icount=-1; icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					print("Wert wird kopiert und erweitert: '" + objectArray[x]+ "' plus '" + myValue + "'");
+					myArrayReturn[icount]=objectArray[x] + myValue;
+				}else{
+					//nix
+				}
+			}
+						
+													
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->	
 	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
 		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
 			 TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
@@ -440,11 +579,59 @@
 			project.setProperty(attributes.get("ireturn"), iReturn);
 		]]>
 	</scriptdef>
-			
-	<!-- ########################### -->	
-	<scriptdef name="substring" language="javascript">
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-						 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+					
+ <!-- ########################### -->
+ <scriptdef name="stringLeftStringZZZ" language="javascript">
+ <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+	<attribute name="text" />
+    <attribute name="matchstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	   var text = attributes.get("text");
+       var match = attributes.get("matchstring");
+       
+       sReturn = getStrLeftStr(text, match);
+	   
+       project.setProperty(attributes.get("returnstring"), sReturn);
+	   
+	   //aus JSZ - Kernel 
+	   function getStrLeftStr(sourceStr, keyStr){
+		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
+		}
+     ]]>
+  </scriptdef>
+
+  <!-- ########################### -->
+  <scriptdef name="stringLeftBackStringZZZ" language="javascript">
+   <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+   <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+	<attribute name="text" />
+    <attribute name="matchstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	  var text = attributes.get("text");
+	  var match = attributes.get("matchstring");
+       
+      sReturn = getStrLeftBackStr(text, match);
+	   
+      project.setProperty(attributes.get("returnstring"), sReturn);
+	   
+	//äquivalent zu JSZ - Kernel
+	//@LeftBack equivalent, !!! casesensitive
+	function getStrLeftBackStr(sourceStr, keyStr){
+		arr = sourceStr.split(keyStr)
+		arr.pop();
+		return (keyStr==null | keyStr=='') ? '' : arr.join(keyStr)
+	}
+  ]]>
+  </scriptdef>
+  
+  <!-- ############################################################ -->
+	<scriptdef name="stringSubStringZZZ" language="javascript">
+	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
 		 <attribute name="text" />
 		 <attribute name="start" />
 		 <attribute name="end" />
@@ -455,15 +642,16 @@
 		   var end = attributes.get("end") || text.length();
 		   project.setProperty(attributes.get("property"), text.substring(start, end));
 		 ]]>
-	  </scriptdef>
-		
+	</scriptdef>
+
+	
 <!-- ################################################################################# -->
 <!-- Die einzelnen Tests im depends hinzufügen -->
 <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 
-<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
-<target name="compile" depends="-declaration,-myTestArrayAppendArrayJsZZZ">
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
+<target name="compile" depends="-declaration,-myTestArrayLeftBackStringJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -523,7 +711,6 @@
 			myArraySize::=2; 
 		</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 	
@@ -549,7 +736,6 @@
 			myArraySize::=1; 
 		</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 	
@@ -575,7 +761,6 @@
 			myArraySize::=0; 
 		</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 	
@@ -599,7 +784,6 @@
 			myArraySize::=; 
 		</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 	
@@ -631,7 +815,6 @@
 		<!-- anderer Versuch: Array mit 3 'initialisieren' -->
 		<fl:let>myArraySize::=3;</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 	
@@ -667,7 +850,6 @@
 			myArraySize::=; 
 		</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArrayNew"/>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<echo>myArray nachher: ${myArray}</echo>
@@ -687,7 +869,6 @@
 			myArraySize::=3; 
 		</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 		
@@ -730,7 +911,6 @@
 			myArraySize::=2; 
 		</fl:let>
 		<echo>ArrayGroesse: ${myArraySize}</echo>
-		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
 	
@@ -820,6 +1000,73 @@
 		
 		<echo>#################################</echo>
 		
+	</target>
+	
+	<target name="-myTestArrayLeftBackStringJsZZZ">
+		<!-- Teste einen String an die Werte eines Arrays anzuhaengen -->
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayLeftBackStringJsZZZ:
+		Meine Loesung: Scriptdef arrayLeftBackStringJsZZZ</fl:logo>	
+
+
+		<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array mit 3 'initialisieren' -->
+		<fl:let>myArraySize::=3;</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<fl:let>myValue2Append::=".txt";</fl:let>
+		
+		<!-- Wert anhängen -->		
+		<arrayPlusStringJsZZZ arrayinput="${myArray}" sinput="${myValue2Append}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+
+		<!-- NUN ERST DAS ABZIEHEN DES WERTS TESTE -->
+		<arrayLeftBackStringJsZZZ arrayinput="${myArray}" sinput=".txt" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+
+		
+	</target>
+	
+	<target name="-myTestArrayPlusStringJsZZZ">
+		<!-- Teste einen String an die Werte eines Arrays anzuhaengen -->
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayPlusStringJsZZZ:
+		Meine Loesung: Scriptdef arrayPlusStringJsZZZ</fl:logo>	
+
+
+		<echo>###########################################################</echo>
+		<!-- anderer Versuch: Array mit 3 'initialisieren' -->
+		<fl:let>myArraySize::=3;</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<fl:let>myValue2Append::="_angehaengt";</fl:let>
+		
+		<!-- Wert anhängen -->		
+		<arrayPlusStringJsZZZ arrayinput="${myArray}" sinput="${myValue2Append}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+	
+		<!-- Ausgabe des neuen Arrays -->	
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>				
 	</target>
   
 
