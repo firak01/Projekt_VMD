@@ -584,9 +584,9 @@
 		   var bIsBoolean = null;
 		   
 		   var myValueInput = attributes.get("valueinput");
-		   print("myValueInput='"+myValueInput+"'");		   			
+		   //print("myValueInput='"+myValueInput+"'");		   			
 			if(isNumber(myValueInput)){
-				print("boolean liegt als Zahl vor.");	
+				//print("boolean liegt als Zahl vor: " + myValueInput);	
 				if (myValueInput=='1') {			   
 					bBooleanValue = true;
 					bIsBoolean = true;
@@ -598,7 +598,7 @@
 					bIsBoolean = false;
 				};
 			}else{			
-				print("boolean liegt als String vor.");	
+				//print("boolean liegt als String vor: " + myValueInput);	
 				if (myValueInput=='true') {			   
 				   bBooleanValue = true;
 				   bIsBoolean = true;
@@ -647,6 +647,31 @@
 				berg = false;
 			}
 			project.setProperty(attributes.get("property"), berg);
+		 ]]>
+	</scriptdef>
+	
+	<!-- ############################################################ -->		
+	<scriptdef name="isFilenameVMD" language="javascript">
+		 <attribute name="text" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   //Überprüft, ob der eingegebenen Dateiname ein vom VMD zu verarbeitender Dateiname ist.
+		   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
+		   var text = attributes.get("text");
+		   
+		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
+		   //      Dies ggfs. in JSZ-Kernel uebernehmen
+		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
+		   
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.file);
+		   var sEnding = FileEasyZZZ.getNameEnd(text);
+		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + text + "'): '" + sEnding +"'");
+		   
+		   berg=false;
+		   project.setProperty(attributes.get("property"), berg);
+			
+									
 		 ]]>
 	</scriptdef>
 	
@@ -1055,25 +1080,21 @@
 				</sequential>
 			</for>		
 			
-			<!-- TODO GOON: Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
-			<!--            Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem postfix _RECHNERNAME ausstatten -->
-			<!--            Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus. -->				
+			<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
+			<!-- Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem Postfix _RECHNERNAME ausstatten -->
+			<!-- Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus, danach den Kopiervorgang für die Datei ohne Postfix. -->				
 			<!--### 1. Lauf Kopiere die Dateien (incl. NAMENSERWEITERUNG) der beiden Arrays  ##################### -->
 
 			<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
 			<!-- 1a. Dateiendung entfernen -->
-						
-			<!-- 20150726 noch KAPUTT! -->
 			<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
 		
 			<!-- 1b. Hostnamen und Endung ausrechnen -->
 			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 					dies passiert hier durch flaka´s install-property handler task -->
 			<fl:install-property-handler />
-			<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-
-			<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 
-			<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let>			
+			<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->			
+			<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
 			
 			<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
 			<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
@@ -1094,15 +1115,17 @@
 					<param name="desta.filename" value="${myDestaTotal.filename}"/>					
 			</antcallback>
 		</fl:when>
-		<fl:otherwise>
+		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 				<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
 				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-		</fl:otherwise>
+		</otherwise>
 	</fl:choose>
 
 </target>
 <!-- ######################################################################### -->
 <target name="-FGLCopyLocal_Copy">
+<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
+
 			<fl:let>mySrcaTotal.filedir ::= "${srca.filedir}"</fl:let>
 			<fl:let>mySrcaTotal.filename ::= "${srca.filename}"</fl:let>
 			<fl:let>myDestaTotal.filedir ::= "${desta.filedir}"</fl:let>
@@ -1271,8 +1294,10 @@
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
 
+	<!-- TODO GOON: Die Analyse der beiden Teile in ein target auslagern, das dann jeweils aufgerufen wird. -->
+	<!-- TODO GOON 20150726: statt x oder X zu verwenden d für nicht existierendes Verzeichnis, f für nicht existierende Datei.-->
 	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
-	<fl:choose>
+	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
 		<fl:when test=" '${myLeftPart}'.tofile.exists == true ">
 			<echo>Datei existiert (von...): ${myLeftPart}</echo>
 																									
@@ -1291,11 +1316,33 @@
 					<fl:let>myCase ::= "F"</fl:let><!-- F=file-->
 			</fl:when>
 		</fl:when>
-		<fl:otherwise>
+		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 			<echo>Datei/Verzeichnis existiert NICHT (von...): ${myLeftPart}</echo>
-			<fl:let>myCase ::= "X"</fl:let>
-			<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-		</fl:otherwise>
+										   <!-- Merke: Großes X , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
+			                               <!--        Kleines x, d.h. Datei existiert nicht, Verzeichnis aber. -->
+			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+			<isFilenameVMD text="${myLeftPart}" property="myisfilenameLeftPart" />			
+			<isBooleanZZZ valueinput="${myisfilenameLeftPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+			<fl:choose>
+ 			<fl:when test="${myValueIsBoolean}==true">
+				<echo>When:  Ein boolean Wert wurde gefunden.</echo>
+				<fl:choose>
+				<fl:when test="${myBooleanValue}==true">
+					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME (von...): ${myLeftPart}</echo>
+					<fl:let>myCase ::= "x"</fl:let>
+				</fl:when>	
+				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS (von...): ${myLeftPart}</echo>
+					<fl:let>myCase ::= "X"</fl:let>
+				</otherwise>
+				</fl:choose>
+			</fl:when>
+			<otherwise>
+				<echo>Ergebnis von isFilenameVMD (= ${myValueIsBoolean} ) nicht interpretierbar (von...): ${myLeftPart}</echo>
+				<fl:let>myCase ::= "X"</fl:let>
+			</otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->	
+			</fl:choose>
+		</otherwise>
 	</fl:choose>
 	
 		<!-- Prüfe, ob Datei vom Rechten Teil existiert -->
@@ -1307,7 +1354,7 @@
 			<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
 			<!-- <echo>rechter Teil: isdirectory=${myisdirectoryRightPart}</echo> -->
 														
-			<fl:when test="${myisdirectoryRightPart} == true">
+			<fl:when test="${myisdirectoryRightPart}==true">
 					<!-- A) Rechter Teil - Verzeichnis-Fall: -->
 					<echo>Rechter Teil: ist Verzeichnis</echo>
 					<fl:let>myCase ::= "${myCase}D"</fl:let>	<!-- D=directory-->																								 
@@ -1318,11 +1365,33 @@
 					<fl:let>myCase ::= "${myCase}F"</fl:let><!-- F=file-->
 			</fl:when>
 		</fl:when>
-		<fl:otherwise>
+		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 			<echo>Datei/Verzeichnis existiert NICHT (nach...): ${myRightPart}</echo>
-			<fl:let>myCase ::= "${myCase}X"</fl:let>
-			<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-		</fl:otherwise>
+											<!-- Merke: Großes X , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
+			                               <!--        Kleines x, d.h. Datei existiert nicht, Verzeichnis aber. -->
+			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+			<isFilenameVMD text="${myRightPart}" property="myisfilenameRightPart" />			
+			<isBooleanZZZ valueinput="${myisfilenameRightPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+			<fl:choose>
+ 			<fl:when test="${myValueIsBoolean}==true">
+				<echo>When:  Ein boolean Wert wurde gefunden.</echo>
+				<fl:choose>
+				<fl:when test="${myBooleanValue}==true">
+					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME (nach...): ${myRightPart}</echo>
+					<fl:let>myCase ::= "${myCase}x"</fl:let>
+				</fl:when>	
+				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS (nach...): ${myRightPart}</echo>
+					<fl:let>myCase ::= "${myCase}X"</fl:let>
+				</otherwise>
+				</fl:choose>
+			</fl:when>	
+			<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+				<echo>Ergebnis von isFilenameVMD (= ${myValueIsBoolean} )nicht interpretierbar (nach...): ${myRightPart}</echo>
+				<fl:let>myCase ::= "${myCase}X"</fl:let>
+			</otherwise>
+			</fl:choose>
+		</otherwise>
 	</fl:choose>	
 	<echo>Soweit ermittelter Fall: ${myCase}</echo>
 	<fl:let>returnAnalyze ::= true</fl:let>
@@ -1337,28 +1406,44 @@
 	<!--### START: Aufruf der verschiedenen Fälle ####################-->
 	<!-- F=file, D=directory,X=not existing. Es geht nicht um die Konfiguration, sondern darum, dass die Dateien / Verzeichnisse existieren -->
 	
-	<!-- TODO GOON: Je nach Fall ein anderes Target aufrufen. Dadurch ist der Code modularer --> 	
-	<!-- TODO: jeweils ein Array erstellen 1) mit den Werten des Ausgangsdateipfads, 2) mit den Werten des Zieldateipfads -->
-	<!-- todo codeschnipsel unten teilweise hier wieder einfügen oder in ein extra Target packen -->
-										
+	<!-- Je nach Fall ein anderes Target aufrufen. Dadurch ist der Code modularer --> 	
+	<!-- Jeweils ein Array erstellen 1) mit den Werten des Ausgangsdateipfads, 2) mit den Werten des Zieldateipfads -->										
 	<ac:if>
 		<ac:equals arg1="${myAnalyze}" arg2="XX"/>										
 		<ac:then>
-			<echo>Fall: Datei/Verzeichnis links nicht existent, Datei/Verzeichnis rechts nicht existent</echo>
+			<echo>Fall: Verzeichnis links nicht existent, Verzeichnis rechts nicht existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
 			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="xx"/>										
+		<ac:then>
+			<echo>Fall: Datei links nicht existent, rechts Datei nicht existent</echo>
+			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControl ::= false</fl:let>
+		</ac:then>
+	</ac:elseif>
+	<ac:elseif>
 		<ac:equals arg1="${myAnalyze}" arg2="XD"/>										
 		<ac:then>
-			<echo>Fall: Datei/Verzeichnis links nicht existent, rechts Datei</echo>
+			<echo>Fall: Verzeichnis links nicht existent, rechts Verzeichnis existent</echo>
 			<fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+		</ac:then>
+	</ac:elseif>
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="xD"/>										
+		<ac:then>
+			<echo>Fall: Datei links NICHT existent, rechts Verzeichnis existent</echo>
+			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
 		<ac:equals arg1="${myAnalyze}" arg2="DX"/>										
 		<ac:then>
-			<echo>Fall: links Datei, Datei/Verzeichnis rechts nicht existent</echo>
+			<echo>Fall: links Verzeichnis existent, rechts Verzeichnis NICHT existent</echo>
+			<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
+			
 			<!-- TODO: Prüfe, ob rechts ein Verzeichnisname ist. Kopiere von links nach rechts. mache ggfs. fehlende Unterverzeichnisse. -->
 			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
@@ -1372,7 +1457,11 @@
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
-		<ac:equals arg1="${myAnalyze}" arg2="FD"/>										
+		<ac:or>
+			<ac:equals arg1="${myAnalyze}" arg2="FD"/>
+			<ac:equals arg1="${myAnalyze}" arg2="FX"/><!-- grosses X = nicht existierendes Verzeichnis -->
+			<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
+		</ac:or>
 		<ac:then>
 			<echo>Fall: links Datei, rechts Verzeichnis</echo>
 			<antcallback target="-FGLCopyLocal_Control_FD" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
@@ -1403,7 +1492,7 @@
 	<ac:elseif>		
 		<ac:or>
 			<ac:equals arg1="${myAnalyze}" arg2="FF"/>
-			<ac:equals arg1="${myAnalyze}" arg2="FX"/>
+			<ac:equals arg1="${myAnalyze}" arg2="Fx"/><!-- kleines x = nicht existierende Datei -->
 		</ac:or>
 		<ac:then>
 			<echo>Fall: links Datei, rechts Datei (oder noch nicht existent)</echo>

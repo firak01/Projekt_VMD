@@ -40,7 +40,7 @@
 	</taskdef>
 		
 	<!-- ######## Scriptdefs ############################################################################--> 		
- 	<!-- ########################### -->		
+ 	<!-- ############################################################ -->		
 	<scriptdef name="isBooleanZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
 		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
@@ -69,7 +69,7 @@
 		   var myValueInput = attributes.get("valueinput");
 		   print("myValueInput='"+myValueInput+"'");		   			
 			if(isNumber(myValueInput)){
-				print("boolean liegt als Zahl vor.");	
+				//print("boolean liegt als Zahl vor: " + myValueInput);	
 				if (myValueInput=='1') {			   
 					bBooleanValue = true;
 					bIsBoolean = true;
@@ -81,7 +81,7 @@
 					bIsBoolean = false;
 				};
 			}else{			
-				print("boolean liegt als String vor.");	
+				//print("boolean liegt als String vor: " + myValueInput);	
 				if (myValueInput=='true') {			   
 				   bBooleanValue = true;
 				   bIsBoolean = true;
@@ -505,11 +505,11 @@
 			<!-- TODO: Verschachtelungsebenen einfügen -->
 			
 		</fl:when>
-		<fl:otherwise>		
+		<otherwise>		<!-- MERKE: otherwise gehört nicht zu flaka! -->
 			<echo>mytest01 ist ungleich'null' </echo>				
 			
 			<!-- TODO: Verschachtelungsebenen einfügen -->
-		</fl:otherwise>
+		</otherwise>
 	</fl:choose>
 
 </target>
