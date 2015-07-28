@@ -639,12 +639,16 @@
 		   //var fd = new java.io.File(text);
 		   var fd = new File(text);
 		   var berg = false;
+		   if(fd.exists()){
 		   if (fd.isDirectory()) {
-			   //print("js true");
+			   print(fd.getPath()+" => js true");
 		       berg = true;
 			} else {
-				//print("js false");
+				print(fd.getPath()+" =>js false");
 				berg = false;
+			}
+			}else{
+					print(fd.getPath()+" =>js not existing!");
 			}
 			project.setProperty(attributes.get("property"), berg);
 		 ]]>
@@ -658,6 +662,7 @@
 		   //Überprüft, ob der eingegebenen Dateiname ein vom VMD zu verarbeitender Dateiname ist.
 		   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
 		   var text = attributes.get("text");
+		   var berg=false;
 		   
 		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
 		   //      Dies ggfs. in JSZ-Kernel uebernehmen
@@ -668,10 +673,12 @@
 		   var sEnding = FileEasyZZZ.getNameEnd(text);
 		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + text + "'): '" + sEnding +"'");
 		   
-		   berg=false;
-		   project.setProperty(attributes.get("property"), berg);
-			
-									
+		   //TODO GOON noch Kaputt ! Hier die Dateiendung .txt erfassen.
+		   if(sEnding=="txt){
+		    print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt relevant.");
+			berg =true;
+		   }
+		   project.setProperty(attributes.get("property"), berg);				
 		 ]]>
 	</scriptdef>
 	
@@ -684,7 +691,7 @@
     <attribute name="matchstring" />
     <attribute name="returnstring" />     
      <![CDATA[
-	 //TODO: Die Encoding Aenderung in den JSZ - Kernel bringen.
+	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
 	 
 	   var text = attributes.get("text");
        var match = attributes.get("matchstring");
@@ -814,12 +821,12 @@
 	</target>
   
   <!-- ################################################################################# -->
-  <!-- Die einzelnen Tests im depends hinzufügen -->
+   <target name="compile" depends="-declaration, -init,-FglRepositoryBackup,-FglCopyClient2archive,-FglCopyLocal_Main">
+   <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
-   <target name="compile" depends="-declaration, -init,-FglRepositoryBackup,-FglCopyClient2archive,-FglCopyLocal_Main">
+   
 	<!-- WIRD NICHT BENÖTIGT -->
-	
     <!-- Compile the java code from ${src} into ${build} -->
 	<!-- example how to create a directory -->
     <!-- <mkdir dir="${build}"/>
@@ -831,7 +838,6 @@
     </javac>
 	-->
   </target>
-  
   
   <target name="-init">
     <!-- Create the time stamp -->
@@ -846,7 +852,8 @@
 	<echo>Current Timestamp: ${current.time}</echo>
 	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
 </target>
-       
+
+<!-- ################################################################################# -->       
 <target name="-FglRepositoryBackup">
 	<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
 	<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
@@ -911,7 +918,6 @@
 </target>
 
 <!-- ######################################################### -->
-<!-- Beispiel für ein antcallback, in dem aus einer Schleife ein Wert zurückgeliefert wird. -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
 <target name="-FglCopyLocal_Main">
 	<echo>######################################</echo>
@@ -969,7 +975,8 @@
 			<!-- <echo>${myfile}</echo> -->
 	
 	
-			<!--2b. Werte den Inhalt der Datei zeilenweise aus -->			
+			<!--2b. Werte den Inhalt der Datei zeilenweise aus -->
+			<!-- Beispiel für eine Schleife in ant, und wie man mit sequentials und dem @ Parameter darin arbeiten kann.  -->			
 			<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
 			<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
 				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
@@ -1294,23 +1301,22 @@
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
 
-	<!-- TODO GOON: Die Analyse der beiden Teile in ein target auslagern, das dann jeweils aufgerufen wird. -->
-	<!-- TODO GOON 20150726: statt x oder X zu verwenden d für nicht existierendes Verzeichnis, f für nicht existierende Datei.-->
+	<!-- TODO GOON:noch KAPUTT  Die Analyse der beiden Teile in ein target auslagern, das dann jeweils aufgerufen wird. -->
 	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
 		<fl:when test=" '${myLeftPart}'.tofile.exists == true ">
-			<echo>Datei existiert (von...): ${myLeftPart}</echo>
+			<echo>Datei/Verzeichnis existiert (von...): ${myLeftPart}</echo>
 																									
 			<!-- Prüfe, ob es ein Verzeichnis ist -->
 			<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-			<!-- <echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo> -->
+			<echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo>
 														
 			<fl:when test="${myisdirectoryLeftPart} == true">
 					<!-- A) Linker Teil - Verzeichnis-Fall: -->
 					<echo>Linker Teil: ist Verzeichnis</echo>
 					<fl:let>myCase ::= "D"</fl:let>	<!-- D=directory-->																						 
 			</fl:when>
-			<fl:when test="${myisdirectoryLeftPart} != true">
+			<fl:when test="${myisdirectoryLeftPart} != true">			
 					<!-- B) Linker Teil - Dateipfad-Fall:-->
 					<echo>Linker Teil: ist KEIN Verzeichnis</echo>
 					<fl:let>myCase ::= "F"</fl:let><!-- F=file-->
@@ -1318,8 +1324,8 @@
 		</fl:when>
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 			<echo>Datei/Verzeichnis existiert NICHT (von...): ${myLeftPart}</echo>
-										   <!-- Merke: Großes X , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
-			                               <!--        Kleines x, d.h. Datei existiert nicht, Verzeichnis aber. -->
+										   <!-- Merke: kleines d , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
+			                               <!--        Kleines f, d.h. Datei existiert nicht, Verzeichnis aber. -->
 			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
 			<isFilenameVMD text="${myLeftPart}" property="myisfilenameLeftPart" />			
 			<isBooleanZZZ valueinput="${myisfilenameLeftPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -1329,11 +1335,11 @@
 				<fl:choose>
 				<fl:when test="${myBooleanValue}==true">
 					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME (von...): ${myLeftPart}</echo>
-					<fl:let>myCase ::= "x"</fl:let>
+					<fl:let>myCase ::= "f"</fl:let>
 				</fl:when>	
 				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS (von...): ${myLeftPart}</echo>
-					<fl:let>myCase ::= "X"</fl:let>
+					<fl:let>myCase ::= "d"</fl:let>
 				</otherwise>
 				</fl:choose>
 			</fl:when>
@@ -1378,11 +1384,11 @@
 				<fl:choose>
 				<fl:when test="${myBooleanValue}==true">
 					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME (nach...): ${myRightPart}</echo>
-					<fl:let>myCase ::= "${myCase}x"</fl:let>
+					<fl:let>myCase ::= "${myCase}f"</fl:let>
 				</fl:when>	
 				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS (nach...): ${myRightPart}</echo>
-					<fl:let>myCase ::= "${myCase}X"</fl:let>
+					<fl:let>myCase ::= "${myCase}d"</fl:let>
 				</otherwise>
 				</fl:choose>
 			</fl:when>	
@@ -1404,19 +1410,29 @@
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
 	
 	<!--### START: Aufruf der verschiedenen Fälle ####################-->
-	<!-- F=file, D=directory,X=not existing. Es geht nicht um die Konfiguration, sondern darum, dass die Dateien / Verzeichnisse existieren -->
+	<!-- F=file, D=directory,X=not defined, f=file not found, d=directory not found.
+   	      Es geht nicht nur um die Konfiguration, sondern auch darum, dass die Dateien / Verzeichnisse existieren -->
 	
 	<!-- Je nach Fall ein anderes Target aufrufen. Dadurch ist der Code modularer --> 	
 	<!-- Jeweils ein Array erstellen 1) mit den Werten des Ausgangsdateipfads, 2) mit den Werten des Zieldateipfads -->										
 	<ac:if>
-		<ac:equals arg1="${myAnalyze}" arg2="XX"/>										
+		<ac:equals arg1="${myAnalyze}" arg2="dd"/>										
 		<ac:then>
 			<echo>Fall: Verzeichnis links nicht existent, Verzeichnis rechts nicht existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
 			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	<ac:elseif>
-		<ac:equals arg1="${myAnalyze}" arg2="xx"/>										
+		<!-- TODO noch Kaputt: Instring abprüfen auf X -->
+		<ac:equals arg1="${myAnalyze}" arg2="XX"/>										
+		<ac:then>
+			<echo>Fall: Linker Ausdruck nicht interpretierbar, rechter Ausdruck nicht interpretierbar</echo>
+			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControl ::= false</fl:let>
+		</ac:then>
+	</ac:elseif>		
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="ff"/>										
 		<ac:then>
 			<echo>Fall: Datei links nicht existent, rechts Datei nicht existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
@@ -1424,14 +1440,15 @@
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
-		<ac:equals arg1="${myAnalyze}" arg2="XD"/>										
+		<ac:equals arg1="${myAnalyze}" arg2="dD"/>										
 		<ac:then>
 			<echo>Fall: Verzeichnis links nicht existent, rechts Verzeichnis existent</echo>
-			<fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
-		<ac:equals arg1="${myAnalyze}" arg2="xD"/>										
+		<ac:equals arg1="${myAnalyze}" arg2="fD"/>										
 		<ac:then>
 			<echo>Fall: Datei links NICHT existent, rechts Verzeichnis existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
@@ -1439,12 +1456,12 @@
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
-		<ac:equals arg1="${myAnalyze}" arg2="DX"/>										
+		<ac:equals arg1="${myAnalyze}" arg2="Dd"/>										
 		<ac:then>
 			<echo>Fall: links Verzeichnis existent, rechts Verzeichnis NICHT existent</echo>
 			<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
 			
-			<!-- TODO: Prüfe, ob rechts ein Verzeichnisname ist. Kopiere von links nach rechts. mache ggfs. fehlende Unterverzeichnisse. -->
+			<!-- TODO noch Kaputt: Kopiere alle Dateien des Verzeichnisses links in das Verzeichnis nach rechts. -->
 			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
 	</ac:elseif>									
@@ -1452,15 +1469,28 @@
 		<ac:equals arg1="${myAnalyze}" arg2="DF"/>										
 		<ac:then>
 			<echo>Fall: links Verzeichnis, rechts Datei</echo>
-			<!-- TODO: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
-			<fl:let>myReturnControl ::= false</fl:let>
+			<!-- TODO: noch kaputt: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
+			<antcallback target="-FGLCopyLocal_Control_DF" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
+				<param name="leftPart" value="${myLeftPart}"/>
+				<param name="rightPart" value="${myRightPart}"/>
+			</antcallback>
+			<!-- <arrayDebugJsZZZ arrayinput="${returnSrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${returnSrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+
+			<fl:echo>Ergebnis des Controll_DF Aufrufs: ${returnControl}</fl:echo>
+			<fl:let>myReturnControl ::= "${returnControl}"</fl:let>
+			<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
+			<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
+			<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
+			<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>	
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
 		<ac:or>
 			<ac:equals arg1="${myAnalyze}" arg2="FD"/>
-			<ac:equals arg1="${myAnalyze}" arg2="FX"/><!-- grosses X = nicht existierendes Verzeichnis -->
-			<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
+			<ac:equals arg1="${myAnalyze}" arg2="Fd"/><!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
 		</ac:or>
 		<ac:then>
 			<echo>Fall: links Datei, rechts Verzeichnis</echo>
@@ -1492,7 +1522,7 @@
 	<ac:elseif>		
 		<ac:or>
 			<ac:equals arg1="${myAnalyze}" arg2="FF"/>
-			<ac:equals arg1="${myAnalyze}" arg2="Fx"/><!-- kleines x = nicht existierende Datei -->
+			<ac:equals arg1="${myAnalyze}" arg2="Ff"/><!-- kleines f = nicht existierende Datei -->
 		</ac:or>
 		<ac:then>
 			<echo>Fall: links Datei, rechts Datei (oder noch nicht existent)</echo>
@@ -1526,7 +1556,6 @@
 </target>
 
 <target name="-FGLCopyLocal_Control_FD">
-	<!-- TODO GOON: 20150722 -->
 	<!-- Fall: Kopiere die benannte Datei von links nach rechts in das benannte Verzeichnis. -->	
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
@@ -1580,6 +1609,36 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 		</ac:else>
 	</ac:if>
+	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
+	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
+	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
+	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	
+</target>
+
+<target name="-FGLCopyLocal_Control_DF">
+	<!-- Fall: Kopiere die recht benannte Datei vom Verzeichnis links nach rechts an den benannten Dateinamen. -->	
+	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
+	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
+	<fl:echo>Start von FGLCopyLocal_Control_DF</fl:echo>
+	<!-- TODO: Dynamisch auf den aktuellen TargetNamen zugreifen.... tryoutAnt_Reflection - currentTarget name
+	siehe mein Dokument:
+	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )		
+I think you can't, unless you spend some time coding your own custom tasks (http://ant.apache.org/manual/tutorial-writing-tasks.html)
+The built-in properties you can display are: basedir, ant.file, ant.version, ant.project.name, ant.java.version
+
+Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lösen.	
+	target name="test">
+  <script language="javascript">
+    project.setNewProperty("current_target", self.getOwningTarget());
+  </script>
+  <echo>${current_target}</echo>
+</target>
+	-->
+	
+	<!-- TODO GOON noch kaputt: Wie -FGLCopyLocal_Control_DF, aber erst den rechten Teil behandeln, dann den linken und dabei den Dateinamen nach links übernehmen -->
+	<fl:let>returnControl ::= false</fl:let>
+	
+	
 	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
 	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
 	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
