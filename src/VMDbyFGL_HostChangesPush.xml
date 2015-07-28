@@ -635,7 +635,8 @@
 		 <![CDATA[
 		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist Package notwendig
 		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
-		   var text = attributes.get("text");		 
+		   var text = attributes.get("text");
+		   print ("start isDirectoryZZZ for: '" + text +"'");
 		   //var fd = new java.io.File(text);
 		   var fd = new File(text);
 		   var berg = false;
@@ -663,18 +664,23 @@
 		   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
 		   var text = attributes.get("text");
 		   var berg=false;
-		   
+		   print("Starte isFilenameVMD '" + text + "'");
+
 		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
 		   //      Dies ggfs. in JSZ-Kernel uebernehmen
 		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
 		   
 		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
 		   importPackage(Packages.basic.zBasic.util.file);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
 		   var sEnding = FileEasyZZZ.getNameEnd(text);
 		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + text + "'): '" + sEnding +"'");
 		   
-		   //TODO GOON noch Kaputt ! Hier die Dateiendung .txt erfassen.
-		   if(sEnding=="txt){
+		   //Hier die für VMD relevanten Dateiendungen erfassen.
+		   if(sEnding=="txt"){
 		    print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt relevant.");
 			berg =true;
 		   }
@@ -1464,11 +1470,20 @@
 			<!-- TODO noch Kaputt: Kopiere alle Dateien des Verzeichnisses links in das Verzeichnis nach rechts. -->
 			<fl:let>myReturnControl ::= false</fl:let>
 		</ac:then>
-	</ac:elseif>									
+	</ac:elseif>
+	<ac:elseif>
+		<ac:equals arg1="${myAnalyze}" arg2="Df"/>										
+		<ac:then>
+			<echo>Fall: links Verzeichnis, rechts NICHT EXISTIERENDE Datei</echo>
+			<!-- TODO: noch kaputt: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
+			<fl:let>myReturnControl ::= false</fl:let>
+			
+		</ac:then>
+	</ac:elseif>	
 	<ac:elseif>
 		<ac:equals arg1="${myAnalyze}" arg2="DF"/>										
 		<ac:then>
-			<echo>Fall: links Verzeichnis, rechts Datei</echo>
+			<echo>Fall: links Verzeichnis, rechts existierende Datei</echo>
 			<!-- TODO: noch kaputt: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
 			<antcallback target="-FGLCopyLocal_Control_DF" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
 				<param name="leftPart" value="${myLeftPart}"/>
@@ -1634,9 +1649,44 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
   <echo>${current_target}</echo>
 </target>
 	-->
+	<echo>Behandle rechten Fall</echo>
+	<antcallback target="-FGLCopyLocal_Control_FF_Part" return="returnControl, returnA.filedir, returnA.filename">
+		<param name="sPart" value="${myRightPart}"/>
+	</antcallback>
+	<fl:let>myDesta.filedir ::= "${returnA.filedir}"</fl:let>
+	<fl:let>myDesta.filename ::= "${returnA.filename}"</fl:let>
+	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<fl:let>returnControl ::= "${returnControl}"</fl:let>
+	
+	<ac:if>
+		<ac:equals arg1="${returnControl}" arg2="false"/>										
+		<ac:then>
+			<echo>Rechter Fall=false => Ueberspringe linken Fall</echo>
+		</ac:then>
+		<ac:else>
+			<echo>Behandle linken Fall: Uebernimm dabei die Datei Angabe vom rechten Fall</echo>
+			<antcallback target="-FGLCopyLocal_Control_FD_Part" return="returnControl, returnA.filedir, returnA.filename">
+				<param name="sPart" value="${myLeftPart}"/>
+				<param name="saFilename" value="${myDesta.filename}"/>
+			</antcallback>
+			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			<fl:let>mySrca.filedir ::= "${returnA.filedir}"</fl:let>
+			<fl:let>mySrca.filename ::= "${returnA.filename}"</fl:let>
+			<fl:let>returnControl ::= "${returnControl}"</fl:let>
+			
+			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+		</ac:else>
+	</ac:if>
+	
 	
 	<!-- TODO GOON noch kaputt: Wie -FGLCopyLocal_Control_DF, aber erst den rechten Teil behandeln, dann den linken und dabei den Dateinamen nach links übernehmen -->
-	<fl:let>returnControl ::= false</fl:let>
+	<!-- <fl:let>returnControl ::= false</fl:let> -->
 	
 	
 	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
