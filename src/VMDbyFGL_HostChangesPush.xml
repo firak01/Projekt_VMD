@@ -1472,19 +1472,12 @@
 		</ac:then>
 	</ac:elseif>
 	<ac:elseif>
-		<ac:equals arg1="${myAnalyze}" arg2="Df"/>										
-		<ac:then>
-			<echo>Fall: links Verzeichnis, rechts NICHT EXISTIERENDE Datei</echo>
-			
-			<!-- TODO: noch kaputt: Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
-			<fl:let>myReturnControl ::= false</fl:let>		
-			
-		</ac:then>
-	</ac:elseif>	
-	<ac:elseif>
+	<ac:or>
 		<ac:equals arg1="${myAnalyze}" arg2="DF"/>										
+		<ac:equals arg1="${myAnalyze}" arg2="Df"/>										
+	</ac:or>
 		<ac:then>
-			<echo>Fall: links Verzeichnis, rechts existierende Datei</echo>
+			<echo>Fall: links Verzeichnis, rechts existierende/nicht existierende Datei</echo>
 			<!-- Kopiere die rechts benannte Datei aus dem links angegebenen Verzeichnis nach rechts -->
 			<antcallback target="-FGLCopyLocal_Control_DF" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
 				<param name="leftPart" value="${myLeftPart}"/>
@@ -1751,7 +1744,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 <target name="-FGLCopyLocal_Control_F_Part">
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
 	<fl:let>myPart ::= "${sPart}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_FF_Part</fl:echo>
+	<fl:echo>Start von FGLCopyLocal_Control_F_Part</fl:echo>
 	<fl:echo>fuer: ${myPart}</fl:echo>
 	
 	
@@ -1816,7 +1809,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- Fall: Hole den Verzeichnisnamen aus dem rechten Teil und verwende die ermittelten Dateinamen aus dem linken Teil. -->	
 	<fl:let>myPart ::= "${sPart}"</fl:let>
 	<fl:let>myAFilename ::= "${saFilename}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_FD_Part</fl:echo>
+	<fl:echo>Start von FGLCopyLocal_Control_D_Part</fl:echo>
 	<fl:echo>fuer: ${myPart}</fl:echo>
 	<fl:echo>fuer: ${myAFilename}</fl:echo>
 		
