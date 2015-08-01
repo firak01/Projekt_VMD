@@ -656,7 +656,7 @@
 	</scriptdef>
 	
 	<!-- ############################################################ -->		
-	<scriptdef name="isFilenameVMD" language="javascript">
+	<scriptdef name="isFilenameRelevantVMD" language="javascript">
 		 <attribute name="text" />
 		 <attribute name="property" />
 		 <![CDATA[
@@ -664,7 +664,7 @@
 		   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
 		   var text = attributes.get("text");
 		   var berg=false;
-		   print("Starte isFilenameVMD '" + text + "'");
+		   print("Starte isFilenameRelevantVMD '" + text + "'");
 
 		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
 		   //      Dies ggfs. in JSZ-Kernel uebernehmen
@@ -680,10 +680,14 @@
 		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + text + "'): '" + sEnding +"'");
 		   
 		   //Hier die für VMD relevanten Dateiendungen erfassen.
-		   if(sEnding=="txt"){
-		    print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt relevant.");
+		   if(sEnding=="txt"){		   
 			berg =true;
 		   }
+		   if(berg==true){	
+			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt relevant.");
+			}else{
+			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt NICHT relevant.");
+			}
 		   project.setProperty(attributes.get("property"), berg);				
 		 ]]>
 	</scriptdef>
@@ -1307,7 +1311,7 @@
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
 
-	<!-- TODO GOON:noch KAPUTT  Die Analyse der beiden Teile in ein target auslagern, das dann jeweils aufgerufen wird. -->
+	<!-- TODO GOON:noch KAPUTT  Die Analyse der beiden Teile links/rechts ist gleich. Daher dies in ein target auslagern, das dann jeweils aufgerufen wird. -->
 	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
 		<fl:when test=" '${myLeftPart}'.tofile.exists == true ">
@@ -1333,7 +1337,7 @@
 										   <!-- Merke: kleines d , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
 			                               <!--        Kleines f, d.h. Datei existiert nicht, Verzeichnis aber. -->
 			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-			<isFilenameVMD text="${myLeftPart}" property="myisfilenameLeftPart" />			
+			<isFilenameRelevantVMD text="${myLeftPart}" property="myisfilenameLeftPart" />			
 			<isBooleanZZZ valueinput="${myisfilenameLeftPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 			<fl:choose>
  			<fl:when test="${myValueIsBoolean}==true">
@@ -1350,7 +1354,7 @@
 				</fl:choose>
 			</fl:when>
 			<otherwise>
-				<echo>Ergebnis von isFilenameVMD (= ${myValueIsBoolean} ) nicht interpretierbar (von...): ${myLeftPart}</echo>
+				<echo>Ergebnis von isFilenameRelevantVMD (= ${myValueIsBoolean} ) nicht interpretierbar (von...): ${myLeftPart}</echo>
 				<fl:let>myCase ::= "X"</fl:let>
 			</otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->	
 			</fl:choose>
@@ -1382,7 +1386,7 @@
 											<!-- Merke: Großes X , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
 			                               <!--        Kleines x, d.h. Datei existiert nicht, Verzeichnis aber. -->
 			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-			<isFilenameVMD text="${myRightPart}" property="myisfilenameRightPart" />			
+			<isFilenameRelevantVMD text="${myRightPart}" property="myisfilenameRightPart" />			
 			<isBooleanZZZ valueinput="${myisfilenameRightPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 			<fl:choose>
  			<fl:when test="${myValueIsBoolean}==true">
@@ -1399,7 +1403,7 @@
 				</fl:choose>
 			</fl:when>	
 			<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-				<echo>Ergebnis von isFilenameVMD (= ${myValueIsBoolean} )nicht interpretierbar (nach...): ${myRightPart}</echo>
+				<echo>Ergebnis von isFilenameRelevantVMD (= ${myValueIsBoolean} )nicht interpretierbar (nach...): ${myRightPart}</echo>
 				<fl:let>myCase ::= "${myCase}X"</fl:let>
 			</otherwise>
 			</fl:choose>
