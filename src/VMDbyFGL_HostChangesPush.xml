@@ -705,20 +705,20 @@
 	 
 	   var text = attributes.get("text");
        var match = attributes.get("matchstring");
-      //print("matchstring="+match);
+      print("matchstring="+match);
 	  
 	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
 	   var matchToEncode=match;
 	   var matchEncoded = encodeMyHtml(matchToEncode);
-	   //print("encoded matchstring=" + matchEncoded);
+	   print("encoded matchstring=" + matchEncoded);
 	   
 	    var textToEncode=text;
 		var textEncoded = encodeMyHtml(textToEncode);
-	   //print("encoded textstring=" + textEncoded);
+	   print("encoded textstring=" + textEncoded);
        sReturn = getStrLeftStr(textEncoded, matchEncoded);
 	   
 	   sReturn = unescape(sReturn);
-	   //print("sReturn="+sReturn);
+	   print("sReturn="+sReturn);
 	   
        project.setProperty(attributes.get("returnstring"), sReturn);
 	   
@@ -788,7 +788,7 @@
   
     <!-- Ausgangsverzeichnis: Das Repository -->
   	<!-- a) Feste Unterverzeichnisstruktur -->
- <property name="dest.dirRepositoryVmdLib" value="lib" />
+  <property name="dest.dirRepositoryVmdLib" value="lib" />
   <property name="dest.dirRepositoryVmdBat" value="bat" />
   <property name="dest.dirRepositoryVmdSrc" value="src" />
   <property name="dest.dirRepositoryVmdMisc" value="misc" />
@@ -797,8 +797,88 @@
   
   <!-- b) Als Umgebungsvarialbe (Batch) oder Argument (Eclipse) übergebene Konfigurationsdatei --> 
   <!-- TODO GOON: Fallunterscheidung, je nachdem was existiert -->
+  
+  <!-- Hier wird der ggfs. übergebene Projektdateiname durch eine Hostspezifische Erweiterung uebersteuert. -->
+  <!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+  <fl:let>vmdLocalFile ::= "project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+  <echo>Name der lokalen Steuerungsdatei waere: ${vmdLocalFile}</echo>
+	
+	<!-- Noch KAPUTT: Hole den Pfad aus der $vmd - Property, die in der Batch uebergeben wurde -->
+	<!-- Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->	
+	<fl:let>vmdUsed ::= '${vmd}'</fl:let><!-- Merke: Die Pfadangebn in der Batch sind mit Slash und nicht mit Backslash -->
+    <echo>vmdUsed = ${vmdUsed}</echo>		
+		
+	<fl:let>sfileadir ::= split('${vmdUsed}','/')</fl:let>
+	<!-- <fl:let>sfileadir ::= split(${vmdUsed},'\\\\')</fl:let> --><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
+											
+	<!-- 2. ermittle die groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
+	<!--    Merke: #{size(${src.fileadir})} funktioniert nicht. Siehe tryoutAnt_FlakaListHandling -->																													
+	<!-- Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
+	<arrayElementCountJsZZZ arrayinput="${sfileadir}" ireturn="mylistasize"/>
+	<fl:echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</fl:echo>								
+	<echo>Pfadbestandteilausgabe</echo>
+	<ac:for param="mydiry" list="${sfileadir}"><!-- Beachte das for nur für sequential funktioniert und darin mit @ auf die Param-Variable zugegriffen werden kann. -->
+		<sequential>
+			<echo>Pfadbestandteil: @{mydiry}</echo>
+		</sequential>				
+	</ac:for>
+																	
+	<!-- 3. Ermittle die Indexposition, den Dateinamen und den Dateipfad -->	
+	<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+	<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+	<var name="op1" value="${mylistasize}"/>
+	<var name="op2" value="1"/>
+	<var name="op" value="-"/>
+	<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+	<echo>errechneter wert fuer Index des letzten Pfadteils: ${index}</echo>
+	<fl:let>xtractedvalue ::= split('${vmd}','/')[${index}]; 
+	<!-- <fl:let>xtractedvalue ::= split('${vmd}','\\\\')[${index}];  -->
+		<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
+	</fl:let>
+	<echo>An letzter Stelle gefundener wert: ${xtractedvalue}</echo>
+
+	<!-- Hole den Pfad, als Teil links vom Dateinamen -->
+	<!-- Merke: Format muss man verwenden um den Backslash in den String zu bekommen -->
+	<!-- Merke: hier den format ausdruck noch mit #{ } umgeben, sonst wird er nicht ausgerechnet sondern als Text übergeben. -->
+	<!-- Merke: das in eine Variable packen, sonst kann man es nicht an 'stringLeftStringZZZ' uebergeben. -->
+	<!-- <fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo>  -->
+	<!-- <fl:let>xtractedvalueTemp ::= #{"format('\\%s', xtractedvalue)"}	</fl:let> -->
+	<fl:let>xtractedvalueTemp ::= #{"format('/%s', xtractedvalue)"}</fl:let>
+	<stringLeftStringZZZ text="${vmdUsed}" matchstring="${xtractedvalueTemp}" returnstring="myPath" />
+	<echo>Der Pfad ist: '${myPath}'</echo>
+
+  
+  <fl:let>vmdLocalFilePath ::= "${myPath}/project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+  <echo>Pruefe Existenz lokaler Uebersteuerungs-Projektdatei: ${vmdLocalFilePath}</echo>
+  
+  <!-- Noch Kaputt: Versuche hier die Slashe durch backslashe zu ersetzten -->
+  <!-- verwendet pathconvert, so wie in:
+    
+  <pathconvert property="mypathfixed" dirsep="/">
+         <path location="${mypath}"/>
+</pathconvert>
+<copy todir="${my.target_dir}" filtering="true">
+            <fileset dir="${basedir}/src/main/conf" includes="my.properties"/>
+            <filterset recurse="true">
+                  <filter token="mypath" value="${mypathfixed}"/>
+            </filterset>
+</copy>
+-->
+  
+  
+  <fl:choose>
+		<fl:when test=" '${vmdLocalFilePath}'.tofile.exists == true ">
+			<echo>Datei existiert: ${vmdLocalFilePath}</echo>
+			<fl:let>vmdUsed ::= '${vmdLocalFilePath}'</fl:let>
+		</fl:when>
+		<otherwise>
+			<fl:let>vmdUsed ::= '${vmd}'</fl:let>
+		</otherwise>
+	</fl:choose>
+			
+  <echo>Verwende Projektdatei: ${vmdUsed}</echo>
   <loadproperties>
-  	<file file="${vmd}"/>
+  	<file file="${vmdUsed}"/>
   	<!--<file file="${env.VMD}"/>-->
   </loadproperties> 
   <echo>test1 hat den Wert: ${test1}</echo>  	 
@@ -1310,110 +1390,96 @@
 <target name="-FGLCopyLocal_Analyze">
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
+	<fl:let>myCaseTotal ::= ""</fl:let>
 
-	<!-- TODO GOON:noch KAPUTT  Die Analyse der beiden Teile links/rechts ist gleich. Daher dies in ein target auslagern, das dann jeweils aufgerufen wird. -->
+	<!-- Meke: Die Analyse der beiden Teile links/rechts ist gleich. Daher dies in ein target ausgelagert, das dann jeweils aufgerufen wird. -->	
+	<antcallback target="-FGLCopyLocal_AnalyzePart" return="returnControl,returnString">					
+			<param name="sPartToAnalyze" value="${myLeftPart}"/>											
+	</antcallback>	
+	<fl:let>myCaseLeft ::= "${returnString}"</fl:let>	
+
+	<isBooleanZZZ valueinput="${returnControl}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
+		<fl:when test="${myValueIsBoolean}==true">
+			<fl:choose>
+				<fl:when test="${myBooleanValue}==true">
+					<echo>Analyze des linken Teils war erfolgreich. Starte Analyze des rechten Teils.</echo>
+					<antcallback target="-FGLCopyLocal_AnalyzePart" return="returnControl,returnString">					
+						<param name="sPartToAnalyze" value="${myRightPart}"/>											
+					</antcallback>
+					<fl:let>myCaseRight ::= "${returnString}"</fl:let>
+					<fl:let>myCaseTotal ::= "${myCaseLeft}${myCaseRight}"</fl:let>
+				</fl:when>	
+				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+					<echo>Analyze des linken Teils war NICHT erfolgreich. Spare mir die Auswertung des rechten Teils.</echo>
+				</otherwise>
+			</fl:choose>
+		</fl:when>
+		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+			<echo>Auswertung vom linken Teil mit Fehler. Spare mir die Auswertung des rechten Teils.</echo>
+		</otherwise>
+	</fl:choose>
+			
+	<echo>Soweit ermittelter Fall: ${myCaseTotal}</echo>
+	<fl:let>returnAnalyze ::= ${returnControl}</fl:let>
+	<fl:let>returnString ::= "${myCaseTotal}"</fl:let>										
+</target>
+<target name="-FGLCopyLocal_AnalyzePart">
+	<fl:let>myPart ::= "${sPartToAnalyze}"</fl:let>
+	
 	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
-		<fl:when test=" '${myLeftPart}'.tofile.exists == true ">
-			<echo>Datei/Verzeichnis existiert (von...): ${myLeftPart}</echo>
+		<fl:when test=" '${myPart}'.tofile.exists == true ">
+			<echo>Datei/Verzeichnis existiert: ${myPart}</echo>
 																									
 			<!-- Prüfe, ob es ein Verzeichnis ist -->
-			<isDirectoryZZZ text="${myLeftPart}" property="myisdirectoryLeftPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-			<echo>linker Teil: isdirectory=${myisdirectoryLeftPart}</echo>
+			<isDirectoryZZZ text="${myPart}" property="myisdirectoryPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+			<echo>Teil: isdirectory=${myisdirectoryPart}</echo>
 														
-			<fl:when test="${myisdirectoryLeftPart} == true">
-					<!-- A) Linker Teil - Verzeichnis-Fall: -->
-					<echo>Linker Teil: ist Verzeichnis</echo>
+			<fl:when test="${myisdirectoryPart} == true">
+					<!-- A) Teil - Verzeichnis-Fall: -->
+					<echo>Teil: ist Verzeichnis</echo>
 					<fl:let>myCase ::= "D"</fl:let>	<!-- D=directory-->																						 
 			</fl:when>
-			<fl:when test="${myisdirectoryLeftPart} != true">			
+			<fl:when test="${myisdirectoryPart} != true">			
 					<!-- B) Linker Teil - Dateipfad-Fall:-->
-					<echo>Linker Teil: ist KEIN Verzeichnis</echo>
+					<echo>Teil: ist KEIN Verzeichnis</echo>
 					<fl:let>myCase ::= "F"</fl:let><!-- F=file-->
 			</fl:when>
 		</fl:when>
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-			<echo>Datei/Verzeichnis existiert NICHT (von...): ${myLeftPart}</echo>
+			<echo>Datei/Verzeichnis existiert NICHT: ${myPart}</echo>
 										   <!-- Merke: kleines d , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
 			                               <!--        Kleines f, d.h. Datei existiert nicht, Verzeichnis aber. -->
 			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-			<isFilenameRelevantVMD text="${myLeftPart}" property="myisfilenameLeftPart" />			
-			<isBooleanZZZ valueinput="${myisfilenameLeftPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+			<isFilenameRelevantVMD text="${myPart}" property="myisfilenamePart" />			
+			<isBooleanZZZ valueinput="${myisfilenamePart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 			<fl:choose>
  			<fl:when test="${myValueIsBoolean}==true">
-				<echo>When:  Ein boolean Wert wurde gefunden.</echo>
+				<!-- <echo>When:  Ein boolean Wert wurde gefunden.</echo> -->
 				<fl:choose>
 				<fl:when test="${myBooleanValue}==true">
-					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME (von...): ${myLeftPart}</echo>
+					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME: ${myPart}</echo>
 					<fl:let>myCase ::= "f"</fl:let>
 				</fl:when>	
 				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS (von...): ${myLeftPart}</echo>
+					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS: ${myPart}</echo>
 					<fl:let>myCase ::= "d"</fl:let>
 				</otherwise>
 				</fl:choose>
 			</fl:when>
 			<otherwise>
-				<echo>Ergebnis von isFilenameRelevantVMD (= ${myValueIsBoolean} ) nicht interpretierbar (von...): ${myLeftPart}</echo>
+				<echo>Ergebnis von isFilenameRelevantVMD (= ${myValueIsBoolean} ) nicht interpretierbar: ${myPart}</echo>
 				<fl:let>myCase ::= "X"</fl:let>
 			</otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->	
 			</fl:choose>
 		</otherwise>
 	</fl:choose>
 	
-		<!-- Prüfe, ob Datei vom Rechten Teil existiert -->
-	<fl:choose>
-		<fl:when test=" '${myRightPart}'.tofile.exists == true ">
-			<echo>Datei existiert (nach...): ${myRightPart}</echo>
-																									
-			<!-- Prüfe, ob es ein Verzeichnis ist -->
-			<isDirectoryZZZ text="${myRightPart}" property="myisdirectoryRightPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-			<!-- <echo>rechter Teil: isdirectory=${myisdirectoryRightPart}</echo> -->
-														
-			<fl:when test="${myisdirectoryRightPart}==true">
-					<!-- A) Rechter Teil - Verzeichnis-Fall: -->
-					<echo>Rechter Teil: ist Verzeichnis</echo>
-					<fl:let>myCase ::= "${myCase}D"</fl:let>	<!-- D=directory-->																								 
-			</fl:when>
-			<fl:when test="${myisdirectoryRightPart} != true">
-					<!-- B) Rechter Teil - Dateipfad-Fall:-->
-					<echo>Rechter Teil: ist KEIN Verzeichnis</echo>
-					<fl:let>myCase ::= "${myCase}F"</fl:let><!-- F=file-->
-			</fl:when>
-		</fl:when>
-		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-			<echo>Datei/Verzeichnis existiert NICHT (nach...): ${myRightPart}</echo>
-											<!-- Merke: Großes X , d.h. Verzeichnis existiert nicht => Datei existiert auch nicht. -->
-			                               <!--        Kleines x, d.h. Datei existiert nicht, Verzeichnis aber. -->
-			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-			<isFilenameRelevantVMD text="${myRightPart}" property="myisfilenameRightPart" />			
-			<isBooleanZZZ valueinput="${myisfilenameRightPart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
-			<fl:choose>
- 			<fl:when test="${myValueIsBoolean}==true">
-				<echo>When:  Ein boolean Wert wurde gefunden.</echo>
-				<fl:choose>
-				<fl:when test="${myBooleanValue}==true">
-					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME (nach...): ${myRightPart}</echo>
-					<fl:let>myCase ::= "${myCase}f"</fl:let>
-				</fl:when>	
-				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS (nach...): ${myRightPart}</echo>
-					<fl:let>myCase ::= "${myCase}d"</fl:let>
-				</otherwise>
-				</fl:choose>
-			</fl:when>	
-			<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-				<echo>Ergebnis von isFilenameRelevantVMD (= ${myValueIsBoolean} )nicht interpretierbar (nach...): ${myRightPart}</echo>
-				<fl:let>myCase ::= "${myCase}X"</fl:let>
-			</otherwise>
-			</fl:choose>
-		</otherwise>
-	</fl:choose>	
-	<echo>Soweit ermittelter Fall: ${myCase}</echo>
-	<fl:let>returnAnalyze ::= true</fl:let>
-	<fl:let>returnString ::= "${myCase}"</fl:let>										
+	<echo>Teilanalyze Fall: ${myCase}</echo>
+	<fl:let>returnControl ::= true</fl:let>
+	<fl:let>returnString ::= "${myCase}"</fl:let>	
 </target>
-
 <target name="-FGLCopyLocal_Control">
 	<fl:let>myAnalyze ::= "${analyze}"</fl:let>
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
