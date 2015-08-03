@@ -705,20 +705,20 @@
 	 
 	   var text = attributes.get("text");
        var match = attributes.get("matchstring");
-      print("matchstring="+match);
+       //print("matchstring="+match);
 	  
 	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
 	   var matchToEncode=match;
 	   var matchEncoded = encodeMyHtml(matchToEncode);
-	   print("encoded matchstring=" + matchEncoded);
+	   //print("encoded matchstring=" + matchEncoded);
 	   
 	    var textToEncode=text;
 		var textEncoded = encodeMyHtml(textToEncode);
-	   print("encoded textstring=" + textEncoded);
+	   //print("encoded textstring=" + textEncoded);
        sReturn = getStrLeftStr(textEncoded, matchEncoded);
 	   
 	   sReturn = unescape(sReturn);
-	   print("sReturn="+sReturn);
+	   //print("sReturn="+sReturn);
 	   
        project.setProperty(attributes.get("returnstring"), sReturn);
 	   
@@ -801,22 +801,29 @@
   <!-- Hier wird der ggfs. übergebene Projektdateiname durch eine Hostspezifische Erweiterung uebersteuert. -->
   <!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
   <fl:let>vmdLocalFile ::= "project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
-  <echo>Name der lokalen Steuerungsdatei waere: ${vmdLocalFile}</echo>
+  <!-- <echo>Name der lokalen Steuerungsdatei waere: ${vmdLocalFile}</echo> -->
 	
-	<!-- Noch KAPUTT: Hole den Pfad aus der $vmd - Property, die in der Batch uebergeben wurde -->
+	<!-- Hole den Pfad aus der $vmd - Property, die in der Batch uebergeben wurde -->
 	<!-- Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->	
 	<fl:let>vmdUsed ::= '${vmd}'</fl:let><!-- Merke: Die Pfadangebn in der Batch sind mit Slash und nicht mit Backslash -->
-    <echo>vmdUsed = ${vmdUsed}</echo>		
-		
-	<fl:let>sfileadir ::= split('${vmdUsed}','/')</fl:let>
-	<!-- <fl:let>sfileadir ::= split(${vmdUsed},'\\\\')</fl:let> --><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
+   
+	<!-- Konvertiere den Pfad in Windows-Format -->
+	<path id="pathToConfigFile">
+      <pathelement location="${vmdUsed}"/>
+    </path>
+    <pathconvert targetos="windows" property="project.path.fileconfig" refid="pathToConfigFile">
+    </pathconvert>
+    <echo>Normierter Pfad (Windows Style)= ${project.path.fileconfig}</echo>
+	
+	<fl:let>vmdUsed::='${project.path.fileconfig}'</fl:let>
+	<fl:let>sfileadir ::= split('${vmdUsed}','\\\\')</fl:let><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
 											
-	<!-- 2. ermittle die groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
+	<!-- 2. ermittle die Groesse der liste, damit man an den letzten Teil kommt. Entweder ein Verzeichnis oder eine Datei. -->
 	<!--    Merke: #{size(${src.fileadir})} funktioniert nicht. Siehe tryoutAnt_FlakaListHandling -->																													
 	<!-- Nutze deshalb auf src.fileadir den scriptdef aufruf -->											
 	<arrayElementCountJsZZZ arrayinput="${sfileadir}" ireturn="mylistasize"/>
-	<fl:echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</fl:echo>								
-	<echo>Pfadbestandteilausgabe</echo>
+	<fl:echo>groesse tempa per scriptdef Aufruf: ${mylistasize}</fl:echo>					
+	 <echo>Pfadbestandteilausgabe</echo>
 	<ac:for param="mydiry" list="${sfileadir}"><!-- Beachte das for nur für sequential funktioniert und darin mit @ auf die Param-Variable zugegriffen werden kann. -->
 		<sequential>
 			<echo>Pfadbestandteil: @{mydiry}</echo>
@@ -831,24 +838,23 @@
 	<var name="op" value="-"/>
 	<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
 	<echo>errechneter wert fuer Index des letzten Pfadteils: ${index}</echo>
-	<fl:let>xtractedvalue ::= split('${vmd}','/')[${index}]; 
-	<!-- <fl:let>xtractedvalue ::= split('${vmd}','\\\\')[${index}];  -->
+	<!-- <fl:let>xtractedvalue ::= split('${vmd}','/')[${index}];  -->
+	<fl:let>xtractedvalue ::= split('${vmdUsed}','\\\\')[${index}];  
 		<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
 	</fl:let>
-	<echo>An letzter Stelle gefundener wert: ${xtractedvalue}</echo>
+	 <echo>An letzter Stelle gefundener wert: ${xtractedvalue}</echo>
 
 	<!-- Hole den Pfad, als Teil links vom Dateinamen -->
 	<!-- Merke: Format muss man verwenden um den Backslash in den String zu bekommen -->
 	<!-- Merke: hier den format ausdruck noch mit #{ } umgeben, sonst wird er nicht ausgerechnet sondern als Text übergeben. -->
 	<!-- Merke: das in eine Variable packen, sonst kann man es nicht an 'stringLeftStringZZZ' uebergeben. -->
 	<!-- <fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo>  -->
-	<!-- <fl:let>xtractedvalueTemp ::= #{"format('\\%s', xtractedvalue)"}	</fl:let> -->
-	<fl:let>xtractedvalueTemp ::= #{"format('/%s', xtractedvalue)"}</fl:let>
+	<fl:let>xtractedvalueTemp ::= #{"format('\\%s', xtractedvalue)"}	</fl:let>
+	<!-- <fl:let>xtractedvalueTemp ::= #{"format('/%s', xtractedvalue)"}</fl:let> -->
 	<stringLeftStringZZZ text="${vmdUsed}" matchstring="${xtractedvalueTemp}" returnstring="myPath" />
 	<echo>Der Pfad ist: '${myPath}'</echo>
 
-  
-  <fl:let>vmdLocalFilePath ::= "${myPath}/project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+  <fl:let>vmdLocalFilePath ::= "${myPath}\\project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
   <echo>Pruefe Existenz lokaler Uebersteuerungs-Projektdatei: ${vmdLocalFilePath}</echo>
   
   <!-- Noch Kaputt: Versuche hier die Slashe durch backslashe zu ersetzten -->
@@ -868,10 +874,11 @@
   
   <fl:choose>
 		<fl:when test=" '${vmdLocalFilePath}'.tofile.exists == true ">
-			<echo>Datei existiert: ${vmdLocalFilePath}</echo>
+			<echo>Lokale Projektdatei existiert: ${vmdLocalFilePath}</echo>
 			<fl:let>vmdUsed ::= '${vmdLocalFilePath}'</fl:let>
 		</fl:when>
 		<otherwise>
+			<echo>Lokale Projektdatei existiert NICHT: ${vmdLocalFilePath}</echo>
 			<fl:let>vmdUsed ::= '${vmd}'</fl:let>
 		</otherwise>
 	</fl:choose>
@@ -1123,12 +1130,32 @@
 											 <fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
 										     <fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 									</fl:when>
-
+									
+									<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
+									<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
+									     Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
+									<!--<path id="pathTempLeft">
+									  <pathelement location="${myLeftPart}"/>
+									</path>
+									<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
+									</pathconvert>
+									<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
+									
+									<path id="pathTempRight">
+									  <pathelement location="${myRightPart}"/>
+									</path>
+									<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
+									</pathconvert>
+									<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
+									
+									
 									<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
 									<fl:let>myCase ::= "undefined"</fl:let>																										
 									<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
 										<param name="leftPart" value="${myLeftPart}"/>
 										<param name="rightPart" value="${myRightPart}"/>
+										<!-- <param name="leftPart" value="${part.path.temp.left}"/>
+										<param name="rightPart" value="${part.path.temp.right}"/> -->
 									</antcallback>
 											
 									<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
@@ -1138,7 +1165,9 @@
 									<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
 												<param name="analyze" value="${myAnalyze}"/>
 												<param name="leftPart" value="${myLeftPart}"/>
-												<param name="rightPart" value="${myRightPart}"/>												
+												<param name="rightPart" value="${myRightPart}"/>
+											<!-- 	<param name="leftPart" value="${part.path.temp.left}"/>
+												<param name="rightPart" value="${part.path.temp.right}"/>	 -->											
 									</antcallback>
 									<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
 									<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
