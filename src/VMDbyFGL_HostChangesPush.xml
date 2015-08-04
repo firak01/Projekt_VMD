@@ -857,21 +857,6 @@
   <fl:let>vmdLocalFilePath ::= "${myPath}\\project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
   <echo>Pruefe Existenz lokaler Uebersteuerungs-Projektdatei: ${vmdLocalFilePath}</echo>
   
-  <!-- Noch Kaputt: Versuche hier die Slashe durch backslashe zu ersetzten -->
-  <!-- verwendet pathconvert, so wie in:
-    
-  <pathconvert property="mypathfixed" dirsep="/">
-         <path location="${mypath}"/>
-</pathconvert>
-<copy todir="${my.target_dir}" filtering="true">
-            <fileset dir="${basedir}/src/main/conf" includes="my.properties"/>
-            <filterset recurse="true">
-                  <filter token="mypath" value="${mypathfixed}"/>
-            </filterset>
-</copy>
--->
-  
-  
   <fl:choose>
 		<fl:when test=" '${vmdLocalFilePath}'.tofile.exists == true ">
 			<echo>Lokale Projektdatei existiert: ${vmdLocalFilePath}</echo>
@@ -884,16 +869,28 @@
 	</fl:choose>
 			
   <echo>Verwende Projektdatei: ${vmdUsed}</echo>
-  <loadproperties>
-  	<file file="${vmdUsed}"/>
-  	<!--<file file="${env.VMD}"/>-->
-  </loadproperties> 
-  <echo>test1 hat den Wert: ${test1}</echo>  	 
-  <echo>conf.dirRepositoryVmdPath hat den Wert: ${conf.dirRepositoryVmdPath}</echo>
-  <property name="dest.dirRepositoryVmdPath" value="c:/1fgl/repository/Projekt_VMD" />  
+  <property name="projekt.configPathVmd" value="${vmdUsed}" />
+
+	<echo>Verwendet Projektkonfiguration: ${projekt.configPathVmd}</echo>
+	<loadproperties>
+		<file file="${projekt.configPathVmd}"/>
+    </loadproperties> 	 
+	<echo>test1 hat den Wert: ${test1}</echo>
+	<echo>OPERATION_MODE_VMD hat den Wert: ${OPERATION_MODE_VMD}</echo> 
+	<property name="project.vmd.operation_mode" value="${OPERATION_MODE_VMD}" />  
+	
+	<echo>conf.dirRepositoryPath_VMD hat den Wert: ${conf.dirRepositoryPath_VMD}</echo>
+	<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />  
  
-  <!-- TODO GOON: Prüfe die Controldateien auf Existenz und Validität. Setze bGOON Variablen, die dann in den Targets abgeprüft werden. -->
+  <!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
+  
+  <!-- TODO : Prüfe die Controldatei auf Validität. -->
   	
+	<!-- TODO GOON: Mache ein Target -FglCopyRepository_Main 
+	                            packe darin die Property - Definitionen, die dafür wichtig sind
+								Rufe -FglRepositoryBackup und -FglCopyClient2archive darin auf, über antcallback.
+	-->
+	                           
   	
   <!-- ######### CLIENT ############################################################################## -->
   <!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
@@ -1023,20 +1020,34 @@
 	<!-- Gesteuert wird das über eine Datei, die für jeden HOST-Rechner individuell ist. 
 	       Unterschied zu FGLCopyRepository ist, das hier der Dateiname geändert werden MUSS, d.h. in der Steuerdatei MUSS hinter dem Gleichheitszeichen ein Dateipfad stehen.-->
 	
-	<!-- 1. Rechne den Dateinamen aus -->
-	<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
-	       dies passiert hier durch flaka´s install-property handler task -->
-	<fl:install-property-handler />
-	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-	
-	 <!-- Todo: Eigentlich müssen oben erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
+	 <!-- Todo: Eigentlich müssen oben (in Decalration) erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
 	<property name="conf.dirRepositoryVmdPath" value="${dest.dirRepositoryVmdPath}" /> 
-	<property name="conf.dirRepositoryVmdBat" value="${dest.dirRepositoryVmdBat}" />
-	
+	<property name="conf.dirRepositoryVmdBat" value="${dest.dirRepositoryVmdBat}" />	
 	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
 
-	<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-    <property name="conf.copyLocalFileName" value = "Fgl${env.COMPUTERNAME}_copy_local.properties"/>
+	<!-- Falls der Test - Modus angestellt ist, verwende die Test-Konfigurationsdatei und rechne den Dateinamen nicht aus.-->
+	<ac:if>
+		<ac:equals arg1="${project.vmd.operation_mode}" arg2="test" />
+		<ac:then>
+			<fl:echo>testmodus</fl:echo> 
+			
+			<property name="conf.copyLocalFileName" value = "test_vmd.properties"/>
+		</ac:then>		
+		<ac:else>													
+			<fl:echo>echtmodus</fl:echo>
+			
+			<!-- 1. Rechne den Dateinamen aus -->
+			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+				  dies passiert hier durch flaka´s install-property handler task -->
+				<fl:install-property-handler />
+				<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+	
+				<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+				<property name="conf.copyLocalFileName" value = "Fgl${env.COMPUTERNAME}_copy_local.properties"/>
+		</ac:else>
+	</ac:if><!-- Testmodus oder nicht -->
+	
+	
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
@@ -1206,41 +1217,52 @@
 				</sequential>
 			</for>		
 			
-			<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
-			<!-- Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem Postfix _RECHNERNAME ausstatten -->
-			<!-- Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus, danach den Kopiervorgang für die Datei ohne Postfix. -->				
-			<!--### 1. Lauf Kopiere die Dateien (incl. NAMENSERWEITERUNG) der beiden Arrays  ##################### -->
+			
+			<arrayElementCountJsZZZ arrayinput="${myDestaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+			<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
+			<ac:if>
+				<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
+				<ac:then>
+					<echo>Keine Dateien im Array => keine Verarbeitung</echo>
+				</ac:then>
+				<ac:else>	
+					<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
+					<!-- Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem Postfix _RECHNERNAME ausstatten -->
+					<!-- Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus, danach den Kopiervorgang für die Datei ohne Postfix. -->				
+					<!--### 1. Lauf Kopiere die Dateien (incl. NAMENSERWEITERUNG) der beiden Arrays  ##################### -->
 
-			<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
-			<!-- 1a. Dateiendung entfernen -->
-			<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
+					<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
+					<!-- 1a. Dateiendung entfernen -->
+					<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
 		
-			<!-- 1b. Hostnamen und Endung ausrechnen -->
-			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
-					dies passiert hier durch flaka´s install-property handler task -->
-			<fl:install-property-handler />
-			<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->			
-			<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
-			
-			<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
-			<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
-		
-			<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
-					<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-					<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-					<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-					<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
-			</antcallback>
-			
-			
-			<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
-			<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
-					<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-					<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-					<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-					<param name="desta.filename" value="${myDestaTotal.filename}"/>					
-			</antcallback>
-		</fl:when>
+					<!-- 1b. Hostnamen und Endung ausrechnen -->
+					<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+							dies passiert hier durch flaka´s install-property handler task -->
+					<fl:install-property-handler />
+					<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->			
+					<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
+					
+					<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
+					<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
+				
+					<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
+							<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+							<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+							<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+							<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
+					</antcallback>
+					
+					
+					<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
+					<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
+							<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+							<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+							<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+							<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+					</antcallback>				
+				</ac:else>
+			</ac:if><!-- Anzahl der Dateien pruefen -->
+		</fl:when><!-- Existiert die Konfigurationsdateie -->
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 				<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
 				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
