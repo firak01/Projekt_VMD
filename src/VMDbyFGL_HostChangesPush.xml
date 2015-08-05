@@ -915,7 +915,7 @@
 	</target>
   
   <!-- ################################################################################# -->
-   <target name="compile" depends="-declaration, -init,-FglRepositoryBackup,-FglCopyClient2archive,-FglCopyLocal_Main">
+   <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main">
    <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
@@ -947,12 +947,35 @@
 	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
 </target>
 
-<!-- ################################################################################# -->       
-<target name="-FglRepositoryBackup">
+<!-- ################################################################################# -->  
+<target name="-FglRepository_Main">
 	<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
 	<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
   
-	<echo>Creating Backup:</echo>
+	<!-- TODO: noch kaputt, eigentlich soll es mehr gekapselt werden. -->
+	<antcallback target="-FglRepositoryBackup" return="returnControl">
+		<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
+		<param name="targetDirectory" value="${dest.dirRepositoryVmdBackupPath}"/>
+		
+		<!-- <param name="leftPart" value="${part.path.temp.left}"/>
+		<param name="rightPart" value="${part.path.temp.right}"/> -->
+	</antcallback>
+	
+	<!-- TODO: returnControl prüfen -->
+	<antcallback target="-FglCopyClient2archive" return="returnControl">
+		<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
+		<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
+		
+		<!-- <param name="leftPart" value="${part.path.temp.left}"/>
+		<param name="rightPart" value="${part.path.temp.right}"/> -->
+	</antcallback>
+
+</target>
+     
+<target name="-FglRepositoryBackup">	
+	<fl:let>myTargetDirectory ::= "${targetDirectory}"</fl:let>
+	<echo>Creating Backup: ${myTargetDirectory}</echo>
+	
 	
 	<!-- Example of howto change file modification date, usefull to enforce 'overwrite' -->
 	<!-- <touch>
@@ -961,13 +984,13 @@
 	-->
 
 	<!-- Erstelle sicherheitshalber die Pfade -->
-	<mkdir dir="//${dest.dirRepositoryVmdPath}"/>
-	<mkdir dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" />
-	<mkdir dir="//${dest.dirRepositoryVmdBackupPath}"/>
+<!-- 	<mkdir dir="//${dest.dirRepositoryVmdPath}"/>
+	<mkdir dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" /> -->
+	<mkdir dir="//${myTargetDirectory}"/>
 
 	<echo>a) VmdRepository Archive:</echo>
 	<!-- Mache von den Zielverzeichnissen ein Backup -->
-	  <zip destfile="//${dest.dirRepositoryVmdBackupPath}/${backup_RepositoryArchive.name}"
+	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryArchive.name}"
        basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}"
 	/>
 	
@@ -977,17 +1000,20 @@
 		<fileset dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" includes="**/*.txt"/>
 	</delete> -->
 	
-	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind. -->
+	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind.
+               Meker: Dabei gilt, das diese Dateien über alle Rechner identischen Inhalt haben sollen.-->
 	<echo>b) VmdRepository Misc:</echo>
 	<!-- Mache von den Zielverzeichnissen ein Backup -->
-	  <zip destfile="//${dest.dirRepositoryVmdBackupPath}/${backup_RepositoryMisc.name}"
+	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryMisc.name}"
        basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}"
 	/>
 </target>
 		
 <target name="-FglCopyClient2archive">
-	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
+	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->	
 	<echo>Pushing Files to Repository:</echo>
+	<fl:let>myTargetDirectory ::= "${targetDirectory}"</fl:let>
+		
 	<echo>a) VMD File:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
@@ -1003,7 +1029,7 @@
 	<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
 	<echo>b) Misc Files:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
+	<copy todir="//${myTargetDirectory}/${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
 		 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
 		<include name="**.txt"/>
