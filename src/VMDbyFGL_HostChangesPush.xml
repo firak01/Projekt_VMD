@@ -805,7 +805,7 @@
 	
 	<!-- Hole den Pfad aus der $vmd - Property, die in der Batch uebergeben wurde -->
 	<!-- Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->	
-	<fl:let>vmdUsed ::= '${vmd}'</fl:let><!-- Merke: Die Pfadangebn in der Batch sind mit Slash und nicht mit Backslash -->
+	<fl:let>vmdUsed ::= '${vmd}'</fl:let><!-- Merke: Die Pfadangaben in der Batch sind mit Slash und nicht mit Backslash -->
    
 	<!-- Konvertiere den Pfad in Windows-Format -->
 	<path id="pathToConfigFile">
@@ -876,21 +876,18 @@
 		<file file="${projekt.configPathVmd}"/>
     </loadproperties> 	 
 	<echo>test1 hat den Wert: ${test1}</echo>
-	<echo>OPERATION_MODE_VMD hat den Wert: ${OPERATION_MODE_VMD}</echo> 
-	<property name="project.vmd.operation_mode" value="${OPERATION_MODE_VMD}" />  
 	
-	<echo>conf.dirRepositoryPath_VMD hat den Wert: ${conf.dirRepositoryPath_VMD}</echo>
-	<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />  
+	<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 		
+	<property name="conf.dirRepositoryPath_VMD" value="${project.vmd.dirRepositoryPath}" /><!-- die Programmteile beziehen sich auf conf. Variablen -->
+		
+	<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>	
+	<property name="conf.operation_mode" value="${project.vmd.operation_mode}" />  	
+	  
  
   <!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
   
   <!-- TODO : Prüfe die Controldatei auf Validität. -->
-  	
-	<!-- TODO GOON: Mache ein Target -FglCopyRepository_Main 
-	                            packe darin die Property - Definitionen, die dafür wichtig sind
-								Rufe -FglRepositoryBackup und -FglCopyClient2archive darin auf, über antcallback.
-	-->
-	                           
+  	                    
   	
   <!-- ######### CLIENT ############################################################################## -->
   <!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
@@ -949,27 +946,65 @@
 
 <!-- ################################################################################# -->  
 <target name="-FglRepository_Main">
-	<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
-	<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
-  
-	<!-- TODO: noch kaputt, eigentlich soll es mehr gekapselt werden. -->
-	<antcallback target="-FglRepositoryBackup" return="returnControl">
-		<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
-		<param name="targetDirectory" value="${dest.dirRepositoryVmdBackupPath}"/>
-		
-		<!-- <param name="leftPart" value="${part.path.temp.left}"/>
-		<param name="rightPart" value="${part.path.temp.right}"/> -->
-	</antcallback>
+	<!-- Prüfe die Existenz der notwendigen Konfigurations-Properties -->
+	<fl:let>myGoon ::= true</fl:let>
+	<ac:if>
+		<ac:and>
+			<isset property="conf.dirRepositoryPath_VMD"/>	
+			<ac:equals arg1="${myGoon}" arg2="true" />
+		</ac:and>
+		<ac:then>
+			<fl:echo>conf.dirRepositoryPath_VMD hat den Wert: '${conf.dirRepositoryPath_VMD}'</fl:echo>
+			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />
+		</ac:then>
+		<ac:else>
+			<fl:let>myGoon ::= false</fl:let>
+		</ac:else>
+	</ac:if>
 	
-	<!-- TODO: returnControl prüfen -->
-	<antcallback target="-FglCopyClient2archive" return="returnControl">
-		<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
-		<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
-		
-		<!-- <param name="leftPart" value="${part.path.temp.left}"/>
-		<param name="rightPart" value="${part.path.temp.right}"/> -->
-	</antcallback>
-
+	
+	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
+	<fl:echo>myGoon hat den Wert: ${myGoon}</fl:echo>
+	<ac:if>
+	<ac:equals arg1="${myGoon}" arg2="false" />
+		<ac:then>
+			<fl:echo>NICHT alle notwendigen Konfigurations-Properties vorhanden. Fahre NICHT fort.</fl:echo>
+		</ac:then>
+		<ac:else>
+			<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
+			
+			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
+			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
+		  
+			<!-- TODO: noch kaputt, eigentlich soll es mehr gekapselt werden. -->
+			<antcallback target="-FglRepositoryBackup" return="returnControl">
+				<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
+				<param name="targetDirectory" value="${dest.dirRepositoryVmdBackupPath}"/>
+				
+				<!-- <param name="leftPart" value="${part.path.temp.left}"/>
+				<param name="rightPart" value="${part.path.temp.right}"/> -->
+			</antcallback>
+			
+			<!-- TODO: returnControl prüfen -->
+			<ac:if>
+				<ac:equals arg1="${returnControl}" arg2="true" />
+				<ac:then>
+					<fl:echo>FglRepositoryBackup erfolgreich. Fahre fort.</fl:echo> 
+					
+					<antcallback target="-FglCopyClient2archive" return="returnControl">
+				<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
+				<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
+				
+				<!-- <param name="leftPart" value="${part.path.temp.left}"/>
+				<param name="rightPart" value="${part.path.temp.right}"/> -->
+			</antcallback>
+				</ac:then>		
+				<ac:else>													
+					<fl:echo>FglRepositoryBackup NICHT erfolgreich. Ueberspringe das Kopieren.</fl:echo> 
+				</ac:else>
+			</ac:if><!-- Backup des Repositories erfolgreich oder nicht -->
+		</ac:else>
+	</ac:if>
 </target>
      
 <target name="-FglRepositoryBackup">	
@@ -1007,6 +1042,8 @@
 	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryMisc.name}"
        basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}"
 	/>
+	<fl:let>myReturnControl ::= true"</fl:let>
+	<fl:let>returnControl ::= "${myReturnControl}"</fl:let>
 </target>
 		
 <target name="-FglCopyClient2archive">
@@ -1046,17 +1083,46 @@
 	<!-- Gesteuert wird das über eine Datei, die für jeden HOST-Rechner individuell ist. 
 	       Unterschied zu FGLCopyRepository ist, das hier der Dateiname geändert werden MUSS, d.h. in der Steuerdatei MUSS hinter dem Gleichheitszeichen ein Dateipfad stehen.-->
 	
-	 <!-- Todo: Eigentlich müssen oben (in Decalration) erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
+	
+	<!-- Prüfe die Existenz der notwendigen Konfigurations-Properties -->
+	<fl:let>myGoon ::= true</fl:let>
+	<ac:if>
+		<ac:and>
+			<isset property="conf.operation_mode"/>	
+			<ac:equals arg1="${myGoon}" arg2="true" />
+		</ac:and>
+		<ac:then>
+			<fl:echo>conf.operation_mode hat den Wert: '${conf.operation_mode}'</fl:echo>
+			<fl:let>myOperationMode ::= "${conf.operation_mode}"</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:let>myOperationMode ::= "prod"</fl:let>
+			<fl:let>myGoon ::= true</fl:let>
+		</ac:else>
+	</ac:if>
+	
+	
+	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
+	<fl:echo>myGoon hat den Wert: ${myGoon}</fl:echo>
+	<ac:if>
+		<ac:equals arg1="${myGoon}" arg2="false" />
+		<ac:then>
+			<fl:echo>NICHT alle notwendigen Konfigurations-Properties vorhanden. Fahre NICHT fort.</fl:echo>
+		</ac:then>
+		<ac:else>
+			<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
+			
+	 <!-- Todo: Eigentlich müssen oben (in Declaration) erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
 	<property name="conf.dirRepositoryVmdPath" value="${dest.dirRepositoryVmdPath}" /> 
 	<property name="conf.dirRepositoryVmdBat" value="${dest.dirRepositoryVmdBat}" />	
 	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
 
 	<!-- Falls der Test - Modus angestellt ist, verwende die Test-Konfigurationsdatei und rechne den Dateinamen nicht aus.-->
+	<!-- <fl:echo>myOperationMode ist '${myOperationMode}'</fl:echo> -->
 	<ac:if>
-		<ac:equals arg1="${project.vmd.operation_mode}" arg2="test" />
+		<ac:equals arg1="${myOperationMode}" arg2="test" />
 		<ac:then>
-			<fl:echo>testmodus</fl:echo> 
-			
+			<fl:echo>testmodus</fl:echo> 			
 			<property name="conf.copyLocalFileName" value = "test_vmd.properties"/>
 		</ac:then>		
 		<ac:else>													
@@ -1128,9 +1194,9 @@
 						<ac:else>													
 							<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
 							<stringSubStringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
-							<fl:echo message="subtext = ${subtext}" />
+							<!-- <fl:echo message="subtext = ${subtext}" /> -->
 							<ac:if>
-								<!-- <ac:equals arg1="${subtext}" arg2="#" /> -->
+								<ac:equals arg1="${subtext}" arg2="#" />
 								<ac:then>
 									<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
 								</ac:then>
@@ -1287,14 +1353,17 @@
 							<param name="desta.filename" value="${myDestaTotal.filename}"/>					
 					</antcallback>				
 				</ac:else>
-			</ac:if><!-- Anzahl der Dateien pruefen -->
-		</fl:when><!-- Existiert die Konfigurationsdateie -->
+			</ac:if><!-- Anzahl der Dateien pruefen -->		
+		</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 				<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
 				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
 		</otherwise>
 	</fl:choose>
-
+	
+	</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
+	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
+	
 </target>
 <!-- ######################################################################### -->
 <target name="-FGLCopyLocal_Copy">
