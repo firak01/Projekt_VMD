@@ -788,18 +788,18 @@
   
     <!-- Ausgangsverzeichnis: Das Repository -->
   	<!-- a) Feste Unterverzeichnisstruktur -->
-  <property name="dest.dirRepositoryVmdLib" value="lib" />
-  <property name="dest.dirRepositoryVmdBat" value="bat" />
-  <property name="dest.dirRepositoryVmdSrc" value="src" />
-  <property name="dest.dirRepositoryVmdMisc" value="misc" />
-  <property name="dest.dirRepositoryVmdTest" value="test" />
-  <property name="dest.dirRepositoryVmdArchive" value="vmd" />
+  <property name="project.vmd.dirRepositoryLib" value="lib" />
+  <property name="project.vmd.dirRepositoryBat" value="bat" />
+  <property name="project.vmd.dirRepositorySrc" value="src" />
+  <property name="project.vmd.dirRepositoryMisc" value="misc" />
+  <property name="project.vmd.dirRepositoryTest" value="test" />
+  <property name="project.vmd.dirRepositoryArchive" value="vmd" />
   
   <!-- b) Als Umgebungsvarialbe (Batch) oder Argument (Eclipse) übergebene Konfigurationsdatei --> 
   <!-- TODO GOON: Fallunterscheidung, je nachdem was existiert -->
   
   <!-- Hier wird der ggfs. übergebene Projektdateiname durch eine Hostspezifische Erweiterung uebersteuert. -->
-  <!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+  <!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET-Befehl und ENTER --> 	  
   <fl:let>vmdLocalFile ::= "project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
   <!-- <echo>Name der lokalen Steuerungsdatei waere: ${vmdLocalFile}</echo> -->
 	
@@ -869,19 +869,17 @@
 	</fl:choose>
 			
   <echo>Verwende Projektdatei: ${vmdUsed}</echo>
-  <property name="projekt.configPathVmd" value="${vmdUsed}" />
+  <property name="projekt.vmd.configPath" value="${vmdUsed}" />
 
-	<echo>Verwendet Projektkonfiguration: ${projekt.configPathVmd}</echo>
+	<echo>Verwendet Projektkonfiguration: ${projekt.vmd.configPath}</echo>
 	<loadproperties>
-		<file file="${projekt.configPathVmd}"/>
+		<file file="${projekt.vmd.configPath}"/>
     </loadproperties> 	 
 	<echo>test1 hat den Wert: ${test1}</echo>
 	
-	<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 		
-	<property name="conf.dirRepositoryPath_VMD" value="${project.vmd.dirRepositoryPath}" /><!-- die Programmteile beziehen sich auf conf. Variablen -->
-		
+	<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 				
 	<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>	
-	<property name="conf.operation_mode" value="${project.vmd.operation_mode}" />  	
+		
 	  
  
   <!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
@@ -896,6 +894,11 @@
   <property name="src.dirFglClient" value="client" /> 
   <property name="src.dirFglPath" value="C:/1fgl"/>
   <property name="src.dirFglClientPath" value="${src.dirFglPath}/${src.dirFglClient}" /> 
+  
+  
+	<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
+	<property name="project.vmd.dirPathClientFgl" value="${project.vmd.dirPathClientFgl}" />  	
+  
 
   <!-- Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
   	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
@@ -937,8 +940,8 @@
 	<tstamp>
 	<format property="current.time" pattern="yyyyMMdd_HHmmss" locale="en,GB"/>
 	<!--<format property="backup_archive.name" pattern="'EinArchiv'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>-->
-	<format property="backup_RepositoryArchive.name" pattern="'${dest.dirRepositoryVmdArchive}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
-	<format property="backup_RepositoryMisc.name" pattern="'${dest.dirRepositoryVmdMisc}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
+	<format property="backup_RepositoryArchive.name" pattern="'${project.vmd.dirRepositoryArchive}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
+	<format property="backup_RepositoryMisc.name" pattern="'${project.vmd.dirRepositoryMisc}'yyyyMMdd_HHmmss'.zip'" locale="en,GB"/>
 	</tstamp>
 	<echo>Current Timestamp: ${current.time}</echo>
 	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
@@ -950,12 +953,12 @@
 	<fl:let>myGoon ::= true</fl:let>
 	<ac:if>
 		<ac:and>
-			<isset property="conf.dirRepositoryPath_VMD"/>	
+			<isset property="project.vmd.dirRepositoryPath"/>	
 			<ac:equals arg1="${myGoon}" arg2="true" />
 		</ac:and>
 		<ac:then>
-			<fl:echo>conf.dirRepositoryPath_VMD hat den Wert: '${conf.dirRepositoryPath_VMD}'</fl:echo>
-			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />
+			<property name="conf.dirRepositoryPath_VMD" value="${project.vmd.dirRepositoryPath}" />
+			<fl:echo>conf.dirRepositoryPath_VMD hat den Wert: '${conf.dirRepositoryPath_VMD}'</fl:echo>			
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
@@ -974,6 +977,7 @@
 			<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
 			
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
+			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />			
 			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
 		  
 			<!-- TODO: noch kaputt, eigentlich soll es mehr gekapselt werden. -->
@@ -1018,21 +1022,21 @@
 	</touch>
 	-->
 
-	<!-- Erstelle sicherheitshalber die Pfade -->
+	<!-- Erstelle sicherheitshalber die Pfade, dabei gehe ich davon aus, dass alle Unterverzeichnisse automtisch erstellt werden. -->
 <!-- 	<mkdir dir="//${dest.dirRepositoryVmdPath}"/>
-	<mkdir dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" /> -->
+	<mkdir dir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" /> -->
 	<mkdir dir="//${myTargetDirectory}"/>
 
 	<echo>a) VmdRepository Archive:</echo>
 	<!-- Mache von den Zielverzeichnissen ein Backup -->
 	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryArchive.name}"
-       basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}"
+       basedir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}"
 	/>
 	
 	<!-- damit die Aenderung: Datei wurde geloescht mitbekommen wird, alle Dateien (nur die Programmdateien!!!) nach dem Backup loeschen -->
 	<!-- NEIN, nicht im VMD_Projekt, da hier die Dateien von verschiedenen Rechnern in einem Verzeichnis zusammengeführt werden.
     	<delete includeemptydirs="false">
-		<fileset dir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" includes="**/*.txt"/>
+		<fileset dir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" includes="**/*.txt"/>
 	</delete> -->
 	
 	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind.
@@ -1040,7 +1044,7 @@
 	<echo>b) VmdRepository Misc:</echo>
 	<!-- Mache von den Zielverzeichnissen ein Backup -->
 	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryMisc.name}"
-       basedir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdMisc}"
+       basedir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryMisc}"
 	/>
 	<fl:let>myReturnControl ::= true"</fl:let>
 	<fl:let>returnControl ::= "${myReturnControl}"</fl:let>
@@ -1053,7 +1057,7 @@
 		
 	<echo>a) VMD File:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${dest.dirRepositoryVmdPath}/${dest.dirRepositoryVmdArchive}" overwrite="false"  preservelastmodified="true"> 
+	<copy todir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
 	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
@@ -1066,7 +1070,7 @@
 	<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
 	<echo>b) Misc Files:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${myTargetDirectory}/${dest.dirRepositoryVmdMisc}" overwrite="false"  preservelastmodified="true"> 
+	<copy todir="//${myTargetDirectory}/${project.vmd.dirRepositoryMisc}" overwrite="false"  preservelastmodified="true"> 
 	  <fileset dir="//${src.dirFglClientPath}">	
 		 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
 		<include name="**.txt"/>
@@ -1092,14 +1096,31 @@
 			<ac:equals arg1="${myGoon}" arg2="true" />
 		</ac:and>
 		<ac:then>
-			<fl:echo>conf.operation_mode hat den Wert: '${conf.operation_mode}'</fl:echo>
-			<fl:let>myOperationMode ::= "${conf.operation_mode}"</fl:let>
+			<fl:echo>project.vmd.operation_mode hat den Wert: '${project.vmd.operation_mode}'</fl:echo>
+			<fl:let>conf.operation_mode ::= "${project.vmd.operation_mode}"</fl:let>
 		</ac:then>
 		<ac:else>
-			<fl:let>myOperationMode ::= "prod"</fl:let>
+			<fl:let>conf.operation_mode ::= "prod"</fl:let>
 			<fl:let>myGoon ::= true</fl:let>
 		</ac:else>
 	</ac:if>
+	
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.dirPathClientFgl"/>	
+			<ac:equals arg1="${myGoon}" arg2="true" />
+		</ac:and>
+		<ac:then>
+			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>
+			<fl:let>conf.dirPathClientFgl ::= "${project.vmd.dirPathClientFgl}"</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:let>conf.dirPathClientFgl ::= "prod"</fl:let>
+			<fl:let>myGoon ::= true</fl:let>
+		</ac:else>
+	</ac:if>
+	
+	
 	
 	
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
@@ -1114,24 +1135,25 @@
 			
 	 <!-- Todo: Eigentlich müssen oben (in Declaration) erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
 	<property name="conf.dirRepositoryVmdPath" value="${dest.dirRepositoryVmdPath}" /> 
-	<property name="conf.dirRepositoryVmdBat" value="${dest.dirRepositoryVmdBat}" />	
-	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}/" />
+	<property name="conf.dirRepositoryVmdBat" value="${project.vmd.dirRepositoryBat}" />	
+	<property name="src.dirFglClientFilePath" value="${conf.dirPathClientFgl}/" />
 
-	<!-- Falls der Test - Modus angestellt ist, verwende die Test-Konfigurationsdatei und rechne den Dateinamen nicht aus.-->
-	<!-- <fl:echo>myOperationMode ist '${myOperationMode}'</fl:echo> -->
+	<!-- Falls der Test - Modus angestellt ist, verwende die Test-Konfigurationsdatei und rechne den Dateinamen nicht aus.-->		
 	<ac:if>
-		<ac:equals arg1="${myOperationMode}" arg2="test" />
+		<ac:equals arg1="${project.vmd.operation_mode}" arg2="test" />
 		<ac:then>
-			<fl:echo>testmodus</fl:echo> 			
+			<fl:echo>testmodus</fl:echo> 		
+			<property name="conf.operation_mode" value="${project.vmd.operation_mode}" />  				
 			<property name="conf.copyLocalFileName" value = "test_vmd.properties"/>
 		</ac:then>		
 		<ac:else>													
 			<fl:echo>echtmodus</fl:echo>
-			
+			<property name="conf.operation_mode" value="${project.vmd.operation_mode}" />  	
+				
 			<!-- 1. Rechne den Dateinamen aus -->
 			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 				  dies passiert hier durch flaka´s install-property handler task -->
-				<fl:install-property-handler />
+			<fl:install-property-handler />
 				<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
 	
 				<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
