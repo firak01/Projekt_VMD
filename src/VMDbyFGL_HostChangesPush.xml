@@ -879,43 +879,19 @@
 	
 	<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 				
 	<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>	
-		
+	<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
 	  
  
   <!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
   
   <!-- TODO : Prüfe die Controldatei auf Validität. -->
   	                    
-  	
-  <!-- ######### CLIENT ############################################################################## -->
-  <!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
-  <!-- Achtung: verwende auch auf deutschen Systemen C:\Program Files (x86), Abaenderung in deutschen Namen Programme... bewirkt nur, das scheinbar das Verzeichnis doppelt angelegt wird. -->
-  <!-- alle .txt Dateien, die ein juengeres Aenderungsdatum haben. --> 
-  <property name="src.dirFglClient" value="client" /> 
-  <property name="src.dirFglPath" value="C:/1fgl"/>
-  <property name="src.dirFglClientPath" value="${src.dirFglPath}/${src.dirFglClient}" /> 
-  
-  
-	<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
-	<property name="project.vmd.dirPathClientFgl" value="${project.vmd.dirPathClientFgl}" />  	
-  
 
-  <!-- Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
-  	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
-	       dies passiert hier durch flaka´s install-property handler task -->
-	<fl:install-property-handler />
-	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-	<property name="src.dirFglClientFilePath" value="${src.dirFglClientPath}" />
-    <property name="src.dirFglClientFileName" value = "Fgl${env.COMPUTERNAME}_Installationen.txt"/><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-	
-	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
-    <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-	<fl:let>src.dirFglClientFilePath ::= '${src.dirFglClientFilePath}/${src.dirFglClientFileName}'</fl:let>
-	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
 	</target>
   
   <!-- ################################################################################# -->
-   <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main">
+  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main">
+    
    <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
@@ -964,6 +940,19 @@
 			<fl:let>myGoon ::= false</fl:let>
 		</ac:else>
 	</ac:if>
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.dirPathClientFgl"/>	
+			<ac:equals arg1="${myGoon}" arg2="true" />
+		</ac:and>
+		<ac:then>
+			<property name="conf.dirPathClientFgl" value="${project.vmd.dirPathClientFgl}" />
+			<fl:echo>conf.dirPathClientFgl hat den Wert: '${conf.dirPathClientFgl}'</fl:echo>			
+		</ac:then>
+		<ac:else>
+			<fl:let>myGoon ::= false</fl:let>
+		</ac:else>
+	</ac:if>
 	
 	
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
@@ -975,38 +964,51 @@
 		</ac:then>
 		<ac:else>
 			<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
+					
+			<!-- ######### CLIENT ############################################################################## -->
+			
+			<!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
+			<!-- Achtung: verwende auch auf deutschen Systemen C:\Program Files (x86), Abaenderung in deutschen Namen Programme... bewirkt nur, das scheinbar das Verzeichnis doppelt angelegt wird. -->
+			<!-- alle .txt Dateien, die ein juengeres Aenderungsdatum haben. --> 
+			 
+
+		<!-- Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
+		<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+				dies passiert hier durch flaka´s install-property handler task -->
+	<fl:install-property-handler />
+	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+	<property name="src.dirFglClientPath" value="${conf.dirPathClientFgl}" />
+    <property name="src.dirFglClientFileName" value = "Fgl${env.COMPUTERNAME}_Installationen.txt"/><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+	
+	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
+    <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
+	<fl:let>src.dirFglClientFilePath ::= '${src.dirFglClientPath}/${src.dirFglClientFileName}'</fl:let>
+	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
 			
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
 			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />			
 			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
 		  
-			<!-- TODO: noch kaputt, eigentlich soll es mehr gekapselt werden. -->
+			<!-- Mache Backup des Repositories. -->
 			<antcallback target="-FglRepositoryBackup" return="returnControl">
-				<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
 				<param name="targetDirectory" value="${dest.dirRepositoryVmdBackupPath}"/>
-				
-				<!-- <param name="leftPart" value="${part.path.temp.left}"/>
-				<param name="rightPart" value="${part.path.temp.right}"/> -->
 			</antcallback>
 			
-			<!-- TODO: returnControl prüfen -->
+			<!-- returnControl prüfen: Backup des Repositories erfolgreich oder nicht -->			
 			<ac:if>
 				<ac:equals arg1="${returnControl}" arg2="true" />
 				<ac:then>
 					<fl:echo>FglRepositoryBackup erfolgreich. Fahre fort.</fl:echo> 
 					
 					<antcallback target="-FglCopyClient2archive" return="returnControl">
-				<!-- <param name="sourceDirectory" value="${myxyz}"/> -->
-				<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
-				
-				<!-- <param name="leftPart" value="${part.path.temp.left}"/>
-				<param name="rightPart" value="${part.path.temp.right}"/> -->
+					<param name="sourceDirectory" value="${src.dirFglClientPath}"/>
+					<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
 			</antcallback>
 				</ac:then>		
 				<ac:else>													
 					<fl:echo>FglRepositoryBackup NICHT erfolgreich. Ueberspringe das Kopieren.</fl:echo> 
 				</ac:else>
-			</ac:if><!-- Backup des Repositories erfolgreich oder nicht -->
+			</ac:if><!-- End if: Backup des Repositories erfolgreich oder nicht -->
 		</ac:else>
 	</ac:if>
 </target>
@@ -1023,8 +1025,6 @@
 	-->
 
 	<!-- Erstelle sicherheitshalber die Pfade, dabei gehe ich davon aus, dass alle Unterverzeichnisse automtisch erstellt werden. -->
-<!-- 	<mkdir dir="//${dest.dirRepositoryVmdPath}"/>
-	<mkdir dir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" /> -->
 	<mkdir dir="//${myTargetDirectory}"/>
 
 	<echo>a) VmdRepository Archive:</echo>
@@ -1040,25 +1040,26 @@
 	</delete> -->
 	
 	<!-- TODO: Der Rückweg : Aus dem vmd und aus dem misc Verzeichnis die Dateien nach c:\1fgl\client kopieren, sofern diese neuer sind.
-               Meker: Dabei gilt, das diese Dateien über alle Rechner identischen Inhalt haben sollen.-->
+               Merke: Dabei gilt, das diese Dateien über alle Rechner identischen Inhalt haben sollen.-->
 	<echo>b) VmdRepository Misc:</echo>
 	<!-- Mache von den Zielverzeichnissen ein Backup -->
 	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryMisc.name}"
        basedir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryMisc}"
 	/>
-	<fl:let>myReturnControl ::= true"</fl:let>
-	<fl:let>returnControl ::= "${myReturnControl}"</fl:let>
+	<fl:let>myReturnControl ::= true</fl:let>
+	<fl:let>returnControl ::= ${myReturnControl}</fl:let>
 </target>
 		
 <target name="-FglCopyClient2archive">
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->	
 	<echo>Pushing Files to Repository:</echo>
+	<fl:let>mySourceDirectory ::= "${sourceDirectory}"</fl:let>
 	<fl:let>myTargetDirectory ::= "${targetDirectory}"</fl:let>
 		
 	<echo>a) VMD File:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	<copy todir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" overwrite="false"  preservelastmodified="true"> 
-	  <fileset dir="//${src.dirFglClientPath}">	
+		<fileset dir="//${mySourceDirectory}">	  
 	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
 		
@@ -1070,8 +1071,8 @@
 	<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
 	<echo>b) Misc Files:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${myTargetDirectory}/${project.vmd.dirRepositoryMisc}" overwrite="false"  preservelastmodified="true"> 
-	  <fileset dir="//${src.dirFglClientPath}">	
+	<copy todir="//${myTargetDirectory}/${project.vmd.dirRepositoryMisc}" overwrite="false"  preservelastmodified="true"> 	
+	  <fileset dir="//${mySourceDirectory}">
 		 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
 		<include name="**.txt"/>
 	  </fileset>
@@ -1900,7 +1901,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<fl:let>mySrca.filedir ::= "${return.filedir}"</fl:let>
-			<fl:let>returnControl ::= "${returnControl}"</fl:let>
+			<!-- <fl:let>returnControl ::= "${returnControl}"</fl:let> -->
 			
 			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
@@ -1949,7 +1950,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<fl:let>mySrca.filedir ::= "${return.filedir}"</fl:let>
 	<fl:let>mySrca.filename ::= "${return.filename}"</fl:let>
-	<fl:let>returnControl ::= "${returnControl}</fl:let>
+	<!-- <fl:let>returnControl ::= ${returnControl}</fl:let> -->
 	<ac:if>
 		<ac:equals arg1="${returnControl}" arg2="false"/>										
 		<ac:then>
