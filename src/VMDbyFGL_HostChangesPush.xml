@@ -926,31 +926,42 @@
 <!-- ################################################################################# -->  
 <target name="-FglRepository_Main">
 	<!-- Prüfe die Existenz der notwendigen Konfigurations-Properties -->
+	<!-- Merke: Oben (in Declaration) werden die project - Parameter ausgelesen und hier in conf - Parameter gepackt woraus wiederum die speziellen dest/src Parameter ggfs. geholt werden.-->
+	<!-- Merke: Da solche Parameter dann für jedes Unter-Main-Target individuell sein kann, darf es nicht in eine Property gespeiert werden, sondern muss in eine Variable gepackt werden.-->	
 	<fl:let>myGoon ::= true</fl:let>
+	<arrayInitJsZZZ isize="0" arrayreturn="myaError"/>		
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.dirRepositoryPath"/>	
 			<ac:equals arg1="${myGoon}" arg2="true" />
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.dirRepositoryPath}" arg2="\${project.vmd.dirRepositoryPath}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
 		</ac:and>
-		<ac:then>
-			<property name="conf.dirRepositoryPath_VMD" value="${project.vmd.dirRepositoryPath}" />
-			<fl:echo>conf.dirRepositoryPath_VMD hat den Wert: '${conf.dirRepositoryPath_VMD}'</fl:echo>			
+		<ac:then>			
+			<fl:echo>project.vmd.dirRepositoryPath hat den Wert: '${project.vmd.dirRepositoryPath}'</fl:echo>			
+			<fl:let>conf.dirRepositoryPath ::= "${project.vmd.dirRepositoryPath}" </fl:let> 			
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath'" arrayreturn="myaError" sflagcontrol="" />
 		</ac:else>
 	</ac:if>
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.dirPathClientFgl"/>	
 			<ac:equals arg1="${myGoon}" arg2="true" />
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.dirPathClientFgl}" arg2="\${project.vmd.dirPathClientFgl}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
 		</ac:and>
 		<ac:then>
-			<property name="conf.dirPathClientFgl" value="${project.vmd.dirPathClientFgl}" />
-			<fl:echo>conf.dirPathClientFgl hat den Wert: '${conf.dirPathClientFgl}'</fl:echo>			
+			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>			
+			<fl:let>conf.dirPathClientFgl ::= "${project.vmd.dirPathClientFgl}" </fl:let>
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl'" arrayreturn="myaError" sflagcontrol="" />
 		</ac:else>
 	</ac:if>
 	
@@ -958,13 +969,23 @@
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
 	<fl:echo>myGoon hat den Wert: ${myGoon}</fl:echo>
 	<ac:if>
-	<ac:equals arg1="${myGoon}" arg2="false" />
+		<ac:not>
+			<ac:equals arg1="${myaError}" arg2="" />			
+		</ac:not>
 		<ac:then>
-			<fl:echo>NICHT alle notwendigen Konfigurations-Properties vorhanden. Fahre NICHT fort.</fl:echo>
+			<fl:echo>Hinweis: ${myaError}</fl:echo>
 		</ac:then>
 		<ac:else>
-			<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
-					
+		</ac:else>
+	</ac:if>
+		<ac:if>
+			<ac:equals arg1="${myGoon}" arg2="false" />
+			<ac:then>
+				<fl:echo>NICHT alle notwendigen Konfigurations-Properties vorhanden. Fahre NICHT fort.</fl:echo>
+			</ac:then>
+			<ac:else>
+				<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
+			
 			<!-- ######### CLIENT ############################################################################## -->
 			
 			<!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
@@ -977,8 +998,8 @@
 				dies passiert hier durch flaka´s install-property handler task -->
 	<fl:install-property-handler />
 	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-	<property name="src.dirFglClientPath" value="${conf.dirPathClientFgl}" />
-    <property name="src.dirFglClientFileName" value = "Fgl${env.COMPUTERNAME}_Installationen.txt"/><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+	<fl:let>src.dirFglClientPath ::= "${conf.dirPathClientFgl}" </fl:let>
+    <fl:let>src.dirFglClientFileName" ::= "Fgl${env.COMPUTERNAME}_Installationen.txt"/></fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
@@ -986,6 +1007,7 @@
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
 			
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
+			<!-- TODO GOON: HIER nicht mit Properties arbeiten, da Properties über alle Unter-Main-Targets gelten und nicht veränderbar sind -->
 			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />			
 			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
 		  
@@ -1090,42 +1112,79 @@
 	
 	
 	<!-- Prüfe die Existenz der notwendigen Konfigurations-Properties -->
+	<!-- Merke: Oben (in Declaration) werden die project - Parameter ausgelesen und hier in conf - Parameter gepackt woraus wiederum die speziellen dest/src Parameter ggfs. geholt werden.-->
+	<!-- Merke: Da solche Parameter dann für jedes Unter-Main-Target individuell sein kann, darf es nicht in eine Property gespeiert werden, sondern muss in eine Variable gepackt werden.-->	
 	<fl:let>myGoon ::= true</fl:let>
+	<arrayInitJsZZZ isize="0" arrayreturn="myaError"/>
 	<ac:if>
 		<ac:and>
-			<isset property="conf.operation_mode"/>	
+			<isset property="project.vmd.operation_mode"/>	
 			<ac:equals arg1="${myGoon}" arg2="true" />
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.operation_mode}" arg2="\${project.vmd.operation_mode}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
 		</ac:and>
 		<ac:then>
-			<fl:echo>project.vmd.operation_mode hat den Wert: '${project.vmd.operation_mode}'</fl:echo>
-			<fl:let>conf.operation_mode ::= "${project.vmd.operation_mode}"</fl:let>
+			<fl:echo>project.vmd.operation_mode hat den Wert: '${project.vmd.operation_mode}'</fl:echo>	
+			<fl:let>conf.operation_mode ::= "${project.vmd.operation_mode}"</fl:let>			
 		</ac:then>
-		<ac:else>
+		<ac:else>			
 			<fl:let>conf.operation_mode ::= "prod"</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.operation_mode' verwende als Standard '${conf.operation_mode}'." arrayreturn="myaError" sflagcontrol="" />
 			<fl:let>myGoon ::= true</fl:let>
 		</ac:else>
 	</ac:if>
+		
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.dirRepositoryPath"/>	
+			<ac:equals arg1="${myGoon}" arg2="true" />
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.dirRepositoryPath}" arg2="\${project.vmd.dirRepositoryPath}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
+		</ac:and>
+		<ac:then>			
+			<fl:echo>project.vmd.dirRepositoryPath hat den Wert: '${project.vmd.dirRepositoryPath}'</fl:echo>				
+			<fl:let>conf.dirRepositoryPath_VMD ::= "${project.vmd.dirRepositoryPath}"</fl:let>				
+		</ac:then>
+		<ac:else>
+			<fl:let>conf.dirRepositoryPath_VMD ::= "C:/1fgl/repository/Projekt_VMD"</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard '${conf.dirRepositoryPath_VMD}'." arrayreturn="myaError" sflagcontrol="" />
+			<fl:let>myGoon ::= true</fl:let>
+		</ac:else>
+	</ac:if>	
 	
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.dirPathClientFgl"/>	
 			<ac:equals arg1="${myGoon}" arg2="true" />
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.dirPathClientFgl}" arg2="\${project.vmd.dirPathClientFgl}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
 		</ac:and>
 		<ac:then>
-			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>
-			<fl:let>conf.dirPathClientFgl ::= "${project.vmd.dirPathClientFgl}"</fl:let>
+			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>			
 		</ac:then>
 		<ac:else>
-			<fl:let>conf.dirPathClientFgl ::= "prod"</fl:let>
+			<fl:let>conf.dirPathClientFgl ::= "c:/1fgl/client"</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard '${conf.dirPathClientFgl}'." arrayreturn="myaError" sflagcontrol="" />
 			<fl:let>myGoon ::= true</fl:let>
 		</ac:else>
 	</ac:if>
-	
-	
-	
-	
+		
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
 	<fl:echo>myGoon hat den Wert: ${myGoon}</fl:echo>
+	<ac:if>
+		<ac:not>
+			<ac:equals arg1="${myaError}" arg2="" />			
+		</ac:not>
+		<ac:then>
+			<!-- TODO IDEE : mache ein Target <arrayEchoZZZ>, in dem die Elemente eines Arrays Zeile für Zeile ausgegeben werden -->
+			<fl:echo>Hinweis: ${myaError}</fl:echo>
+		</ac:then>
+		<ac:else>
+		</ac:else>
+	</ac:if>
 	<ac:if>
 		<ac:equals arg1="${myGoon}" arg2="false" />
 		<ac:then>
@@ -1134,257 +1193,246 @@
 		<ac:else>
 			<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
 			
-	 <!-- Todo: Eigentlich müssen oben (in Declaration) erst die conf - Parameter definiert werden und daraus werden dann die dest/src Parameter ggfs. geholt -->
-	<property name="conf.dirRepositoryVmdPath" value="${dest.dirRepositoryVmdPath}" /> 
-	<property name="conf.dirRepositoryVmdBat" value="${project.vmd.dirRepositoryBat}" />	
-	<property name="src.dirFglClientFilePath" value="${conf.dirPathClientFgl}/" />
-
-	<!-- Falls der Test - Modus angestellt ist, verwende die Test-Konfigurationsdatei und rechne den Dateinamen nicht aus.-->		
-	<ac:if>
-		<ac:equals arg1="${project.vmd.operation_mode}" arg2="test" />
-		<ac:then>
-			<fl:echo>testmodus</fl:echo> 		
-			<property name="conf.operation_mode" value="${project.vmd.operation_mode}" />  				
-			<property name="conf.copyLocalFileName" value = "test_vmd.properties"/>
-		</ac:then>		
-		<ac:else>													
-			<fl:echo>echtmodus</fl:echo>
-			<property name="conf.operation_mode" value="${project.vmd.operation_mode}" />  	
-				
-			<!-- 1. Rechne den Dateinamen aus -->
-			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
-				  dies passiert hier durch flaka´s install-property handler task -->
-			<fl:install-property-handler />
-				<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-	
-				<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-				<property name="conf.copyLocalFileName" value = "Fgl${env.COMPUTERNAME}_copy_local.properties"/>
-		</ac:else>
-	</ac:if><!-- Testmodus oder nicht -->
-	
-	
-	
-	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
-    <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-	<fl:let>conf.copyLocalFilePath ::= '${conf.dirRepositoryVmdPath}/${conf.dirRepositoryVmdBat}/${conf.copyLocalFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
-	<echo>Copy files general, by property file:</echo>
-	<echo>${conf.copyLocalFilePath}</echo>
-	
-	<!-- 2a. Prüfe, ob die Steuerungsdatei überhaupt existiert -->
-	<fl:choose>
-		<fl:when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
-			<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>
-
-			<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
-			<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filename"/>
-			<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filedir"/>
-			<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filename"/>
-			<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filedir"/>
-	
+			<!-- Konfiguriere sonstige Variablen -->						
+			<fl:let>conf.dirRepositoryVmdBat ::= "${project.vmd.dirRepositoryBat}" </fl:let>	
+						
 		
-			<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
-			<!--<loadproperties>
-				<file file="${conf.copyGeneralFilePath}"/>
-			</loadproperties> 
-			<echo>test1 hat den Wert: ${test1}</echo> -->
-			
-			
-			<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
-			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" /> -->
-			<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im VMD_Projekt 'src' ausgegangen -->
-			
-			<!-- Test: Gib den Inhalt der Datei aus -->
-			<!-- <echo>Dateiinhalt als Ganzes:</echo> -->
-			<!-- <echo>${myfile}</echo> -->
+			<!-- Falls der Test - Modus angestellt ist, verwende die Test-Konfigurationsdatei und rechne den Dateinamen nicht aus.-->		
+			<ac:if>
+				<ac:equals arg1="${conf.operation_mode}" arg2="test" />
+				<ac:then>
+					<fl:echo>testmodus</fl:echo> 							 			
+					<fl:let>conf.copyLocalFileName ::= "test_vmd.properties"</fl:let>
+				</ac:then>		
+				<ac:else>													
+					<fl:echo>echtmodus</fl:echo>
+								
+					<!-- 1. Rechne den Dateinamen aus -->
+					<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+					dies passiert hier durch flaka´s install-property handler task -->
+					<fl:install-property-handler />
+					<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+
+					<!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+					<fl:let>conf.copyLocalFileName ::= "Fgl${env.COMPUTERNAME}_copy_local.properties"</fl:let>
+				</ac:else>
+			</ac:if><!-- Testmodus oder nicht: Konfigurationsdateinamen ausrechnen -->
+
+			<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
+			<!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
+			<fl:let>conf.copyLocalFilePath ::= '${conf.dirRepositoryPath_VMD}/${conf.dirRepositoryVmdBat}/${conf.copyLocalFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+			<echo>Copy files general, by property file:</echo>
+			<echo>${conf.copyLocalFilePath}</echo>
+
+			<!-- 2a. Prüfe, ob die Steuerungsdatei überhaupt existiert -->
+			<fl:choose>
+				<fl:when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
+					<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>
+
+					<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
+					<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filename"/>
+					<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filedir"/>
+					<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filename"/>
+					<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filedir"/>
+
 	
-	
-			<!--2b. Werte den Inhalt der Datei zeilenweise aus -->
-			<!-- Beispiel für eine Schleife in ant, und wie man mit sequentials und dem @ Parameter darin arbeiten kann.  -->			
-			<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
-			<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
-				<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
-					<file file="${conf.copyLocalFilePath}" />
-				</tokens>
-				<sequential>
-					<fl:let>myCase ::= "neue Zeile"</fl:let><!-- für jede Zeile wird der mögliche Verarbeitungsfall neu ermittelt -->
-					<var name="line.length" unset="true" />
-					<length string="@{line}" property="line.length" />
-					<ac:if>
-						<ac:equals arg1="${line.length}" arg2="0" />
-						<ac:then>
-							<!-- <fl:echo>Leerzeile...</fl:echo> -->
-						</ac:then>
-						<ac:else>													
-							<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
-							<stringSubStringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
-							<!-- <fl:echo message="subtext = ${subtext}" /> -->
+					<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
+					<!--<loadproperties>
+						<file file="${conf.copyGeneralFilePath}"/>
+						</loadproperties> 
+						<echo>test1 hat den Wert: ${test1}</echo> -->
+		
+		
+					<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
+					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" /> -->
+					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im VMD_Projekt 'src' ausgegangen -->
+		
+					<!-- Test: Gib den Inhalt der Datei aus -->
+					<!-- <echo>Dateiinhalt als Ganzes:</echo> -->
+					<!-- <echo>${myfile}</echo> -->
+
+
+					<!--2b. Werte den Inhalt der Datei zeilenweise aus -->
+					<!-- Beispiel für eine Schleife in ant, und wie man mit sequentials und dem @ Parameter darin arbeiten kann.  -->			
+					<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
+					<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
+						<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
+							<file file="${conf.copyLocalFilePath}" />
+						</tokens>
+						<sequential>
+							<fl:let>myCase ::= "neue Zeile"</fl:let><!-- für jede Zeile wird der mögliche Verarbeitungsfall neu ermittelt -->
+							<var name="line.length" unset="true" />
+							<length string="@{line}" property="line.length" />
 							<ac:if>
-								<ac:equals arg1="${subtext}" arg2="#" />
+								<ac:equals arg1="${line.length}" arg2="0" />
 								<ac:then>
-									<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
+									<!-- <fl:echo>Leerzeile...</fl:echo> -->
 								</ac:then>
-								<ac:else>
-									<fl:echo>Zeile: @{line}</fl:echo>
-									<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->
-									
-									<!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
-									<!-- <fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo> --><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
-									<!-- <fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo> -->
-	
-									<!-- Schreibe das in eine Flaka - Variable -->		
-									<fl:let>myLeftPart ::= split('@{line}','=')[0]</fl:let>		
-									<fl:let>myRightPart ::= split('@{line}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
-									<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
-									<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
-														 							
-									<!-- TODO: Idee: in der initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
-									<fl:when test="null('${myRightPart}')">
-										<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo>
-										<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-																								
-										<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-										<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-											 <fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-										     <fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
-									</fl:when>
-									<fl:when test="null('${myLeftPart}')">
-										<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): @{line}</echo>
-										<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-																								
-										<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-										<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-											 <fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-										     <fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
-									</fl:when>
-									
-									<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
-									<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
-									     Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
-									<!--<path id="pathTempLeft">
-									  <pathelement location="${myLeftPart}"/>
-									</path>
-									<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
-									</pathconvert>
-									<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
-									
-									<path id="pathTempRight">
-									  <pathelement location="${myRightPart}"/>
-									</path>
-									<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
-									</pathconvert>
-									<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
-									
-									
-									<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
-									<fl:let>myCase ::= "undefined"</fl:let>																										
-									<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
-										<param name="leftPart" value="${myLeftPart}"/>
-										<param name="rightPart" value="${myRightPart}"/>
-										<!-- <param name="leftPart" value="${part.path.temp.left}"/>
-										<param name="rightPart" value="${part.path.temp.right}"/> -->
-									</antcallback>
-											
-									<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
-									<fl:let>myAnalyze ::= "${returnString}"</fl:let>
-									
-                                    <!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
-									<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
-												<param name="analyze" value="${myAnalyze}"/>
-												<param name="leftPart" value="${myLeftPart}"/>
-												<param name="rightPart" value="${myRightPart}"/>
-											<!-- 	<param name="leftPart" value="${part.path.temp.left}"/>
-												<param name="rightPart" value="${part.path.temp.right}"/>	 -->											
-									</antcallback>
-									<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
-									<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
-									<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
-									<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>
-									
-									
-									<!-- TODO GOON 20150719: Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
-									<!-- myStringaLeftTotal
-									     myStringaRightTotal
-									-->
+								<ac:else>													
+									<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
+									<stringSubStringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
+									<!-- <fl:echo message="subtext = ${subtext}" /> -->
 									<ac:if>
-										<equals arg1="${returnControl}" arg2="true"/>
+										<ac:equals arg1="${subtext}" arg2="#" />
 										<ac:then>
-											<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
-											<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
-											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
-			
-											<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
-											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
-			
-											<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
-											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
-												
-											<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
-											<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
+											<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
 										</ac:then>
 										<ac:else>
-											<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
-										</ac:else>
-									</ac:if>
-						</ac:else>
-					</ac:if>
-					</ac:else>
-					</ac:if>
-				</sequential>
-			</for>		
-			
-			
-			<arrayElementCountJsZZZ arrayinput="${myDestaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-			<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
-			<ac:if>
-				<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
-				<ac:then>
-					<echo>Keine Dateien im Array => keine Verarbeitung</echo>
-				</ac:then>
-				<ac:else>	
-					<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
-					<!-- Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem Postfix _RECHNERNAME ausstatten -->
-					<!-- Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus, danach den Kopiervorgang für die Datei ohne Postfix. -->				
-					<!--### 1. Lauf Kopiere die Dateien (incl. NAMENSERWEITERUNG) der beiden Arrays  ##################### -->
+											<fl:echo>Zeile: @{line}</fl:echo>
+											<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->
+								
+											<!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
+											<!-- <fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo> --><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
+											<!-- <fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo> -->
 
-					<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
-					<!-- 1a. Dateiendung entfernen -->
-					<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
+											<!-- Schreibe das in eine Flaka - Variable -->		
+											<fl:let>myLeftPart ::= split('@{line}','=')[0]</fl:let>		
+											<fl:let>myRightPart ::= split('@{line}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
+											<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
+											<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
+																				
+											<!-- TODO: Idee: in der initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
+											<fl:when test="null('${myRightPart}')">
+												<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo>
+												<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+																							
+												<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+												<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+												<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+												<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
+											</fl:when>
+											<fl:when test="null('${myLeftPart}')">
+												<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): @{line}</echo>
+												<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+																							
+												<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+												<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+												<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+												<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
+											</fl:when>
+								
+											<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
+											<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
+												Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
+											<!--<path id="pathTempLeft">
+												<pathelement location="${myLeftPart}"/>
+												</path>
+												<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
+												</pathconvert>
+												<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
+									
+												<path id="pathTempRight">
+												<pathelement location="${myRightPart}"/>
+												</path>
+												<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
+												</pathconvert>
+												<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
+								
+								
+											<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
+											<fl:let>myCase ::= "undefined"</fl:let>																										
+											<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
+												<param name="leftPart" value="${myLeftPart}"/>
+												<param name="rightPart" value="${myRightPart}"/>
+											</antcallback>
+										
+											<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
+											<fl:let>myAnalyze ::= "${returnString}"</fl:let>
+								
+											<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
+											<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
+												<param name="analyze" value="${myAnalyze}"/>
+												<param name="leftPart" value="${myLeftPart}"/>
+												<param name="rightPart" value="${myRightPart}"/>												
+											</antcallback>
+											<fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
+											<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
+											<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
+											<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let>
+																	
+											<!-- TODO GOON 20150719: Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
+											<!-- myStringaLeftTotal
+												myStringaRightTotal
+											-->
+											<ac:if>
+												<equals arg1="${returnControl}" arg2="true"/>
+												<ac:then>
+													<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
+													<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
+													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
 		
-					<!-- 1b. Hostnamen und Endung ausrechnen -->
-					<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
-							dies passiert hier durch flaka´s install-property handler task -->
-					<fl:install-property-handler />
-					<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->			
-					<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
+													<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
+													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
+		
+													<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
+													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
+											
+													<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
+													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
+												</ac:then>
+												<ac:else>
+													<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
+												</ac:else>
+											</ac:if>
+										</ac:else>
+									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
+								</ac:else>
+							</ac:if><!-- end if <ac:equals arg1="${line.length}" arg2="0" /> -->
+						</sequential>
+					</for><!-- end for param="line"> -->		
+		
+		
+					<arrayElementCountJsZZZ arrayinput="${myDestaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+					<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
+					<ac:if>
+						<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
+						<ac:then>
+							<echo>Keine Dateien im Array => keine Verarbeitung</echo>
+						</ac:then>
+						<ac:else>	
+							<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
+							<!-- Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem Postfix _RECHNERNAME ausstatten -->
+							<!-- Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus, danach den Kopiervorgang für die Datei ohne Postfix. -->				
+							<!--### 1. Lauf Kopiere die Dateien (incl. NAMENSERWEITERUNG) der beiden Arrays  ##################### -->
+
+							<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
+							<!-- 1a. Dateiendung entfernen -->
+							<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
+			
+							<!-- 1b. Hostnamen und Endung ausrechnen -->
+							<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+									dies passiert hier durch flaka´s install-property handler task -->
+							<fl:install-property-handler />
+							<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->			
+							<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
+						
+							<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
+							<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
 					
-					<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
-					<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
-				
-					<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
-							<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-							<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-							<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-							<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
-					</antcallback>
-					
-					
-					<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
-					<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
-							<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-							<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-							<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-							<param name="desta.filename" value="${myDestaTotal.filename}"/>					
-					</antcallback>				
-				</ac:else>
-			</ac:if><!-- Anzahl der Dateien pruefen -->		
-		</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
-		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-				<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
-				<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-		</otherwise>
-	</fl:choose>
-	
-	</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
+							<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
+								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+								<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
+							</antcallback>
+						
+						
+							<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
+							<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
+								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+							</antcallback>				
+						</ac:else>
+					</ac:if><!-- Anzahl der Dateien pruefen -->		
+				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
+				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+					<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
+					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+				</otherwise>
+			</fl:choose>
+		</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
 	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
 	
 </target>
