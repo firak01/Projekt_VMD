@@ -1,0 +1,3 @@
+### Lotus Notes 8.5x RCP Programmierung
+
+20140402: IE8, Kein WinXP Updates

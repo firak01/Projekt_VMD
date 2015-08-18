@@ -890,7 +890,8 @@
 	</target>
   
   <!-- ################################################################################# -->
-  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main">
+  <!-- <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main"> -->
+  <target name="compile" depends="-declaration, -init,-FglRepository_Main">
     
    <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
@@ -967,6 +968,7 @@
 	
 	
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
+	<!-- TODO GOON, noch kaputt: Hier wird <#!!FGLUNDEFINED!!#> ausgegeben, es muss also eine Target <arrayEchoZZZ> erstellt werden. -->
 	<fl:echo>myGoon hat den Wert: ${myGoon}</fl:echo>
 	<ac:if>
 		<ac:not>
@@ -999,7 +1001,9 @@
 	<fl:install-property-handler />
 	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
 	<fl:let>src.dirFglClientPath ::= "${conf.dirPathClientFgl}" </fl:let>
-    <fl:let>src.dirFglClientFileName" ::= "Fgl${env.COMPUTERNAME}_Installationen.txt"/></fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+	<!-- TODO GOON NOCH KAPUTT: Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
+	<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+    <fl:let>src.dirFglClientFileName ::= "Fgl${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
@@ -1008,7 +1012,7 @@
 			
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
 			<!-- TODO GOON: HIER nicht mit Properties arbeiten, da Properties über alle Unter-Main-Targets gelten und nicht veränderbar sind -->
-			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath_VMD}" />			
+			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath}" />			
 			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
 		  
 			<!-- Mache Backup des Repositories. -->

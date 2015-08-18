@@ -1,0 +1,7 @@
+#### Wohl mal gedacht als von einer Eclipse-Umgebung unabhängige Serverumgebung (Tomcat)
+
+TODO: Tomcat hier installieren
+
+
+
+20130719: Erstellt als Kopie aus ...SRV_GIT. Entfernen des Apache GIT STacks. Ändern der IP auf 192.168.3.113.

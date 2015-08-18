@@ -1,0 +1,2 @@
+#### Windows 2000, Mein CVS Server, Domino 6 Server, TODO: Soll nur noch Maildatenbank enthalten, ggf. Web
+                                                                   OpenVPN 10.0.0.1  

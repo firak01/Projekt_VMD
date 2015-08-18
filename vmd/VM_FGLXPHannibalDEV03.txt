@@ -1,0 +1,20 @@
+--- Synchron halten mit HannibalDEV02BVM auf dem Notebook
+#########################################################
+	Eclipse 3.22
+        --- Aktuelle Entwicklungsumgebung von KernelZZZ und VideoArchiv mit Java Version 1.6 für Domino 8 Server
+        --- Workspace zum Buch "Graphic Java - Das AWT beherrschen".
+         
+	Eclipse 3.3 WTP
+	--- Workspace zum Buch "SOA using Java WebServices"
+
+Alte Javaprojekte für Albis und die Sparkassn Informatik
+######################################################
+2014-06-11: Java 7 SDK installiert
+
+2014-03-15: Ist mit neuesten Updates von der Windows Update Seite versehen
+2014-02-17: Aufrufparametr von Eclipse erweitert um  -vmargs -Duser.name="Fritz Lindhauer"
+
+2014-01-11: Klassen aus dem Buch "Java Graphic - Das AWT beherrschen" als eigenen Eclipse Workspace für eclipse.exe - 3.22 hinzugefügt. Workspace Eclipse3_GraphicJava eingrichtet.
+
+2012-10-18
+Behalte unbedingt die J2EE Installation bei, da nur hier die Eclipse Version 2.2WTP und das Beispiel SOA-Projekt ohne Fehler angezeigt werden kann.

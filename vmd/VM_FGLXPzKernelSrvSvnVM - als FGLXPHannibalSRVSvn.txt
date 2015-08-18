@@ -1,0 +1,7 @@
+#####   Mein Subversion Server
+#####   Feste IP 192.168.3.131
+
+20140427: BGInfo eingerichtet, Buttons für Shutdown.
+
+20140331: IE8, WinXP Updates
+20140217: Repository buch_java_xml erstellt.

@@ -1,3 +1,11 @@
+######################################################################
+--- VMWare Server 2.x
+--- Wichtig: Niemals Firefox updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
+######################################################################
+2015-06-20: Notepad++ mit plugins: compare, explorer, xmltools
+
+2015-06-07: Großes Windows7 Update durchgeführt, vorher Backup gemacht
+
 2014-03-08: Installation von Acronis True Image 2014 - und Aktivierung
 
 2013-08-14: Installataion von HTTracker - WebSite Copier

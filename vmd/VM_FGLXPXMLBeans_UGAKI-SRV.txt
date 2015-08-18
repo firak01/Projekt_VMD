@@ -1,0 +1,20 @@
+### Java Entwicklungsumgebung:
+      Eclipse Ganymed:
+      Apache XMLBeans eingerichtet.
+      Blackberry JDK & Entwicklungsumgebung eingerichtet.
+
+20140331: WinXP Updates nicht möglich
+IE8
+
+20120713 Rüberkopiert nach Alarich 
+20120915 Speicher auf 1024 MB reduziert
+
+
+TryOut.Yahoo.Location
+TryOut.jdom
+TryOut.joda.Time
+TryOut.JSONLib
+
+
+
+      Lotus Notes 8.5 installiert
