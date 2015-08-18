@@ -890,9 +890,8 @@
 	</target>
   
   <!-- ################################################################################# -->
-  <!-- <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main"> -->
-  <target name="compile" depends="-declaration, -init,-FglRepository_Main">
-    
+  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main">
+  
    <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
