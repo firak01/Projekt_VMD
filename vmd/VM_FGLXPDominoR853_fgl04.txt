@@ -1,0 +1,16 @@
+##### Domino 8.52 Server, für FritzTV VIA Projekt
+      Synchron halten mit fgl05VM
+      Merke: Letzte Version der Domino Server, bei denen klassische Servlets noch funktionieren 
+             und keine OSGI Servlets notwendig sind.
+
+Merke:
+ Im fgl-Netz die IP hart verdrahten. Sie lautet: 192.168.3.104
+Im "Host only"-Netz die IP hart verdrahten mit: 192.168.217.104
+
+20140320: IE8 installiert, WindowsXP Updates
+
+2012-10-19 Installation des Upgrade Packs 1 für den Server
+2012-10-19 Installation des Fixpack 1 für den Server
+
+Vor 2012-10-18
+Installation eines Domino Servers "fgl04/fgl/DE"
