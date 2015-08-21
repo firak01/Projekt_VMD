@@ -784,8 +784,12 @@
   	<echo>VMD Properties Datei= ${env.VMD}</echo>
 	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
   	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo>
-  	
-  
+	
+	
+  	<!-- Das Betriebssystem, in der Batch ermittelt. -->
+	<echo>VMD_OS= {env.VMD_OS}</echo>
+	<property name="project.vmd.os" value="${env.VMD_OS}" />
+	
     <!-- Ausgangsverzeichnis: Das Repository -->
   	<!-- a) Feste Unterverzeichnisstruktur -->
   <property name="project.vmd.dirRepositoryLib" value="lib" />
@@ -880,7 +884,8 @@
 	<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 				
 	<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>	
 	<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
-	  
+	<echo>project.vmd.os hat den Wert: ${project.vmd.os}</echo>
+    
  
   <!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
   
@@ -929,7 +934,7 @@
 	<!-- Merke: Oben (in Declaration) werden die project - Parameter ausgelesen und hier in conf - Parameter gepackt woraus wiederum die speziellen dest/src Parameter ggfs. geholt werden.-->
 	<!-- Merke: Da solche Parameter dann für jedes Unter-Main-Target individuell sein kann, darf es nicht in eine Property gespeiert werden, sondern muss in eine Variable gepackt werden.-->	
 	<fl:let>myGoon ::= true</fl:let>
-	<arrayInitJsZZZ isize="0" arrayreturn="myaError"/>		
+	<arrayInitJsZZZ isize="0" arrayreturn="myaError"/>	
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.dirRepositoryPath"/>	
@@ -962,6 +967,24 @@
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
 			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl'" arrayreturn="myaError" sflagcontrol="" />
+		</ac:else>
+	</ac:if>
+	
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.os"/>	
+			<ac:equals arg1="${myGoon}" arg2="true" />
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.os}" arg2="\${project.vmd.os}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
+		</ac:and>
+		<ac:then>			
+			<fl:echo>project.vmd.os hat den Wert: '${project.vmd.os}'</fl:echo>			
+			<fl:let>conf.os ::= "${project.vmd.os}" </fl:let> 			
+		</ac:then>
+		<ac:else>
+			<fl:let>myGoon ::= false</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.os'" arrayreturn="myaError" sflagcontrol="" />
 		</ac:else>
 	</ac:if>
 	
@@ -1000,9 +1023,9 @@
 	<fl:install-property-handler />
 	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
 	<fl:let>src.dirFglClientPath ::= "${conf.dirPathClientFgl}" </fl:let>
-	<!-- TODO GOON NOCH KAPUTT: Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
+	<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
 	<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
-    <fl:let>src.dirFglClientFileName ::= "Fgl${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+    <fl:let>src.dirFglClientFileName ::= "FGL${conf.os}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->

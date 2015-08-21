@@ -1,6 +1,6 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
-2015-04-28: Umbenannt in Paton-PRV
+2015-04-28: Umbenannt in Patton-PRV
 
 2014-12-14: Alle nicht genutzten Netzwerkadapter (vmware) diabled. 
             Bei Problemen, das Modem mal neu durchstarten. Dadurch wird Kerbal Space Program x mal schneller geladen.
