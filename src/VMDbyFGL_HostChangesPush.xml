@@ -990,7 +990,8 @@
 	
 	
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
-	<!-- TODO GOON, noch kaputt: Hier wird <#!!FGLUNDEFINED!!#> ausgegeben, es muss also eine Target <arrayEchoZZZ> erstellt werden. -->
+	<!-- TODO GOON, noch kaputt: Hier wird 'Hinweis: <#!!FGLUNDEFINED!!#>' auf der Konsole ausgegeben, es muss also eine Target <arrayEchoZZZ> erstellt werden.
+                                                    welches bei einem leeren Array (hier: dem leeren Fehlerarray) nix ausgibt und ansonsten die Fehler Zeile für Zeile ausgeben würde.	-->
 	<fl:echo>myGoon hat den Wert: ${myGoon}</fl:echo>
 	<ac:if>
 		<ac:not>
@@ -1033,7 +1034,7 @@
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
 			
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
-			<!-- TODO GOON: HIER nicht mit Properties arbeiten, da Properties über alle Unter-Main-Targets gelten und nicht veränderbar sind -->
+			<!-- TODO GOON: HIER nicht mit Properties arbeiten, da Properties über alle Unter-Main-Targets gelten und nicht veränderbar sind. Statt dessen Variablen fl:let verwenden. -->
 			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath}" />			
 			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
 		  
@@ -1184,7 +1185,7 @@
 		<ac:and>
 			<isset property="project.vmd.dirPathClientFgl"/>	
 			<ac:equals arg1="${myGoon}" arg2="true" />
-			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+			<ac:not><!-- Abpruefen, ob der Variableninhalt gleich dem Variablennamen ist -->
 				<ac:equals arg1="${project.vmd.dirPathClientFgl}" arg2="\${project.vmd.dirPathClientFgl}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
 			</ac:not>
 		</ac:and>
