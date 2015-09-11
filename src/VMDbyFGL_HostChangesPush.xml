@@ -895,7 +895,7 @@
 	</target>
   
   <!-- ################################################################################# -->
-  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglCopyLocal_Main">
+  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglVmd_Main">
   
    <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
@@ -1130,7 +1130,7 @@
 
 <!-- ######################################################### -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
-<target name="-FglCopyLocal_Main">
+<target name="-FglVmd_Main">
 	<echo>######################################</echo>
 	
 	<!-- Schiebe die angegebenen Dateien von a nach b auf dem lokalen Rechner -->
@@ -1251,6 +1251,11 @@
 			<echo>Copy files general, by property file:</echo>
 			<echo>${conf.copyLocalFilePath}</echo>
 
+			<!-- TODO GOON: Nachfolgenden Code als Target -FglVmdController_Main aufrufen.
+			                             Die "Schemata" Untersuchung machen.
+										 Und letztlich beim Kopieren das neue Target -FglCopyLocal_Main aufrufen. -->
+			      
+			
 			<!-- 2a. Prüfe, ob die Steuerungsdatei überhaupt existiert -->
 			<fl:choose>
 				<fl:when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
