@@ -874,6 +874,10 @@
 			
   <echo>Verwende Projektdatei: ${vmdUsed}</echo>
   <property name="projekt.vmd.configPath" value="${vmdUsed}" />
+  
+  <!-- Teste mal, ob ein defaultwert durch loadproperties ueberschrieben werden kann -->
+  <property name="projekt.useDefaultWhenMissing" value="false" />
+  
 
 	<echo>Verwendet Projektkonfiguration: ${projekt.vmd.configPath}</echo>
 	<loadproperties>
@@ -929,66 +933,16 @@
 </target>
 
 <!-- ################################################################################# -->  
-<target name="-FglRepository_Main">
-	<!-- Prüfe die Existenz der notwendigen Konfigurations-Properties -->
-	<!-- Merke: Oben (in Declaration) werden die project - Parameter ausgelesen und hier in conf - Parameter gepackt woraus wiederum die speziellen dest/src Parameter ggfs. geholt werden.-->
-	<!-- Merke: Da solche Parameter dann für jedes Unter-Main-Target individuell sein kann, darf es nicht in eine Property gespeiert werden, sondern muss in eine Variable gepackt werden.-->	
-	<fl:let>myGoon ::= true</fl:let>
-	<arrayInitJsZZZ isize="0" arrayreturn="myaError"/>	
-	<ac:if>
-		<ac:and>
-			<isset property="project.vmd.dirRepositoryPath"/>	
-			<ac:equals arg1="${myGoon}" arg2="true" />
-			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
-				<ac:equals arg1="${project.vmd.dirRepositoryPath}" arg2="\${project.vmd.dirRepositoryPath}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
-			</ac:not>
-		</ac:and>
-		<ac:then>			
-			<fl:echo>project.vmd.dirRepositoryPath hat den Wert: '${project.vmd.dirRepositoryPath}'</fl:echo>			
-			<fl:let>conf.dirRepositoryPath ::= "${project.vmd.dirRepositoryPath}" </fl:let> 			
-		</ac:then>
-		<ac:else>
-			<fl:let>myGoon ::= false</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath'" arrayreturn="myaError" sflagcontrol="" />
-		</ac:else>
-	</ac:if>
-	<ac:if>
-		<ac:and>
-			<isset property="project.vmd.dirPathClientFgl"/>	
-			<ac:equals arg1="${myGoon}" arg2="true" />
-			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
-				<ac:equals arg1="${project.vmd.dirPathClientFgl}" arg2="\${project.vmd.dirPathClientFgl}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
-			</ac:not>
-		</ac:and>
-		<ac:then>
-			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>			
-			<fl:let>conf.dirPathClientFgl ::= "${project.vmd.dirPathClientFgl}" </fl:let>
-		</ac:then>
-		<ac:else>
-			<fl:let>myGoon ::= false</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl'" arrayreturn="myaError" sflagcontrol="" />
-		</ac:else>
-	</ac:if>
+<target name="-FglRepository_Main">	
+	<!-- Mache Backup des Repositories. -->
 	
-	<ac:if>
-		<ac:and>
-			<isset property="project.vmd.os"/>	
-			<ac:equals arg1="${myGoon}" arg2="true" />
-			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
-				<ac:equals arg1="${project.vmd.os}" arg2="\${project.vmd.os}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
-			</ac:not>
-		</ac:and>
-		<ac:then>			
-			<fl:echo>project.vmd.os hat den Wert: '${project.vmd.os}'</fl:echo>			
-			<fl:let>conf.os ::= "${project.vmd.os}" </fl:let> 			
-		</ac:then>
-		<ac:else>
-			<fl:let>myGoon ::= false</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.os'" arrayreturn="myaError" sflagcontrol="" />
-		</ac:else>
-	</ac:if>
-	
-	
+	<!-- Pruefe die Projekt-Properites -->
+	<antcallback target="-FglCheckProjectPropertiesRepository" return="returnControl,returnaString">
+		<param name="useDefaultsWhenMissing" value="${project.useDefaultWhenMissing}"/>
+	</antcallback>
+	<fl:let>myGoon ::= "${returnControl}" </fl:let>
+	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />
+		
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
 	<!-- TODO GOON, noch kaputt: Hier wird 'Hinweis: <#!!FGLUNDEFINED!!#>' auf der Konsole ausgegeben, es muss also eine Target <arrayEchoZZZ> erstellt werden.
                                                     welches bei einem leeren Array (hier: dem leeren Fehlerarray) nix ausgibt und ansonsten die Fehler Zeile für Zeile ausgeben würde.	-->
@@ -1060,6 +1014,88 @@
 			</ac:if><!-- End if: Backup des Repositories erfolgreich oder nicht -->
 		</ac:else>
 	</ac:if>
+</target>
+
+<target name = "-FglCheckProjectPropertiesRepository">
+	
+	<!-- Pruefe die Projekt-Properites fuer den Repository-Zweig-->
+	
+	<!-- Pruefe die allgemeinen Projekt-Properties -->
+	<antcallback target="-FglCheckProjectProperties" return="returnControl,returnaString">
+		<param name="useDefaultsWhenMissing" value="${project.useDefaultWhenMissing}"/>
+	</antcallback>
+	<fl:let>myGoon ::= "${returnControl}" </fl:let>
+	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />
+
+
+	<!-- Rueckgabe -->
+	<fl:let>returnControl ::= ${myGoon}</fl:let>
+	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+</target>
+
+<target name="-FglCheckProjectProperties">
+
+<!-- Prüfe die Existenz der notwendigen Konfigurations-Properties -->
+	<!-- Merke: Oben (in Declaration) werden die project - Parameter ausgelesen und hier in conf - Parameter gepackt woraus wiederum die speziellen dest/src Parameter ggfs. geholt werden.-->
+	<!-- Merke: Da solche Parameter dann für jedes Unter-Main-Target individuell sein kann, darf es nicht in eine Property gespeiert werden, sondern muss in eine Variable gepackt werden.-->	
+	<fl:let>myGoon ::= true</fl:let>
+	<arrayInitJsZZZ isize="0" arrayreturn="myaError"/>	
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.dirRepositoryPath"/>	
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.dirRepositoryPath}" arg2="\${project.vmd.dirRepositoryPath}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
+		</ac:and>
+		<ac:then>			
+			<fl:echo>project.vmd.dirRepositoryPath hat den Wert: '${project.vmd.dirRepositoryPath}'</fl:echo>			
+			<fl:let>conf.dirRepositoryPath ::= "${project.vmd.dirRepositoryPath}" </fl:let> 			
+		</ac:then>
+		<ac:else>
+			<fl:let>myGoon ::= false</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath'" arrayreturn="myaError" sflagcontrol="" />
+		</ac:else>
+	</ac:if>
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.dirPathClientFgl"/>	
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.dirPathClientFgl}" arg2="\${project.vmd.dirPathClientFgl}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
+		</ac:and>
+		<ac:then>
+			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>			
+			<fl:let>conf.dirPathClientFgl ::= "${project.vmd.dirPathClientFgl}" </fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:let>myGoon ::= false</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl'" arrayreturn="myaError" sflagcontrol="" />
+		</ac:else>
+	</ac:if>
+	
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.os"/>	
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.os}" arg2="\${project.vmd.os}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
+		</ac:and>
+		<ac:then>			
+			<fl:echo>project.vmd.os hat den Wert: '${project.vmd.os}'</fl:echo>			
+			<fl:let>conf.os ::= "${project.vmd.os}" </fl:let> 			
+		</ac:then>
+		<ac:else>
+			<fl:let>myGoon ::= false</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.os'" arrayreturn="myaError" sflagcontrol="" />
+		</ac:else>
+	</ac:if>
+	
+	<fl:let>returnControl ::= ${myGoon}</fl:let>
+	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+
 </target>
      
 <target name="-FglRepositoryBackup">	
@@ -1146,7 +1182,7 @@
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.operation_mode"/>	
-			<ac:equals arg1="${myGoon}" arg2="true" />
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
 			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
 				<ac:equals arg1="${project.vmd.operation_mode}" arg2="\${project.vmd.operation_mode}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
 			</ac:not>
@@ -1165,7 +1201,7 @@
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.dirRepositoryPath"/>	
-			<ac:equals arg1="${myGoon}" arg2="true" />
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
 			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
 				<ac:equals arg1="${project.vmd.dirRepositoryPath}" arg2="\${project.vmd.dirRepositoryPath}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
 			</ac:not>
@@ -1184,7 +1220,7 @@
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.dirPathClientFgl"/>	
-			<ac:equals arg1="${myGoon}" arg2="true" />
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
 			<ac:not><!-- Abpruefen, ob der Variableninhalt gleich dem Variablennamen ist -->
 				<ac:equals arg1="${project.vmd.dirPathClientFgl}" arg2="\${project.vmd.dirPathClientFgl}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
 			</ac:not>
@@ -1254,14 +1290,26 @@
 			<!-- TODO GOON: Nachfolgenden Code als Target -FglVmdController_Main aufrufen.
 			                             Die "Schemata" Untersuchung machen.
 										 Und letztlich beim Kopieren das neue Target -FglCopyLocal_Main aufrufen. -->
-			      
-			
-			<!-- 2a. Prüfe, ob die Steuerungsdatei überhaupt existiert -->
-			<fl:choose>
-				<fl:when test=" '${conf.copyLocalFilePath}'.tofile.exists == true ">
-					<echo>Datei existiert: ${conf.copyLocalFilePath}</echo>
+			<antcallback target="-FglVmdController_Main" return="returnString, returnControl">
+				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
+			</antcallback>      
+			<fl:echo>Ergebnis des VMD Controllers: ${returnString}</fl:echo>
+		
+		</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
+	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->	
+</target>
+
+<!-- ######################################################################### -->
+<target name="-FglVmdController_Main">
+	<fl:let>myLocalFileControlPath ::= "${localFileControlPath}"</fl:let>
+
+	<!-- Prüfe, ob die Steuerungsdatei überhaupt existiert -->
+	<fl:choose>
+		<fl:when test=" '${myLocalFileControlPath}'.tofile.exists == true ">
+					<echo>Datei existiert: ${myLocalFileControlPath}</echo>
 
 					<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
+					<!-- Todo: diese dann im Schema "copy" verwenden -->
 					<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filename"/>
 					<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filedir"/>
 					<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filename"/>
@@ -1289,7 +1337,7 @@
 					<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
 					<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
 						<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
-							<file file="${conf.copyLocalFilePath}" />
+							<file file="${myLocalFileControlPath}" />
 						</tokens>
 						<sequential>
 							<fl:let>myCase ::= "neue Zeile"</fl:let><!-- für jede Zeile wird der mögliche Verarbeitungsfall neu ermittelt -->
@@ -1312,6 +1360,7 @@
 										<ac:else>
 											<fl:echo>Zeile: @{line}</fl:echo>
 											<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->
+											<!-- +++++++++++++++++++  TODO GOON Hier dann den Schema Controller starten +++++++++  -->
 								
 											<!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
 											<!-- <fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo> --><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
@@ -1457,17 +1506,20 @@
 								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
 							</antcallback>				
 						</ac:else>
-					</ac:if><!-- Anzahl der Dateien pruefen -->		
+					</ac:if><!-- Anzahl der Dateien pruefen -->
+					<fl:let>returnControl ::= true</fl:let>
+					<fl:let>returnString ::= "alles ok"</fl:let>					
 				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
 				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-					<echo>Konfigurations-Datei existiert NICHT: ${conf.copyLocalFilePath}</echo>
 					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+					<fl:let>returnControl ::= false</fl:let>
+					<fl:let>returnString ::= "Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"</fl:let>
 				</otherwise>
 			</fl:choose>
-		</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
-	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
-	
+			<echo>${returnString}</echo>
+
 </target>
+
 <!-- ######################################################################### -->
 <target name="-FGLCopyLocal_Copy">
 <!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
