@@ -765,6 +765,26 @@
   <property name="src" value="src"/>
   -->
   
+  <!-- ################################################################################# -->
+  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglVmd_Main">
+  
+   <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+   
+	<!-- WIRD NICHT BENÖTIGT -->
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
   <target name="-declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
     <!-- An dieser Stelle Argumente entgegennehmen, entweder aus der Batch oder unter Eclipse aus der "external Configuration" des AntScripts  -->
   	<!-- Merke: You can define an argument with the property file name to the build in the 'Arguments' section of the Run > External Tools > External Tools Configuration for your Ant Build. Something like:
@@ -787,7 +807,7 @@
 	
 	
   	<!-- Das Betriebssystem, in der Batch ermittelt. -->
-	<echo>VMD_OS= {env.VMD_OS}</echo>
+	<echo>VMD_OS= ${env.VMD_OS}</echo>
 	<property name="project.vmd.os" value="${env.VMD_OS}" />
 	
     <!-- Ausgangsverzeichnis: Das Repository -->
@@ -898,26 +918,7 @@
 
 	</target>
   
-  <!-- ################################################################################# -->
-  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglVmd_Main">
-  
-   <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
-  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
-             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
-   
-	<!-- WIRD NICHT BENÖTIGT -->
-    <!-- Compile the java code from ${src} into ${build} -->
-	<!-- example how to create a directory -->
-    <!-- <mkdir dir="${build}"/>
-	-->
-    
-	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
-	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
-    	<classpath refid="project.classpath"/>
-    </javac>
-	-->
-  </target>
-  
+  <!-- ############################################################################## -->
   <target name="-init">
     <!-- Create the time stamp -->
 	<echo>Receiving timestamp:</echo>
@@ -937,7 +938,7 @@
 	<!-- Mache Backup des Repositories. -->
 	
 	<!-- Pruefe die Projekt-Properites -->
-	<antcallback target="-FglCheckProjectPropertiesRepository" return="returnControl,returnaString">
+	<antcallback target="-FglCheckProjectPropertiesRepository" return="conf.dirRepositoryPathFgl,conf.dirPathClientFgl,conf.os,returnControl,returnaString">
 		<param name="useDefaultsWhenMissing" value="${project.useDefaultWhenMissing}"/>
 	</antcallback>
 	<fl:let>myGoon ::= "${returnControl}" </fl:let>
@@ -988,6 +989,7 @@
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
 			
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
+			<!-- TODO GOON, 20150914 noch kaputt... -->
 			<!-- TODO GOON: HIER nicht mit Properties arbeiten, da Properties über alle Unter-Main-Targets gelten und nicht veränderbar sind. Statt dessen Variablen fl:let verwenden. -->
 			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath}" />			
 			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
@@ -1018,18 +1020,26 @@
 
 <target name = "-FglCheckProjectPropertiesRepository">
 	
-	<!-- Pruefe die Projekt-Properites fuer den Repository-Zweig-->
+	<!-- Pruefe die Projekt-Properites fuer den Repository-Zweig -->
 	
 	<!-- Pruefe die allgemeinen Projekt-Properties -->
-	<antcallback target="-FglCheckProjectProperties" return="returnControl,returnaString">
+	<antcallback target="-FglCheckProjectProperties" return="conf.dirRepositoryPath,conf.dirPathClientFgl,conf.os,returnControl,returnaString">
 		<param name="useDefaultsWhenMissing" value="${project.useDefaultWhenMissing}"/>
 	</antcallback>
 	<fl:let>myGoon ::= "${returnControl}" </fl:let>
-	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />
+	<fl:let>myDirRepositoryPath ::= "${conf.dirRepositoryPath}" </fl:let>
+	<fl:let>myDirPathClientFgl ::= "${conf.dirPathClientFgl}" </fl:let>
+	<fl:let>myOs ::= "${conf.os}" </fl:let>
+	<echo>myOs hat den Wert: "${myOs}"</echo>
+	<echo>myDirRepositoryPath hat den Wert: "${myDirRepositoryPath}"</echo>
+	<echo>myDirPathClientFgl hat den Wert: "${myDirPathClientFgl}"</echo>
+	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />	
 
-
-	<!-- Rueckgabe -->
-	<fl:let>returnControl ::= ${myGoon}</fl:let>
+	<!-- Rueckgabebwerte -->
+	<ac:var name="conf.dirRepositoryPath" value="${myDirRepositoryPath}" />
+	<ac:var name="conf.dirPathClientFgl" value="${myDirPathClientFgl}" />
+	<ac:var name="conf.os" value="${myOs}" />
+	<ac:var name="returnControl" value="${myGoon}" />
 	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 </target>
 
@@ -1050,7 +1060,7 @@
 		</ac:and>
 		<ac:then>			
 			<fl:echo>project.vmd.dirRepositoryPath hat den Wert: '${project.vmd.dirRepositoryPath}'</fl:echo>			
-			<fl:let>conf.dirRepositoryPath ::= "${project.vmd.dirRepositoryPath}" </fl:let> 			
+			<fl:let>myDirRepositoryPath ::= "${project.vmd.dirRepositoryPath}" </fl:let> 			
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
@@ -1067,7 +1077,7 @@
 		</ac:and>
 		<ac:then>
 			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>			
-			<fl:let>conf.dirPathClientFgl ::= "${project.vmd.dirPathClientFgl}" </fl:let>
+			<fl:let>myDirPathClient ::="${project.vmd.dirPathClientFgl}"</fl:let>
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
@@ -1083,9 +1093,10 @@
 				<ac:equals arg1="${project.vmd.os}" arg2="\${project.vmd.os}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
 			</ac:not>
 		</ac:and>
-		<ac:then>			
-			<fl:echo>project.vmd.os hat den Wert: '${project.vmd.os}'</fl:echo>			
-			<fl:let>conf.os ::= "${project.vmd.os}" </fl:let> 			
+		<ac:then>						
+			<fl:echo>project.vmd.os hat den Wert: '${project.vmd.os}'</fl:echo>						
+			<!-- <ac:var name="myOs" value="${project.vmd.os}" /> -->
+			<fl:let>myOs ::="${project.vmd.os}"</fl:let>
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
@@ -1093,9 +1104,12 @@
 		</ac:else>
 	</ac:if>
 	
-	<fl:let>returnControl ::= ${myGoon}</fl:let>
-	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
-
+	<!-- Rueckgabebwerte -->
+	<ac:var name="conf.dirRepositoryPathFgl" value="${myDirRepositoryPath}" />
+	<ac:var name="conf.dirPathClientFgl" value="${myDirPathClient}" />
+	<ac:var name="conf.os" value="${myOs}" />
+	<ac:var name="returnControl" value="${myGoon}" />
+	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->		
 </target>
      
 <target name="-FglRepositoryBackup">	

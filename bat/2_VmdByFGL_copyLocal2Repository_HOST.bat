@@ -16,15 +16,15 @@ FOR /F "tokens=3 delims=." %%a IN ("%VersionNumber%") DO SET VersionBuild=%%a
 IF %VersionMajor%==6 (
 		 IF %VersionMinor%==4 (
 		 		 SET VersionName=Windows 10
-				 SET VMD_OS = Win10
+				 SET VMD_OS=Win10
 		 ) ELSE (
 		 IF %VersionMinor%==3 (
 		 		 SET VersionName=Windows 8.1
-				 SET VMD_OS = Win81
+				 SET VMD_OS=Win81
 		 ) ELSE (
 		 IF %VersionMinor%==2 (
 		 		 SET VersionName=Windows 8
-				 SET VMD_OS = Win8
+				 SET VMD_OS=Win8
 		 ) ELSE (
 		 IF %VersionMinor%==1 (
 		 		 SET VersionName=Windows 7
@@ -72,10 +72,10 @@ IF %VersionMajor%==3 (
 		 SET VMD_OS=Win31
 ))))
 
-ECHO Vesionsnummer: %VersionNumber%
-ECHO %VersionMajor%.%VersionMinor%.%VersionBuild%
-ECHO %VersionName%
-ECHO VMD_OS Kuerzel: %VMD_OS%
+ECHO Versionsnummer: %VersionNumber%
+ECHO VersionMajar.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%VersionBuild%
+ECHO VersionName: %VersionName%
+ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
 
 
 
