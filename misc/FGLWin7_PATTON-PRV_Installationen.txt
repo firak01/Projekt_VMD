@@ -1,0 +1,27 @@
+### Spieleplattform, Screencasterstellung, Videobearbeitung
+
+2015-04-28: Umbenannt in Patton-PRV
+
+2014-12-14: Alle nicht genutzten Netzwerkadapter (vmware) diabled. 
+            Bei Problemen, das Modem mal neu durchstarten. Dadurch wird Kerbal Space Program x mal schneller geladen.
+
+2014-02-28: Java JDK installiert (Voraussetzung fuer Ant), Version 64bit, JDK Java 7 Update 51.
+2014-02-28: Java Ant installiert, JAVA_HOME & Ant_HOME in classpath und Path als Umgebungsvariable
+2014-02-24: GitHub-Client installiert & GitGUI-Client installiert.
+
+2014-02-15: Viele sinnvolle Plugins für Notepad++ installiert. KOS als "Language" darin erstellt. Alternative zu KOS.
+2014-02-10: Notepad++ installiert
+2014-02-08: Edit KOS - Kleiner Editor zum Bearbeiten von KOS (KerbalScript) Dateien
+
+2014-01-23: Teamviewer Version 6 installiert
+
+2013-12-15: Autologon für Win7 eingerichtet
+
+2013-12-12: FireFox Plugin "Better twitch TV" (http://nightdev.com/betterttv/) installiert.
+ 
+2013-11-21: Subtitle Workshop installiert: Erlaubt das Hinzufügen von Untertiteln in Videos.
+            Freemake um das "Subtitle Package" (für ca 4 Euro) erweitert.
+
+2013-11-20: Lightworks Videobearbeitung mit Maschinennummer 1458
+            zusätzlich zu der Screencast Software "Open Broadcaster" 
+            und dem VideoConvertierer "Freemake"

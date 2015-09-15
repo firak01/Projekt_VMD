@@ -938,8 +938,8 @@
 	<!-- Mache Backup des Repositories. -->
 	
 	<!-- Pruefe die Projekt-Properites -->
-	<antcallback target="-FglCheckProjectPropertiesRepository" return="conf.dirRepositoryPathFgl,conf.dirPathClientFgl,conf.os,returnControl,returnaString">
-		<param name="useDefaultsWhenMissing" value="${project.useDefaultWhenMissing}"/>
+	<antcallback target="-FglCheckProjectPropertiesRepository" return="conf.dirRepositoryPath,conf.dirPathClientFgl,conf.os,returnControl,returnaString">
+		<param name="useDefaultWhenMissing" value="${project.useDefaultWhenMissing}"/>
 	</antcallback>
 	<fl:let>myGoon ::= "${returnControl}" </fl:let>
 	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />
@@ -1024,15 +1024,15 @@
 	
 	<!-- Pruefe die allgemeinen Projekt-Properties -->
 	<antcallback target="-FglCheckProjectProperties" return="conf.dirRepositoryPath,conf.dirPathClientFgl,conf.os,returnControl,returnaString">
-		<param name="useDefaultsWhenMissing" value="${project.useDefaultWhenMissing}"/>
+		<param name="useDefaultWhenMissing" value="${project.useDefaultWhenMissing}"/>
 	</antcallback>
 	<fl:let>myGoon ::= "${returnControl}" </fl:let>
 	<fl:let>myDirRepositoryPath ::= "${conf.dirRepositoryPath}" </fl:let>
 	<fl:let>myDirPathClientFgl ::= "${conf.dirPathClientFgl}" </fl:let>
 	<fl:let>myOs ::= "${conf.os}" </fl:let>
-	<echo>myOs hat den Wert: "${myOs}"</echo>
 	<echo>myDirRepositoryPath hat den Wert: "${myDirRepositoryPath}"</echo>
 	<echo>myDirPathClientFgl hat den Wert: "${myDirPathClientFgl}"</echo>
+	<echo>myOs hat den Wert: "${myOs}"</echo>
 	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />	
 
 	<!-- Rueckgabebwerte -->
@@ -1062,9 +1062,9 @@
 			<fl:echo>project.vmd.dirRepositoryPath hat den Wert: '${project.vmd.dirRepositoryPath}'</fl:echo>			
 			<fl:let>myDirRepositoryPath ::= "${project.vmd.dirRepositoryPath}" </fl:let> 			
 		</ac:then>
-		<ac:else>
-			<fl:let>myGoon ::= false</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath'" arrayreturn="myaError" sflagcontrol="" />
+		<ac:else><!-- TODO GOON: Default nur verwenden, wenn project.useDefault konfiguriert ist -->
+			<fl:let>myDirRepositoryPath ::= "C:/1fgl/repository/Projekt_VMD"</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard '${myDirRepositoryPath}'." arrayreturn="myaError" sflagcontrol="" />			
 		</ac:else>
 	</ac:if>
 	<ac:if>
@@ -1080,11 +1080,10 @@
 			<fl:let>myDirPathClient ::="${project.vmd.dirPathClientFgl}"</fl:let>
 		</ac:then>
 		<ac:else>
-			<fl:let>myGoon ::= false</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl'" arrayreturn="myaError" sflagcontrol="" />
+			<fl:let>myDirPathClientFgl ::= "c:/1fgl/client"</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard '${myDirPathClientFgl}'." arrayreturn="myaError" sflagcontrol="" />
 		</ac:else>
 	</ac:if>
-	
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.os"/>	
@@ -1095,7 +1094,6 @@
 		</ac:and>
 		<ac:then>						
 			<fl:echo>project.vmd.os hat den Wert: '${project.vmd.os}'</fl:echo>						
-			<!-- <ac:var name="myOs" value="${project.vmd.os}" /> -->
 			<fl:let>myOs ::="${project.vmd.os}"</fl:let>
 		</ac:then>
 		<ac:else>
@@ -1104,9 +1102,11 @@
 		</ac:else>
 	</ac:if>
 	
+	
+	
 	<!-- Rueckgabebwerte -->
-	<ac:var name="conf.dirRepositoryPathFgl" value="${myDirRepositoryPath}" />
-	<ac:var name="conf.dirPathClientFgl" value="${myDirPathClient}" />
+	<ac:var name="conf.dirRepositoryPath" value="${myDirRepositoryPath}" />
+	<ac:var name="conf.dirPathClientFgl" value="${myDirPathClientFgl}" />
 	<ac:var name="conf.os" value="${myOs}" />
 	<ac:var name="returnControl" value="${myGoon}" />
 	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->		
@@ -1182,72 +1182,17 @@
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
 <target name="-FglVmd_Main">
 	<echo>######################################</echo>
-	
-	<!-- Schiebe die angegebenen Dateien von a nach b auf dem lokalen Rechner -->
+	<!-- Fuehre die in der Steuereungsdatei definierten Aktionen aus. -->
 	<!-- Gesteuert wird das über eine Datei, die für jeden HOST-Rechner individuell ist. 
 	       Unterschied zu FGLCopyRepository ist, das hier der Dateiname geändert werden MUSS, d.h. in der Steuerdatei MUSS hinter dem Gleichheitszeichen ein Dateipfad stehen.-->
+	<!-- Z.B. Schiebe die angegebenen Dateien von a nach b auf dem lokalen Rechner -->
 	
-	
-	<!-- Prüfe die Existenz der notwendigen Konfigurations-Properties -->
-	<!-- Merke: Oben (in Declaration) werden die project - Parameter ausgelesen und hier in conf - Parameter gepackt woraus wiederum die speziellen dest/src Parameter ggfs. geholt werden.-->
-	<!-- Merke: Da solche Parameter dann für jedes Unter-Main-Target individuell sein kann, darf es nicht in eine Property gespeiert werden, sondern muss in eine Variable gepackt werden.-->	
-	<fl:let>myGoon ::= true</fl:let>
-	<arrayInitJsZZZ isize="0" arrayreturn="myaError"/>
-	<ac:if>
-		<ac:and>
-			<isset property="project.vmd.operation_mode"/>	
-			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
-			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
-				<ac:equals arg1="${project.vmd.operation_mode}" arg2="\${project.vmd.operation_mode}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
-			</ac:not>
-		</ac:and>
-		<ac:then>
-			<fl:echo>project.vmd.operation_mode hat den Wert: '${project.vmd.operation_mode}'</fl:echo>	
-			<fl:let>conf.operation_mode ::= "${project.vmd.operation_mode}"</fl:let>			
-		</ac:then>
-		<ac:else>			
-			<fl:let>conf.operation_mode ::= "prod"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.operation_mode' verwende als Standard '${conf.operation_mode}'." arrayreturn="myaError" sflagcontrol="" />
-			<fl:let>myGoon ::= true</fl:let>
-		</ac:else>
-	</ac:if>
-		
-	<ac:if>
-		<ac:and>
-			<isset property="project.vmd.dirRepositoryPath"/>	
-			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
-			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
-				<ac:equals arg1="${project.vmd.dirRepositoryPath}" arg2="\${project.vmd.dirRepositoryPath}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
-			</ac:not>
-		</ac:and>
-		<ac:then>			
-			<fl:echo>project.vmd.dirRepositoryPath hat den Wert: '${project.vmd.dirRepositoryPath}'</fl:echo>				
-			<fl:let>conf.dirRepositoryPath_VMD ::= "${project.vmd.dirRepositoryPath}"</fl:let>				
-		</ac:then>
-		<ac:else>
-			<fl:let>conf.dirRepositoryPath_VMD ::= "C:/1fgl/repository/Projekt_VMD"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard '${conf.dirRepositoryPath_VMD}'." arrayreturn="myaError" sflagcontrol="" />
-			<fl:let>myGoon ::= true</fl:let>
-		</ac:else>
-	</ac:if>	
-	
-	<ac:if>
-		<ac:and>
-			<isset property="project.vmd.dirPathClientFgl"/>	
-			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
-			<ac:not><!-- Abpruefen, ob der Variableninhalt gleich dem Variablennamen ist -->
-				<ac:equals arg1="${project.vmd.dirPathClientFgl}" arg2="\${project.vmd.dirPathClientFgl}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
-			</ac:not>
-		</ac:and>
-		<ac:then>
-			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>			
-		</ac:then>
-		<ac:else>
-			<fl:let>conf.dirPathClientFgl ::= "c:/1fgl/client"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard '${conf.dirPathClientFgl}'." arrayreturn="myaError" sflagcontrol="" />
-			<fl:let>myGoon ::= true</fl:let>
-		</ac:else>
-	</ac:if>
+	<!-- Pruefe die Projekt-Properites -->
+	<antcallback target="-FglCheckProjectPropertiesVmd" return="conf.dirRepositoryPath,conf.dirPathClientFgl,conf.os,conf.opertion_mode,returnControl,returnaString">
+		<param name="useDefaultWhenMissing" value="${project.useDefaultWhenMissing}"/>
+	</antcallback>
+	<fl:let>myGoon ::= "${returnControl}" </fl:let>
+	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />
 		
 	<!-- Sind alle notwendigen Konfigurations-Properties vorhanden, weitermachen -->
 	<fl:echo>myGoon hat den Wert: ${myGoon}</fl:echo>
@@ -1311,6 +1256,52 @@
 		
 		</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
 	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->	
+</target>
+
+<target name = "-FglCheckProjectPropertiesVmd">
+	
+	<!-- Pruefe die Projekt-Properites fuer den Repository-Zweig -->
+	
+	<!-- Pruefe die allgemeinen Projekt-Properties -->
+	<antcallback target="-FglCheckProjectProperties" return="conf.dirRepositoryPath,conf.dirPathClientFgl,conf.os,returnControl,returnaString">
+		<param name="useDefaultWhenMissing" value="${project.useDefaultWhenMissing}"/>
+	</antcallback>
+	<fl:let>myGoon ::= "${returnControl}" </fl:let>
+	<fl:let>myDirRepositoryPath ::= "${conf.dirRepositoryPath}" </fl:let>
+	<fl:let>myDirPathClientFgl ::= "${conf.dirPathClientFgl}" </fl:let>
+	<fl:let>myOs ::= "${conf.os}" </fl:let>
+	<echo>myDirRepositoryPath hat den Wert: "${myDirRepositoryPath}"</echo>
+	<echo>myDirPathClientFgl hat den Wert: "${myDirPathClientFgl}"</echo>
+	<echo>myOs hat den Wert: "${myOs}"</echo>
+	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />	
+
+	<!--prüfe die speziellen Projekt-Properites -->	
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.operation_mode"/>	
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.operation_mode}" arg2="\${project.vmd.operation_mode}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
+		</ac:and>
+		<ac:then>
+			<fl:echo>project.vmd.operation_mode hat den Wert: '${project.vmd.operation_mode}'</fl:echo>	
+			<fl:let>myOperation_mode ::= "${project.vmd.operation_mode}"</fl:let>			
+		</ac:then>
+		<ac:else>			
+			<fl:let>myOperation_mode ::= "prod"</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.operation_mode' verwende als Standard '${myOperation_mode}'." arrayreturn="myaError" sflagcontrol="" />
+		</ac:else>
+	</ac:if>
+	
+	
+	<!-- Rueckgabebwerte -->
+	<ac:var name="conf.dirRepositoryPath" value="${myDirRepositoryPath}" />
+	<ac:var name="conf.dirPathClientFgl" value="${myDirPathClientFgl}" />
+	<ac:var name="conf.os" value="${myOs}" />
+	<ac:var name="conf.operation_mode" value="${myOpertion_mode}" />
+	<ac:var name="returnControl" value="${myGoon}" />
+	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 </target>
 
 <!-- ######################################################################### -->
