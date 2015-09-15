@@ -966,12 +966,18 @@
 			<ac:else>
 				<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
 			
+				<!-- übernimm Projekt KonfigurationsPROPERTIES in gier hier verwendete KonfigurationsVARIABLEN -->
+				<fl:let>conf.dirRepositoryArchive ::= "${project.vmd.dirRepositoryArchive}"</fl:let>
+				<fl:let>conf.dirRepositoryMisc ::= "${project.vmd.dirRepositoryMisc}"</fl:let>
+				
 			<!-- ######### CLIENT ############################################################################## -->
 			
 			<!-- mit absoluten Pfaden hat das kopieren so nicht geklappt, erst wenn wie unten // vor der property steht, funktioniert es -->
 			<!-- Achtung: verwende auch auf deutschen Systemen C:\Program Files (x86), Abaenderung in deutschen Namen Programme... bewirkt nur, das scheinbar das Verzeichnis doppelt angelegt wird. -->
 			<!-- alle .txt Dateien, die ein juengeres Aenderungsdatum haben. --> 
 			 
+			
+				
 
 		<!-- Rechne den Namen der Datei aus... Das ist wichtig, alle anderen Dateien des Verzeichnisses kommen in misc-->
 		<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
@@ -994,7 +1000,7 @@
 			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath}" />			
 			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
 		  
-			<!-- Mache Backup des Repositories. -->
+			<!-- ########### Mache Backup des Repositories. ######################################################### -->
 			<antcallback target="-FglRepositoryBackup" return="returnControl">
 				<param name="targetDirectory" value="${dest.dirRepositoryVmdBackupPath}"/>
 			</antcallback>
@@ -1077,7 +1083,7 @@
 		</ac:and>
 		<ac:then>
 			<fl:echo>project.vmd.dirPathClientFgl hat den Wert: '${project.vmd.dirPathClientFgl}'</fl:echo>			
-			<fl:let>myDirPathClient ::="${project.vmd.dirPathClientFgl}"</fl:let>
+			<fl:let>myDirPathClientFgl ::="${project.vmd.dirPathClientFgl}"</fl:let>
 		</ac:then>
 		<ac:else>
 			<fl:let>myDirPathClientFgl ::= "c:/1fgl/client"</fl:let>
@@ -1127,9 +1133,13 @@
 	<mkdir dir="//${myTargetDirectory}"/>
 
 	<echo>a) VmdRepository Archive:</echo>
+	<echo>project.vmd.dirRepositoryArchive = "${project.vmd.dirRepositoryArchive}"</echo>
+	<echo>conf.dirRepositoryArchive = "${conf.dirRepositoryArchive}"</echo>
+	<echo>myTargetDirectory = "${myTargetDirectory}"</echo>
+	
 	<!-- Mache von den Zielverzeichnissen ein Backup -->
 	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryArchive.name}"
-       basedir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}"
+       basedir="//${dest.dirRepositoryVmdPath}/${conf.dirRepositoryArchive}"
 	/>
 	
 	<!-- damit die Aenderung: Datei wurde geloescht mitbekommen wird, alle Dateien (nur die Programmdateien!!!) nach dem Backup loeschen -->
@@ -1143,7 +1153,7 @@
 	<echo>b) VmdRepository Misc:</echo>
 	<!-- Mache von den Zielverzeichnissen ein Backup -->
 	  <zip destfile="//${myTargetDirectory}/${backup_RepositoryMisc.name}"
-       basedir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryMisc}"
+       basedir="//${dest.dirRepositoryVmdPath}/${conf.dirRepositoryMisc}"
 	/>
 	<fl:let>myReturnControl ::= true</fl:let>
 	<fl:let>returnControl ::= ${myReturnControl}</fl:let>
@@ -1156,8 +1166,11 @@
 	<fl:let>myTargetDirectory ::= "${targetDirectory}"</fl:let>
 		
 	<echo>a) VMD File:</echo>
+	<echo>conf.dirRepositoryArchive = "${conf.dirRepositoryArchive}"</echo>
+	<echo>mySourceDirectory = "${mySourceDirectory}"</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" overwrite="false"  preservelastmodified="true"> 
+	<!-- <copy todir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" overwrite="false"  preservelastmodified="true"> --> 
+	<copy todir="//${dest.dirRepositoryVmdPath}/${conf.dirRepositoryArchive}" overwrite="false"  preservelastmodified="true">
 		<fileset dir="//${mySourceDirectory}">	  
 	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
@@ -1170,7 +1183,7 @@
 	<!-- Alle anderen txt Dateien aus dem client-Ordner in den misc-Ordner verschieben, ausser der VMD Datei. Nix aus Unterordnern verschieben. -->
 	<echo>b) Misc Files:</echo>
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<copy todir="//${myTargetDirectory}/${project.vmd.dirRepositoryMisc}" overwrite="false"  preservelastmodified="true"> 	
+	<copy todir="//${myTargetDirectory}/${conf.dirRepositoryMisc}" overwrite="false"  preservelastmodified="true"> 	
 	  <fileset dir="//${mySourceDirectory}">
 		 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
 		<include name="**.txt"/>
