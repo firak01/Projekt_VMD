@@ -811,9 +811,10 @@
 	<property name="project.vmd.os" value="${env.VMD_OS}" />
 	
     <!-- Ausgangsverzeichnis: Das Repository -->
-  	<!-- a) Feste Unterverzeichnisstruktur -->
+  	<!-- a) Feste Unterverzeichnisstruktur, 
+	        TODO diese Werte in projekt-Konfigurationsdatei uebernehmen, 
+	        nachdem sie in den "...checProperties..." Methoden aufgenommen wurden und dort als Fallback mit dem defaultwert versehen wurden. -->
   <property name="project.vmd.dirRepositoryLib" value="lib" />
-  <property name="project.vmd.dirRepositoryBat" value="bat" />
   <property name="project.vmd.dirRepositorySrc" value="src" />
   <property name="project.vmd.dirRepositoryMisc" value="misc" />
   <property name="project.vmd.dirRepositoryTest" value="test" />
@@ -1201,7 +1202,7 @@
 	<!-- Z.B. Schiebe die angegebenen Dateien von a nach b auf dem lokalen Rechner -->
 	
 	<!-- Pruefe die Projekt-Properites -->
-	<antcallback target="-FglCheckProjectPropertiesVmd" return="conf.dirRepositoryPath,conf.dirPathClientFgl,conf.os,conf.opertion_mode,returnControl,returnaString">
+	<antcallback target="-FglCheckProjectPropertiesVmd" return="conf.dirRepositoryVmdBat,conf.dirRepositoryPath,conf.dirPathClientFgl,conf.os,conf.operation_mode,returnControl,returnaString">
 		<param name="useDefaultWhenMissing" value="${project.useDefaultWhenMissing}"/>
 	</antcallback>
 	<fl:let>myGoon ::= "${returnControl}" </fl:let>
@@ -1229,10 +1230,12 @@
 			<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
 			
 			<!-- Konfiguriere sonstige Variablen -->						
-			<fl:let>conf.dirRepositoryVmdBat ::= "${project.vmd.dirRepositoryBat}" </fl:let>	
+			<!-- ... müssten normalerweise stehen in -FglCheckProjectPropertiesVmd ... -->
+			<!-- wie z.B. <fl:let>conf.dirRepositoryVmdBat ::= "${project.vmd.dirRepositoryBat}" </fl:let> -->	
 						
 		
 			<!-- Falls der Test - Modus angestellt ist, verwende die Test-Konfigurationsdatei und rechne den Dateinamen nicht aus.-->		
+			<!-- <echo>conf.operation_mode='${conf.operation_mode}'</echo> -->
 			<ac:if>
 				<ac:equals arg1="${conf.operation_mode}" arg2="test" />
 				<ac:then>
@@ -1255,7 +1258,7 @@
 
 			<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
 			<!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-			<fl:let>conf.copyLocalFilePath ::= '${conf.dirRepositoryPath_VMD}/${conf.dirRepositoryVmdBat}/${conf.copyLocalFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+			<fl:let>conf.copyLocalFilePath ::= '${conf.dirRepositoryPath}/${conf.dirRepositoryVmdBat}/${conf.copyLocalFileName}'</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
 			<echo>Copy files general, by property file:</echo>
 			<echo>${conf.copyLocalFilePath}</echo>
 
@@ -1288,7 +1291,7 @@
 	<echo>myOs hat den Wert: "${myOs}"</echo>
 	<arrayCopyJsZZZ arrayinput="${returnaString}" arrayreturn="myaError" sflagcontrol="" />	
 
-	<!--prüfe die speziellen Projekt-Properites -->	
+	<!--prüfe die speziellen Projekt-Properites -->		
 	<ac:if>
 		<ac:and>
 			<isset property="project.vmd.operation_mode"/>	
@@ -1307,12 +1310,31 @@
 		</ac:else>
 	</ac:if>
 	
+	<ac:if>
+		<ac:and>
+			<isset property="project.vmd.dirRepositoryBat"/>	
+			<!-- <ac:equals arg1="${myGoon}" arg2="true" /> -->
+			<ac:not><!-- Abprüfen, ob der Variableninhalt gleich dem Variablennamen ist -->
+				<ac:equals arg1="${project.vmd.dirRepositoryBat}" arg2="\${project.vmd.dirRepositoryBat}" /><!-- Merke: mit dem Backslash maskiert man das $ Zeichen-->
+			</ac:not>
+		</ac:and>
+		<ac:then>
+			<fl:echo>project.vmd.dirRepositoryBat hat den Wert: '${project.vmd.dirRepositoryBat}'</fl:echo>	
+			<fl:let>myDirRepositoryBat ::= "${project.vmd.dirRepositoryBat}"</fl:let>			
+		</ac:then>
+		<ac:else>					
+			<fl:let>myDirRepositoryBat ::= "bat"</fl:let>
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard '${myDirRepositoryBat}'." arrayreturn="myaError" sflagcontrol="" />
+		</ac:else>
+	</ac:if>
+	
 	
 	<!-- Rueckgabebwerte -->
+	<ac:var name="conf.dirRepositoryVmdBat" value="${myDirRepositoryBat}" />
 	<ac:var name="conf.dirRepositoryPath" value="${myDirRepositoryPath}" />
 	<ac:var name="conf.dirPathClientFgl" value="${myDirPathClientFgl}" />
 	<ac:var name="conf.os" value="${myOs}" />
-	<ac:var name="conf.operation_mode" value="${myOpertion_mode}" />
+	<ac:var name="conf.operation_mode" value="${myOperation_mode}" />
 	<ac:var name="returnControl" value="${myGoon}" />
 	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 </target>
