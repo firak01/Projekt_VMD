@@ -1565,10 +1565,10 @@
 <target name="-FGLCopyLocal_Copy">
 <!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
 
-			<fl:let>mySrcaTotal.filedir ::= "${srca.filedir}"</fl:let>
-			<fl:let>mySrcaTotal.filename ::= "${srca.filename}"</fl:let>
-			<fl:let>myDestaTotal.filedir ::= "${desta.filedir}"</fl:let>
-			<fl:let>myDestaTotal.filename ::= "${desta.filename}"</fl:let>
+			<fl:let>mySrcaTotal.filedir::="${srca.filedir}"</fl:let>
+			<fl:let>mySrcaTotal.filename::="${srca.filename}"</fl:let>
+			<fl:let>myDestaTotal.filedir::="${desta.filedir}"</fl:let>
+			<fl:let>myDestaTotal.filename::="${desta.filename}"</fl:let>
 
 			<arrayElementCountJsZZZ arrayinput="${mySrcaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 			<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
@@ -1685,10 +1685,10 @@
 		</ac:for>			
 </target>
 <target name="-FGLCopyLocal_CopyFileSingle">
-	<fl:let>mySrca.filedir ::= "${srca.filedir}"</fl:let>
-	<fl:let>mySrca.filename ::= "${srca.filename}"</fl:let>
-	<fl:let>myDesta.filedir ::= "${desta.filedir}"</fl:let>
-	<fl:let>myDesta.filename ::= "${desta.filename}"</fl:let>
+	<fl:let>mySrca.filedir::="${srca.filedir}"</fl:let>
+	<fl:let>mySrca.filename::="${srca.filename}"</fl:let>
+	<fl:let>myDesta.filedir::="${desta.filedir}"</fl:let>
+	<fl:let>myDesta.filename::="${desta.filename}"</fl:let>
 	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> -->
 	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
@@ -1770,7 +1770,7 @@
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->				
 </target>
 <target name="-FGLCopyLocal_AnalyzePart">
-	<fl:let>myPart ::= "${sPartToAnalyze}"</fl:let>
+	<fl:let>myPart::="${sPartToAnalyze}"</fl:let>
 	
 	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
@@ -1784,12 +1784,12 @@
 			<fl:when test="${myisdirectoryPart} == true">
 					<!-- A) Teil - Verzeichnis-Fall: -->
 					<echo>Teil: ist Verzeichnis</echo>
-					<fl:let>myCase ::= "D"</fl:let>	<!-- D=directory-->																						 
+					<fl:let>myCase::="D"</fl:let>	<!-- D=directory-->																						 
 			</fl:when>
 			<fl:when test="${myisdirectoryPart} != true">			
 					<!-- B) Linker Teil - Dateipfad-Fall:-->
 					<echo>Teil: ist KEIN Verzeichnis</echo>
-					<fl:let>myCase ::= "F"</fl:let><!-- F=file-->
+					<fl:let>myCase::="F"</fl:let><!-- F=file-->
 			</fl:when>
 		</fl:when>
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
@@ -1805,17 +1805,17 @@
 				<fl:choose>
 				<fl:when test="${myBooleanValue}==true">
 					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS DATEINAME: ${myPart}</echo>
-					<fl:let>myCase ::= "f"</fl:let>
+					<fl:let>myCase::="f"</fl:let>
 				</fl:when>	
 				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 					<echo>NICHT EXISTIERENDER EINTRAG GILT ALS VERZEICHNIS: ${myPart}</echo>
-					<fl:let>myCase ::= "d"</fl:let>
+					<fl:let>myCase::="d"</fl:let>
 				</otherwise>
 				</fl:choose>
 			</fl:when>
 			<otherwise>
 				<echo>Ergebnis von isFilenameRelevantVMD (= ${myValueIsBoolean} ) nicht interpretierbar: ${myPart}</echo>
-				<fl:let>myCase ::= "X"</fl:let>
+				<fl:let>myCase::="X"</fl:let>
 			</otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->	
 			</fl:choose>
 		</otherwise>
@@ -1832,6 +1832,12 @@
 	<fl:let>myAnalyze::="${analyze}"</fl:let>
 	<fl:let>myLeftPart::="${leftPart}"</fl:let>
 	<fl:let>myRightPart::="${rightPart}"</fl:let>
+	
+	<!--### Zu Anfang erst einmal alle Rückgabeparameter mit Leerstring deklarieren, damit selbst im "false-Fall" keine $Variablennamen zurückgegeben werden. ### -->
+	<fl:let>mySrca.filedir::=""</fl:let>
+	<fl:let>mySrca.filename::=""</fl:let>
+	<fl:let>myDesta.filedir::=""</fl:let>
+	<fl:let>myDesta.filename::=""</fl:let>
 	
 	<!--### START: Aufruf der verschiedenen Fälle ####################-->
 	<!-- F=file, D=directory,X=not defined, f=file not found, d=directory not found.
@@ -1981,7 +1987,7 @@
 	<ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
 	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
 	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
+	<ac:var name="returnDesta.filename" value="${myDesta.filename}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
 </target>
 
@@ -2041,7 +2047,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
 	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
 	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
+	<ac:var name="returnDesta.filename" value="${mySrca.filename}" /><!-- WICHTIG: Uebernimm die Dateien von links -->
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 </target>
 
@@ -2087,7 +2093,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<fl:let>mySrca.filedir::="${return.filedir}"</fl:let>
-			<fl:let>myReturnControl ::= "${returnControl}"</fl:let>
+			<fl:let>myReturnControl::="${returnControl}"</fl:let>
 			
 			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
@@ -2105,7 +2111,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
 	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
 	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
+	<ac:var name="returnDesta.filename" value="${myDesta.filename}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
@@ -2203,7 +2209,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<var name="op" value="-"/>
 	<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
 	<echo>errechneter wert fuer Index des letzten Pfadteils: ${index}</echo>
-	<fl:let>xtractedvalue ::= split('${myPart}','\\\\')[${index}]; 
+	<fl:let>xtractedvalue::=split('${myPart}','\\\\')[${index}]; 
 		<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
 	</fl:let>
 	<echo>An letzter Stelle gefundener wert: ${xtractedvalue}</echo>
@@ -2226,7 +2232,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<arrayAppendJsZZZ arrayinput="${myfileadir}" valueinput="${myPath}" arrayreturn="fileadir" sflagcontrol="" />
 	<!-- <arrayDebugJsZZZ arrayinput="${fileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	
-	<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+	<!-- Rückagebwerteckagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="true" />
 	<ac:var name="return.filedir" value="${fileadir}" />
