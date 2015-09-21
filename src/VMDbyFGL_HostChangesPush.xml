@@ -750,9 +750,14 @@
 		 <attribute name="property" />
 		 <![CDATA[
 		   var text = attributes.get("text");
+		   if(text==''){
+		   //print("Leerstring im JS Teil stringSubStringZZZ");
+		   project.setProperty(attributes.get("property"), '');
+		   }else{
 		   var start = attributes.get("start");
 		   var end = attributes.get("end") || text.length();
 		   project.setProperty(attributes.get("property"), text.substring(start, end));
+		   }
 		 ]]>
 	</scriptdef>
 
@@ -1381,16 +1386,37 @@
 						</tokens>
 						<sequential>
 							<fl:let>myCase ::= "neue Zeile"</fl:let><!-- für jede Zeile wird der mögliche Verarbeitungsfall neu ermittelt -->
+							
+							<var name="myLine" value="@{line}" />
+							<!-- <fl:echo>Zeile:'${myLine}'</fl:echo> -->					
+							
 							<var name="line.length" unset="true" />
-							<length string="@{line}" property="line.length" />
+							<length string="@{line}" property="line.length" /><!-- ueber das length-Tag wird eine property gefüllt, die lediglich so aussieht als wäre sie eine Methode des line-Objekts -->							
+							<!-- <fl:echo>Zeile Länge: ${line.length}</fl:echo> -->
+							
 							<ac:if>
 								<ac:equals arg1="${line.length}" arg2="0" />
+							    <ac:then>
+									<fl:let>myLineTrimmed::=''</fl:let>
+								</ac:then>
+								<ac:else>
+									<fl:let>myLineTrimmed::=trim("@{line}")</fl:let>
+								</ac:else>
+							</ac:if>													
+							<!-- <fl:echo>Zeile trimmed:'${myLineTrimmed}'</fl:echo> -->
+							
+							<!-- <var name="myLineTrimmed.length" unset="true" />
+							<length string="${myLineTrimmed}" property="myLineTrimmed.length" />
+							<fl:echo>Zeile trimmed Länge ${myLineTrimmed.length}</fl:echo> -->
+							
+							<ac:if>								
+								<ac:equals arg1="${myLineTrimmed}" arg2="" />								
 								<ac:then>
 									<!-- <fl:echo>Leerzeile...</fl:echo> -->
 								</ac:then>
-								<ac:else>													
-									<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->							
-									<stringSubStringZZZ text="@{line}" start="0" end="1" property="subtext" /><!-- anwenden der oben definierten scriptdef funktion substring -->
+								<ac:else>												
+									<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->																
+									<stringSubStringZZZ text="${myLineTrimmed}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
 									<!-- <fl:echo message="subtext = ${subtext}" /> -->
 									<ac:if>
 										<ac:equals arg1="${subtext}" arg2="#" />
@@ -1398,7 +1424,7 @@
 											<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
 										</ac:then>
 										<ac:else>
-											<fl:echo>Zeile: @{line}</fl:echo>
+											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 											<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->
 											<!-- +++++++++++++++++++  TODO GOON Hier dann den Schema Controller starten +++++++++  -->
 								
@@ -1407,23 +1433,29 @@
 											<!-- <fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo> -->
 
 											<!-- Schreibe das in eine Flaka - Variable -->		
-											<fl:let>myLeftPart ::= split('@{line}','=')[0]</fl:let>		
-											<fl:let>myRightPart ::= split('@{line}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
+											<!-- <fl:let>myLeftPart::=split('@{line}','=')[0]</fl:let> -->		
+											<fl:let>myLeftPart::=split('${myLineTrimmed}','=')[0]</fl:let>
+											<!-- <fl:let>myRightPart::=split('@{line}','=')[1]</fl:let> --><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
+											<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
 											<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
 											<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
 																				
-											<!-- TODO: Idee: in der initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
+											<!-- TODO: Idee: in der Initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
 											<fl:when test="null('${myRightPart}')">
-												<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo>
-												<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-																							
+												<!-- <echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo> -->
+												<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): ${myLineTrimmed}</echo>
+												<!-- <fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: @{line}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+												<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+												
 												<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
 												<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
 												<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
 												<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 											</fl:when>
 											<fl:when test="null('${myLeftPart}')">
-												<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): @{line}</echo>
+												<!-- <echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): @{line}</echo> -->
+												<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): ${myLineTrimmed}</echo>
+												<!-- <fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: @{line}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 												<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: @{line}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 																							
 												<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
@@ -2030,6 +2062,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<echo>Behandle rechten Fall: Uebernimm dabei die Datei Angabe vom linken Fall</echo>
 			<antcallback target="-FGLCopyLocal_Control_D_Part" return="returnControl, return.filedir">
 				<param name="sPart" value="${myRightPart}"/>
+				<param name="saFilename" value="${mySrca.filename}"/><!-- TODO GOON : Parameter hinzugefügt 20150921, weil er in der Funktion verwendet wurde. Sinnvoll? -->
 			</antcallback>
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<fl:let>myDesta.filedir ::= "${return.filedir}"</fl:let>
@@ -2044,11 +2077,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
+<!-- 	<ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
 	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
 	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filename" value="${mySrca.filename}" /><!-- WICHTIG: Uebernimm die Dateien von links -->
-	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	<ac:var name="returnDesta.filename" value="${mySrca.filename}" /> --><!-- WICHTIG: Uebernimm die Dateien von links -->
+	<arrayCopyJsZZZ arrayinput="${mySrca.filedir}" arrayreturn="returnSrca.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnSrca.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${myDesta.filedir}" arrayreturn="returnDesta.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnDesta.filename" sflagcontrol="" /><!-- WICHTIG: Uebernimm die Dateien von links --><!-- So gibt man einen Arraywertzurueck -->	
+	
 </target>
 
 <target name="-FGLCopyLocal_Control_DF">
@@ -2107,12 +2144,19 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- <fl:let>returnControl ::= false</fl:let> -->
 		
 	<!-- Rueckgabebwerte -->
+	<!-- TODO GOON Noch kaputt: Hier arrays zurückgeben -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
+	<!-- <ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
 	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
 	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filename" value="${myDesta.filename}" />
+	<ac:var name="returnDesta.filename" value="${myDesta.filename}" /> -->
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${mySrca.filedir}" arrayreturn="returnSrca.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnSrca.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${myDesta.filedir}" arrayreturn="returnDesta.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnDesta.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+
+	
 </target>
 
 <target name="-FGLCopyLocal_Control_FF">
@@ -2168,10 +2212,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<fl:let>returnControl ::= true</fl:let>
 		</ac:else>
 	</ac:if>
-	<fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
+	<!-- <fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
 	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
 	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
-	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	
+	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	 -->
+	<arrayCopyJsZZZ arrayinput="${mySrca.filedir}" arrayreturn="returnSrca.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnSrca.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${myDesta.filedir}" arrayreturn="returnDesta.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnDesta.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+
 </target>
 
 <target name="-FGLCopyLocal_Control_F_Part">
@@ -2266,8 +2315,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- Rückgabewerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="true" />
-	<ac:var name="return.filedir" value="${myAFiledir}" />
-	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+	<!-- <ac:var name="return.filedir" value="${myAFiledir}" /> -->
+	<arrayCopyJsZZZ arrayinput="${myAFiledir}" arrayreturn="return.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
 </project>

@@ -58,18 +58,24 @@
 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
- <scriptdef name="stringSubStringZZZ" language="javascript">
-     <attribute name="text" />
-     <attribute name="start" />
-     <attribute name="end" />
-     <attribute name="property" />
-     <![CDATA[
-       var text = attributes.get("text");
-       var start = attributes.get("start");
-       var end = attributes.get("end") || text.length();
-       project.setProperty(attributes.get("property"), text.substring(start, end));
-     ]]>
-  </scriptdef>
+  <scriptdef name="stringSubStringZZZ" language="javascript">
+	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
+		 <attribute name="text" />
+		 <attribute name="start" />
+		 <attribute name="end" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   var text = attributes.get("text");
+		   if(text==''){
+		   //print("Leerstring im JS Teil stringSubStringZZZ");
+		   project.setProperty(attributes.get("property"), '');
+		   }else{
+		   var start = attributes.get("start");
+		   var end = attributes.get("end") || text.length();
+		   project.setProperty(attributes.get("property"), text.substring(start, end));
+		   }
+		 ]]>
+	</scriptdef>
   
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->
