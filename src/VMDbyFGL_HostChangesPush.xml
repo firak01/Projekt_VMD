@@ -1501,6 +1501,7 @@
 											<fl:let>myReturnControl::="${returnControl}"</fl:let>											
 											<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
 											<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
+											<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
 											<!-- <fl:let>mySrca.filedir::="${returnSrca.filedir}"</fl:let>
 											<fl:let>mySrca.filename::="${returnSrca.filename}"</fl:let>
 											<fl:let>myDesta.filedir::="${returnDesta.filedir}"</fl:let>
@@ -1877,10 +1878,6 @@
 	<fl:let>myRightPart::="${rightPart}"</fl:let>
 	
 	<!--### Zu Anfang erst einmal alle Rückgabeparameter mit Leerstring deklarieren, damit selbst im "false-Fall" keine $Variablennamen zurückgegeben werden. ### -->
-	<!-- 	<fl:let>mySrca.filedir::=""</fl:let>
-	<fl:let>mySrca.filename::=""</fl:let>
-	<fl:let>myDesta.filedir::=""</fl:let>
-	<fl:let>myDesta.filename::=""</fl:let> -->
 	<arrayInitJsZZZ isize="0" arrayreturn="mySrca.filedir"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
 	<arrayInitJsZZZ isize="0" arrayreturn="mySrca.filename"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
 	<arrayInitJsZZZ isize="0" arrayreturn="myDesta.filedir"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
@@ -1961,11 +1958,7 @@
 			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 			<fl:echo>Ergebnis des Control_DF Aufrufs: ${returnControl}</fl:echo>
-			<fl:let>myReturnControl::="${returnControl}"</fl:let>
-			<!-- <fl:let>mySrca.filedir::="${returnSrca.filedir}"</fl:let>
-			<fl:let>mySrca.filename::="${returnSrca.filename}"</fl:let>
-			<fl:let>myDesta.filedir::="${returnDesta.filedir}"</fl:let>
-			<fl:let>myDesta.filename::="${returnDesta.filename}"</fl:let> -->	
+			<fl:let>myReturnControl::="${returnControl}"</fl:let>	
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
@@ -1989,11 +1982,7 @@
 			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 			<fl:echo>Ergebnis des Control_FD Aufrufs: ${returnControl}</fl:echo>
-			<fl:let>myReturnControl::="${returnControl}"</fl:let>
-			<!-- <fl:let>mySrca.filedir::="${returnSrca.filedir}"</fl:let>
-			<fl:let>mySrca.filename::="${returnSrca.filename}"</fl:let>
-			<fl:let>myDesta.filedir::="${returnDesta.filedir}"</fl:let>
-			<fl:let>myDesta.filename::="${returnDesta.filename}"</fl:let> -->	
+			<fl:let>myReturnControl::="${returnControl}"</fl:let>	
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
@@ -2027,10 +2016,6 @@
 
 			<fl:echo>Ergebnis des Control_FF Aufrufs: ${returnControl}</fl:echo>
 			<fl:let>myReturnControl ::= "${returnControl}"</fl:let>
-			<!-- <fl:let>mySrca.filedir ::= "${returnSrca.filedir}"</fl:let>
-			<fl:let>mySrca.filename ::= "${returnSrca.filename}"</fl:let>
-			<fl:let>myDesta.filedir ::= "${returnDesta.filedir}"</fl:let>
-			<fl:let>myDesta.filename ::= "${returnDesta.filename}"</fl:let> -->
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
@@ -2044,10 +2029,6 @@
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<!-- <ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
-	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
-	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filename" value="${myDesta.filename}" /> -->
 	<arrayCopyJsZZZ arrayinput="${mySrca.filedir}" arrayreturn="returnSrca.filedir" sflagcontrol="" />
 	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnSrca.filename" sflagcontrol="" />
 	<arrayCopyJsZZZ arrayinput="${myDesta.filedir}" arrayreturn="returnDesta.filedir" sflagcontrol="" />
@@ -2080,11 +2061,19 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<antcallback target="-FGLCopyLocal_Control_F_Part" return="returnControl, returna.filedir, returna.filename">
 		<param name="sPart" value="${myLeftPart}"/>
 	</antcallback>
-	<!-- <arrayDebugJsZZZ arrayinput="${return.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
-	<!-- <arrayDebugJsZZZ arrayinput="${return.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-	<fl:let>mySrca.filedir::="${returna.filedir}"</fl:let>
-	<fl:let>mySrca.filename::="${returna.filename}"</fl:let>
+	
+	<!-- <fl:echo>FD-FALL: BIS HIERHER O.K.!!! -FGLCopyLocal_Control_FD</fl:echo> -->
+	<!-- <arrayDebugJsZZZ arrayinput="${returna.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${returna.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
+	
 	<fl:let>myReturnControl::="${returnControl}"</fl:let>
+	<fl:let>mySrca.filedir::="${returna.filedir}"</fl:let><!-- klappt das mit fl:let so? oder sollte man doch besser das ganze Array kopieren? -->	
+	<fl:let>mySrca.filename::="${returna.filename}"</fl:let>
+	<!-- <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	<!-- <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mySrca.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->		
+	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	
 	<ac:if>
 		<ac:equals arg1="${myReturnControl}" arg2="false"/>										
 		<ac:then>
@@ -2097,27 +2086,25 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 				<param name="saFilename" value="${mySrca.filename}"/><!-- TODO GOON : Parameter hinzugefügt 20150921, weil er in der Funktion verwendet wurde. Sinnvoll? -->
 			</antcallback>
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
-			<fl:let>myDesta.filedir ::= "${returna.filedir}"</fl:let>
-			<fl:let>returnControl ::= "${returnControl}"</fl:let>
 			
-			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
+			<fl:let>returnControl ::= "${returnControl}"</fl:let>
+			<fl:let>myDesta.filedir ::= "${returna.filedir}"</fl:let><!-- klappt das mit fl:let so? oder sollte man doch besser das ganze Array kopieren? -->	
+			<fl:let>myDesta.filename ::= "${mySrca.filename}"</fl:let><!-- WICHTIG: HIER WIRD DER QUELLDATEINAME ALS ZIELDATEINAME UEBERNOMMEN -->
+			<!-- <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+			<!-- <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="myDesta.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->		
+						
+			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->				
 			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->			
 		</ac:else>
 	</ac:if>
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-<!-- 	<ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
-	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
-	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filename" value="${mySrca.filename}" /> --><!-- WICHTIG: Uebernimm die Dateien von links -->
 	<arrayCopyJsZZZ arrayinput="${mySrca.filedir}" arrayreturn="returnSrca.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnSrca.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	<arrayCopyJsZZZ arrayinput="${myDesta.filedir}" arrayreturn="returnDesta.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
-	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnDesta.filename" sflagcontrol="" /><!-- WICHTIG: Uebernimm die Dateien von links --><!-- So gibt man einen Arraywertzurueck -->	
-	
+	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnDesta.filename" sflagcontrol="" /><!-- WICHTIG: Uebernimm die Dateien von links --><!-- So gibt man einen Arraywertzurueck -->		
 </target>
 
 <target name="-FGLCopyLocal_Control_DF">
@@ -2143,8 +2130,11 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<antcallback target="-FGLCopyLocal_Control_F_Part" return="returnControl, returna.filedir, returna.filename">
 		<param name="sPart" value="${myRightPart}"/>
 	</antcallback>
-	<fl:let>myDesta.filedir::="${returna.filedir}"</fl:let>
+	<fl:let>myDesta.filedir::="${returna.filedir}"</fl:let><!-- klappt das mit dem fl:let so, oder sollte man doch das array kopieren? -->
 	<fl:let>myDesta.filename::="${returna.filename}"</fl:let>
+	<!-- <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	<!-- <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="myDesta.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	
 	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<fl:let>myReturnControl::="${returnControl}"</fl:let>
@@ -2162,13 +2152,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			</antcallback>
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
-			<fl:let>mySrca.filedir::="${returna.filedir}"</fl:let>
+			<fl:let>mySrca.filedir::="${returna.filedir}"</fl:let><!-- klappt das mit dem fl:let so, oder sollte man doch das array kopieren? -->
 			<fl:let>myReturnControl::="${returnControl}"</fl:let>
-			
+			<!-- <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+			<!-- <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mySrca.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	
+	
 			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
-			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-			<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->				
 		</ac:else>
 	</ac:if>
 	
@@ -2177,19 +2169,12 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- <fl:let>returnControl ::= false</fl:let> -->
 		
 	<!-- Rueckgabebwerte -->
-	<!-- TODO GOON Noch kaputt: Hier arrays zurückgeben -->
-	<ac:var name="returnControl" value="${myReturnControl}" />
-	<!-- <ac:var name="returnSrca.filedir" value="${mySrca.filedir}" />
-	<ac:var name="returnSrca.filename" value="${mySrca.filename}" />
-	<ac:var name="returnDesta.filedir" value="${myDesta.filedir}" />
-	<ac:var name="returnDesta.filename" value="${myDesta.filename}" /> -->
-	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+	<ac:var name="returnControl" value="${myReturnControl}" />		
 	<arrayCopyJsZZZ arrayinput="${mySrca.filedir}" arrayreturn="returnSrca.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnSrca.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	<arrayCopyJsZZZ arrayinput="${myDesta.filedir}" arrayreturn="returnDesta.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnDesta.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
-
-	
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 </target>
 
 <target name="-FGLCopyLocal_Control_FF">
@@ -2217,14 +2202,14 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<antcallback target="-FGLCopyLocal_Control_F_Part" return="returnControl, returna.filedir, returna.filename">
 		<param name="sPart" value="${myLeftPart}"/>
 	</antcallback>
-	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
-	<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-	<!-- <fl:let>mySrca.filedir ::= "${return.filedir}"</fl:let>
-	<fl:let>mySrca.filename ::= "${return.filename}"</fl:let> -->
+	
+	<!-- <fl:echo>FF-FALL: BIS HIERHER O.K.!!! -FGLCopyLocal_Control_FF</fl:echo> -->
+	<!-- <arrayDebugJsZZZ arrayinput="${returna.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<!-- <arrayDebugJsZZZ arrayinput="${returna.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
+	
 	<arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	<arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mySrca.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	<fl:let>myReturnControl::=${returnControl}</fl:let>
-
 	<ac:if>
 		<ac:equals arg1="${myReturnControl}" arg2="false"/>										
 		<ac:then>
@@ -2235,10 +2220,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<antcallback target="-FGLCopyLocal_Control_F_Part" return="returnControl, returna.filedir, returna.filename">
 				<param name="sPart" value="${myRightPart}"/>
 			</antcallback>
-			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
-			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
-			<!-- <fl:let>myDesta.filedir ::= "${return.filedir}"</fl:let>
-			<fl:let>myDesta.filename ::= "${return.filename}"</fl:let> -->
+			<!-- <arrayDebugJsZZZ arrayinput="${returna.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			<!-- <arrayDebugJsZZZ arrayinput="${returna.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
+			
 			<arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 			<arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="myDesta.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 	
@@ -2251,10 +2235,6 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<fl:let>myReturnControl::=true</fl:let>
 		</ac:else>
 	</ac:if>
-	<!-- <fl:let>returnSrca.filedir ::= "${mySrca.filedir}"</fl:let>
-	<fl:let>returnSrca.filename ::= "${mySrca.filename}"</fl:let>
-	<fl:let>returnDesta.filedir ::= "${myDesta.filedir}"</fl:let>
-	<fl:let>returnDesta.filename ::= "${myDesta.filename}"</fl:let>	 -->
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
@@ -2315,21 +2295,20 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<echo>Der Pfad ist: ${myPath}</echo>
 	
 	<!-- 4. Packe die Werte in ein Array -->
-	<arrayInitJsZZZ isize="0" arrayreturn="myfileaname"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
-	<arrayAppendJsZZZ arrayinput="${myfileaname}" valueinput="${xtractedvalue}" arrayreturn="fileaname" sflagcontrol="" />
-	<!-- <arrayDebugJsZZZ arrayinput="${fileaname}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+	<arrayInitJsZZZ isize="0" arrayreturn="fileadir"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt. -->
+	<arrayAppendJsZZZ arrayinput="${fileadir}" valueinput="${myPath}" arrayreturn="myFileadir" sflagcontrol="" />
+	<!-- <arrayDebugJsZZZ arrayinput="${myFileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
+
+	<arrayInitJsZZZ isize="0" arrayreturn="fileaname"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
+	<arrayAppendJsZZZ arrayinput="${fileaname}" valueinput="${xtractedvalue}" arrayreturn="myFileaname" sflagcontrol="" />
+	<!-- <arrayDebugJsZZZ arrayinput="${myFileaname}" ilevel="1"/ --><!-- Ausgabe des neuen Arrays -->	
 	
-	<arrayInitJsZZZ isize="0" arrayreturn="myfileadir"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt. -->
-	<arrayAppendJsZZZ arrayinput="${myfileadir}" valueinput="${myPath}" arrayreturn="fileadir" sflagcontrol="" />
-	<!-- <arrayDebugJsZZZ arrayinput="${fileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-	
+		
 	<!-- Rückagebwerteckagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="true" />
-	<!-- <ac:var name="return.filedir" value="${fileadir}" />
-	<ac:var name="return.filename" value="${fileaname}" /> -->
-	<arrayCopyJsZZZ arrayinput="${fileadir}" arrayreturn="returna.filedir" sflagcontrol="" />
-	<arrayCopyJsZZZ arrayinput="${filename}" arrayreturn="returna.filename" sflagcontrol="" />
+	<arrayCopyJsZZZ arrayinput="${myFileadir}" arrayreturn="returna.filedir" sflagcontrol="" />
+	<arrayCopyJsZZZ arrayinput="${myFileaname}" arrayreturn="returna.filename" sflagcontrol="" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
@@ -2358,8 +2337,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- Rückgabewerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 	<!-- Rueckgabebwerte -->
-	<ac:var name="returnControl" value="true" />
-	<!-- <ac:var name="return.filedir" value="${myAFiledir}" /> -->
+	<ac:var name="returnControl" value="true" />	
 	<arrayCopyJsZZZ arrayinput="${myAFiledir}" arrayreturn="returna.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
