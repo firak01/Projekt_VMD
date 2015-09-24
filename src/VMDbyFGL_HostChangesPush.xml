@@ -1993,7 +1993,7 @@
 		<ac:equals arg1="${myAnalyze}" arg2="DD"/>										
 		<ac:then>
 			<echo>Fall: links Verzeichnis, rechts Verzeichnis</echo>
-			<!-- TODO: Kopiere alle Dateien aus dem einen Verzeichnis in das andere -->
+			<!-- TODO GOON 20150923: Kopiere alle Dateien aus dem einen Verzeichnis in das andere -->
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	</ac:elseif>
@@ -2153,6 +2153,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<!-- <arrayDebugJsZZZ arrayinput="${returnA.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->		
 			<fl:let>mySrca.filedir::="${returna.filedir}"</fl:let><!-- klappt das mit dem fl:let so, oder sollte man doch das array kopieren? -->
+			<fl:let>mySrca.filename::="${myDesta.filename}"</fl:let><!-- WICHTIG: HIER WIRD DER ZIELDATEINAME ALS QUELLDATEINAME UEBERNOMMEN -->
 			<fl:let>myReturnControl::="${returnControl}"</fl:let>
 			<!-- <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 			<!-- <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mySrca.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
