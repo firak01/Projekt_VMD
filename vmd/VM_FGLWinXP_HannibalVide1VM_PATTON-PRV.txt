@@ -1,20 +1,4 @@
-20140315 Updates von der Windows Seite
-20140315 Update auf IE8
+20150929 Star Wars Empire At War installiert
+         
 
-FGL 2013-03-12: Installation von Apache CouchDb als "Server"
-
-Allgemeine Hinweise:
-Auf dem Notebook "Alarich die Auflösung ändern auf 1208x768
-
-
-FGL 20121005: Installation von Masters Of Orion 2 in der DOS-BOX. Bereithalten einer ISO-Datei der Installation.
-FGL 20120712: Firefox Bookmark Synchronisierung
-
-Vor 20120712
-Installation des Spiels Asia Engulfed.
-
-Einrichten von DOSBox und einigen Spielen.
-
-Einrichten des Free Iso Creator
-
-Installieren von CloneCD
+20140326 IE8 installiert, WinXP Updates

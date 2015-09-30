@@ -1017,7 +1017,7 @@
 				<ac:then>
 					<fl:echo>FglRepositoryBackup erfolgreich. Fahre fort.</fl:echo> 
 					
-					<antcallback target="-FglCopyClient2archive" return="returnControl">
+					<antcallback target="-FglRepositoryCopyClient2archive" return="returnControl">
 					<param name="sourceDirectory" value="${src.dirFglClientPath}"/>
 					<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
 			</antcallback>
@@ -1165,7 +1165,7 @@
 	<fl:let>returnControl ::= ${myReturnControl}</fl:let>
 </target>
 		
-<target name="-FglCopyClient2archive">
+<target name="-FglRepositoryCopyClient2archive">
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->	
 	<echo>Pushing Files to Repository:</echo>
 	<fl:let>mySourceDirectory ::= "${sourceDirectory}"</fl:let>
@@ -1270,11 +1270,33 @@
 			<!-- TODO GOON noch kaputt: Nachfolgenden Code als Target -FglVmdController_Main aufrufen.
 			                             Die "Schemata" Untersuchung machen.
 										 Und letztlich beim Kopieren das neue Target -FglCopyLocal_Main aufrufen. -->
-			<antcallback target="-FglVmdController_Main" return="returnString, returnControl">
+			<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
 			<fl:echo>Ergebnis des VMD Controllers: ${returnString}</fl:echo>
-		
+			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
+			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
+			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
+			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
+			
+			<ac:if>
+				<ac:equals arg1="${returnControl}" arg2="false" />
+				<ac:then>
+					<fl:echo>VMD Controller beendet mit false. Keine weitere Verarbeitung.</fl:echo>
+				</ac:then>
+				<ac:else>
+					<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
+						
+					<antcallback target="-FGLCopyLocal_Main" return="returnString, returnControl">
+						<!-- Scheinbar kann man als Parameter auch arrays uebergeben, nur Arrays zurückgeben ist dann halt etwas schwieriger -->
+						<param name="mySrcaTotal.filedir" value="${srcaTotal.filedir}"/>	
+						<param name="mySrcaTotal.filename" value="${srcaTotal.filename}"/>	
+						<param name="myDestaTotal.filedir" value="${destaTotal.filedir}"/>	
+						<param name="myDestaTotal.filename" value="${destaTotal.filename}"/>	
+					</antcallback>      
+					<fl:echo>Ergebnis des VMD Kopierers: ${returnString}</fl:echo>			
+				</ac:else> <!-- Controller erfolgreich -->
+			</ac:if>
 		</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
 	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->	
 </target>
@@ -1502,20 +1524,13 @@
 											<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
 											<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
 											<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
-											<!-- <fl:let>mySrca.filedir::="${returnSrca.filedir}"</fl:let>
-											<fl:let>mySrca.filename::="${returnSrca.filename}"</fl:let>
-											<fl:let>myDesta.filedir::="${returnDesta.filedir}"</fl:let>
-											<fl:let>myDesta.filename::="${returnDesta.filename}"</fl:let> -->
 											<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
 											<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
 											<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
 											<arrayCopyJsZZZ arrayinput="${returnDesta.filename}" arrayreturn="myDesta.filename" sflagcontrol="" />
 											
 																	
-											<!-- TODO GOON 20150719: Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
-											<!-- myStringaLeftTotal
-												myStringaRightTotal
-											-->
+											<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
 											<ac:if>
 												<equals arg1="${returnControl}" arg2="true"/>
 												<ac:then>
@@ -1542,18 +1557,35 @@
 							</ac:if><!-- end if <ac:equals arg1="${line.length}" arg2="0" /> -->
 						</sequential>
 					</for><!-- end for param="line"> -->		
-		
-		
-		<!-- TODO GOON 20150922 noch kaputt: Jetzt die Arrays zurückgeben. Der Controller ist soweit 
-		                            fertig. Danach geht das kopieren in der aufrufenden Funktion weiter -->
-		
-		
+					
+					<fl:let>myReturnControl ::= true</fl:let>
+					<fl:let>myReturnString ::= "alles ok"</fl:let>																					
+				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
+				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+					<fl:let>myReturnControl ::= false</fl:let>
+					<fl:let>myReturnString ::= "Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"</fl:let>
+				</otherwise>
+			</fl:choose>
+			
+			<!-- Rueckgabebwerte -->
+			<ac:var name="returnControl" value="${myReturnControl}" />
+			<ac:var name="returnString" value="${myReturnString}" />
+			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
+<!-- ######################################################################### -->
+<target name="-FGLCopyLocal_Main">
 					<arrayElementCountJsZZZ arrayinput="${myDestaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 					<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
 					<ac:if>
 						<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
-						<ac:then>
-							<echo>Keine Dateien im Array => keine Verarbeitung</echo>
+						<ac:then>							
+							<fl:let>myReturnString ::= "Keine Dateien im Array => keine Verarbeitung"</fl:let>
+							<fl:let>myReturnControl::=false</fl:let>
 						</ac:then>
 						<ac:else>	
 							<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
@@ -1575,39 +1607,37 @@
 							<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
 							<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
 					
-							<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
+							<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
 								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
 								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
 								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
 								<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
 							</antcallback>
+							<fl:let>myReturnControl ::="${returnControl}"</fl:let>
+							<fl:let>myReturnString ::="${returnString}"</fl:let>
 						
 						
 							<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
-							<antcallback target="-FGLCopyLocal_Copy" return="returnCopy">					
+							<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
 								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
 								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
 								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
 								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
-							</antcallback>				
+							</antcallback>	
+							<fl:let>myReturnControl ::="${returnControl}"</fl:let>
+							<fl:let>myReturnString ::="${returnString}"</fl:let>
 						</ac:else>
 					</ac:if><!-- Anzahl der Dateien pruefen -->
-					<fl:let>returnControl ::= true</fl:let>
-					<fl:let>returnString ::= "alles ok"</fl:let>					
-				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
-				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-					<fl:let>returnControl ::= false</fl:let>
-					<fl:let>returnString ::= "Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"</fl:let>
-				</otherwise>
-			</fl:choose>
-			<echo>${returnString}</echo>
 
+					<!-- Rueckgabewerte -->
+					<ac:var name="returnControl" value="${myReturnControl}" />
+					<ac:var name="returnString" value="${myReturnString}" />
+					<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- Merke: So gibt man einen Arraywertzurueck -->
 </target>
 
 <!-- ######################################################################### -->
 <target name="-FGLCopyLocal_Copy">
-<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
+			<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
 
 			<fl:let>mySrcaTotal.filedir::="${srca.filedir}"</fl:let>
 			<fl:let>mySrcaTotal.filename::="${srca.filename}"</fl:let>
@@ -1626,27 +1656,32 @@
 					<ac:if>				
 					<equals arg1="1" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich ein Fallunterscheidung einbauen, da in ac:for (des aufzurufenden copy Targets) nicht beide Parameter 0 (also gleich) sein dürfen. -->
 					<ac:then>			
-						<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnCopy">					
+						<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnControl,returnString">					
 								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
 								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
 								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
 								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
-						</antcallback>					
+						</antcallback>	
+						<fl:let>myReturnControl ::="${returnControl}"</fl:let>
+						<fl:let>myReturnString ::="${returnString}"</fl:let>
 					</ac:then>
 					<ac:else> 
-					<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnCopy">					
+					<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnControl,returnString">					
 								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
 								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
 								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
 								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
 						</antcallback>
+						<fl:let>myReturnControl ::="${returnControl}"</fl:let>
+						<fl:let>myReturnString ::="${returnString}"</fl:let>
 					</ac:else>
 					</ac:if> 
 				</ac:else>
 			</ac:if>
-
-
-
+			
+			<!-- Rueckgabewerte -->
+			<ac:var name="returnControl" value="${myReturnControl}" />
+			<ac:var name="returnString" value="${myReturnString}" />			
 </target>
 <target name="-FGLCopyLocal_CopyFileByFile">
 	<fl:let>mySrca.filedir ::= "${srca.filedir}"</fl:let>
@@ -1726,7 +1761,11 @@
 				<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
 			</copy>
 		</sequential>
-		</ac:for>			
+		</ac:for>		
+
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnString" value="CopyFileByFile: Alles ok." />
 </target>
 <target name="-FGLCopyLocal_CopyFileSingle">
 	<fl:let>mySrca.filedir::="${srca.filedir}"</fl:let>
@@ -1771,6 +1810,9 @@
 		<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
 	</copy>
 	
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnString" value="CopySingleFile: Alles ok." />
 </target>
 
 <target name="-FGLCopyLocal_Analyze">
@@ -1778,7 +1820,7 @@
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
 	<fl:let>myCaseTotal ::= ""</fl:let>
 
-	<!-- Meke: Die Analyse der beiden Teile links/rechts ist gleich. Daher dies in ein target ausgelagert, das dann jeweils aufgerufen wird. -->	
+	<!-- Merke: Die Analyse der beiden Teile links/rechts ist gleich. Daher dies in ein target ausgelagert, das dann jeweils aufgerufen wird. -->	
 	<antcallback target="-FGLCopyLocal_AnalyzePart" return="returnControl,returnString">					
 			<param name="sPartToAnalyze" value="${myLeftPart}"/>											
 	</antcallback>	

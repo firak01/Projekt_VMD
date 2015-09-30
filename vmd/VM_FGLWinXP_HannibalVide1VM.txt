@@ -1,11 +1,4 @@
-Spielumgebung 
-###########################
-Installiert sind
-
-20140813 Druckersuite für Brother-Drucker
-
-
-Vassal Client
-Java 1.6 
+20150929 Star Wars Empire At War installiert
+         
 
 20140326 IE8 installiert, WinXP Updates
