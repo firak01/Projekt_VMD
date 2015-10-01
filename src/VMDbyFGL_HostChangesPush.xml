@@ -771,7 +771,8 @@
   -->
   
   <!-- ################################################################################# -->
-  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglVmd_Main">
+  <!-- <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglVmd_Main"> -->
+  <target name="compile" depends="-declaration, -init,-FglRepository_Main"><!-- Einzeln testen -->
   
    <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
@@ -990,14 +991,18 @@
 				dies passiert hier durch flaka´s install-property handler task -->
 	<fl:install-property-handler />
 	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-	<fl:let>src.dirFglClientPath ::= "${conf.dirPathClientFgl}" </fl:let>
+	<fl:let>src.dirFglClientPath::="${conf.dirPathClientFgl}" </fl:let>
 	<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
 	<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
-    <fl:let>src.dirFglClientFileName ::= "FGL${conf.os}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+	<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+				<param name="osUsed" value="${conf.os}"/>					
+	</antcallback>	
+    <!-- <fl:let>src.dirFglClientFileName::="FGL${conf.os}_${env.COMPUTERNAME}_Installationen.txt"</fl:let> --><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+	<fl:let>src.dirFglClientFileName::="${returnFilename}"</fl:let><!-- Merke: Der Computername wird nicht extra gesetzte. Er kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 	
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-	<fl:let>src.dirFglClientFilePath ::= '${src.dirFglClientPath}/${src.dirFglClientFileName}'</fl:let>
+	<fl:let>src.dirFglClientFilePath::='${src.dirFglClientPath}/${src.dirFglClientFileName}'</fl:let>
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
 			
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
@@ -2383,5 +2388,21 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnControl" value="true" />	
 	<arrayCopyJsZZZ arrayinput="${myAFiledir}" arrayreturn="returna.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
+
+<target name="-FglComputeFilenameHostVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:let>myFilename::="FGL${myOsUsed}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
 
 </project>

@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="test_vmdRelevant"   default="compile" basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka">
+	 <!-- damit definiert man für antcontrib einen eigenen Namespace -->
+   <!-- damit definiert man für FLAKA einen eigenen Namespace -->
+
+   <!-- ### Einbinden von Ant-Contrib ### -->
+   <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!--    <taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	 <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+<!-- ######## Scriptdefs ############################################################################--> 
+
+	<!-- ############################################################ -->		
+	<scriptdef name="isFilenameRelevantVMD" language="javascript">
+		 <attribute name="text" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   //Überprüft, ob der eingegebenen Dateiname ein vom VMD zu verarbeitender Dateiname ist.
+		   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
+		   var text = attributes.get("text");
+		   var berg=false;
+		   print("Starte isFilenameRelevantVMD '" + text + "'");
+
+		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
+		   //      Dies ggfs. in JSZ-Kernel uebernehmen
+		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
+		   
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.file);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sEnding = FileEasyZZZ.getNameEnd(text);
+		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + text + "'): '" + sEnding +"'");
+		   
+		   //Hier die für VMD relevanten Dateiendungen erfassen.
+		   if(sEnding=="txt"){		   
+			berg =true;
+		   }
+		   if(berg==true){	
+			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt relevant.");
+			}else{
+			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt NICHT relevant.");
+			}
+		   project.setProperty(attributes.get("property"), berg);				
+		 ]]>
+	</scriptdef>
+	
+	<!-- ############################################################ -->		
+	<scriptdef name="isHostVMD" language="javascript">
+		 <attribute name="stringinput" />
+		 <attribute name="booleanreturn" />
+		 <![CDATA[
+		   //Überprüft, ob der eingegebenen Dateiname von der Struktur her dem Dateinamen einer Hostdatei entspricht.
+		   //Beispiel: FGLWin81_HIS4528_Installationen.txt		   
+		   var myString = attributes.get("stringinput");
+		   var berg=false;
+		   print("Starte isHostVMD '" + myString + "'");
+
+		//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.file);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sEnding = FileEasyZZZ.getNameEnd(myString);
+		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
+		   
+		   //Hier die für VMD relevanten Dateiendungen erfassen.
+		   if(sEnding=="txt"){		   
+			berg =true;
+		   }
+		   if(berg==true){	
+			print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
+			}else{
+			print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
+			}
+			
+		//2. Pruefe ob am Anfang FGL steht.
+		//TODO GOON 20151001
+			
+			//Rueckgabewerte
+		   project.setProperty(attributes.get("booleanreturn"), berg);				
+		 ]]>
+	</scriptdef>
+
+
+ 
+  
+<!-- ################################################################################# -->
+	<!-- Die einzelnen Tests im depends hinzufügen -->
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ 
+ <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsHostVMD">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+	<target name="-myTestIsFilenameRelevantVMD">
+		<echo>myTestIsFilenameRelevantVMD: </echo>
+		
+		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+		<isFilenameRelevantVMD text="asdfasdfasdf" property="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+		<isFilenameRelevantVMD text="dummy.txt" property="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+	</target> 
+	
+	
+	<target name="-myTestIsHostVMD">
+		<echo>myTestIsHostVMD: </echo>
+		
+		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+		<isHostVMD stringinput="asdfasdfasdf" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+		
+		<isHostVMD stringinput="dummy.txt" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+		<!-- ultimativer Test, bei dem der Dateiname tatsächlich berechnet wird -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+		</antcallback>
+		<echo message="errechneter Dateiname = ${returnFilename}" />
+				
+		<isHostVMD stringinput="${returnFilename}" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+	</target>
+	
+	
+	<target name="-myTestComputeFilenameHostVMD">
+		<echo>myTestComputeFilenameHostVMD: </echo>
+
+		<!-- Das Betriebssystem, in der Batch ermittelt. -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		
+		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+		</antcallback>
+		
+		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+	</target>
+	
+	<target name="-FglComputeFilenameHostVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:let>myFilename::="FGL${myOsUsed}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
+ </project>
