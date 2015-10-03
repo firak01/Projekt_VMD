@@ -771,8 +771,8 @@
   -->
   
   <!-- ################################################################################# -->
-  <!-- <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglVmd_Main"> -->
-  <target name="compile" depends="-declaration, -init,-FglRepository_Main"><!-- Einzeln testen -->
+  <target name="compile" depends="-declaration, -init,-FglRepository_Main,-FglVmd_Main">
+  <!-- <target name="compile" depends="-declaration, -init,-FglRepository_Main">--><!-- Einzeln testen --> 
   
    <!-- Die einzelnen internen Targets / Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
