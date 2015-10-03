@@ -1,4 +1,5 @@
 ---- Synchron halten mit DEV04, auch Verzeichnis "Installation"
+---- Entwicklungsumgebung von "KernelZZZ", "ScheduledFileArchiveZZZ"
 ##### Lotus Notes Client 8.53, Für Arbeit mit Foren, Tips, etc. eingerichtet.
              Komodo Edit 8: Entwicklungsumgebung für JQuery
              SoapUI (alte Version)
