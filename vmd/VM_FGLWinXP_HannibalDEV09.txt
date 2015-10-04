@@ -1,5 +1,7 @@
 ---- Synchron halten mit ...DEV08
 ### Entwickungsumgebung für TileHexMap Projekt (Version 03, d.h. MIT Hibernate, als Maven Projekt)
+    Dabei wird der zKernel nur als JAR-File eingebunden und hier nicht aktuell entwickelt
+
 #### Apache Wicket Entwickungsumgebung 
 
 

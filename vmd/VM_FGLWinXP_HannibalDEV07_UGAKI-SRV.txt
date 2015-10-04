@@ -10,7 +10,12 @@
 	--- Entwicklungsumgebung für das Buch "Lucene in action"
 	
 	--- Eclipse 3.2 
-	Alte ZKernel Entwicklungumgebung
+	ZKernel Entwicklungumgebung für Java 1.6 (angebunden an CVS System)
+	Plugin zum Packen des JAR-Archivs
+
+
+	--- Eclipse 4.2EE Juno
+	ZKernel Entwicklungsumgebung für Java 1.6 (angebunden an CVS System)
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
 2015-04-12: PDF24Creator installiert

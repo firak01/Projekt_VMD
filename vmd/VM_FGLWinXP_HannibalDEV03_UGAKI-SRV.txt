@@ -7,7 +7,7 @@
 	Eclipse 3.3 WTP
 	--- Workspace zum Buch "SOA using Java WebServices"
 
-Alte Javaprojekte für Albis und die Sparkassn Informatik
+Alte Javaprojekte für Albis und die Sparkassen Informatik
 ######################################################
 2014-06-11: Java 7 SDK installiert
 

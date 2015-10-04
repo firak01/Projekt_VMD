@@ -1,5 +1,4 @@
 ---- Synchron halten mit DEV04, auch Verzeichnis "Installation"
----- Entwicklungsumgebung von "KernelZZZ", "ScheduledFileArchiveZZZ"
 ##### Lotus Notes Client 8.53, Für Arbeit mit Foren, Tips, etc. eingerichtet.
              Komodo Edit 8: Entwicklungsumgebung für JQuery
              SoapUI (alte Version)
@@ -11,10 +10,15 @@
 	Eclipse - JEE - Luna
 	--- Workspace zum Buch "Java & Xml"
 	---  Alte Entwicklungumgebung für "KernelZZZ" und das "VideoArchiveZZZ", mit Java 1.6
-             
-        Eclipse 3.22:    
-	--- ALTE Entwicklung des "KernelZZZ", diverse TryOuts: Z.B. CouchDb, VideoArchive (alt 1.6er compiler) 
-        --- Workspace zum Buch "Graphic Java - Das AWT beherrschen".
+
+
+ 	 Eclipse 3.22:    
+	--- Entwicklung des "KernelZZZ" V1.0, diverse TryOuts: Z.B. CouchDb, VideoArchive (alt 1.6er compiler)(angebunden ans CVS) 
+             	--- Workspace zum Buch "Graphic Java - Das AWT beherrschen".
+
+	Eclipse 3.22
+	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)               
+
 
 
 20140627: Lotus Notes 8.53 Fixpack 6
