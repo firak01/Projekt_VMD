@@ -1,0 +1,15 @@
+Allgemeine Hinweise:
+Auf dem Notebook "Alarich die Auflösung ändern auf 1208x768
+
+20151003: Einrichten des Free Iso Creator,
+          Installieren von CloneCD
+
+20151002: Installation des Spiels "Star Wars - Empire at War"
+
+2014    : Installation des Spiels "Asia Engulfed"
+
+20121005: Installation von Masters Of Orion 2 in der DOS-BOX. Bereithalten einer ISO-Datei der Installation.
+20120712: Firefox Bookmark Synchronisierung
+
+Vor 
+20120712: Einrichten von DOSBox und entsprechenden DOS Spielen
