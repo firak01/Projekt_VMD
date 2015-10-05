@@ -73,8 +73,9 @@
 		   var myString = attributes.get("stringinput");
 		   var berg=false;
 		   print("Starte isHostVMD '" + myString + "'");
-
-		//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
+		   main:{
+		   
+			//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
 		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
 		   importPackage(Packages.basic.zBasic.util.file);
 		   
@@ -86,23 +87,215 @@
 		   
 		   //Hier die für VMD relevanten Dateiendungen erfassen.
 		   if(sEnding=="txt"){		   
-			berg =true;
+			berg=true;
+		   }else{
+		     berg=false;
 		   }
 		   if(berg==true){	
 			print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
 			}else{
 			print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
+			break main;
 			}
 			
-		//2. Pruefe ob am Anfang FGL steht.
-		//TODO GOON 20151001
+			
+			//2. Pruefe ob am Anfang FGL steht.
+			//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.datatype.string);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sBeginning = StringZZZ.left(myString,3);
+		   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
+		   
+		   //Hier die für VMD relevanten Dateiendungen erfassen.
+		   if(sBeginning=="FGL"){		   
+			berg=true;
+		   }else{
+		    berg=false;
+		   }
+		   if(berg==true){	
+			print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
+			}else{
+			print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
+			}
+		   
+		   }//end main:
+		
 			
 			//Rueckgabewerte
 		   project.setProperty(attributes.get("booleanreturn"), berg);				
 		 ]]>
 	</scriptdef>
 
+	<!-- ############################################################ -->		
+	<scriptdef name="isVmOnHostVMD" language="javascript">
+		 <attribute name="stringinput" />
+		 <attribute name="booleanreturn" />
+		 <![CDATA[
+		   //Überprüft, ob der eingegebenen Dateiname von der Struktur her dem Dateinamen einer Hostdatei entspricht.
+		   //Wichtig ist, dass die Überprüfung auf ein Hostnamenssuffix entfällt.		   
+		   //Beispiel: VM_FGLWin7_Ugaki-SRV.txt		   
+		   var myString = attributes.get("stringinput");
+		   var berg=false;
+		   print("Starte isVmOnHostVMD '" + myString + "'");
+		   main:{
+		   
+			//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.file);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sEnding = FileEasyZZZ.getNameEnd(myString);
+		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
+		   
+		   //Hier die für VMD relevanten Dateiendungen erfassen.
+		   if(sEnding=="txt"){		   
+			berg=true;
+		   }else{
+		     berg=false;
+		   }
+		   if(berg==true){	
+			print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
+			}else{
+			print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
+			break main;
+			}
+			
+			
+			//2. Pruefe ob am Anfang VM_ steht.
+			//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.datatype.string);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sBeginning = StringZZZ.left(myString,3);
+		   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
+		   
+		   //Hier den für VMD relevanten Dateianfang erfassen.
+		   if(sBeginning=="VM_"){		   
+			berg=true;
+		   }else{
+		    berg=false;
+		   }
+		   if(berg==true){	
+			print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
+			}else{
+			print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
+			}
+			
+			//Zähle die Unterstriche
+			//TODO: Diese Methode erst noch bereitstellen. Dabei soll _ tatsächlich ein Char sein.
+			var iUnderlineFound = StringZZZ.countChar(myString,"_");
+			if(iUnderlineFound==3){	
+			print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann durchaus VMD-Datei auf dem Host sein.");
+			}else{
+			print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann keine VMD-Datei auf dem Host sein.");
+			}					  
+		   }//end main:
+		
+			
+			//Rueckgabewerte
+		   project.setProperty(attributes.get("booleanreturn"), berg);				
+		 ]]>
+	</scriptdef>
+	
+	<!-- ############################################################ -->		
+	<scriptdef name="isVmOnClientVMD" language="javascript">
+		 <attribute name="stringinput" />
+		 <attribute name="booleanreturn" />
+		 <![CDATA[
+		   //Überprüft, ob der eingegebenen Dateiname von der Struktur her dem Dateinamen einer Hostdatei entspricht.
+		   //Wichtig ist, dass die Überprüfung auf ein Hostnamenssuffix entfällt.		   
+		   //Beispiel: VM_FGLWin7_Ugaki-SRV.txt		   
+		   var myString = attributes.get("stringinput");
+		   var berg=false;
+		   print("Starte isVmOnHostVMD '" + myString + "'");
+		   main:{
+		   
+			//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.file);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sEnding = FileEasyZZZ.getNameEnd(myString);
+		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
+		   
+		   //Hier die für VMD relevanten Dateiendungen erfassen.
+		   if(sEnding=="txt"){		   
+			berg=true;
+		   }else{
+		     berg=false;
+		   }
+		   if(berg==true){	
+			print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
+			}else{
+			print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
+			break main;
+			}
+			
+			
+			//2. Pruefe ob am Anfang VM_ steht.
+			//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   importPackage(Packages.basic.zBasic.util.datatype.string);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sBeginning = StringZZZ.left(myString,3);
+		   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
+		   
+		   //Hier den für VMD relevanten Dateianfang erfassen.
+		   if(sBeginning=="VM_"){		   
+			berg=true;
+		   }else{
+		    berg=false;
+		   }
+		   if(berg==true){	
+			print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
+			}else{
+			print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
+			}
+			
+			//Zähle die Unterstriche
+			//TODO: Diese Methode erst noch bereitstellen. Dabei soll _ tatsächlich ein Char sein.
+			var iUnderlineFound = StringZZZ.countChar(myString,"_");
+			if(iUnderlineFound==4){	
+			print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==4, d.h. kann durchaus VMD-Datei auf dem Client sein.");
+			}else{
+			print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==4, d.h. kann keine VMD-Datei auf dem Client sein.");
+			}					  
+		   }//end main:
+		
+			
+			//Rueckgabewerte
+		   project.setProperty(attributes.get("booleanreturn"), berg);				
+		 ]]>
+	</scriptdef>
 
+	
+<!-- ######## Targets ############################################################################--> 	
+<target name="-FglComputeFilenameHostVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:let>myFilename::="FGL${myOsUsed}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
  
   
 <!-- ################################################################################# -->
@@ -110,7 +303,8 @@
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  
- <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsHostVMD">
+ <!-- <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsHostVMD,-myTestIsVmOnHostVMD,-myTestIsClientVMD"> -->
+ <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsHostVMD,-myTestIsVmOnHostVMD">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -125,6 +319,65 @@
     </javac>
 	-->
   </target>
+    	
+	<target name="-myTestComputeFilenameHostVMD">
+		<echo>myTestComputeFilenameHostVMD: </echo>
+
+		<!-- Das Betriebssystem, in der Batch ermittelt. -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		
+		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+		</antcallback>
+		
+		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+	</target>
+  
+	<!-- Die Datei auf feinem Host-Rechner im Verzeichnis c:\VMWare\.... -->
+	<target name="-myTestIsVmOnHostVMD">
+		<echo>myTestIsVmOnHostVMD: </echo>
+		
+		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+		<isVmOnHostVMD stringinput="asdfasdfasdf" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+		
+		
+		<isVmOnHostVMD stringinput="dummy.txt" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+		<!-- ultimativer Test, bei dem der Dateiname tatsächlich berechnet wird -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+		</antcallback>
+		<echo message="errechneter Dateiname = ${returnFilename}" /><!-- ERWARTE FALSE -->
+				
+		<isVmOnHostVMD stringinput="${returnFilename}" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+		
+		<!-- Diese Datei DARF kein _HOSTNAME haben -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->		
+		<fl:let>myInput::="VM_FGLWin7_Ugaki-SRV_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  		
+		<echo message="myInput=${myInput}" />		
+		<isVmOnHostVMD stringinput="${myInput}" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+		
+		<!-- Hier einen gültigen Dateinamen testen -->
+		<isVmOnHostVMD stringinput="VM_FGLWin7_Ugaki-SRV.txt" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE TRUE -->
+		
+	</target>
+  
   
 	<target name="-myTestIsFilenameRelevantVMD">
 		<echo>myTestIsFilenameRelevantVMD: </echo>
@@ -137,7 +390,7 @@
 		<echo message="returnControl = ${returnControl}" />
 	</target> 
 	
-	
+	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
 	<target name="-myTestIsHostVMD">
 		<echo>myTestIsHostVMD: </echo>
 		
@@ -164,36 +417,33 @@
 		
 	</target>
 	
-	
-	<target name="-myTestComputeFilenameHostVMD">
-		<echo>myTestComputeFilenameHostVMD: </echo>
-
-		<!-- Das Betriebssystem, in der Batch ermittelt. -->
+	<!-- Die Datei in einer VMWare im Verzeichnis c:\1fgl\client -->
+	<target name="-myTestIsClientVMD">
+		<echo>myTestIsHostVMD: </echo>
+		
+		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+		<isHostVMD stringinput="asdfasdfasdf" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+		
+		<isHostVMD stringinput="dummy.txt" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+		<!-- ultimativer Test, bei dem der Dateiname tatsächlich berechnet wird -->
 		<fl:install-property-handler />
 		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		
 		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
 					<param name="osUsed" value="${osUsed}"/>					
 		</antcallback>
+		<echo message="errechneter Dateiname = ${returnFilename}" />
+				
+		<isHostVMD stringinput="${returnFilename}" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
 		
-		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
-	</target>
+	</target>	
 	
-	<target name="-FglComputeFilenameHostVMD">
-		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
-		<fl:let>myOsUsed::="${osUsed}"</fl:let>
-		
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-		
-		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
-		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
-		<fl:let>myFilename::="FGL${myOsUsed}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-
-		<!-- Rueckgabebwerte -->			
-		<ac:var name="returnFilename" value="${myFilename}" />
-		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
-	</target>
+	
+	
  </project>
