@@ -20,14 +20,12 @@ TODO Alte Entwicklungsumgebung nach DEV02B/DEV03 verschieben.
 	--- Entwicklung des "KernelZZZ", diverse TryOuts: Z.B. CouchDb, VideoArchive (alt 1.6er compiler) 
               ---  Workspace zum Buch "Graphic Java - Das AWT beherrschen".
 
-	
-
 
 ###############################################################
 20140417: Notes Client um die Seiten FGL Projekt (aktuell) und FGL (Mail / Adressn & Foren erweitert
 
 20141208: Eclipse.ini Dateien deaktiviert/umbenannt, damit die Parameter der Verknüpfungen wirken
-          C:\java\eclipse3.2\eclipse\eclipse.exe -data c:\1fgl\Workspace\Eclipse3FGL_V02 -vm c:\java\jre1.6.0\bin\javaw.exe -clean -showlocation  -vmargs -Xms512m -Xmx1024m  -XX:MaxPermSize=128m -Duser.name="Fritz Lindhauer"
+                C:\java\eclipse3.2\eclipse\eclipse.exe -data c:\1fgl\Workspace\Eclipse3FGL_V02 -vm c:\java\jre1.6.0\bin\javaw.exe -clean -showlocation  -vmargs -Xms512m -Xmx1024m  -XX:MaxPermSize=128m -Duser.name="Fritz Lindhauer"
 
 20140627: Lotus Notes 8.53 Fixpack 6
 20140627: Notes startet nicht mehr, workspace deinstallieren hat nix gebracht. Komplett deinstalliert und neu installiert.
