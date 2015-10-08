@@ -1,8 +1,0 @@
-##### Domino 8.52 Server, für Foren, Tips, etc. Datenbanken
-      Synchron halten mit fgl02VM
-      Merke: Letzte Version der Domino Server, bei denen klassische Servlets noch funktionieren 
-             und keine OSGI Servlets notwendig sind.
-
-2014-06-18: Domino 8.5.2 Fixpack4
-2014-02-21: Windows XP Updates, scheitert im 1. Anlauf - kein gültiger key...
-2013-10-22: Start und Shutdown Scripts (mit Runterfahren des Servers, Entfernen von Lock-Dateien beim Neustart)

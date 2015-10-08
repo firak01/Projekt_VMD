@@ -1,8 +1,0 @@
-### Apache GIT Server
-
-TODO: Anbindung aus Eclipse oder so mal realisieren!!!
-      Aber 20140216 est mal GitHub nutzen und dann eine andere Form des GitServers speziell für windows.
-
-
-2014-03-31: XP Update funktioniert nicht "kein gültiger Produkt-Key"
-Apache GIT Server-Stack installiert
