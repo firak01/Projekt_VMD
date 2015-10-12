@@ -1,5 +1,0 @@
-### WinXP - Srv - Schablone
-
-20140405: Neu per Telefon aktivert, anschliessend auf Service Pack3 verbessert
-20140404: Product Key geändert auf "Schullizenz"
-20140404: Erstellt als Version mit ServicePack2

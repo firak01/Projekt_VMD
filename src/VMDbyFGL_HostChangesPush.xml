@@ -973,7 +973,7 @@
 			<ac:else>
 				<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
 			
-				<!-- übernimm Projekt KonfigurationsPROPERTIES in gier hier verwendete KonfigurationsVARIABLEN -->
+				<!-- übernimm Projekt KonfigurationsPROPERTIES in hier verwendete KonfigurationsVARIABLEN -->
 				<fl:let>conf.dirRepositoryArchive ::= "${project.vmd.dirRepositoryArchive}"</fl:let>
 				<fl:let>conf.dirRepositoryMisc ::= "${project.vmd.dirRepositoryMisc}"</fl:let>
 				
@@ -1623,6 +1623,11 @@
 						
 						
 							<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
+							<!-- NEIN 20151005 : So kommt es zu Problemen, weil sich der Inhalt dieser Datei von HostRechner zu HostRechner unterscheidet.
+							                     Eine Alternative Lösung muss her:
+												 Z.B. Erstelle ein Sammeldokument .html, in dem in einzelnen DIVs 
+												 der Inhalt der hostspezifischen Clientdatei eingefügt wird. -->
+							<!--  
 							<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
 								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
 								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
@@ -1631,6 +1636,7 @@
 							</antcallback>	
 							<fl:let>myReturnControl ::="${returnControl}"</fl:let>
 							<fl:let>myReturnString ::="${returnString}"</fl:let>
+							-->
 						</ac:else>
 					</ac:if><!-- Anzahl der Dateien pruefen -->
 

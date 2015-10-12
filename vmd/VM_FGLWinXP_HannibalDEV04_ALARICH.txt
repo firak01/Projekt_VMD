@@ -7,6 +7,10 @@
 ##### Komodo Edit 8: Entwicklungsumgebung für JQuery
              SoapUI (alte Version)
              Eclipse (Juno): Einige KernelKlassen, Entwicklung von "ScheduledFileArchiveZZZ" - Projekt, Entwicklung des Java-Kommentar Entferners.            
+
+	Eclipse 3.22
+	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
+
              Eclipse 3.22:    
 TODO Alte Entwicklungsumgebung nach DEV02B/DEV03 verschieben.
 	---  Alte Entwicklungumgebung für "KernelZZZ" und das "VideoArchiveZZZ", mit Java 1.6
