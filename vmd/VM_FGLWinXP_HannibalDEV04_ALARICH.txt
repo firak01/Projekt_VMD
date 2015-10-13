@@ -10,10 +10,11 @@
  Eclipse 3.22:    
 	TODO Alte Entwicklungsumgebung nach DEV02B/DEV03 verschieben.
 	---  Alte Entwicklungumgebung für "KernelZZZ" und das "VideoArchiveZZZ", mit Java 1.6 (Kernel 01 CVS)
-
-	Eclipse (Juno): Einige KernelKlassen, (Kernel 01, CVS)
-                        Entwicklung von "ScheduledFileArchiveZZZ" - Projekt (Kernel01, Subversion)
-                        Entwicklung des Java-Kommentar Entferners. (CVS)
+                                   
+	Eclipse (Juno):
+	--- Einige KernelKlassen, (Kernel 01, CVS)
+              --- Entwicklung von "ScheduledFileArchiveZZZ" - Projekt (Kernel01, Subversion)
+              --- Entwicklung des Java-Kommentar Entferners. (CVS)
             
 	Eclipse 3.22
 	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
@@ -21,8 +22,8 @@
               --- diverse TryOuts: Z.B. CouchDb, TimerTask (angebunden an Subversion)
               --- diverse TryOuts: Z.B. iText, PortScanner (angebunden an CVS)                                   
             
-	Eclipse 3.22:
-        ---  Workspace zum Buch "Graphic Java - Das AWT beherrschen".
+	Eclipse 4.2:
+        ---  Workspace zum Buch "Java XML".
 
 	Eclipse 3.22:
         --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
