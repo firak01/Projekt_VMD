@@ -1,26 +1,32 @@
 ---- Synchron halten mit DEV04, auch Verzeichnis "Installation"
+---- Entwicklungsumgebung von "KernelZZZ", "ScheduledFileArchiveZZZ"
 ##### Lotus Notes Client 8.53, Für Arbeit mit Foren, Tips, etc. eingerichtet.
-             Komodo Edit 8: Entwicklungsumgebung für JQuery
+
+##### Komodo Edit 8: Entwicklungsumgebung für JQuery
              SoapUI (alte Version)
 
-	Eclipse 4.2EE Web Developer
-        --- Entwicklungsumgebung von "ScheduledFileArchiveZZZ", mit Java 1.7 und entsprechendem Kernel
-	    Projekt, Entwicklung des Java-Kommentar Entferners.
+ Eclipse 3.22:    
+	TODO Alte Entwicklungsumgebung nach DEV02B/DEV03 verschieben.
+	---  Alte Entwicklungumgebung für "KernelZZZ" und das "VideoArchiveZZZ", mit Java 1.6 (Kernel 01 CVS)
+                                   
+	Eclipse 4.2 EE Juno:
+	--- Einige KernelKlassen, (Kernel 01, CVS)
+        --- Entwicklung von "ScheduledFileArchiveZZZ" - Projekt (Kernel01, Subversion)
+        --- Entwicklung des Java-Kommentar Entferners. (CVS)
 
-	Eclipse - JEE - Luna
-	--- Workspace zum Buch "Java & Xml"
-	---  Alte Entwicklungumgebung für "KernelZZZ" und das "VideoArchiveZZZ", mit Java 1.6
-
-
- 	 Eclipse 3.22:    
-	--- Entwicklung des "KernelZZZ" V1.0, diverse TryOuts: Z.B. CouchDb, VideoArchive (alt 1.6er compiler)(angebunden ans CVS) 
-             	--- Workspace zum Buch "Graphic Java - Das AWT beherrschen".
 
 	Eclipse 3.22
-	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)               
+	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
+        --- VideoInternetArchive (Kernel V02, 1.6er compiler, angebunden an Subversion )
+        --- diverse TryOuts: Z.B. CouchDb, TimerTask (angebunden an Subversion)
+        --- diverse TryOuts: Z.B. iText, PortScanner (angebunden an CVS)                 
 
+	Eclipse 4.2:
+        ---  Workspace zum Buch "Java XML".
 
-
+	Eclipse 3.22:
+        --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
+###############################################################
 20140627: Lotus Notes 8.53 Fixpack 6
 20140626: Arbeitsspeicher auf 2048Mb erhöhrt, Windows neu aktiviert
 
