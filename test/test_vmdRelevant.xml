@@ -74,58 +74,99 @@
 		   var berg=false;
 		   print("Starte isHostVMD '" + myString + "'");
 		   main:{
-		   
-			//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
-		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-		   importPackage(Packages.basic.zBasic.util.file);
-		   
-		   //var test = java.lang.System.getProperty("java.class.path");
-		   //println("classpath="+test);
-		   
-		   var sEnding = FileEasyZZZ.getNameEnd(myString);
-		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
-		   
-		   //Hier die für VMD relevanten Dateiendungen erfassen.
-		   if(sEnding=="txt"){		   
-			berg=true;
-		   }else{
-		     berg=false;
-		   }
-		   if(berg==true){	
-			print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
-			}else{
-			print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
-			break main;
-			}
-			
-			
-			//2. Pruefe ob am Anfang FGL steht.
-			//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-		   importPackage(Packages.basic.zBasic.util.datatype.string);
-		   
-		   //var test = java.lang.System.getProperty("java.class.path");
-		   //println("classpath="+test);
-		   
-		   var sBeginning = StringZZZ.left(myString,3);
-		   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
-		   
-		   //Hier die für VMD relevanten Dateiendungen erfassen.
-		   if(sBeginning=="FGL"){		   
-			berg=true;
-		   }else{
-		    berg=false;
-		   }
-		   if(berg==true){	
-			print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
-			}else{
-			print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
-			}
-		   
+		        berg = isHostVMD(myString);		   
 		   }//end main:
-		
-			
+
 			//Rueckgabewerte
-		   project.setProperty(attributes.get("booleanreturn"), berg);				
+		   project.setProperty(attributes.get("booleanreturn"), berg);	
+
+			//##################################################################
+			function isHostVMD(myString){
+				var bReturn = false;			
+				main:{			
+				   //1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
+				   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+				   importPackage(Packages.basic.zBasic.util.file);
+				   
+				   //var test = java.lang.System.getProperty("java.class.path");
+				   //println("classpath="+test);
+				   
+				   var sEnding = FileEasyZZZ.getNameEnd(myString);
+				   print("Per JAZ-Kernel ermittelte Dateiendung - aus '" + myString + "': '" + sEnding +"'");
+				   
+				   //Hier die für VMD relevanten Dateiendungen erfassen.
+				   if(sEnding=="txt"){		   
+					bReturn=true;
+				   }else{
+					 bReturn=false;
+				   };
+				   if(bReturn==true){	
+					print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
+					}else{
+					print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
+					break main;
+					}
+					
+					
+					//2. Pruefe ob am Anfang FGL steht.
+					//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+				   importPackage(Packages.basic.zBasic.util.datatype.string);
+				   
+				   //var test = java.lang.System.getProperty("java.class.path");
+				   //println("classpath="+test);
+				   
+				   var sBeginning = StringZZZ.left(myString,3);
+				   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
+				   
+				   //Hier die für VMD relevanten Dateiendungen erfassen.
+				   if(sBeginning=="FGL"){		   
+					bReturn=true;
+				   }else{
+					bReturn=false;
+				   }
+				   if(bReturn==true){	
+					print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
+					}else{
+					print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
+					break main;
+					}			
+					
+					
+				//3. Anzahl Unterstriche
+				var iUnderlineFound = StringZZZ.countChar(myString,"_");
+				if(iUnderlineFound==2){													
+				bReturn=true;
+				}else{
+				bReturn=false;
+				}
+				
+				if(bReturn==true){
+				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==2, d.h. kann durchaus VMD-Datei des Host selber sein.");
+				}else{
+				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==2, d.h. kann keine VMD-Datei des Host selber sein.");
+				break main;
+				}				
+					
+				//4. Endet der Dateiname mit dem eingebenen/benannten Hostnamen?
+				var sNameOnly = FileEasyZZZ.getNameOnly(myString);
+				print("Per JAZ-Kernel ermittelter reiner Dateiname - aus '" + myString + "': '" + sNameOnly +"'");
+			    var sEnding = StringZZZ.rightback(sNameOnly, "_");
+				if(sEnding=="Installation"){
+					bReturn=true;
+				}else{
+					bReturn=false;
+				}
+								
+				if(bReturn==true){
+				print("Dateiendung '" + sEnding + "' kann durchaus VMD-Datei des Host selber sein.");
+				}else{
+				print("Dateiendung '" + sEnding + "' kann keine VMD-Datei des Host selber sein - Erwartet: 'Installation'.");
+				break main;
+				}
+					
+				}//end main:
+				return bReturn;
+			}
 		 ]]>
 	</scriptdef>
 
@@ -141,70 +182,199 @@
 		   var berg=false;
 		   print("Starte isVmOnHostVMD '" + myString + "'");
 		   main:{
-		   
-			//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
-		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-		   importPackage(Packages.basic.zBasic.util.file);
-		   
-		   //var test = java.lang.System.getProperty("java.class.path");
-		   //println("classpath="+test);
-		   
-		   var sEnding = FileEasyZZZ.getNameEnd(myString);
-		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
-		   
-		   //Hier die für VMD relevanten Dateiendungen erfassen.
-		   if(sEnding=="txt"){		   
-			berg=true;
-		   }else{
-		     berg=false;
-		   }
-		   if(berg==true){	
-			print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
-			}else{
-			print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
-			break main;
-			}
-			
-			
-			//2. Pruefe ob am Anfang VM_ steht.
-			//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-		   importPackage(Packages.basic.zBasic.util.datatype.string);
-		   
-		   //var test = java.lang.System.getProperty("java.class.path");
-		   //println("classpath="+test);
-		   
-		   var sBeginning = StringZZZ.left(myString,3);
-		   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
-		   
-		   //Hier den für VMD relevanten Dateianfang erfassen.
-		   if(sBeginning=="VM_"){		   
-			berg=true;
-		   }else{
-		    berg=false;
-		   }
-		   if(berg==true){	
-			print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
-			}else{
-			print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
-			}
-			
-			//Zähle die Unterstriche
-			//TODO: Diese Methode erst noch bereitstellen. Dabei soll _ tatsächlich ein Char sein.
-			var iUnderlineFound = StringZZZ.countChar(myString,"_");
-			if(iUnderlineFound==3){	
-			print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann durchaus VMD-Datei auf dem Host sein.");
-			}else{
-			print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann keine VMD-Datei auf dem Host sein.");
-			}					  
+			berg=isVmOnHostVMD(myString);			
 		   }//end main:
-		
-			
+
 			//Rueckgabewerte
 		   project.setProperty(attributes.get("booleanreturn"), berg);				
+		   
+	//###############################################################################
+			function isVmOnHostVMD(myString){
+				var bReturn = false;			
+				main:{	
+			
+				//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
+			   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+			   importPackage(Packages.basic.zBasic.util.file);
+			   
+			   //var test = java.lang.System.getProperty("java.class.path");
+			   //println("classpath="+test);
+			   
+			   var sEnding = FileEasyZZZ.getNameEnd(myString);
+			   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
+			   
+			   //Hier die für VMD relevanten Dateiendungen erfassen.
+			   if(sEnding=="txt"){		   
+				bReturn=true;
+			   }else{
+				 bReturn=false;
+			   }
+			   if(bReturn==true){	
+				print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
+				}else{
+				print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
+				break main;
+				}
+				
+				
+				//2. Pruefe ob am Anfang VM_ steht.
+				//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+			   importPackage(Packages.basic.zBasic.util.datatype.string);
+			   
+			   //var test = java.lang.System.getProperty("java.class.path");
+			   //println("classpath="+test);
+			   
+			   var sBeginning = StringZZZ.left(myString,3);
+			   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
+			   
+			   //Hier den für VMD relevanten Dateianfang erfassen.
+			   if(sBeginning=="VM_"){		   
+				bReturn=true;
+			   }else{
+				bReturn=false;
+			   }
+			   if(bReturn==true){	
+				print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
+				}else{
+				print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
+				break main;
+				}
+				
+				//3. Zähle die Unterstriche				
+				var iUnderlineFound = StringZZZ.countChar(myString,"_");
+				if(iUnderlineFound==3){													
+				bReturn=true;
+				}else{
+				bReturn=false;
+				}
+				
+				if(bReturn==true){
+				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann durchaus VMD-Datei auf dem Host sein.");
+				}else{
+				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann keine VMD-Datei auf dem Host sein.");
+				break main;
+				}					  
+				
+				}//end main:
+				return bReturn;
+			}
 		 ]]>
 	</scriptdef>
 	
 	<!-- ############################################################ -->		
+	<scriptdef name="isVmOnHostNamedVMD" language="javascript">
+		 <attribute name="stringinput" />
+		 <attribute name="hostinput" />
+		 <attribute name="booleanreturn" />
+		 <![CDATA[
+		   //Überprüft, ob der eingegebenen Dateiname von der Struktur her dem Dateinamen einer Hostdatei entspricht.
+		   //Wichtig ist, dass die Überprüfung auf ein Hostnamenssuffix entfällt.		   
+		   //Beispiel: VM_FGLWin7_Ugaki-SRV.txt		   
+		   var myString = attributes.get("stringinput");
+		   var myHost = attributes.get("hostinput");
+		   var berg=false;
+		   print("Starte isVmOnHostNamedVMD '" + myString + "' fuer Host '" + myHost + "'");
+		   main:{
+			berg=isVmOnHostNamedVMD(myString,myHost);			
+		   }//end main:
+
+			//Rueckgabewerte
+		   project.setProperty(attributes.get("booleanreturn"), berg);				
+		   
+	//###############################################################################
+			function isVmOnHostNamedVMD(myString,myHost){
+				var bReturn = false;			
+				main:{	
+			
+				//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
+			   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+			   importPackage(Packages.basic.zBasic.util.file);
+			   
+			   //var test = java.lang.System.getProperty("java.class.path");
+			   //println("classpath="+test);
+			   
+			   var sEnding = FileEasyZZZ.getNameEnd(myString);
+			   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
+			   
+			   //Hier die für VMD relevanten Dateiendungen erfassen.
+			   if(sEnding=="txt"){		   
+				bReturn=true;
+			   }else{
+				 bReturn=false;
+			   }
+			   if(bReturn==true){	
+				print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
+				}else{
+				print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
+				break main;
+				}
+				
+				
+				//2. Pruefe ob am Anfang VM_ steht.
+				//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+			   importPackage(Packages.basic.zBasic.util.datatype.string);
+			   
+			   //var test = java.lang.System.getProperty("java.class.path");
+			   //println("classpath="+test);
+			   
+			   var sBeginning = StringZZZ.left(myString,3);
+			   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
+			   
+			   //Hier den für VMD relevanten Dateianfang erfassen.
+			   if(sBeginning=="VM_"){		   
+				bReturn=true;
+			   }else{
+				bReturn=false;
+			   }
+			   if(bReturn==true){	
+				print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
+				}else{
+				print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
+				break main;
+				}
+				
+				//3. Zähle die Unterstriche				
+				var iUnderlineFound = StringZZZ.countChar(myString,"_");
+				if(iUnderlineFound==3){	
+				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann durchaus VMD-Datei auf dem Host sein.");
+				}else{
+				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann keine VMD-Datei auf dem Host sein.");
+				break main;
+				}		
+
+				//4. Endet der Dateiname mit dem eingebenen/benannten Hostnamen?				
+				var sNameOnly = FileEasyZZZ.getNameOnly(myString);				
+				print("Per JAZ-Kernel ermittelter reiner Dateiname - aus '" + myString + "': '" + sNameOnly +"'");				
+			    var sEnding = StringZZZ.right(sNameOnly, "_");	
+				//print("Dateiteil hinter _: '" + sEnding + "' und Hostname: '" + myHost + "'"); 				
+				if(sEnding==myHost){
+					bReturn=true;
+				}else{
+					bReturn=false;
+				}
+				
+				if(bReturn==true){
+					print("Dateiteil hinter _: '" + sEnding + "' kann durchaus VMD-Datei fuer den Host '" + myHost + "' sein.");
+				}else{
+					print("Dateiteil hinter _: '" + sEnding + "' kann keine VMD-Datei fuer den Host '" + myHost + "' sein.");
+					break main;
+				}
+	
+				}//end main:
+				return bReturn;
+			}
+		 ]]>
+	</scriptdef>
+	
+	<!-- ############################################################ -->   
+	<!-- TODO 20151014 noch kaputt: 
+	     1. übergib auf der client-maschine irgendwie den Namen des host.
+		    z.B. durch definition einer Variablen in der Projektdatei.
+		 2. wende funktion aus Scriptdef isVmOnHostNamedVMD an, 
+		    um das Ergebnis für diesen Hostnamen zu bekommen.
+			
+		Verwende: FglComputeFilenameClientHostNamedVMD in dem neuen Test für diese Scriptdef...
+	--> 	
 	<scriptdef name="isVmOnClientVMD" language="javascript">
 		 <attribute name="stringinput" />
 		 <attribute name="booleanreturn" />
@@ -214,7 +384,7 @@
 		   //Beispiel: VM_FGLWin7_Ugaki-SRV.txt		   
 		   var myString = attributes.get("stringinput");
 		   var berg=false;
-		   print("Starte isVmOnHostVMD '" + myString + "'");
+		   print("Starte isVmOnClientVMD '" + myString + "'");
 		   main:{
 		   
 			//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
@@ -297,6 +467,23 @@
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 	</target>
  
+ <!-- ######## Targets ############################################################################--> 	
+<target name="-FglComputeFilenameClientHostNamedVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
+		
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:let>myFilename::="VM_FGL${myOsUsed}_${env.COMPUTERNAME}_${myHostUsed}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
   
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->
@@ -304,7 +491,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  
  <!-- <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsHostVMD,-myTestIsVmOnHostVMD,-myTestIsClientVMD"> -->
- <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsHostVMD,-myTestIsVmOnHostVMD">
+ <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsHostVMD,-myTestIsVmOnHostVMD,-myTestIsVmOnHostNamedVMD">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -376,6 +563,50 @@
 		<isVmOnHostVMD stringinput="VM_FGLWin7_Ugaki-SRV.txt" booleanreturn="returnControl" />
 		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE TRUE -->
 		
+	</target>
+	
+	<!-- Die Datei auf feinem Host-Rechner im Verzeichnis c:\VMWare\.... -->
+	<target name="-myTestIsVmOnHostNamedVMD">
+		<echo>myTestIsVmOnHostNamedVMD: </echo>
+		
+		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+		<isVmOnHostNamedVMD stringinput="asdfasdfasdf" hostinput="nixda" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+		
+		<!-- Test: Lasse den 2. Parameter weg -->		
+		<isVmOnHostNamedVMD stringinput="dummy.txt" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" />
+		
+		<!-- Diese Datei DARF kein _HOSTNAME haben -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->		
+		<fl:let>myInput::="VM_FGLWin7_Ugaki-SRV_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  		
+		<echo message="myInput=${myInput}" />		
+		<isVmOnHostNamedVMD stringinput="${myInput}" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+		
+		<!-- Hier einen gültigen Dateinamen testen, aber ohne den 2. Parameter -->
+		<isVmOnHostNamedVMD stringinput="VM_FGLWin7_Ugaki-SRV.txt" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+		
+		<!-- ultimativer Test, bei dem der Dateiname tatsächlich berechnet wird -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<fl:let>hostUsed::='${env.COMPUTERNAME}'</fl:let>
+		<antcallback target="-FglComputeFilenameClientHostNamedVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+					<param name="hostUsed" value="${hostUsed}"/>
+		</antcallback>
+		<echo message="errechneter Dateiname fuer eine Clientdatei auf dem Host= ${returnFilename}" />
+				
+		<isVmOnHostNamedVMD stringinput="${returnFilename}" hostinput="${env.COMPUTERNAME}" booleanreturn="returnControl" />
+		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE TRUE -->
+						
 	</target>
   
   
