@@ -13,14 +13,14 @@
                                    
 	Eclipse (Juno):
               --- Installation des fatjar - Plugins 0.31 von http://kurucz-grafika.de/fatjar
-	--- Einige KernelKlassen, (Kernel 01, CVS)
+	      --- Einige KernelKlassen, (Kernel 01, CVS)
               --- Entwicklung von "ScheduledFileArchiveZZZ" - Projekt (Kernel01, Subversion)
               --- Entwicklung des Java-Kommentar Entferners. (CVS)
 
             
 	Eclipse 3.22
-	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
-              ---  VideoInternetArchive (Kernel V02, 1.6er compiler, angebunden an Subversion )
+	      --- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
+              --- VideoInternetArchive (Kernel V02, 1.6er compiler, angebunden an Subversion )
               --- diverse TryOuts: Z.B. CouchDb, TimerTask (angebunden an Subversion)
               --- diverse TryOuts: Z.B. iText, PortScanner (angebunden an CVS)                                   
             
@@ -30,6 +30,12 @@
 	Eclipse 3.22:
         --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
 ####################################################################
+20151016: Neuer Workspace unter Eclipse Luna 4.4 - für Kernel V02
+                Installation des fatjar - Plugins 0.31 in Eclipse Luna 4.4 -Version : von http://kurucz-grafika.de/fatjar GESCHEITERT
+                Upadte von Eclipse Luna 4.4
+
+
+
 20151015:  Installation des fatjar - Plugins 0.31 in Eclipse Juno - Version : von http://kurucz-grafika.de/fatjar
 
 20150501: Installiere Eclipse Wiki Plugin in der Eclipse Luna - Version : von http://www.stateofflow.com/UpdateSite
