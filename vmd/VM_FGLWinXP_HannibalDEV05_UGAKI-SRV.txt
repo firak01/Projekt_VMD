@@ -26,6 +26,10 @@
 
 	Eclipse 3.22:
         --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
+
+	Eclipse 4.4 Luna
+        --- Fatjar und Subversion Plugin
+        --- Workspace mit Kernel V2.0 (angebunden an Subversion)
 ###############################################################
 20140627: Lotus Notes 8.53 Fixpack 6
 20140626: Arbeitsspeicher auf 2048Mb erhöhrt, Windows neu aktiviert
