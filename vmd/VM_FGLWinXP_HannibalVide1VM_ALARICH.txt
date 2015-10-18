@@ -1,4 +1,5 @@
 Spielumgebung 
+Original Lotus Notes 7 Umgebung - Diese erhalten
 ###########################
 Installiert sind
 

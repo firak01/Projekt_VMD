@@ -29,13 +29,11 @@
 
 	Eclipse 3.22:
         --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
+
+	Eclipse 4.4 Luna
+        --- Fatjar und Subversion Plugin
+        --- Workspace mit Kernel V2.0 (angebunden an Subversion)
 ####################################################################
-20151016: Neuer Workspace unter Eclipse Luna 4.4 - für Kernel V02
-                Installation des fatjar - Plugins 0.31 in Eclipse Luna 4.4 -Version : von http://kurucz-grafika.de/fatjar GESCHEITERT
-                Upadte von Eclipse Luna 4.4
-
-
-
 20151015:  Installation des fatjar - Plugins 0.31 in Eclipse Juno - Version : von http://kurucz-grafika.de/fatjar
 
 20150501: Installiere Eclipse Wiki Plugin in der Eclipse Luna - Version : von http://www.stateofflow.com/UpdateSite
