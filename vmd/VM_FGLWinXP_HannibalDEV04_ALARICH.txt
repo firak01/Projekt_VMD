@@ -34,7 +34,12 @@
         --- Fatjar und Subversion Plugin
         --- Workspace mit Kernel V2.0 (angebunden an Subversion)
 ####################################################################
-20151015:  Installation des fatjar - Plugins 0.31 in Eclipse Juno - Version : von http://kurucz-grafika.de/fatjar
+20151020: Installation von GitGui, TortoiseGit und Auschecken des Repository: VMD_PROJECT
+
+
+20151016: Neuer Workspace unter Eclipse Luna 4.4 - für Kernel V02
+                Installation des fatjar - Plugins 0.31 in Eclipse Luna 4.4 -Version : von http://kurucz-grafika.de/fatjar Erst nach weiterer Installation geklappt (Eclipse Update : Tool für nicht ganz kompatible OSGI Bundles)
+                Update von Eclipse Luna 4.4
 
 20150501: Installiere Eclipse Wiki Plugin in der Eclipse Luna - Version : von http://www.stateofflow.com/UpdateSite
                 Aber: Das ist nix was ich gebrauchen kann.
