@@ -1,4 +1,9 @@
-20150929 Star Wars Empire At War installiert
-         
+### Spielumgebung Video 01
+
+20151021: Installation Java JDK 1.7, Ant_HOME, ANT_ARGS für Flaka
+20151021: VMD_PROJEKT ist Repository, Git ist eingerichtet
+
+20150930 Installation von "Star Wars - Empire At War".
+                Merke: Saves sind unter C:\Dokumente und Einstellungen\lindhaueradmin\Anwendungsdaten\Petroglyph\Star Wars Empire at War
 
 20140326 IE8 installiert, WinXP Updates
