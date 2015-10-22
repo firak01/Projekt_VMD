@@ -894,7 +894,7 @@
 			<fl:let>vmdUsed ::= '${vmdLocalFilePath}'</fl:let>
 		</fl:when>
 		<otherwise>
-			<echo>Lokale Projektdatei existiert NICHT: ${vmdLocalFilePath}</echo>
+			<echo>Lokale Projektdatei existiert NICHT: ${vmdLocalFilePath} verwende Standard.</echo>
 			<fl:let>vmdUsed ::= '${vmd}'</fl:let>
 		</otherwise>
 	</fl:choose>
@@ -905,24 +905,32 @@
   <!-- Teste mal, ob ein defaultwert durch loadproperties ueberschrieben werden kann -->
   <property name="projekt.useDefaultWhenMissing" value="false" />
   
-
+	<!-- ######## Anwenden, der lokalen Konfiguration -->
 	<echo>Verwendet Projektkonfiguration: ${projekt.vmd.configPath}</echo>
-	<loadproperties>
-		<file file="${projekt.vmd.configPath}"/>
-    </loadproperties> 	 
-	<echo>test1 hat den Wert: ${test1}</echo>
 	
-	<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 				
-	<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>	
-	<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
-	<echo>project.vmd.os hat den Wert: ${project.vmd.os}</echo>
-    
- 
-  <!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
-  
-  <!-- TODO : Prüfe die Controldatei auf Validität. -->
-  	                    
-
+	<!-- Prüfe, ob die angegebenen Datei vorhanden ist -->	 
+	 <fl:choose>
+		<fl:when test=" '${projekt.vmd.configPath}'.tofile.exists == true ">
+			<echo>In Projektdatei angebene Projektkonfiguration existiert: ${projekt.vmd.configPath}</echo>
+			
+			<loadproperties>
+				<file file="${projekt.vmd.configPath}"/>
+			</loadproperties> 	 
+			<echo>test1 hat den Wert: ${test1}</echo>
+	
+			<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 				
+			<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>	
+			<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
+			<echo>project.vmd.os hat den Wert: ${project.vmd.os}</echo>
+			
+			<!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
+			<!-- TODO : Prüfe die Controldatei auf Validität. -->
+		</fl:when>
+		<otherwise>
+			<echo>In Projektdatei angegebene Projektkonfiguration existiert NICHT: ${projekt.vmd.configPath}</echo>
+			<fl:fail message="In Projektdatei angegebene Projektkonfiguration existiert NICHT: ${projekt.vmd.configPath}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+		</otherwise>
+	</fl:choose>
 	</target>
   
   <!-- ############################################################################## -->
