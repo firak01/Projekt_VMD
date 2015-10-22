@@ -911,7 +911,7 @@
 	<!-- Prüfe, ob die angegebenen Datei vorhanden ist -->	 
 	 <fl:choose>
 		<fl:when test=" '${projekt.vmd.configPath}'.tofile.exists == true ">
-			<echo>In Projektdatei angebene Projektkonfiguration existiert: ${projekt.vmd.configPath}</echo>
+			<echo>Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert: ${projekt.vmd.configPath}</echo>
 			
 			<loadproperties>
 				<file file="${projekt.vmd.configPath}"/>
@@ -927,7 +927,7 @@
 			<!-- TODO : Prüfe die Controldatei auf Validität. -->
 		</fl:when>
 		<otherwise>
-			<echo>In Projektdatei angegebene Projektkonfiguration existiert NICHT: ${projekt.vmd.configPath}</echo>
+			<echo>Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert NICHT: ${projekt.vmd.configPath}</echo>
 			<fl:fail message="In Projektdatei angegebene Projektkonfiguration existiert NICHT: ${projekt.vmd.configPath}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 		</otherwise>
 	</fl:choose>
