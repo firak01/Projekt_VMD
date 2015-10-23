@@ -386,8 +386,67 @@
 	</scriptdef>
 	
 	
+	<!-- ######## Targets ############################################################################--> 	
+<target name="-computeFilenameVMD">
+		<!-- Ermittle den Dateinamen für VMD-Datei, unabhaengig davon ob auf Client oder Hostmaschine. -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		<fl:let>myPathClientUsed::="${pathClientUsed}"</fl:let>
+	
+	<!-- Auf dem Host und auf einem VMWare Clientrechner unterscheiden sich die Dateien in ihrer Namensstruktur.
+	     Daher erst prüfen, ob man auf einem Client- oder auf einem Hostrechner ist. -->
+		 	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
+	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->		
+	<antcallback target="-isHostVMD" return="returnControl,returnBoolean">
+				<param name="dirPathClient" value="${myPathClientUsed}"/>				
+	</antcallback>
+	<echo message="Ergebnis'isHostVMD' = ${returnBoolean}" />	 
+	<ac:if>
+		<ac:equals arg1="${returnBoolean}" arg2="true" />
+		<ac:then>
+			<fl:echo>Hostrechner identifiziert.</fl:echo>
+			
+			<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
+			<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+			<antcallback target="-computeFilenameHostVMD" return="returnFilename">
+				<param name="osUsed" value="${myOsUsed}"/>					
+			</antcallback>	
+			<fl:let>myFilename::="${returnFilename}"</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:echo>Ggfs VMware Client auf Host identifiziert.</fl:echo>
+			<!-- Prüfe, um sicherzugehen auch das mit einem Target ab. -->
+			<!-- TODO GOON: Hole den Hostnamen aus einer rechnerspezifischen Konfiguration -->
+			<antcallback target="-isClientVMD" return="returnControl,returnBoolean">
+					<param name="dirPathClient" value="${myPathClientUsed}"/>				
+					<param name="hostUsed" value="${myHostUsed}"/>				
+			</antcallback>
+			<ac:if>
+				<ac:equals arg1="${returnBoolean}" arg2="true" />
+				<ac:then>
+					<fl:echo>VMware Client auf Host Rechner bestätigt.</fl:echo>
+				 
+					<!-- TODO GOON: Den Hostnamen in der Konfigurationsdatei hinterlegen -->
+					<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
+						<param name="osUsed" value="${myOsUsed}"/>					
+						<param name="hostUsed" value="${myHostUsed}"/>	
+					</antcallback>				 
+					<fl:let>myFilename::="${returnFilename}"</fl:let>
+				</ac:then>
+				<ac:else>
+					<fl:echo>VMware Client auf Host Rechner NICHT bestätigt.</fl:echo>
+					<fl:fail message="UNGEPLANTER VORZEITIGER SICHERHEITSABBRUCH: Konfiguration pruefen."/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+				</ac:else>
+			</ac:if>			
+		</ac:else>
+	</ac:if><!-- Pruefung auf isHost -->
+
+			<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
+	
 <!-- ######## Targets ############################################################################--> 	
-<target name="-FglComputeFilenameHostVMD">
+<target name="-computeFilenameHostVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
 		<fl:let>myOsUsed::="${osUsed}"</fl:let>
 		
@@ -404,7 +463,7 @@
 	</target>
  
  <!-- ######## Targets ############################################################################--> 	
-<target name="-FglComputeFilenameClientHostNamedVMD">
+<target name="-computeFilenameClientHostNamedVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
 		<fl:let>myOsUsed::="${osUsed}"</fl:let>
 		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
@@ -421,6 +480,8 @@
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 	</target>
 
+
+	
  <!-- ######## Targets ############################################################################--> 	
  <target name="-isHostVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
@@ -433,13 +494,13 @@
 		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
 					<param name="osUsed" value="${osUsed}"/>					
 		</antcallback>
 		<echo message="errechneter Dateiname = ${returnFilename}" />
 				
 		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
-		<!-- TODO GON: Die Konfigurationsdatei für das PRojekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
+		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
 		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
 		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
 		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
@@ -477,14 +538,14 @@
 		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		<antcallback target="-FglComputeFilenameClientHostNamedVMD" return="returnFilename">
+		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
 					<param name="osUsed" value="${osUsed}"/>					
 					<param name="hostUsed" value="${myHostUsed}"/>	
 		</antcallback>
 		<echo message="errechneter Dateiname = ${returnFilename}" />
 				
 		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
-		<!-- TODO GON: Die Konfigurationsdatei für das PRojekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
+		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
 		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
 		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
 		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
@@ -514,8 +575,8 @@
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsFileVmdHostOnHostVMD,-myTestIsFileVmdClientOnHostVMD,-myTestIsFileVmdClientOnHostNamedVMD, -myTestIsHostVMD, -myTestIsClientVMD">
- <!-- <target name="compile" depends="-myTestIsHostVMD,-myTestIsClientVMD"> -->
+ <!-- <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsFileVmdHostOnHostVMD,-myTestIsFileVmdClientOnHostVMD,-myTestIsFileVmdClientOnHostNamedVMD,-myTestIsHostVMD,-myTestIsClientVMD,-myTestComputeFilenameClientHostNamedVMD,-myTestComputeFilenameVMD"> -->
+ <target name="compile" depends="-myTestComputeFilenameVMD">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -531,6 +592,23 @@
 	-->
   </target>
   
+	<!-- Versuch unabhängig vom Client oder Hostrechner den VMD-Dateinamen zu errechnen. -->
+	<target name="-myTestComputeFilenameVMD">
+		<echo>myTestComputeFilenameVMD: </echo>
+
+		<!-- Das Betriebssystem, in der Batch ermittelt. -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS=${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>		
+		<fl:let>pathClientUsed::="c:\1fgl\client"</fl:let>		
+		<antcallback target="-computeFilenameVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>
+					<param name="pathClientUsed" value="${pathClientUsed}"/>					
+		</antcallback>
+		
+		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+	</target>
 	
 	<target name="-myTestComputeFilenameHostVMD">
 		<echo>myTestComputeFilenameHostVMD: </echo>
@@ -541,14 +619,34 @@
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
 		
-		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
 					<param name="osUsed" value="${osUsed}"/>					
 		</antcallback>
 		
 		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
 	</target>
+	
+	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\VMWare\.... oder auf einem VMWare Client Rechner im Verzeichnis c:\1fgl\Client -->
+	<target name="-myTestComputeFilenameClientHostNamedVMD">
+		<echo>myTestComputeFilenameClientHostNamedVMD: </echo>
+
+		<!-- Das Betriebssystem, in der Batch ermittelt. -->
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		
+		<!-- Merke: DUMMYLösung. Hole normalerweise den Hostnamen aus einer Rechnerspezifischen Konfiguration im VMWare-client -->
+		<fl:let>myHostUsed::="${env.COMPUTERNAME}"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>
+					<param name="hostUsed" value="${myHostUsed}"/>						
+		</antcallback>
+		
+		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+	</target>
   
-	<!-- Die Datei auf feinem Host-Rechner im Verzeichnis c:\VMWare\.... -->
+	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client\.... -->
 	<target name="-myTestIsFileVmdClientOnHostVMD">
 		<echo>myTestIsFileVmdClientOnHostVMD: </echo>
 		
@@ -565,7 +663,7 @@
 		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
 					<param name="osUsed" value="${osUsed}"/>					
 		</antcallback>
 		<echo message="errechneter Dateiname = ${returnFilename}" /><!-- ERWARTE FALSE -->
@@ -590,7 +688,7 @@
 		
 	</target>
 	
-	<!-- Die Datei auf feinem Host-Rechner im Verzeichnis c:\VMWare\.... -->
+	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\VMWare\.... oder auf einem VMWare Client Rechner im Verzeichnis c:\1fgl\Client -->
 	<target name="-myTestIsFileVmdClientOnHostNamedVMD">
 		<echo>myTestIsFileVmdClientOnHostNamedVMD: </echo>
 		
@@ -623,7 +721,7 @@
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
 		<fl:let>hostUsed::='${env.COMPUTERNAME}'</fl:let>
-		<antcallback target="-FglComputeFilenameClientHostNamedVMD" return="returnFilename">
+		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
 					<param name="osUsed" value="${osUsed}"/>					
 					<param name="hostUsed" value="${hostUsed}"/>
 		</antcallback>
@@ -663,7 +761,7 @@
 		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
+		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
 					<param name="osUsed" value="${osUsed}"/>					
 		</antcallback>
 		<echo message="errechneter Dateiname = ${returnFilename}" />
@@ -687,6 +785,7 @@
 	</target>
 		
 	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
+	<!-- TODO: Es muss rechnerspezifisch hinterlegt werden, wie der Hostname lautet. Den kann der Client nämlich nicht herausbekommen.-->
 	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->
 	<target name="-myTestIsClientVMD">
 		<echo>myTestIsClientVMD: </echo>

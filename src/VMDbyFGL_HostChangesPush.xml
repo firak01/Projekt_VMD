@@ -1000,19 +1000,24 @@
 	<fl:install-property-handler />
 	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
 	<fl:let>src.dirFglClientPath::="${conf.dirPathClientFgl}" </fl:let>
-	<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
-	<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
-	<antcallback target="-FglComputeFilenameHostVMD" return="returnFilename">
-				<param name="osUsed" value="${conf.os}"/>					
-	</antcallback>	
+	
+	<!-- Die Ermittlung des Dateinamens, unbhaengig von Client oder Host.-->
+	<echo>VMD_OS=${env.VMD_OS}</echo>
+	<fl:let>osUsed::='${env.VMD_OS}'</fl:let>		
+	<fl:let>pathClientUsed::='${conf.dirPathClientFgl}'</fl:let>		
+	<antcallback target="-computeFilenameVMD" return="returnFilename">
+				<param name="osUsed" value="${osUsed}"/>
+				<param name="pathClientUsed" value="${pathClientUsed}"/>					
+	</antcallback>
+		
     <!-- <fl:let>src.dirFglClientFileName::="FGL${conf.os}_${env.COMPUTERNAME}_Installationen.txt"</fl:let> --><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 	<fl:let>src.dirFglClientFileName::="${returnFilename}"</fl:let><!-- Merke: Der Computername wird nicht extra gesetzte. Er kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-	
+
 	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
     <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
 	<fl:let>src.dirFglClientFilePath::='${src.dirFglClientPath}/${src.dirFglClientFileName}'</fl:let>
 	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
-			
+		
 			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
 			<!-- TODO GOON, 20150914 noch kaputt... -->
 			<!-- TODO GOON: HIER nicht mit Properties arbeiten, da Properties über alle Unter-Main-Targets gelten und nicht veränderbar sind. Statt dessen Variablen fl:let verwenden. -->
@@ -2403,7 +2408,70 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<arrayCopyJsZZZ arrayinput="${myAFiledir}" arrayreturn="returna.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
-<target name="-FglComputeFilenameHostVMD">
+
+<!-- ### HILFSTARGETS ########################################################## -->
+
+<!-- ######## Targets ############################################################################--> 	
+<target name="-computeFilenameVMD">
+		<!-- Ermittle den Dateinamen für VMD-Datei, unabhaengig davon ob auf Client oder Hostmaschine. -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		<fl:let>myPathClientUsed::="${pathClientUsed}"</fl:let>
+	
+	<!-- Auf dem Host und auf einem VMWare Clientrechner unterscheiden sich die Dateien in ihrer Namensstruktur.
+	     Daher erst prüfen, ob man auf einem Client- oder auf einem Hostrechner ist. -->
+		 	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
+	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->		
+	<antcallback target="-isHostVMD" return="returnControl,returnBoolean">
+				<param name="dirPathClient" value="${myPathClientUsed}"/>				
+	</antcallback>
+	<echo message="Ergebnis'isHostVMD' = ${returnBoolean}" />	 
+	<ac:if>
+		<ac:equals arg1="${returnBoolean}" arg2="true" />
+		<ac:then>
+			<fl:echo>Hostrechner identifiziert.</fl:echo>
+			
+			<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
+			<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+			<antcallback target="-computeFilenameHostVMD" return="returnFilename">
+				<param name="osUsed" value="${myOsUsed}"/>					
+			</antcallback>	
+			<fl:let>myFilename::="${returnFilename}"</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:echo>Ggfs VMware Client auf Host identifiziert.</fl:echo>
+			<!-- Prüfe, um sicherzugehen auch das mit einem Target ab. -->
+			<!-- TODO GOON: Hole den Hostnamen aus einer rechnerspezifischen Konfiguration -->
+			<antcallback target="-isClientVMD" return="returnControl,returnBoolean">
+					<param name="dirPathClient" value="${myPathClientUsed}"/>				
+					<param name="hostUsed" value="${myHostUsed}"/>				
+			</antcallback>
+			<ac:if>
+				<ac:equals arg1="${returnBoolean}" arg2="true" />
+				<ac:then>
+					<fl:echo>VMware Client auf Host Rechner bestätigt.</fl:echo>
+				 
+					<!-- TODO GOON: Den Hostnamen in der Konfigurationsdatei hinterlegen -->
+					<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
+						<param name="osUsed" value="${myOsUsed}"/>					
+						<param name="hostUsed" value="${myHostUsed}"/>	
+					</antcallback>				 
+					<fl:let>myFilename::="${returnFilename}"</fl:let>
+				</ac:then>
+				<ac:else>
+					<fl:echo>VMware Client auf Host Rechner NICHT bestätigt.</fl:echo>
+					<fl:fail message="UNGEPLANTER VORZEITIGER SICHERHEITSABBRUCH: Konfiguration pruefen."/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+				</ac:else>
+			</ac:if>			
+		</ac:else>
+	</ac:if><!-- Pruefung auf isHost -->
+
+			<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
+ 
+<!-- ######## Targets ############################################################################--> 	
+<target name="-computeFilenameHostVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
 		<fl:let>myOsUsed::="${osUsed}"</fl:let>
 		
@@ -2418,5 +2486,114 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<ac:var name="returnFilename" value="${myFilename}" />
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 	</target>
+	
+	<!-- ######## Targets ############################################################################--> 	
+<target name="-computeFilenameClientHostNamedVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
+		
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:let>myFilename::="VM_FGL${myOsUsed}_${env.COMPUTERNAME}_${myHostUsed}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
+	
+	<!-- ######## Targets ############################################################################--> 	
+ <target name="-isHostVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
+		<fl:let>returnBoolean::=false</fl:let>			
+		<fl:let>returnControl::=false</fl:let>
+				
+		<!-- Den Dateinamen tatsächlich berechnen -->
+		<!-- <fl:install-property-handler /> Das ist in Untertargets nicht erlaubt!!! -->
+		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+		</antcallback>
+		<echo message="errechneter Dateiname = ${returnFilename}" />
+				
+		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
+		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
+		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
+		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
+  
+		<fl:choose>
+			<fl:when test=" '${vmdClientFilePath}'.tofile.exists == true ">
+			<echo>Client Verzeichnis Host-VMD-Datei existiert: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=true</fl:let>
+		</fl:when>
+		<otherwise>
+			<echo>Client Verzeichnis Host-VMD-Datei existiert NICHT: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=false</fl:let>
+		</otherwise>
+	</fl:choose>
+    <fl:let>returnControl::=true</fl:let>		
+		
+		
+		
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnControl" value="${returnControl}" />
+		<ac:var name="returnBoolean" value="${returnBoolean}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
+	</target>
+	
+ <!-- ######## Targets ############################################################################--> 	
+ <target name="-isClientVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
+		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
+		<fl:let>returnBoolean::=false</fl:let>			
+		<fl:let>returnControl::=false</fl:let>
+				
+		<!-- Den Dateinamen tatsächlich berechnen -->
+		<!-- <fl:install-property-handler /> Das ist in Untertargets nicht erlaubt!!! -->
+		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+					<param name="hostUsed" value="${myHostUsed}"/>	
+		</antcallback>
+		<echo message="errechneter Dateiname = ${returnFilename}" />
+				
+		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
+		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
+		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
+		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
+  
+		<fl:choose>
+			<fl:when test=" '${vmdClientFilePath}'.tofile.exists == true ">
+			<echo>Client Verzeichnis Host-VMD-Datei existiert: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=true</fl:let>
+		</fl:when>
+		<otherwise>
+			<echo>Client Verzeichnis Host-VMD-Datei existiert NICHT: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=false</fl:let>
+		</otherwise>
+	</fl:choose>
+    <fl:let>returnControl::=true</fl:let>		
+		
+		
+		
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnControl" value="${returnControl}" />
+		<ac:var name="returnBoolean" value="${returnBoolean}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
+	</target>
+
+	
+
 
 </project>
