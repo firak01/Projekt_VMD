@@ -2,7 +2,9 @@
 
 #########################################################
 
-20151003 : Installation des Spiels "Star Wars - Empire At War"
+20151017 : Updaten VMWare Player auf Version 12, dazu VMWare Player 4 deinstalliert
+
+20151003 : Installation des spiels "Star Wars - Empire At War"
 
 20150426 : Installation von Notepad++
 
