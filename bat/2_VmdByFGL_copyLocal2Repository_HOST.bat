@@ -1,10 +1,11 @@
 @echo off
-REM KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
+REM 1) KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
+REM 2) Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist (aus einem JDK). 
 
-REM Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist.
-REM Das nur unter Windows DOS Box aufrufen, unter Eclipse werden die Pfade nicht gefunden.
-REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
 echo start Copy Repository to Local HOST
+echo uebergebener Parameter 1: %1
+echo uebergebener Parameter 2: %2
+echo alle Parameter: %*
 
 REM Ermittle auf Batch Ebene das verwendete Betriebssystem, um es als Parameter über eine Umgebungsvariable an das ANT Script zu uebergeben.
 FOR /F "tokens=2 delims=[]" %%a IN ('VER') DO FOR /F "tokens=2" %%b IN ("%%a") DO SET VersionNumber=%%b
@@ -84,13 +85,20 @@ REM Merke: Der übergebenen Dateiname wird ggfs. durch die existenz eines Dateina
 REM Merke: Die Pfadangaben sind mit Slash und nicht mit Backslash
 
 REM Varinte A) Für Batch Alternative Möglichkeit über Umgebungsvariablen Parameter zu übergeben.
+REM Das nur unter Windows DOS Box aufrufen, unter Eclipse werden die Pfade nicht gefunden.
 SET TRYOUT_ANT="Das ist ein Test"
 SET VMD="C:/1fgl/repository/Projekt_VMD"
 
 REM Variante B) Sowohl für Eclipse (Run Konfiguration) als auch Batch. 
 REM MERKE: Wenn die Batch auch aus Eclipse heraus gestartet werden soll, braucht man wohl ANT_HOME usw. als Umgebungsvariable. 
-call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties
+REM Mit -D wird eine Parameter übergeben. Ohne -D wird davon ausgegangen, dass dies der Targetname in dem AntScript ist, der gestartet werden soll.
+REM                                                          Z.B. call ant -buildfile test.xml -Dparam1 -Dparam2 blabla
+REM                                                          Hier soll das Target blabla ausgeführt werden. Ohne solch eine Targetangabe wird gestartet was unter <project ... default="..." > angegeben ist.
+REM %* gibt alle Parameter aus, mit denen diese Batch aufgerufen wurde. Diese werden an Ant weitergegeben.
+REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
+call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%*
 
 echo Ende Copy Repository to Local HOST
 pause
 REM timeout /T 20 /nobreak
+exit

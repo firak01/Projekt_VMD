@@ -4,6 +4,10 @@
 	xmlns:fl="antlib:it.haefelinger.flaka">
    <!-- damit definiert man für antcontrib einen eigenen Namespace -->
    <!-- damit definiert man für FLAKA einen eigenen Namespace -->
+   
+   <!-- ### Notepad++ Hotkeys:
+        ALT + 0, ALT +1, .... XML Tags der Ebene zusammenklappen. -->
+   
 
    <!-- ### Einbinden von Ant-Contrib ### -->
    <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
@@ -800,16 +804,30 @@
   	<property file="${properties}"/>
   	-->
   	
+	<!-- Alternative 1: Werte entgegennehmen, die an das Ant Script per -Dvmd= bzw. -D%* uebergeben wurden. Letzeres leitet alle Argumente einer Batch an das Ant-Script weiter.-->
+	<property name="vmd" value="nothing"/>
+    <echo message="Wert fuer vmd= ${vmd}"/>
+	
+	<property name="controlstring" value="nothing"/>
+    <echo message="Wert fuer controlstring= ${controlstring}"/>
+	<property name="host" value="nothing"/>
+    <echo message="Wert fuer host= ${host}"/>
   	
+	<!-- Alternative 2: Werte entgegennehmen, die per Batch in eine Umgebungsvariable geschrieben wurden. -->
 	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 	       dies passiert hier durch flaka´s install-property handler task -->
 	<fl:install-property-handler />  	
   	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
   	
   	<!-- TODO GOON: Hier eine Fallunterscheidung machen, ob durch Eclipse oder durch Batch gestartet wurde !!! -->
+	<!-- es soll gelten, dass die Werte per Batchuebergabe wichtiger sind als die Werte per Umgebungsvariable! -->
   	<echo>VMD Properties Datei= ${env.VMD}</echo>
 	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
   	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo>
+	
+	<echo>VMD CONSTROLSTRING= ${env.controlstring}</echo>
+	<echo>VMD HOST= ${env.host}</echo>
+	
 	
 	
   	<!-- Das Betriebssystem, in der Batch ermittelt. -->
@@ -2592,8 +2610,5 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<ac:var name="returnBoolean" value="${returnBoolean}" />
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
 	</target>
-
-	
-
 
 </project>
