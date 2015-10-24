@@ -78,8 +78,6 @@ ECHO VersionMajar.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%Vers
 ECHO VersionName: %VersionName%
 ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
 
-
-
 REM Eine Startdatei mit den Projekteinstellungen übergeben. 
 REM Merke: Der übergebenen Dateiname wird ggfs. durch die existenz eines Dateinamens project_ "Hostname des Rechners" _vmd.properties übersteuert.
 REM Merke: Die Pfadangaben sind mit Slash und nicht mit Backslash
@@ -96,7 +94,13 @@ REM                                                          Z.B. call ant -buil
 REM                                                          Hier soll das Target blabla ausgeführt werden. Ohne solch eine Targetangabe wird gestartet was unter <project ... default="..." > angegeben ist.
 REM %* gibt alle Parameter aus, mit denen diese Batch aufgerufen wurde. Diese werden an Ant weitergegeben.
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
-call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%*
+IF NOT "%1"=="" (
+		REM Fehler "missing value for property" wenn -D nix dahinterstehendes hat.
+		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%*
+	) ELSE (
+		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties
+	)
+
 
 echo Ende Copy Repository to Local HOST
 pause
