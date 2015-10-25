@@ -803,34 +803,78 @@
   	You use this in your build.xml like this:
   	<property file="${properties}"/>
   	-->
-  	
-	<!-- Alternative 1: Werte entgegennehmen, die an das Ant Script per -Dvmd= bzw. -D%* uebergeben wurden. Letzeres leitet alle Argumente einer Batch an das Ant-Script weiter.-->
-	<property name="vmd" value="nothing"/>
-    <echo message="Wert fuer vmd= ${vmd}"/>
 	
-	<property name="controlstring" value="nothing"/>
-    <echo message="Wert fuer controlstring= ${controlstring}"/>
-	<property name="host" value="nothing"/>
-    <echo message="Wert fuer host= ${host}"/>
-  	
+	
+  	<!-- ### Behandle Uebergabeparameter von den aufrufenden Batches / Eclipse ### -->
+	<!-- Es soll gelten, dass die Werte per Batchuebergabe wichtiger sind als die Werte per Umgebungsvariable! -->
+	<!-- Alternative 1: Werte entgegennehmen, die an das Ant Script per -Dvmd= bzw. -D%* uebergeben wurden. Letzeres leitet alle Argumente einer Batch an das Ant-Script weiter.-->
 	<!-- Alternative 2: Werte entgegennehmen, die per Batch in eine Umgebungsvariable geschrieben wurden. -->
-	 <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	
+	<!-- TODO GOON: Hier eine Fallunterscheidung machen, ob durch Eclipse oder durch Batch gestartet wurde !!! -->
+		
+	<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 	       dies passiert hier durch flaka´s install-property handler task -->
 	<fl:install-property-handler />  	
   	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
   	
-  	<!-- TODO GOON: Hier eine Fallunterscheidung machen, ob durch Eclipse oder durch Batch gestartet wurde !!! -->
-	<!-- es soll gelten, dass die Werte per Batchuebergabe wichtiger sind als die Werte per Umgebungsvariable! -->
-  	<echo>VMD Properties Datei= ${env.VMD}</echo>
-	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
-  	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo>
-	
+	<!-- controlstring wird noch nicht verwendet, sollte aber ggfs. zur weiteren Steuerung genutzt werden -->
+	<property name="controlstring" value="nothing"/>
+    <echo message="Wert fuer controlstring= ${controlstring}"/>
 	<echo>VMD CONSTROLSTRING= ${env.controlstring}</echo>
-	<echo>VMD HOST= ${env.host}</echo>
+	
+	<!-- START KAPUTT -->
+	<!-- TODO GOON NOCH KAPUTT 20151025: Hier funktioniert isset wieder nicht. 
+	     Es muss ein Target oder ein Scriptdef entwickelt werden, mit dem man auf ein beginnendes $ abfragt. 
+		 		<!-- Hier noch auf den Wert prüfen. Wenn es mit $ beginnt, dann ist der Wert auch in einem antcallback als 'undefined' anzusehen -->		
+		<substring text="${myInputBooleanValue}" start="0" end="1" property="subtext" /><!-- Es wird die scriptdef Methode substring aufgerufen -->
+		<echo message="Pruefe auf $ am Anfang: subtext = ${subtext}" />
+		<ac:if>
+			<equals arg1="${subtext}" arg2="$" />
+			<ac:then>
+				<!-- TODO: es müsste noch auf eine Laenge >=2 geprueft werden -->
+				<echo message="$ am Anfang -> undefined Wert" />				
+				<fl:let>myResult ::= 'undefined'</fl:let>
+			</ac:then>
+			<ac:else>
+				<echo message="kein $ am Anfang -> defined Wert" />
+				
+		<!-- ENDE KAPUTT -->		
+				
+	<property name="vmd" value="nothing"/>
+    <echo message="Wert fuer vmd=${vmd}"/>
+	<ac:if>
+      <isset property="vmd"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <ac:then>
+		<fl:let>myVmdUsed::="${vmd}"</fl:let>
+	  </ac:then>
+	  <ac:else>
+		<echo>VMD aus Umgebungsvariable= ${env.VMD}</echo>
+		<fl:let>myVmdUsed::="${env.VMD"</fl:let><!-- Merke: Die Pfadangaben in der Batch sind mit Slash und nicht mit Backslash -->
+	  </ac:else>
+	 </ac:if>
+	
+	
+	<property name="host" value="nothing"/>
+    <echo message="Wert fuer host= ${host}"/>	
+  	<ac:if>
+      <isset property="myBooleanValue02A"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <ac:then>
+		<fl:let>myHostUsed::="${host}"</fl:let>
+	  </ac:then>
+	  <ac:else>
+		<echo>HOST aus Umgebungsvariable = ${env.host}</echo>
+		<fl:let>myHostUsed::="${env.host}"</fl:let>
+	  </ac:else>
+	 </ac:if>
 	
 	
 	
-  	<!-- Das Betriebssystem, in der Batch ermittelt. -->
+  	
+  	
+<!-- 	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
+  	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo> -->
+
+  	<!-- Das Betriebssystem wird ausschliesslich in der Batch ermittelt. -->
 	<echo>VMD_OS= ${env.VMD_OS}</echo>
 	<property name="project.vmd.os" value="${env.VMD_OS}" />
 	
@@ -854,11 +898,10 @@
 	
 	<!-- Hole den Pfad aus der $vmd - Property, die in der Batch uebergeben wurde -->
 	<!-- Ermittle aus dem linken Teil den Dateinamen. Er sollte des letzte Element eines Arrays nach dem Aufruf der Splitt - Methode sein -->	
-	<fl:let>vmdUsed ::= '${vmd}'</fl:let><!-- Merke: Die Pfadangaben in der Batch sind mit Slash und nicht mit Backslash -->
-   
+	
 	<!-- Konvertiere den Pfad in Windows-Format -->
 	<path id="pathToConfigFile">
-      <pathelement location="${vmdUsed}"/>
+      <pathelement location="${myVmdUsed}"/>
     </path>
     <pathconvert targetos="windows" property="project.path.fileconfig" refid="pathToConfigFile">
     </pathconvert>
@@ -888,7 +931,7 @@
 	<math result="index" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
 	<echo>errechneter wert fuer Index des letzten Pfadteils: ${index}</echo>
 	<!-- <fl:let>xtractedvalue ::= split('${vmd}','/')[${index}];  -->
-	<fl:let>xtractedvalue ::= split('${vmdUsed}','\\\\')[${index}];  
+	<fl:let>xtractedvalue ::= split('${myVmdUsed}','\\\\')[${index}];  
 		<!-- man muss erneut split aufrufen. Das geht nicht <echo>An letzter Stelle gefundener wert: #{'${src.fileadir}[${index}]'}</echo> -->
 	</fl:let>
 	 <echo>An letzter Stelle gefundener wert: ${xtractedvalue}</echo>
@@ -1066,7 +1109,7 @@
 	</ac:if>
 </target>
 
-<target name = "-FglCheckProjectPropertiesRepository">
+<target name="-FglCheckProjectPropertiesRepository">
 	
 	<!-- Pruefe die Projekt-Properites fuer den Repository-Zweig -->
 	
@@ -1337,7 +1380,7 @@
 	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->	
 </target>
 
-<target name = "-FglCheckProjectPropertiesVmd">
+<target name="-FglCheckProjectPropertiesVmd">
 	
 	<!-- Pruefe die Projekt-Properties fuer den Repository-Zweig -->
 	

@@ -105,4 +105,4 @@ IF NOT "%1"=="" (
 echo Ende Copy Repository to Local HOST
 pause
 REM timeout /T 20 /nobreak
-exit
+REM nicht im Debuggen, sonst wieder einkommentieren, damit sich das Fenster schliesst: exit
