@@ -818,15 +818,15 @@
   	<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
   	
 	<!-- controlstring wird noch nicht verwendet, sollte aber ggfs. zur weiteren Steuerung genutzt werden -->
-	<property name="controlstring" value="nothing"/>
+	<property name="controlstring" value="${nothing}"/>
     <echo message="Wert fuer controlstring= ${controlstring}"/>
 	<echo>VMD CONSTROLSTRING= ${env.controlstring}</echo>
 	
 	<!-- START KAPUTT -->
 	<!-- TODO GOON NOCH KAPUTT 20151025: Hier funktioniert isset wieder nicht. 
-	     Es muss ein Target oder ein Scriptdef entwickelt werden, mit dem man auf ein beginnendes $ abfragt. 
+	     Es muss ein Target oder ein Scriptdef entwickelt werden, mit dem man auf ein beginnendes $ abfragt. -->
 		 		<!-- Hier noch auf den Wert prüfen. Wenn es mit $ beginnt, dann ist der Wert auch in einem antcallback als 'undefined' anzusehen -->		
-		<substring text="${myInputBooleanValue}" start="0" end="1" property="subtext" /><!-- Es wird die scriptdef Methode substring aufgerufen -->
+		<stringSubStringZZZ text="${myInputBooleanValue}" start="0" end="1" property="subtext" /><!-- Es wird die scriptdef Methode substring aufgerufen -->
 		<echo message="Pruefe auf $ am Anfang: subtext = ${subtext}" />
 		<ac:if>
 			<equals arg1="${subtext}" arg2="$" />
@@ -837,10 +837,12 @@
 			</ac:then>
 			<ac:else>
 				<echo message="kein $ am Anfang -> defined Wert" />
-				
+			</ac:else>
+		</ac:if>
+		
 		<!-- ENDE KAPUTT -->		
 				
-	<property name="vmd" value="nothing"/>
+	<property name="vmd" value="${nothing}"/>
     <echo message="Wert fuer vmd=${vmd}"/>
 	<ac:if>
       <isset property="vmd"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
@@ -854,10 +856,10 @@
 	 </ac:if>
 	
 	
-	<property name="host" value="nothing"/>
+	<property name="host" value="${nothing}"/>
     <echo message="Wert fuer host= ${host}"/>	
   	<ac:if>
-      <isset property="myBooleanValue02A"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <isset property="host"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
       <ac:then>
 		<fl:let>myHostUsed::="${host}"</fl:let>
 	  </ac:then>

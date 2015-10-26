@@ -91,8 +91,7 @@
 				}else{					
 					bIsBoolean = false;
 				};			
-			}
-						
+			}			
 			project.setProperty(attributes.get("valuereturn"), bBooleanValue);
 			project.setProperty(attributes.get("isboolean"), bIsBoolean);
 			
@@ -112,11 +111,57 @@
 	</scriptdef>
 	
 	
+	<!-- ########################### -->
+<scriptdef name="isSetZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob der Wert irgendwie als gesetzt interpretiert werden kann. -->
+		<!-- Es werden Ausdrücke, die ${ } entsprechen als nicht gesetzt angesehen.
+		     
+		-->
+			
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+												
+		<attribute name="valueinput" />
+		<attribute name="valuereturn" />
+		<attribute name="isset" />
+		<![CDATA[		   		  
+		   var bIsSetValue = null;
+		   var bIsSet = null;
+		   
+		   var myValueInput = attributes.get("valueinput");
+		   print("myValueInput='"+myValueInput+"'");		   			
+			
+			//Die ersten beiden Zeichen und das letze Zeichen prüfen.
+		    var sBeginning = myValueInput.substring(0, 2);
+			print("ermittelter Anfang="+sBeginning);
+			
+			load("nashorn:mozilla_compat.js");//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+		   importPackage(Packages.basic.zBasic.util.datatype.string);	   
+			//var test = java.lang.System.getProperty("java.class.path");
+			//println("classpath="+test);			  
+			var sEnding = StringZZZ.right(myValueInput,1);
+			print("Per JAZ-Kernel ermitteltes Stringende (aus '" + myValueInput + "'): '" + sEnding +"'");
+			   			   
+						
+			if(sBeginning=="${" && sEnding=="}") {
+				bIsSet=false;
+			}else{
+				bIsSet=true;
+				bIsSetValue=myValueInput;
+			}
+						
+			project.setProperty(attributes.get("valuereturn"), bIsSetValue);
+			project.setProperty(attributes.get("isset"), bIsSet);
+		 ]]>
+	</scriptdef>
+	
+	
 <!-- ########################### -->
 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
- <scriptdef name="substring" language="javascript">
+ <scriptdef name="stringSubStringZZZ" language="javascript">
      <attribute name="text" />
      <attribute name="start" />
      <attribute name="end" />
@@ -148,7 +193,7 @@
         <echo message="myInputBooleanValue exists: '${myInputBooleanValue}'" />
 		
 		<!-- Hier noch auf den Wert prüfen. Wenn es mit $ beginnt, dann ist der Wert auch in einem antcallback als 'undefined' anzusehen -->		
-		<substring text="${myInputBooleanValue}" start="0" end="1" property="subtext" /><!-- Es wird die scriptdef Methode substring aufgerufen -->
+		<stringSubStringZZZ text="${myInputBooleanValue}" start="0" end="1" property="subtext" /><!-- Es wird die scriptdef Methode substring aufgerufen -->
 		<echo message="Pruefe auf $ am Anfang: subtext = ${subtext}" />
 		<ac:if>
 			<equals arg1="${subtext}" arg2="$" />
@@ -215,7 +260,8 @@
   <!-- ################################################################################# -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <target name="compile" depends="-declaration, -init,-myTestIsBoolean,-myTestAntcontribIf,-myTestFlakaChoose">
+ <!-- <target name="compile" depends="-declaration, -init,-myTestIsBoolean,-myTestAntcontribIf,-myTestFlakaChoose"> -->
+ <target name="compile" depends="-declaration, -init,-myTestIsSet">
 
 	<!-- WIRD NICHT BENOETIGT -->
 	
@@ -401,6 +447,62 @@
 	<echo>es gilt: myBooleanValue02E = ${myBooleanValue02E} | myValueIsBoolean02E = ${myValueIsBoolean02E} </echo>
  </target>
   
+  <!-- ######################################################### -->  
+  <target name="-myTestIsSet">
+	<fl:logo>myTestIsBoolean</fl:logo>
+	
+	<echo>- isset: Normale, funktioniert ----------------------------------------------------</echo>
+	<property name="controlstring" value="${nothing}"/>
+	<echo message="Wert fuer controlstring=${controlstring}"/>
+	<ac:if>
+      <isset property="controlstring"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <ac:then>
+		<fl:let>myControlstring::="${controlstring}"</fl:let>
+		<echo>Property gesetzt. MyControlstring=${myControlstring}</echo>
+	  </ac:then>
+	  <ac:else>
+		<echo>Property NICHT gesetzt.</echo>
+	  </ac:else>
+	 </ac:if>	
+	<echo>----------------------------------------------------------------------------------</echo>
+	
+	<echo>- isset, ohne dass die Property deklariert worden ist, funktioniert auch. --------</echo>	
+	<ac:if>
+      <isset property="neverever"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <ac:then>	
+		<echo>Property gesetzt. neverever=${neverever}</echo>
+	  </ac:then>
+	  <ac:else>
+		<echo>Property NICHT gesetzt.</echo>
+	  </ac:else>
+	 </ac:if>	
+	<echo>-----------------------------------------------------------------------------------</echo>
+		
+	<echo>- teste isSetZZZ ---------- </echo>
+	<property name="myProperty" value="${nothing}"/>
+	<echo message="Wert fuer myProperty=${myProperty}"/>
+	<isSetZZZ valueinput="${myProperty}" valuereturn="myIsSetValue" isset="myValueIsSet" />
+	
+	<!-- Das Ergebnis von isSetZZZ prüfen -->
+	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<ac:if>
+	  <equals arg1="${myValueIsBoolena}" arg2="true" />
+      <ac:then>		
+		<echo>Property war gesetzt.</echo>
+	  </ac:then>
+	  <ac:else>
+		<echo>Property war NICHT gesetzt.</echo>
+	  </ac:else>
+	 </ac:if>	
+	
+	<echo>-----------------------------------------------------------------------------------</echo>
+	
+	<!-- TODO GOON: Funktioniert das auch in einem ant-callback ? Falls nein, isSetZZZ bereitstellen. -->
+	
+	<echo>-----------------------------------------------------------------------------------</echo>
+	
+ </target>
+  
  <!-- ######################################################### -->  
 <target name="-myTestAntcontribIf">
 <fl:logo>
@@ -459,9 +561,7 @@
 			</if>	
 		</else>
 	</if>		
- </target>
- 
- 
+ </target> 
   
 <!-- ######################################################### -->  
 <target name="-myTestFlakaChoose">
