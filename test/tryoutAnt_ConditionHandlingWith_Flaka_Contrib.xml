@@ -136,6 +136,8 @@
 		    var sBeginning = myValueInput.substring(0, 2);
 			print("ermittelter Anfang="+sBeginning);
 			
+			var version = java.lang.System.getProperty("java.version");
+			print("Java Version:" + version);
 			load("nashorn:mozilla_compat.js");//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
 		   importPackage(Packages.basic.zBasic.util.datatype.string);	   
 			//var test = java.lang.System.getProperty("java.class.path");
