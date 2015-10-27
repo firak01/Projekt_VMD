@@ -126,7 +126,7 @@
 		<attribute name="valuereturn" />
 		<attribute name="isset" />
 		<![CDATA[		   		  
-		   var bIsSetValue = null;
+		   var isSetValue = null;
 		   var bIsSet = null;
 		   
 		   var myValueInput = attributes.get("valueinput");
@@ -146,10 +146,11 @@
 				bIsSet=false;
 			}else{
 				bIsSet=true;
-				bIsSetValue=myValueInput;
+				isSetValue=myValueInput;
 			}
-						
-			project.setProperty(attributes.get("valuereturn"), bIsSetValue);
+			
+			print("Returnvalues. isset='"+bIsSet+"' | valuereturn='"+isSetValue+"'");
+			project.setProperty(attributes.get("valuereturn"), isSetValue);
 			project.setProperty(attributes.get("isset"), bIsSet);
 			
 			//Todo: Diese Funktion in den JSZ Kernel packen
@@ -496,7 +497,7 @@
 	 </ac:if>	
 	<echo>-----------------------------------------------------------------------------------</echo>
 		
-	<echo>- teste isSetZZZ ---------- </echo>
+	<echo>- teste isSetZZZ: false Fall ---------- </echo>
 	<property name="myProperty" value="${nothing}"/>
 	<echo message="Wert fuer myProperty=${myProperty}"/>
 	<isSetZZZ valueinput="${myProperty}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -504,7 +505,25 @@
 	<!-- Das Ergebnis von isSetZZZ prüfen -->
 	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<ac:if>
-	  <equals arg1="${myValueIsBoolean}" arg2="true" />
+	  <equals arg1="${myBooleanValue}" arg2="true" />
+      <ac:then>		
+		<echo>Property war gesetzt.</echo>
+	  </ac:then>
+	  <ac:else>
+		<echo>Property war NICHT gesetzt.</echo>
+	  </ac:else>
+	 </ac:if>	
+	 <echo>-----------------------------------------------------------------------------------</echo>
+		
+	<echo>- teste isSetZZZ: true Fall ---------- </echo>
+	<property name="myProperty02" value="etwasGesetztes"/>
+	<echo message="Wert fuer myProperty02=${myProperty02}"/>
+	<isSetZZZ valueinput="${myProperty02}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	
+	<!-- Das Ergebnis von isSetZZZ prüfen -->
+	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<ac:if>
+	  <equals arg1="${myBooleanValue}" arg2="true" />
       <ac:then>		
 		<echo>Property war gesetzt.</echo>
 	  </ac:then>
