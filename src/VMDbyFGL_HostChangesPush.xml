@@ -679,6 +679,69 @@
 		 ]]>
 	</scriptdef>
 	
+	<!-- ########################### -->
+	<scriptdef name="isSetZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob der Wert irgendwie als gesetzt interpretiert werden kann. -->
+		<!-- Es werden Ausdrücke, die ${ } entsprechen als nicht gesetzt angesehen.
+		     
+		-->
+			
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+												
+		<attribute name="valueinput" />
+		<attribute name="valuereturn" />
+		<attribute name="isset" />
+		<![CDATA[		   		  
+		   var bIsSetValue = null;
+		   var bIsSet = null;
+		   
+		   var myValueInput = attributes.get("valueinput");
+		   print("myValueInput='"+myValueInput+"'");		   			
+			
+			//Die ersten beiden Zeichen und das letze Zeichen prüfen.
+		    var sBeginning = myValueInput.substring(0, 2);
+			//print("ermittelter Anfang="+sBeginning);
+			
+		   enableJava();
+		   importPackage(Packages.basic.zBasic.util.datatype.string);	   			  
+		   var sEnding = StringZZZ.right(myValueInput,1);
+			//print("Per JAZ-Kernel ermitteltes Stringende (aus '" + myValueInput + "'): '" + sEnding +"'");
+			   			   
+						
+			if(sBeginning=="${" && sEnding=="}") {
+				bIsSet=false;
+			}else{
+				bIsSet=true;
+				bIsSetValue=myValueInput;
+			}
+						
+			project.setProperty(attributes.get("valuereturn"), bIsSetValue);
+			project.setProperty(attributes.get("isset"), bIsSet);
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+		 ]]>
+	</scriptdef>	
+	
 	<!-- ############################################################ -->		
 	<scriptdef name="isFilenameRelevantVMD" language="javascript">
 		 <attribute name="text" />
@@ -736,7 +799,7 @@
 		 ]]>
 	</scriptdef>
 	
-	 <!-- ########################################################### -->
+	<!-- ########################################################### -->
 	 <scriptdef name="stringLeftStringZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -880,27 +943,51 @@
 			</ac:else>
 		</ac:if>
 		
-		<!-- ENDE KAPUTT -->		
-				
-	<property name="vmd" value="${nothing}"/>
-    <echo message="Wert fuer vmd=${vmd}"/>
+		
+		
+		
+			<isSetZZZ valueinput="${myProperty}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	
+	<!-- Das Ergebnis von isSetZZZ prüfen -->
+	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<ac:if>
-      <isset property="vmd"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+	  <equals arg1="${myValueIsBoolena}" arg2="true" />
+      <ac:then>		
+		<echo>Property war gesetzt.</echo>
+	  </ac:then>
+	  <ac:else>
+		<echo>Property war NICHT gesetzt.</echo>
+	  </ac:else>
+	 </ac:if>	
+
+		<!-- ENDE KAPUTT -->
+	
+				
+	<property name="vmd" value="${nothing}"/><!--Merke: In der if-Abfrage <isset property="..."></isset> funktioniert nicht immer, darum mit einer eigenen Methode prüfen -->
+    <echo message="Wert fuer vmd=${vmd}"/>
+	<isSetZZZ valueinput="${vmd}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<ac:if>
+	 <equals arg1="${myValueIsBoolean}" arg2="true" />     
       <ac:then>
-		<fl:let>myVmdUsed::="${vmd}"</fl:let>
+		<echo>VMD aus Uebergabeparameter= ${vmd}</echo>
+		<fl:let>myVmdUsed::="${vmd}"</fl:let>		
 	  </ac:then>
 	  <ac:else>
 		<echo>VMD aus Umgebungsvariable= ${env.VMD}</echo>
-		<fl:let>myVmdUsed::="${env.VMD"</fl:let><!-- Merke: Die Pfadangaben in der Batch sind mit Slash und nicht mit Backslash -->
+		<fl:let>myVmdUsed::="${env.VMD}"</fl:let><!-- Merke: Die Pfadangaben in der Batch sind mit Slash und nicht mit Backslash -->
 	  </ac:else>
 	 </ac:if>
 	
 	
-	<property name="host" value="${nothing}"/>
+	<property name="host" value="${nothing}"/><!--Merke: In der if-Abfrage <isset property="..."></isset> funktioniert nicht immer, darum mit einer eigenen Methode prüfen -->
     <echo message="Wert fuer host= ${host}"/>	
-  	<ac:if>
-      <isset property="host"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+  	<isSetZZZ valueinput="${host}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<ac:if>
+	 <equals arg1="${myValueIsBoolean}" arg2="true" />
       <ac:then>
+		<echo>HOST aus Uebergabeparameter= ${host}</echo>
 		<fl:let>myHostUsed::="${host}"</fl:let>
 	  </ac:then>
 	  <ac:else>
@@ -909,9 +996,6 @@
 	  </ac:else>
 	 </ac:if>
 	
-	
-	
-  	
   	
 <!-- 	<echo>TRYOUT= ${env.TRYOUT_ANT}</echo>
   	<echo>ECLIPSE ARGUMENTS= ${vmd}</echo> -->

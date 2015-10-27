@@ -499,12 +499,12 @@
 	<echo>- teste isSetZZZ ---------- </echo>
 	<property name="myProperty" value="${nothing}"/>
 	<echo message="Wert fuer myProperty=${myProperty}"/>
-	<isSetZZZ valueinput="${myProperty}" valuereturn="myIsSetValue" isset="myValueIsSet" />
+	<isSetZZZ valueinput="${myProperty}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
 	
 	<!-- Das Ergebnis von isSetZZZ prüfen -->
 	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<ac:if>
-	  <equals arg1="${myValueIsBoolena}" arg2="true" />
+	  <equals arg1="${myValueIsBoolean}" arg2="true" />
       <ac:then>		
 		<echo>Property war gesetzt.</echo>
 	  </ac:then>
