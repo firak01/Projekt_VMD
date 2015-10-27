@@ -637,6 +637,7 @@
 		 <attribute name="text" />
 		 <attribute name="property" />
 		 <![CDATA[
+		   enableJava();
 		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist Package notwendig
 		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
 		   var text = attributes.get("text");
@@ -656,6 +657,25 @@
 					print(fd.getPath()+" =>js not existing!");
 			}
 			project.setProperty(attributes.get("property"), berg);
+			
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
 		 ]]>
 	</scriptdef>
 	
@@ -675,6 +695,7 @@
 		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
 		   
 		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   enableJava();
 		   importPackage(Packages.basic.zBasic.util.file);
 		   
 		   //var test = java.lang.System.getProperty("java.class.path");
@@ -692,7 +713,26 @@
 			}else{
 			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt NICHT relevant.");
 			}
-		   project.setProperty(attributes.get("property"), berg);				
+		   project.setProperty(attributes.get("property"), berg);	
+
+		   function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}		   
 		 ]]>
 	</scriptdef>
 	

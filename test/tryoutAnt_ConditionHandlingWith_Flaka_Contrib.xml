@@ -112,7 +112,7 @@
 	
 	
 	<!-- ########################### -->
-<scriptdef name="isSetZZZ" language="javascript">
+	<scriptdef name="isSetZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie als gesetzt interpretiert werden kann. -->
 		<!-- Es werden Ausdrücke, die ${ } entsprechen als nicht gesetzt angesehen.
 		     
@@ -134,16 +134,12 @@
 			
 			//Die ersten beiden Zeichen und das letze Zeichen prüfen.
 		    var sBeginning = myValueInput.substring(0, 2);
-			print("ermittelter Anfang="+sBeginning);
+			//print("ermittelter Anfang="+sBeginning);
 			
-			var version = java.lang.System.getProperty("java.version");
-			print("Java Version:" + version);
-			load("nashorn:mozilla_compat.js");//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-		   importPackage(Packages.basic.zBasic.util.datatype.string);	   
-			//var test = java.lang.System.getProperty("java.class.path");
-			//println("classpath="+test);			  
-			var sEnding = StringZZZ.right(myValueInput,1);
-			print("Per JAZ-Kernel ermitteltes Stringende (aus '" + myValueInput + "'): '" + sEnding +"'");
+		   enableJava();
+		   importPackage(Packages.basic.zBasic.util.datatype.string);	   			  
+		   var sEnding = StringZZZ.right(myValueInput,1);
+			//print("Per JAZ-Kernel ermitteltes Stringende (aus '" + myValueInput + "'): '" + sEnding +"'");
 			   			   
 						
 			if(sBeginning=="${" && sEnding=="}") {
@@ -155,6 +151,26 @@
 						
 			project.setProperty(attributes.get("valuereturn"), bIsSetValue);
 			project.setProperty(attributes.get("isset"), bIsSet);
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
 		 ]]>
 	</scriptdef>
 	
@@ -239,7 +255,7 @@
   <property name="src" value="src"/>
   -->
   
-  <target name="-declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafuer sorgen dass die Deklaration vor allen anderen Targets ausgefuehrt wird. -->
+<target name="-declaration"><!-- damit dies nicht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafuer sorgen dass die Deklaration vor allen anderen Targets ausgefuehrt wird. -->
     <!-- An dieser Stelle Argumente entgegennehmen, entweder aus der Batch oder unter Eclipse aus der "external Configuration" des AntScripts  -->
   	<!-- Merke: You can define an argument with the property file name to the build in the 'Arguments' section of the Run > External Tools > External Tools Configuration for your Ant Build. Something like:
   	-Dproperties=Buildfile_test.properties
@@ -279,7 +295,7 @@
 	-->
  </target>
  
-  <target name="-init">
+<target name="-init">
     <!-- Create the time stamp -->
 	<echo>Receiving timestamp:</echo>
     <!--<tstamp/>-->
@@ -449,9 +465,9 @@
 	<echo>es gilt: myBooleanValue02E = ${myBooleanValue02E} | myValueIsBoolean02E = ${myValueIsBoolean02E} </echo>
  </target>
   
-  <!-- ######################################################### -->  
-  <target name="-myTestIsSet">
-	<fl:logo>myTestIsBoolean</fl:logo>
+<!-- ######################################################### -->  
+<target name="-myTestIsSet">
+	<fl:logo>myTestIsSet</fl:logo>
 	
 	<echo>- isset: Normale, funktioniert ----------------------------------------------------</echo>
 	<property name="controlstring" value="${nothing}"/>
