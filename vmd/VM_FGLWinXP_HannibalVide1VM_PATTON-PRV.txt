@@ -1,7 +1,9 @@
 ### Spielumgebung Video 01
+20151027: Java 1.4 deinstalliert
+20151027: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
 
 20151021: Installation Java JDK 1.7, Ant_HOME, ANT_ARGS für Flaka
-20151021: VMD_PROJEKT ist Repository, Git ist eingerichtet
+20151021: VMD_PROJEKT ist Repository, Git ist eingerichtet, Installation von GitGUI
 
 20150930 Installation von "Star Wars - Empire At War".
                 Merke: Saves sind unter C:\Dokumente und Einstellungen\lindhaueradmin\Anwendungsdaten\Petroglyph\Star Wars Empire at War
