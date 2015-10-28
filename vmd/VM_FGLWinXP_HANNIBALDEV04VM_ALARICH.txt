@@ -34,6 +34,8 @@
         --- Fatjar und Subversion Plugin
         --- Workspace mit Kernel V2.0 (angebunden an Subversion)
 ####################################################################
+20151027: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
+
 20151021: Installation Java JDK 1.7, ANT_HOME, ANT_ARGS für Flaka
 20151020: Installation von GitGui, TortoiseGit und Auschecken des Repository: VMD_PROJECT
 
