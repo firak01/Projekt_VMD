@@ -1,0 +1,103 @@
+---- Synchron halten mit DEV05
+---- Entwicklungsumgebung von "KernelZZZ", "ScheduledFileArchiveZZZ"
+
+##### Lotus Notes Client 8.53, Für Arbeit mit Foren, Tips, etc. eingerichtet.
+            ABER: Die Dateien bleiben auf dem fgl02 - Server und werden nicht lokal repliziert (Platz sparen)
+
+##### Komodo Edit 8: Entwicklungsumgebung für JQuery
+             SoapUI (alte Version)	
+
+ Eclipse 3.22:    
+	TODO Alte Entwicklungsumgebung nach DEV02B/DEV03 verschieben.
+	---  Alte Entwicklungumgebung für "KernelZZZ" und das "VideoArchiveZZZ", mit Java 1.6 (Kernel 01 CVS)
+                                   
+	Eclipse (Juno):
+              --- Installation des fatjar - Plugins 0.31 von http://kurucz-grafika.de/fatjar
+	      --- Einige KernelKlassen, (Kernel 01, CVS)
+              --- Entwicklung von "ScheduledFileArchiveZZZ" - Projekt (Kernel01, Subversion)
+              --- Entwicklung des Java-Kommentar Entferners. (CVS)
+
+            
+	Eclipse 3.22
+	      --- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
+              --- VideoInternetArchive (Kernel V02, 1.6er compiler, angebunden an Subversion )
+              --- diverse TryOuts: Z.B. CouchDb, TimerTask (angebunden an Subversion)
+              --- diverse TryOuts: Z.B. iText, PortScanner (angebunden an CVS)                                   
+            
+	Eclipse 4.2:
+        ---  Workspace zum Buch "Java XML".
+
+	Eclipse 3.22:
+        --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
+
+	Eclipse 4.4 Luna
+        --- Fatjar und Subversion Plugin
+        --- Workspace mit Kernel V2.0 (angebunden an Subversion)
+####################################################################
+20151027: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
+
+20151021: Installation Java JDK 1.7, ANT_HOME, ANT_ARGS für Flaka
+20151020: Installation von GitGui, TortoiseGit und Auschecken des Repository: VMD_PROJECT
+
+20151016: Neuer Workspace unter Eclipse Luna 4.4 - für Kernel V02
+                Installation des fatjar - Plugins 0.31 in Eclipse Luna 4.4 -Version : von http://kurucz-grafika.de/fatjar Erst nach weiterer Installation geklappt (Eclipse Update : Tool für nicht ganz kompatible OSGI Bundles)
+                Update von Eclipse Luna 4.4
+
+20150501: Installiere Eclipse Wiki Plugin in der Eclipse Luna - Version : von http://www.stateofflow.com/UpdateSite
+                Aber: Das ist nix was ich gebrauchen kann.
+
+20140417: Notes Client um die Seiten FGL Projekt (aktuell) und FGL (Mail / Adressen & Foren) erweitert
+
+20141208: Eclipse.ini Dateien deaktiviert/umbenannt, damit die Parameter der Verknüpfungen wirken
+                C:\java\eclipse3.2\eclipse\eclipse.exe -data c:\1fgl\Workspace\Eclipse3FGL_V02 -vm c:\java\jre1.6.0\bin\javaw.exe -clean -showlocation  -vmargs -Xms512m -Xmx1024m  -XX:MaxPermSize=128m -Duser.name="Fritz Lindhauer"
+
+20140627: Lotus Notes 8.53 Fixpack 6
+20140627: Notes startet nicht mehr, workspace deinstallieren hat nix gebracht. Komplett deinstalliert und neu installiert.
+
+20140626: Arbeitsspeicher auf 2048Mb erhöht, Windows neu aktiviert
+20140626: Java7SDK installiert
+
+20140320: WindowsXP Updates, IE8
+20131224: Malicious Software Removal Tool 
+20131224: Microsoft Office Compatibility Pack für Dateiformate von Word, Excel und PowerPoint
+                Öffnen, Bearbeiten und Speichern von Dokumenten, Arbeitsmappen und Präsentationen in Open XML-Dateiformaten, die ab Office 2007 und auch in Office 2010 in Microsoft Office Word, Excel und PowerPoint eingeführt wurden.
+
+
+##################
+2013-11-03: Gimp 2.6 installiert
+
+2013-10-23: PDF Creator 1.7 installiert
+
+2013-04-05: Chrome installiert
+2013-04-05: Update des Internet Explorers auf Version 8
+
+2013 03 28: Workspace mit SOAP UI Projekten errichtet
+
+
+
+########################
+2013-03-27: CouchDb Version 1.21 installiert
+2013-03-24: soapui installiert
+2013-03-24: node.js installiert, ist in komodoEdit konfiguriert.
+2013-03-24: Komodo Edit 8 als JavaScript Editor installiert
+
+2013-03-08: curl (http Tool) im client Verzeichnis installiert
+
+2012-11-14: Java 1.7 API Dokumentation hinzugefügt
+2012-11-13: Installation von Java 7
+
+2012-11-06: Installation der Treiber & Software für den Brother Drucker auf 192.168.3.249
+2012-11-06: Installation der Java 6 - API DOCS
+
+###########################################
+2012-10-19: Domino Designer. Das Installieren von Plugins erlaubt. Plugins von der Update Site installiert: 1. SVN 2. Firebug light
+2012-10-19: Notes 8.5.3 Client mit Desiger und Administrator installiert, Fixpack 1 & 2 installiert. Upgradepack 1 für Designer installiert. Siehe: http://www-10.lotus.com/ldd/ddwiki.nsf/xpViewCategories.xsp?lookupName=Domino%20Designer%20XPages%20Extension%20Library
+
+2012-10-18: Plugin EGIT für GIT Versionskontrolle in Eclipse Installiert (schon mal vorsorglich, da es noch keinen GIT Server gibt)
+2012-10-18: Plugin für SVN in Eclipse (inklusive SVN Konnector - Installation nach Verbindung mit dem Internet)SVN 
+2012-10-18: Installation von Eclipse Juno (4.2) EE und WebDeveloper
+2012-10-18: Installation von Java 6 JRE & SDK
+
+2012-10-16: Dateien in das Software Verzeichnis kopiert. (Unter Verwendung der MBS Relay VM).
+2012-10-14: Arbeitsspeicher auf 768 MB verringert. Windows neu Aktiviert
+2012-10-13: Aufgeräumt, d.h. deinstallation von Notes 7, glassfish Server, Tom tom, etc.
