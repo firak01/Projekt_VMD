@@ -1189,49 +1189,39 @@
 	<fl:let>src.dirFglClientPath::="${conf.dirPathClientFgl}" </fl:let>
 	
 	<!-- Die Ermittlung des Dateinamens, unbhaengig von Client oder Host.-->
+	<!-- Merke: Normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
 	<echo>VMD_OS=${env.VMD_OS}</echo>
 	<fl:let>osUsed::='${env.VMD_OS}'</fl:let>		
 	<fl:let>pathClientUsed::='${conf.dirPathClientFgl}'</fl:let>		
 	<antcallback target="-computeFilenameVMD" return="returnFilename">
 				<param name="osUsed" value="${osUsed}"/>
 				<param name="pathClientUsed" value="${pathClientUsed}"/>					
-	</antcallback>
-		
-    <!-- <fl:let>src.dirFglClientFileName::="FGL${conf.os}_${env.COMPUTERNAME}_Installationen.txt"</fl:let> --><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+	</antcallback>		
+	<echo>Errechneter wert der VMD Datei=${returnFilename}</echo>
 	<fl:let>src.dirFglClientFileName::="${returnFilename}"</fl:let><!-- Merke: Der Computername wird nicht extra gesetzte. Er kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-
-	<!-- normalerweise kann in ANT keine  Property verändert werden. Benutze dazu Flaka LET -->
-    <!--das würde also nicht verändert, wenn src.dirFglClientFile vorher schon definiert ist <property name="src.dirFglClientFile" value="${src.dirFglPath}/${src.dirFglClient}" />  -->
-	<fl:let>src.dirFglClientFilePath::='${src.dirFglClientPath}/${src.dirFglClientFileName}'</fl:let>
-	<echo>Wert von src.dirFglClientFilePath=${src.dirFglClientFilePath}</echo>
-		
-			<!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
-			<!-- TODO GOON, 20150914 noch kaputt... -->
-			<!-- TODO GOON: HIER nicht mit Properties arbeiten, da Properties über alle Unter-Main-Targets gelten und nicht veränderbar sind. Statt dessen Variablen fl:let verwenden. -->
-			<property name="dest.dirRepositoryVmdPath" value="${conf.dirRepositoryPath}" />			
-			<property name ="dest.dirRepositoryVmdBackupPath" value="${dest.dirRepositoryVmdPath}Backups" />
+	<fl:let>dest.dirRepositoryVmdPath::="${conf.dirRepositoryPath}"</fl:let>
+	<fl:let>dest.dirRepositoryVmdBackupPath::="${dest.dirRepositoryVmdPath}Backups"</fl:let><!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
 		  
-			<!-- ########### Mache Backup des Repositories. ######################################################### -->
-			<antcallback target="-FglRepositoryBackup" return="returnControl">
-				<param name="targetDirectory" value="${dest.dirRepositoryVmdBackupPath}"/>
-			</antcallback>
-			
-			<!-- returnControl prüfen: Backup des Repositories erfolgreich oder nicht -->			
-			<ac:if>
-				<ac:equals arg1="${returnControl}" arg2="true" />
-				<ac:then>
-					<fl:echo>FglRepositoryBackup erfolgreich. Fahre fort.</fl:echo> 
-					
-					<antcallback target="-FglRepositoryCopyClient2archive" return="returnControl">
-					<param name="sourceDirectory" value="${src.dirFglClientPath}"/>
-					<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
-			</antcallback>
-				</ac:then>		
-				<ac:else>													
-					<fl:echo>FglRepositoryBackup NICHT erfolgreich. Ueberspringe das Kopieren.</fl:echo> 
-				</ac:else>
-			</ac:if><!-- End if: Backup des Repositories erfolgreich oder nicht -->
+	<!-- ########### Mache Backup des Repositories. ######################################################### -->
+	<antcallback target="-FglRepositoryBackup" return="returnControl">
+			<param name="targetDirectory" value="${dest.dirRepositoryVmdBackupPath}"/>
+	</antcallback>								
+	<ac:if><!-- returnControl prüfen: Backup des Repositories erfolgreich oder nicht -->
+		<ac:equals arg1="${returnControl}" arg2="true" />
+		<ac:then>
+			<fl:echo>FglRepositoryBackup erfolgreich. Fahre fort.</fl:echo> 
+				
+			<antcallback target="-FglRepositoryCopyClient2archive" return="returnControl">
+			<param name="sourceDirectory" value="${src.dirFglClientPath}"/>
+			<param name="targetDirectory" value="${dest.dirRepositoryVmdPath}"/>
+			<param name="fileNameVmd" value="${src.dirFglClientFileName}"/>
+		</antcallback>
+		</ac:then>		
+		<ac:else>													
+			<fl:echo>FglRepositoryBackup NICHT erfolgreich. Ueberspringe das Kopieren.</fl:echo> 
 		</ac:else>
+	</ac:if><!-- End if: Backup des Repositories erfolgreich oder nicht -->
+	</ac:else>
 	</ac:if>
 </target>
 
@@ -1375,19 +1365,22 @@
 	<echo>Pushing Files to Repository:</echo>
 	<fl:let>mySourceDirectory ::= "${sourceDirectory}"</fl:let>
 	<fl:let>myTargetDirectory ::= "${targetDirectory}"</fl:let>
+	<fl:let>myFileNameVmd ::= "${fileNameVmd}"</fl:let>
 		
 	<echo>a) VMD File:</echo>
-	<echo>conf.dirRepositoryArchive = "${conf.dirRepositoryArchive}"</echo>
+	<!-- <echo>conf.dirRepositoryArchive = "${conf.dirRepositoryArchive}"</echo>
 	<echo>mySourceDirectory = "${mySourceDirectory}"</echo>
+	<echo>myTargetDirectory = "${myTargetDirectory}"</echo>
+	<echo>myFileNameVmd = "${myFileNameVmd}"</echo> -->
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
-	<!-- <copy todir="//${dest.dirRepositoryVmdPath}/${project.vmd.dirRepositoryArchive}" overwrite="false"  preservelastmodified="true"> --> 
 	<copy todir="//${dest.dirRepositoryVmdPath}/${conf.dirRepositoryArchive}" overwrite="false"  preservelastmodified="true">
 		<fileset dir="//${mySourceDirectory}">	  
-	     <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
-		 <!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
+	    <!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+		<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />--><!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
 		
 		<!--Hier den errechneten Namen der VMD Datei verwenden und nicht alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
-		<include name="${src.dirFglClientFileName}" />		
+		<!-- <include name="${src.dirFglClientFileName}" /> -->	
+		<include name="${myFileNameVmd}" />		
 	  </fileset>
 	</copy>
 	
@@ -1396,7 +1389,7 @@
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	  
 	<copy todir="//${myTargetDirectory}/${conf.dirRepositoryMisc}" overwrite="false"  preservelastmodified="true"> 	
 	  <fileset dir="//${mySourceDirectory}">
-		 <exclude name="${src.dirFglClientFileName}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
+		<exclude name="${myFileNameVmd}" /><!-- wichtig: Das exclude muss VOR dem include stehen -->		
 		<include name="**.txt"/>
 	  </fileset>
 	</copy>
