@@ -21,6 +21,8 @@
 	Alte ZKernel Entwicklungumgebung
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 #################################################
+20151029: Notepad++ installiert, mit den Erweiterungen compare, explorer, xml tools
+
 20150412: PDF24creator installiert
 
 20150113: EGit als neue Software für Eclipse installiert. Repositories über Eclipse als neue Projekte aus GitHub importiert. (Screenshots zum Procedere).
