@@ -5,7 +5,7 @@ REM start /wait .\Domino\ServerDominoQuit.bat
 
 REM die Batchparameter z.B. host= werden per #* entgegengenommen und an das ANT-Script per -D%* weitergereicht.
 REM Im AntScript stehen sie dann als Property zur Verfügung. Z.B. <property name="host" value="nothing"/><echo message="Wert fuer host= ${host}"/>
-start .\"2_VmdByFGL_copyLocal2Repository_HOST.bat" host=PATTON-PRV
+start .\"2_VmdByFGL_copyLocal2Repository_HOST.bat" host=UGAKI-SRV
 
 REM das konsolenfenster schliessen. Was wichtig ist, falls ein aufrufendes Programm auf das ende des Batch-Tasks wartet.
 exit

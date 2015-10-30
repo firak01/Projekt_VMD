@@ -1,7 +1,11 @@
+Spieleumgebung 3
+###############################################################
+
+20151030: Entfernen von Clip4Moni aus der Autostart-Gruppe, dann tritt der Java Exception Error nicht mehr auf.
 
 20151030: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
 20151030: Instalation von Git und Ant. Klonen des VMD_PROJEKT Repositories
-20151030: Installation von Java JDK 1.7, Ändern des JAVA_HOME ==> Java Launcher Exception Error
+20151030: Installation von Java JDK 1.7, Ändern des JAVA_HOME 
 
 20140812 Druckertreiber etc. für Brother Drucker installiert
 
