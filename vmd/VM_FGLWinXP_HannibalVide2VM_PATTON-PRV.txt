@@ -1,1 +1,8 @@
+Spielumgebung 2
+#########################################################################
+
+20151030: Installation von Git und Klonen des Repositories Projekt_VMD
+20151030: Installation von JDK 1.7
+20151030: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
+
 20140327 IE8 Installation, WinXP updates
