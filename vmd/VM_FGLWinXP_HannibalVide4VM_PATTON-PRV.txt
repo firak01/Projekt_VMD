@@ -1,6 +1,17 @@
+Spielumgebung 4
+
 Allgemeine Hinweise:
 Auf dem Notebook "Alarich die Auflösung ändern auf 1208x768
+#########################################
 
+20151030: Clip4Moni aus Autostart entfernt, damit kein Java Exception Fehler auftritt.
+
+20151030: Installation von Git und Anlegen des Repositories für Projekt_VMD
+20151030: Installation von Java JDK 1.7 und Apache Ant
+20151030: Installation von Notepad++ mit Erweiterungen compare, exlporer, xml tools
+
+20140810 Vassal Client 3.2.x installiert
+20140810 Java Runtime 1.6er Version installiert
 
 2014-03-25: IE8 installiert und WinXP Updates
 
