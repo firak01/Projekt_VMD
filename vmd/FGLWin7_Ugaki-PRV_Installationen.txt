@@ -1,6 +1,7 @@
 ### Private Festplatte mit Spielen ect.
 
 #########################################################
+20151031 : Einbau USB 3.0 Karte und Installation des Treibers von der CD.
 
 20151017 : Updaten VMWare Player auf Version 12, dazu VMWare Player 4 deinstalliert
 
