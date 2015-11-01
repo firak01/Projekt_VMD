@@ -1,0 +1,18 @@
+Spielumgebung 4
+
+Allgemeine Hinweise:
+Auf dem Notebook "Alarich die Auflösung ändern auf 1208x768
+##########################################################
+
+20151101: Installation von Java JDK 1.7  und Apache Ant (inkl. Path-Variablen)
+20151101: Installation von Git und Klonen des Repository Projekt_VMD
+20151101: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
+
+2014-04-08: WinXP Updates
+
+2012-10-11
+Installation DOS Box, 
+Rüberkopieren von DOS Spielen / DOSBOXGUI vom FGLHannibalVideoPlay3VM
+
+Vor 2012-07-12
+Installation Spiel Asia Engulfed
