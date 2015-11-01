@@ -1,5 +1,13 @@
+Spieleumgebung 3
+
 Allgemeine Hinweise:
 Auf dem Notebook "Alarich die Auflösung ändern auf 1208x768
+####################################################
+
+20151101: Installation von Java JDK 1.7  und Apache Ant (inkl. Path-Variablen)
+20151101: Installation von Git und Klonen des Repository Projekt_VMD
+20151101: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
+
 
 20151003: Einrichten des Free Iso Creator,
           Installieren von CloneCD
