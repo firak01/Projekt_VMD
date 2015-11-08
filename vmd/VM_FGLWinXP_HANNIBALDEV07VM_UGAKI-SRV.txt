@@ -13,11 +13,15 @@
 	ZKernel Entwicklungumgebung für Java 1.6 (angebunden an CVS System)
 	Plugin zum Packen des JAR-Archivs
 
-
 	--- Eclipse 4.2EE Juno
 	ZKernel Entwicklungsumgebung für Java 1.6 (angebunden an CVS System)
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
+
+20151108: Java 1.7 JDK Intstalliert, Apache Ant Installiert und entsprechende Umgebungsvariablen gesetzt
+20151108: Repository für ProjektVM erstellt
+20151108: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
+
 2015-04-12: PDF24Creator installiert
       
 2015-01-11: Egit für Eclipse installiert und Projekt "XSLT Buch" ausgechecked
