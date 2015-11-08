@@ -1,7 +1,6 @@
 ---- Synchron halten mit ...DEV08
 ### Entwickungsumgebung für TileHexMap Projekt (Version 03, d.h. MIT Hibernate, als Maven Projekt)
-    Dabei wird der zKernel nur als JAR-File eingebunden und hier nicht aktuell entwickelt
-
+### Dabei wird der zKernel nur als JAR-File eingebunden und hier nicht aktuell entwickelt
 #### Apache Wicket Entwickungsumgebung 
 
 
@@ -16,6 +15,11 @@
 
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
+
+
+20151108: Java 1.7 JDK Intstalliert, Apache Ant Installiert und entsprechende Umgebungsvariablen gesetzt
+20151108: Repository für ProjektVM erstellt
+20151108: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
 
 20141101: Betzemeier Workspace erstellt.
 20140916: Nionex Workspace erstellt.
