@@ -1426,9 +1426,12 @@
 			<echo>Copy files general, by property file:</echo>
 			<echo>${conf.copyLocalFilePath}</echo>
 
-			<!-- TODO GOON noch kaputt: Nachfolgenden Code als Target -FglVmdController_Main aufrufen.
-			                             Die "Schemata" Untersuchung machen.
-										 Und letztlich beim Kopieren das neue Target -FglCopyLocal_Main aufrufen. -->
+			<!-- TODO GOON: Die "Schemata" Untersuchung machen. Dies mit einem -FglSchemaController_Main machen...
+										Darin die Steuerungsdatei Zeile für Zeile auswerten, bis zum nächsten Eintrag, der ein anderes Schema ist.
+										Für den COPY Fall den VmdController aufrufen, bzw. für den VMD Fall ebenfalls den VmdController aufrufen aber mit einem Steuerungsparameter.			                             
+										 Und letztlich beim Kopieren das neue Target -FglCopyLocal_Main aufrufen. 
+										 
+										 Weitere Schema Befehle sind zip:, remove:-->
 			<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
