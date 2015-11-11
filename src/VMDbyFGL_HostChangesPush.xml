@@ -1432,6 +1432,15 @@
 										 Und letztlich beim Kopieren das neue Target -FglCopyLocal_Main aufrufen. 
 										 
 										 Weitere Schema Befehle sind zip:, remove:-->
+			<!-- START ENTWICKLUNG: Diesen Teil auskkommentieren -->								
+			<antcallback target="-FglFileController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
+				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
+			</antcallback>      
+			<fl:echo>Ergebnis des File Controllers: ${returnString}</fl:echo>		
+			<fl:fail message="SICHERHEITSABBRUCH: ENDE ENTWICKLUNG."/>
+			<!-- END ENTWICKLUNG -->
+				
+			<!-- TODO: Das nach dem SchemaController Aufruf machen, dazu müssen die Eingabeparameterwerte aber umgestellt werden -->
 			<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
@@ -1526,6 +1535,186 @@
 	<ac:var name="conf.operation_mode" value="${myOperation_mode}" />
 	<ac:var name="returnControl" value="${myGoon}" />
 	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
+</target>
+
+<!-- ######################################################################### -->
+<target name="-FglFileController_Main">
+	<fl:let>myLocalFileControlPath ::= "${localFileControlPath}"</fl:let>
+
+	<!-- Prüfe, ob die Steuerungsdatei überhaupt existiert -->
+	<fl:choose>
+		<fl:when test=" '${myLocalFileControlPath}'.tofile.exists == true ">
+					<echo>Datei existiert: ${myLocalFileControlPath}</echo>
+						
+					<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
+					<!--<loadproperties>
+						<file file="${conf.copyGeneralFilePath}"/>
+						</loadproperties> 
+						<echo>test1 hat den Wert: ${test1}</echo> -->
+		
+		
+					<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
+					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" /> -->
+					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im VMD_Projekt 'src' ausgegangen -->
+		
+					<!-- Test: Gib den Inhalt der Datei aus -->
+					<!-- <echo>Dateiinhalt als Ganzes:</echo> -->
+					<!-- <echo>${myfile}</echo> -->
+
+
+					<!--2b. Werte den Inhalt der Datei zeilenweise aus -->
+					<!-- Beispiel für eine Schleife in ant, und wie man mit sequentials und dem @ Parameter darin arbeiten kann.  -->			
+					<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
+					<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
+						<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
+							<file file="${myLocalFileControlPath}" />
+						</tokens>
+						<sequential>
+							<fl:let>myCase ::= "neue Zeile"</fl:let><!-- für jede Zeile wird der mögliche Verarbeitungsfall neu ermittelt -->
+							
+							<var name="myLine" value="@{line}" />
+							<!-- <fl:echo>Zeile:'${myLine}'</fl:echo> -->					
+							
+							<var name="line.length" unset="true" />
+							<length string="@{line}" property="line.length" /><!-- ueber das length-Tag wird eine property gefüllt, die lediglich so aussieht als wäre sie eine Methode des line-Objekts -->							
+							<!-- <fl:echo>Zeile Länge: ${line.length}</fl:echo> -->
+							
+							<ac:if>
+								<ac:equals arg1="${line.length}" arg2="0" />
+							    <ac:then>
+									<fl:let>myLineTrimmed::=''</fl:let>
+								</ac:then>
+								<ac:else>
+									<fl:let>myLineTrimmed::=trim("@{line}")</fl:let>
+								</ac:else>
+							</ac:if>													
+							<!-- <fl:echo>Zeile trimmed:'${myLineTrimmed}'</fl:echo> -->
+							
+							<!-- <var name="myLineTrimmed.length" unset="true" />
+							<length string="${myLineTrimmed}" property="myLineTrimmed.length" />
+							<fl:echo>Zeile trimmed Länge ${myLineTrimmed.length}</fl:echo> -->
+							
+							<ac:if>								
+								<ac:equals arg1="${myLineTrimmed}" arg2="" />								
+								<ac:then>
+									<!-- <fl:echo>Leerzeile...</fl:echo> -->
+								</ac:then>
+								<ac:else>												
+									<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->																
+									<stringSubStringZZZ text="${myLineTrimmed}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
+									<!-- <fl:echo message="subtext = ${subtext}" /> -->
+									<ac:if>
+										<ac:equals arg1="${subtext}" arg2="#" />
+										<ac:then>
+											<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
+										</ac:then>
+										<ac:else>
+											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
+											<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->											
+											<antcallback target="-FglSchemaController_Main" return="returnString, returnControl,returnString.Schema,returnControl.Schema,linea.Schema">
+												<param name="lineCurrent" value="${myLineTrimmed}" />
+												<param name="lineaCurrent.Schema" value="${myLinea.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->
+												<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/>
+											</antcallback>
+											
+											<!-- Falls der Controller meint returnControl.Schema==true, dann wurde entweder nix mehr gefunden oder das Schema hat gewechselt -->											
+											<!-- Nun anhand des zurückgegebenen returnControl.Schema Werts die Untercontroller aufrufen.
+       											 Der zu übergebende Parameter ist das Array linea.Schema -->
+											
+											
+											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf
+											     fülle linea.Schema als Kopie von lineaCurrent.Schema -->
+											
+										</ac:else>	
+									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
+								</ac:else>
+							</ac:if><!-- end if <ac:equals arg1="${line.length}" arg2="0" /> -->
+						</sequential>
+					</for><!-- end for param="line"> -->		
+					
+					<fl:let>myReturnControl ::= true</fl:let>
+					<fl:let>myReturnString ::= "alles ok"</fl:let>																					
+				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
+				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+					<fl:let>myReturnControl ::= false</fl:let>
+					<fl:let>myReturnString ::= "Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"</fl:let>
+				</otherwise>
+			</fl:choose>
+			
+			<!-- Rueckgabebwerte -->
+			<ac:var name="returnControl" value="${myReturnControl}" />
+			<ac:var name="returnString" value="${myReturnString}" />
+			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
+<!-- ######################################################################### -->
+<target name="-FglSchemaController_Main">
+	<fl:let>myLineCurrent::="${lineCurrent}"</fl:let>
+	<arrayCopyJsZZZ arrayinput="${lineCurrent.Schema}" arrayreturn="mylineaCurrent.Schema" sflagcontrol="" />	
+	<fl:let>myStringCurrent.Schema::="${StringCurrent.Schema}"</fl:let>
+
+	<!-- Prüfe, ob eine Zeile ueberhaupt korrekt uebergeben wurde -->
+	<ac:if>
+		<ac:equals arg1="${myLineCurrent}" arg2="0" />
+		    <ac:then>
+				<fl:fail message="Argument Error: Empty line"/>
+			</ac:then>
+			<ac:else>
+				<stringSubStringZZZ text="${myLineCurrent}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
+				<ac:if>
+					<ac:equals arg1="${subtext}" arg2="#" />
+					<ac:then>
+						<fl:fail message="Argument Error: Comment line"/>
+					</ac:then>
+					<ac:else>
+					</ac:else>
+				</ac:if>
+			</ac:else>
+	</ac:if>
+
+	<!-- Ermittle den Schema-Teil, falls leer dann mache copy als Schema -->
+	<stringLeftStringZZZ text="${myLineCurrent}" matchstring=":" returnstring="schemacurrent" />
+	<fl:let>mySchemaCurrent::="trim(${schemacurrent})"</fl:let>
+	<ac:if>
+		<ac:equals arg1="${mySchemaCurrent}" arg2="0" />
+		    <ac:then>
+				<fl:let>mySchemaCurrent::="copy"</fl:let>
+			</ac:then>
+			<ac:else>									
+			</ac:else>
+	</ac:if>
+	<fl:let>myReturnString.Schema::=mySchemaCurrent</fl:let>
+
+	<!-- Prüfe, ob sich das Schema geändert hat -->
+	<fl:choose>
+		<fl:when test="'${mySchemaCurrent}'=='${myStringCurrent.Schema}'">
+			<echo>Keine Schemaaenderung</echo>
+			<fl:let>myReturnControl.Schema::=true</fl:let>
+										
+			<!-- Hänge an bestehendes Array an -->
+																				
+		</fl:when><!-- '${mySchemaCurrent}'=='${myStringCurrent.Schema}' -->
+		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->		
+			<echo>Schemaaenderung vorhanden!</echo>
+			<fl:let>myReturnControl.Schema::=true</fl:let>
+			
+			<!-- Mache neues Array. Hänge an neues Array an -->
+					
+		</otherwise>
+	</fl:choose>
+	<fl:let>myReturnControl::=true</fl:let>
+	<fl:let>myReturnString::="Alles ok"</fl:let>
+	
+	<!-- Rueckgabebwerte -->
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControl.Schema" value="${myReturnControl.Schema}" />
+	<ac:var name="returnString.Schema" value="${myReturnString.Schema}" />		
+	<arrayCopyJsZZZ arrayinput="${mylinea.Schema}" arrayreturn="lineaSchema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
 <!-- ######################################################################### -->
