@@ -1777,7 +1777,7 @@
     </ac:if>-->
 	 
 	<fl:choose>
-		<fl:when test="'${myBooleanValue}'==true">
+		<fl:when test="${myBooleanValue}==true">
 		<echo>Noch nicht gesetztes altes Schema</echo>
 			
 			<!-- Erzeuge das Array zum ersten mal -->
