@@ -817,7 +817,7 @@
 	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
 	   var matchToEncode=match;
 	   var matchEncoded = encodeMyHtml(matchToEncode);
-	   //print("encoded matchstring=" + matchEncoded);
+	  // print("encoded matchstring=" + matchEncoded);
 	   
 	    var textToEncode=text;
 		var textEncoded = encodeMyHtml(textToEncode);
@@ -1433,11 +1433,11 @@
 										 
 										 Weitere Schema Befehle sind zip:, remove:-->
 			<!-- START ENTWICKLUNG: Diesen Teil auskkommentieren -->								
-			<antcallback target="-FglFileController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
+			<antcallback target="-FglFileController_Main" return="returnString, returnControl">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
 			<fl:echo>Ergebnis des File Controllers: ${returnString}</fl:echo>		
-			<fl:fail message="SICHERHEITSABBRUCH: ENDE ENTWICKLUNG."/>
+			<fl:fail message="SICHERHEITSABBRUCH: ENDE WEIL NOCH IN ENTWICKLUNG."/>
 			<!-- END ENTWICKLUNG -->
 				
 			<!-- TODO: Das nach dem SchemaController Aufruf machen, dazu müssen die Eingabeparameterwerte aber umgestellt werden -->
@@ -1624,7 +1624,9 @@
 											
 											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf
 											     fülle linea.Schema als Kopie von lineaCurrent.Schema -->
-											
+												<!--<fl:echo>returnString.Schema:'${returnString.Schema}'</fl:echo>-->
+												<fl:let>myStringCurrent.Schema::='${returnString.Schema}'</fl:let>
+												<!--<fl:echo>myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo>-->
 										</ac:else>	
 									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
 								</ac:else>
@@ -1653,18 +1655,17 @@
 
 <!-- ######################################################################### -->
 <target name="-FglSchemaController_Main">
-	<fl:let>myLineCurrent::="${lineCurrent}"</fl:let>
-	<arrayCopyJsZZZ arrayinput="${lineCurrent.Schema}" arrayreturn="mylineaCurrent.Schema" sflagcontrol="" />	
-	<fl:let>myStringCurrent.Schema::="${StringCurrent.Schema}"</fl:let>
-
+	<fl:let>myLineNext::="${lineCurrent}"</fl:let>
+	<arrayCopyJsZZZ arrayinput="${lineCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
+	
 	<!-- Prüfe, ob eine Zeile ueberhaupt korrekt uebergeben wurde -->
 	<ac:if>
-		<ac:equals arg1="${myLineCurrent}" arg2="0" />
+		<ac:equals arg1="${myLineNext}" arg2="0" />
 		    <ac:then>
 				<fl:fail message="Argument Error: Empty line"/>
 			</ac:then>
 			<ac:else>
-				<stringSubStringZZZ text="${myLineCurrent}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
+				<stringSubStringZZZ text="${myLineNext}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
 				<ac:if>
 					<ac:equals arg1="${subtext}" arg2="#" />
 					<ac:then>
@@ -1675,23 +1676,32 @@
 				</ac:if>
 			</ac:else>
 	</ac:if>
-
-	<!-- Ermittle den Schema-Teil, falls leer dann mache copy als Schema -->
-	<stringLeftStringZZZ text="${myLineCurrent}" matchstring=":" returnstring="schemacurrent" />
-	<fl:let>mySchemaCurrent::="trim(${schemacurrent})"</fl:let>
+	
+	<!-- Uebernimm den vorherigen Schema-Teil -->
+	<fl:let>myStringCurrent.Schema::=trim('${stringCurrent.Schema}')</fl:let>
+	<echo>myStringCurrentSchema="${myStringCurrentSchema}"</echo>
+	
+	<!-- Ermittle den neuen Schema-Teil, falls leer dann mache copy als Schema -->
+	<echo>myLineNext="${myLineNext}"</echo>
+	<stringLeftStringZZZ text="${myLineNext}" matchstring="://" returnstring="schemanext" />
+	<fl:let>mySchemaNext::="${schemanext}"</fl:let>
+	<!--<echo>mySchemaNext="${mySchemaNext}"</echo>-->
+	<fl:let>mySchemaNextTrimmed::=trim('${mySchemaNext}')</fl:let>
+	<!--<echo>mySchemaNextTrimmed="${mySchemaNextTrimmed}"</echo>-->
 	<ac:if>
-		<ac:equals arg1="${mySchemaCurrent}" arg2="0" />
+		<ac:equals arg1="${mySchemaNextTrimmed}" arg2="0" />
 		    <ac:then>
-				<fl:let>mySchemaCurrent::="copy"</fl:let>
+				<fl:let>mySchemaNextTrimmed::="copy"</fl:let>
 			</ac:then>
 			<ac:else>									
 			</ac:else>
 	</ac:if>
-	<fl:let>myReturnString.Schema::=mySchemaCurrent</fl:let>
+	<fl:let>myReturnString.Schema::='${mySchemaNextTrimmed}'</fl:let>
+	<echo>myReturnString.Schema="${myReturnString.Schema}"</echo>
 
 	<!-- Prüfe, ob sich das Schema geändert hat -->
 	<fl:choose>
-		<fl:when test="'${mySchemaCurrent}'=='${myStringCurrent.Schema}'">
+		<fl:when test="'${mySchemaNextTrimmed}'=='${myStringCurrent.Schema}' and 1==1"><!-- TODO GOON 20151112: Hier pruefen, ob die Variable initialisiert ist -->
 			<echo>Keine Schemaaenderung</echo>
 			<fl:let>myReturnControl.Schema::=true</fl:let>
 										
@@ -1705,9 +1715,9 @@
 			<!-- Mache neues Array. Hänge an neues Array an -->
 					
 		</otherwise>
-	</fl:choose>
+	</fl:choose>	
 	<fl:let>myReturnControl::=true</fl:let>
-	<fl:let>myReturnString::="Alles ok"</fl:let>
+	<fl:let>myReturnString::="alles ok"</fl:let>
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />

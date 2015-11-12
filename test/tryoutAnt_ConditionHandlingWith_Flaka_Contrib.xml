@@ -227,7 +227,7 @@
 				<!-- Danach erst kann der test auf den Property Wert funktionieren -->
 				<!-- Merke: die Property muss für den test in einfache Hochkommata, sonst funktioniert nix -->
 				<!-- <fl:when test="'${myInputBooleanValue}'==true"> -->
-				<fl:when test="${myInputBooleanValue}==true">
+				<fl:when test="${myInputBooleanValue}==true"><!-- merke: innerhalb von when kann man mit 'and' arbeiten um operatoren zu verknüpfen z.B. when test="${myInputBooleanValue}==true and ${xx}==${YY}" -->
 				<echo>true Fall erkannt.</echo>
 				<fl:let>myResult ::= 'true'</fl:let>
 				</fl:when>
