@@ -190,8 +190,10 @@
 			if(myLevel<=0){
 				
 			}else{
+			if(myArray===undefined) print("myarray = undefined");
+			if(myArray==null) print("myarray = NULL");	
 			
-			<!-- Typausgabe -->
+			//Typausgabe
 			print("typeof myarray = " + typeof(myArray));
 					
 			

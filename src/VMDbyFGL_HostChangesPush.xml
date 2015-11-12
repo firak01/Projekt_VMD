@@ -211,17 +211,19 @@
 				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
 		<attribute name="arrayinput" />
 		<attribute name="ilevel" />	
-		<![CDATA[										 								
+		<![CDATA[					
 			var myArray = attributes.get("arrayinput");					
 			var myLevel = attributes.get("ilevel");					
+			
 			if(myLevel<=0){
 				
 			}else{
+			if(myArray===undefined) print("myarray = undefined");
+			if(myArray==null) print("myarray = NULL");	
 			
-			<!-- Typausgabe -->
+			// Typausgabe				
 			print("typeof myarray = " + typeof(myArray));
-					
-			
+								
 			var iSize=0;
 			if(Array.isArray(myArray)){
 				print("Array uebergeben bekommen");
@@ -281,8 +283,11 @@
 							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
 							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
 						};
+					}else if(typeof(myArray)=='string'){
+						print("kein Objekt sondern String");
+						print(myArray);
 					}else{
-						//print("kein Objekt");
+						//print("weder Objekt noch String");
 					};
 			};
 			};//myLevel <= 0;
@@ -846,6 +851,56 @@
 		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
 	   }
      ]]>
+  </scriptdef>
+	
+	 <!-- ########################### -->
+	<scriptdef name="stringLeftBackStringZZZ" language="javascript">
+   <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+   <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+	<attribute name="text" />
+    <attribute name="matchstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	  var text = attributes.get("text");
+	  var match = attributes.get("matchstring");
+      //print("matchstring="+match); 
+	  
+	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+	   var matchToEncode=match;
+	   var matchEncoded = encodeMyHtml(matchToEncode);
+	   //print("encoded matchstring=" + matchEncoded);
+	   
+	   var textToEncode=text;
+	   var textEncoded = encodeMyHtml(textToEncode);
+	   //print("encoded textstring=" + textEncoded);
+	  
+      sReturn = getStrLeftBackStr(textEncoded, matchEncoded);
+	  //print("return vor unescape: getStrLeftBackStr=" + sReturn);
+	  sReturn = unescape(sReturn);
+      project.setProperty(attributes.get("returnstring"), sReturn);
+	   
+	//äquivalent zu JSZ - Kernel
+	//@LeftBack equivalent, !!! casesensitive
+	function getStrLeftBackStr(sourceStr, keyStr){
+		arr = sourceStr.split(keyStr);
+		//arr.pop();		//entfernt das letzte Element aus dem Array
+		arr.shift();		//entfernt das erste Element aus dem Array
+		return (keyStr==null | keyStr=='') ? '' : arr.join();		
+	}
+	
+	//TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
+  ]]>
   </scriptdef>
 	
 	<!-- ############################################################ -->
@@ -1611,10 +1666,11 @@
 										<ac:else>
 											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 											<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->											
+											<fl:echo>1. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo>
 											<antcallback target="-FglSchemaController_Main" return="returnString, returnControl,returnString.Schema,returnControl.Schema,linea.Schema">
 												<param name="lineCurrent" value="${myLineTrimmed}" />
-												<param name="lineaCurrent.Schema" value="${myLinea.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->
 												<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/>
+												<param name="lineaCurrent.Schema" value="${myLinea.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 											</antcallback>
 											
 											<!-- Falls der Controller meint returnControl.Schema==true, dann wurde entweder nix mehr gefunden oder das Schema hat gewechselt -->											
@@ -1624,9 +1680,9 @@
 											
 											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf
 											     fülle linea.Schema als Kopie von lineaCurrent.Schema -->
-												<!--<fl:echo>returnString.Schema:'${returnString.Schema}'</fl:echo>-->
+												<fl:echo>2a. returnString.Schema:'${returnString.Schema}'</fl:echo>
 												<fl:let>myStringCurrent.Schema::='${returnString.Schema}'</fl:let>
-												<!--<fl:echo>myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo>-->
+												<fl:echo>2b. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo>
 										</ac:else>	
 									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
 								</ac:else>
@@ -1655,7 +1711,7 @@
 
 <!-- ######################################################################### -->
 <target name="-FglSchemaController_Main">
-	<fl:let>myLineNext::="${lineCurrent}"</fl:let>
+	<fl:let>myLineNextSchema::="${lineCurrent}"</fl:let>
 	<arrayCopyJsZZZ arrayinput="${lineCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
 	
 	<!-- Prüfe, ob eine Zeile ueberhaupt korrekt uebergeben wurde -->
@@ -1679,11 +1735,12 @@
 	
 	<!-- Uebernimm den vorherigen Schema-Teil -->
 	<fl:let>myStringCurrent.Schema::=trim('${stringCurrent.Schema}')</fl:let>
-	<echo>myStringCurrentSchema="${myStringCurrentSchema}"</echo>
+	<echo>myStringCurrent.Schema=${myStringCurrent.Schema}</echo>
 	
 	<!-- Ermittle den neuen Schema-Teil, falls leer dann mache copy als Schema -->
-	<echo>myLineNext="${myLineNext}"</echo>
-	<stringLeftStringZZZ text="${myLineNext}" matchstring="://" returnstring="schemanext" />
+	<!-- Ermittle die Zeile ohne Schema-Anfang.-->
+	<echo>myLineNextSchema="${myLineNextSchema}"</echo>
+	<stringLeftStringZZZ text="${myLineNextSchema}" matchstring="://" returnstring="schemanext" />
 	<fl:let>mySchemaNext::="${schemanext}"</fl:let>
 	<!--<echo>mySchemaNext="${mySchemaNext}"</echo>-->
 	<fl:let>mySchemaNextTrimmed::=trim('${mySchemaNext}')</fl:let>
@@ -1692,20 +1749,57 @@
 		<ac:equals arg1="${mySchemaNextTrimmed}" arg2="0" />
 		    <ac:then>
 				<fl:let>mySchemaNextTrimmed::="copy"</fl:let>
+				<fl:let>myLineNext::="${myLineNextSchema}"</fl:let>
 			</ac:then>
-			<ac:else>									
+			<ac:else>
+				<!-- Ermittle die Zeile ohne Schema -->
+				<stringLeftBackStringZZZ text="${myLineNextSchema}" matchstring="${mySchemaNext}://" returnstring="myLineNext" />
+				<echo>myLineNext="${myLineNext}"</echo>
 			</ac:else>
 	</ac:if>
 	<fl:let>myReturnString.Schema::='${mySchemaNextTrimmed}'</fl:let>
 	<echo>myReturnString.Schema="${myReturnString.Schema}"</echo>
+	
+	
 
-	<!-- Prüfe, ob sich das Schema geändert hat -->
+	<!-- Prüfe, ob sich das Schema geändert hat -->	
+	<isSetZZZ valueinput="${myStringCurrent.Schema}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<!-- Das Ergebnis von isSetZZZ prüfen -->
+	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<!--<ac:if>
+	  <equals arg1="${myBooleanValue}" arg2="true" />
+      <ac:then>		
+		<echo>Property war gesetzt.</echo>
+	  </ac:then>
+	  <ac:else>
+		<echo>Property war NICHT gesetzt.</echo>
+	  </ac:else>
+    </ac:if>-->
+	 
 	<fl:choose>
-		<fl:when test="'${mySchemaNextTrimmed}'=='${myStringCurrent.Schema}' and 1==1"><!-- TODO GOON 20151112: Hier pruefen, ob die Variable initialisiert ist -->
+		<fl:when test="'${myBooleanValue}'==true">
+		<echo>Noch nicht gesetztes altes Schema</echo>
+			
+			<!-- Erzeuge das Array zum ersten mal -->
+			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.Schema"/>
+			
+			<!-- Ausgabe des neuen Arrays -->	
+			<arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/>
+																				
+		</fl:when><!-- test="'${myBooleanValue}'=='true' -->
+	</fl:choose>
+	 
+	<fl:choose>		
+		<fl:when test="'${mySchemaNextTrimmed}'=='${myStringCurrent.Schema}' or '${myBooleanValue}'==true"><!-- TODO GOON 20151112: Hier pruefen, ob die Variable initialisiert ist -->
 			<echo>Keine Schemaaenderung</echo>
-			<fl:let>myReturnControl.Schema::=true</fl:let>
+			<fl:let>myReturnControl.Schema::=false</fl:let>
 										
 			<!-- Hänge an bestehendes Array an -->
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.Schema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />
+	
+			<!-- Ausgabe des neuen Arrays -->	
+			<arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/>
 																				
 		</fl:when><!-- '${mySchemaCurrent}'=='${myStringCurrent.Schema}' -->
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->		
