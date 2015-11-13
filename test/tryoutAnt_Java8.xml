@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="tryoutAnt_JavaUsedByJavaScript"  default="compile" basedir=".."
+	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so waehlen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<!-- gebraucht wird das z.B. fuer den <for> </for> Task. -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+
+	<!-- ######## Scriptdefs ############################################################################--> 		
+	
+	<!-- ########################### -->
+	<scriptdef name="arrayDebugJsZZZ" language="javascript">
+	
+		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
+			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
+			   - der Inhalt
+			   - die Größe des Arrays			-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="arrayinput" />
+		<attribute name="ilevel" />	
+		<![CDATA[	
+			enableJava();
+			var myArray = attributes.get("arrayinput");					
+			var myLevel = attributes.get("ilevel");					
+			if(myLevel<=0){
+				
+			}else{
+			if(myArray===undefined) print("myarray = undefined");
+			if(myArray==null) print("myarray = NULL");	
+			
+			//Typausgabe
+			print("typeof myarray = " + typeof(myArray));
+					
+			
+			var iSize=0;
+			if(Array.isArray(myArray)){
+				print("Array uebergeben bekommen");
+				iSize = myArray.length;
+				print("Arraygroesse="+iSize);
+				
+				//TODO: Die gleichen Ausgaben wie im KEIN ARRAY Fall.
+				//- Werte
+			}else{
+				print("kein Array uebergeben bekommen.");
+				
+				var icount=0;					
+				if(typeof(myArray)=="object"){
+					print("Object uebergeben bekommen.");
+					
+					if(myLevel>=2){
+					//das listet alle Methoden des objekts auf.... scheint ein String zu sein....
+					//print("ALLE METHODEN DES OBJEKTS:");
+					//for(x in myArray){
+					//	print(x);		
+					//};	
+					
+					print("#################################");
+					print("ALLE METHODEN UND CODEINHALT DES OBJEKTS:");
+					for(xx in myArray){
+						print("xx: '"+ xx + "'");		//ABER: Damit bekommt man die Namen der Methoden
+						print("zugriff ueber xx: '" + myArray[xx] + "'"); //damit bekommt man codeinhalt der Methoden.
+					};
+					};//myLevel>=2;
+					
+					print("#################################");
+					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
+					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
+					
+					print("splitte diesen String nach Komma.");
+					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
+					for(x in objectArray){
+						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					};
+					
+					//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
+					//for(x2 in objectArray02){
+					//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
+					//};
+					
+					//var objectArrayString = myArray.toString();
+					//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
+					//for(z in objectArray03){
+					//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					//};
+					
+					print("#################################");
+					print("Versuch die Werte auszugeben: ");	
+					//Merke: Voraussetzung ist:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 for(yy in objectArray){
+							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+						};
+					}else{
+						//print("kein Objekt");
+					};
+			};
+			};//myLevel <= 0;
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+			
+		]]>
+	</scriptdef>
+ 
+	<!-- ############################################################-->		
+	<scriptdef name="arrayInitJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Erstellung eines Arrays.
+			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="isize" />
+		<attribute name="arrayreturn" />		
+		<![CDATA[										 
+			var mySize = attributes.get("isize");	
+			//print("iSize = '" + mySize + "'");
+			
+			//Prüfen, ob mySize eine Zahl ist. 
+			//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
+			//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
+			if(isNumber(mySize)){
+				//print("eine Zahl");
+				var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
+				
+				if(mySize==0){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+				}
+				if(mySize>=1){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					for(icount=0; icount<=mySize-1; icount++){
+						myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
+					}												
+				}								
+			}else{
+				//print("KEINE Zahl");
+				var myArrayReturn = new Array();
+
+				//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+				myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+			}
+						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
+		]]>
+	</scriptdef>
+	
+	 <!-- ########################### -->	
+	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
+		<attribute name="arrayinput" />
+		<attribute name="ireturn" />
+		<![CDATA[
+			var lista = attributes.get("arrayinput");		 
+			var iReturn = -1;
+										
+			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+			var icount=0;
+			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+			if(typeof(objectArray)=="object"){
+			for(x in objectArray){
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				}else{
+					icount++;
+				};				
+			}							
+			}else{
+				iReturn=0;
+			}
+			
+			iReturn = icount;
+			
+			project.setProperty(attributes.get("ireturn"), iReturn);
+		]]>
+	</scriptdef>
+	
+	
+	
+	<!-- ########################### -->
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Uebersicht die Camelcase Variante beibehalten. -->
+	<scriptdef name="tryout_java8_array" language="javascript">
+     <!--<attribute name="filename_search" />
+     <attribute name="filenames" />
+	 <attribute name="filelengths" />
+	 <attribute name="tryout" />-->
+     <![CDATA[		
+		var data = [1,2,3,4,5,6];
+		var JavaArray = Java.to(data,"int[]");
+		print(JavaArray[0]+JavaArray[1]+JavaArray[2]);
+		   
+		   
+			//#### RUECKGABE #####
+			//project.setProperty(attributes.get("tryout"), "Konstanten Text zurueckgeben.");  
+			//project.setProperty(attributes.get("filenames"), arrayFilenames);
+			//project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilitaet zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu koennen, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalitaet bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}			
+     ]]>
+  </scriptdef>
+    
+<!-- ################################################################################# -->
+<!-- Die einzelnen Tests im depends hinzufuegen -->
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden koennen.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-myTestJava8array,-myTestArrayInitJsZZZ">
+    <echo>Im default - Target..., das von allen anderen Targets abh. </echo>
+	<!-- WIRD NICHT BENOETIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+	<target name="-myTestJava8array">
+		<echo>myTestJava8array: </echo>
+				 
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<!-- <tryout_java8_array filename_search="*" filenames="myfilenames" filelengths="myfilelengths" tryout="mytryout_string"/> -->
+		<tryout_java8_array/>
+		<!--<echo message="mytryout_string = ${mytryout_string}" />-->
+		
+		<!-- Verwende antcontrib fuer eine Schleife ueber die Arrays -->
+		<!--<for list="${myfilenames}" param="myelement">
+			<sequential>				
+				<echo>myelement= @{myelement}</echo>
+			</sequential>
+		</for>-->
+		
+	</target>
+
+<target name="-myTestArrayInitJsZZZ">
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>myTestArrayInitJsZZZ:
+			Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
+		<fl:let>
+			myArraySize::=; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		<fl:let>
+			myArraySize::=0; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Auch diese Methode darf nur 0 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss <#!!FGLUNDEFINED!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+			<fl:let>
+			myArraySize::=1; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 1 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+				<fl:let>
+			myArraySize::=2; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Debug Ausgabe, wie das Array nun aussieht: -->
+		<arrayDebugJsZZZ arrayinput="${myArray}" iLevel="1"/>
+		
+		<!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="iSize"/>
+		<echo>ArrayGroesse von arrayElementCountJsZZZ: ${iSize}</echo><!-- Diese Methode darf nur 2 zurückgeben. -->
+		<echo>myArray nachher (2): ${myArray}</echo><!-- hier muss 1x <#!!FGLEMPTY!!#> drin stehen. -->
+		
+		<echo>#################################</echo>
+		
+	</target>	
+ </project>

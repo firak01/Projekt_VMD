@@ -184,7 +184,8 @@
 				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
 		<attribute name="arrayinput" />
 		<attribute name="ilevel" />	
-		<![CDATA[										 								
+		<![CDATA[	
+			enableJava();
 			var myArray = attributes.get("arrayinput");					
 			var myLevel = attributes.get("ilevel");					
 			if(myLevel<=0){
@@ -261,6 +262,27 @@
 					};
 			};
 			};//myLevel <= 0;
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+			
 		]]>
 	</scriptdef>
 	
@@ -458,15 +480,15 @@
 			}
 						
 													
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-			
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);			
 			
 			//äquivalent zu JSZ - Kernel
 			//@LeftBack equivalent, !!! casesensitive
 			function getStrLeftBackStr(sourceStr, keyStr){
-				arr = sourceStr.split(keyStr)
-				arr.pop();
-				return (keyStr==null | keyStr=='') ? '' : arr.join(keyStr)
+				arr = sourceStr.split(keyStr);
+				//arr.pop();		//entfernt das letzte Element aus dem Array
+				arr.shift();		//entfernt das erste Element aus dem Array
+				return (keyStr==null | keyStr=='') ? '' : arr.join();		
 			}
 		]]>
 	</scriptdef>
@@ -552,6 +574,7 @@
 		<attribute name="arrayreturn" />
 		<attribute name="ireturn" /><!-- true, false -->
 		<![CDATA[
+			enableJava();
 			var myArray = attributes.get("arrayinput");		 
 			var iReturn = false;
 			var myArrayReturn = new Array();
@@ -579,6 +602,27 @@
 		
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
 			project.setProperty(attributes.get("ireturn"), iReturn);
+			
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
 		]]>
 	</scriptdef>
 					
@@ -1038,8 +1082,6 @@
 	
 		<!-- Ausgabe des neuen Arrays -->	
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
-
-		
 	</target>
 	
 	<target name="-myTestArrayPlusStringJsZZZ">
