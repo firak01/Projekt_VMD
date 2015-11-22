@@ -1488,7 +1488,7 @@
 										 
 										 Weitere Schema Befehle sind zip:, remove:-->
 			<!-- START ENTWICKLUNG: Diesen Teil auskkommentieren -->								
-			<antcallback target="-FglFileController_Main" return="returnString, returnControl">
+			<antcallback target="-FglFileControlController_Main" return="returnString, returnControl">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
 			<fl:echo>Ergebnis des File Controllers: ${returnString}</fl:echo>		
@@ -1593,7 +1593,7 @@
 </target>
 
 <!-- ######################################################################### -->
-<target name="-FglFileController_Main">
+<target name="-FglFileControlController_Main">
 	<fl:let>myLocalFileControlPath ::= "${localFileControlPath}"</fl:let>
 
 	<!-- Prüfe, ob die Steuerungsdatei überhaupt existiert -->
@@ -1670,7 +1670,7 @@
 											<antcallback target="-FglSchemaController_Main" return="returnString, returnControl,returnString.Schema,returnControl.Schema,linea.Schema">
 												<param name="lineCurrent" value="${myLineTrimmed}" />
 												<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/>
-												<param name="lineaCurrent.Schema" value="${myLinea.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+												<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 											</antcallback>
 											
 											<!-- Falls der Controller meint returnControl.Schema==true, dann wurde entweder nix mehr gefunden oder das Schema hat gewechselt -->											
@@ -1680,15 +1680,42 @@
 											
 											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf
 											     fülle linea.Schema als Kopie von lineaCurrent.Schema -->
-												<fl:echo>2a. returnString.Schema:'${returnString.Schema}'</fl:echo>
-												<fl:let>myStringCurrent.Schema::='${returnString.Schema}'</fl:let>
+												<fl:echo>2a. returnString.Schema:'${returnString.Schema}'</fl:echo>												
 												<fl:echo>2b. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo>
+												<fl:echo>2c. linea.Schema</fl:echo>
+												<arrayDebugJsZZZ arrayinput="${linea.Schema}" ilevel="1"/>
+												<fl:echo>2d. myLineaCurrent.Schema</fl:echo>
+												<arrayDebugJsZZZ arrayinput="${myLineaCurrent.Schema}" ilevel="1"/>
+												
+												<fl:echo>2e. returnControl.Schema: '${returnControl.Schema}</fl:echo>
+												<isBooleanZZZ valueinput="${returnControl.Schema}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+												<ac:if>
+												  <equals arg1="${myBooleanValue}" arg2="true" />
+												  <ac:then>		
+													<echo>Schemawechsel hat stattgefunden.</echo>
+													<!-- TODO GOON 20151121: Rufe nun die Funktion auf, die das vorherige Schema verarbeiten soll. -->
+													
+												  </ac:then>
+												  <ac:else>
+													<echo>Noch hat kein Schemawechsel stattgefunden.</echo>													
+												  </ac:else>
+												</ac:if>
+												<!-- uebernimm das zurueckgebene Schema als neues Schema -->
+												<fl:let>myStringCurrent.Schema::='${returnString.Schema}'</fl:let>
+												<!-- uebernimm das Zeilenarray, ggfs. als neues Schema -->
+												<arrayCopyJsZZZ arrayinput="${linea.Schema}" arrayreturn="myLineaCurrent.Schema" sflagcontrol="" />
+												
 										</ac:else>	
 									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
 								</ac:else>
 							</ac:if><!-- end if <ac:equals arg1="${line.length}" arg2="0" /> -->
 						</sequential>
-					</for><!-- end for param="line"> -->		
+					</for><!-- end for param="line"> -->	
+
+					<!-- TODO GOON 20151121: Wenn keine Zeilen mehr zu verarbeiten sind, das letzte Array, des letzen Schemas noch abarbeiten, durch den passenden Funktionsaufruf -->
+					<!-- ${myLineaCurrent.Schema}, myStringCurrent.Schema -->
+					<fl:echo>2xxx. Verabeite das letze Array, fuer das Schema: '${myStringCurrent.Schema}</fl:echo>
+					<arrayDebugJsZZZ arrayinput="${myLineaCurrent.Schema}" ilevel="1"/>
 					
 					<fl:let>myReturnControl ::= true</fl:let>
 					<fl:let>myReturnString ::= "alles ok"</fl:let>																					
@@ -1712,7 +1739,8 @@
 <!-- ######################################################################### -->
 <target name="-FglSchemaController_Main">
 	<fl:let>myLineNextSchema::="${lineCurrent}"</fl:let>
-	<arrayCopyJsZZZ arrayinput="${lineCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
+	<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
 	
 	<!-- Prüfe, ob eine Zeile ueberhaupt korrekt uebergeben wurde -->
 	<ac:if>
@@ -1728,6 +1756,7 @@
 						<fl:fail message="Argument Error: Comment line"/>
 					</ac:then>
 					<ac:else>
+						<!-- Also nur in diesem Fall weitermachen -->
 					</ac:else>
 				</ac:if>
 			</ac:else>
@@ -1746,7 +1775,7 @@
 	<fl:let>mySchemaNextTrimmed::=trim('${mySchemaNext}')</fl:let>
 	<!--<echo>mySchemaNextTrimmed="${mySchemaNextTrimmed}"</echo>-->
 	<ac:if>
-		<ac:equals arg1="${mySchemaNextTrimmed}" arg2="0" />
+		<ac:equals arg1="${mySchemaNextTrimmed}" arg2="" />
 		    <ac:then>
 				<fl:let>mySchemaNextTrimmed::="copy"</fl:let>
 				<fl:let>myLineNext::="${myLineNextSchema}"</fl:let>
@@ -1777,20 +1806,20 @@
     </ac:if>-->
 	 
 	<fl:choose>
-		<fl:when test="${myBooleanValue}==true">
+		<fl:when test="${myBooleanValue}==false">
 		<echo>Noch nicht gesetztes altes Schema</echo>
 			
 			<!-- Erzeuge das Array zum ersten mal -->
 			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.Schema"/>
 			
 			<!-- Ausgabe des neuen Arrays -->	
-			<arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/>
+			<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
 																				
-		</fl:when><!-- test="'${myBooleanValue}'=='true' -->
+		</fl:when><!-- test="'${myBooleanValue}'==false -->
 	</fl:choose>
 	 
 	<fl:choose>		
-		<fl:when test="'${mySchemaNextTrimmed}'=='${myStringCurrent.Schema}' or '${myBooleanValue}'==true"><!-- TODO GOON 20151112: Hier pruefen, ob die Variable initialisiert ist -->
+		<fl:when test="'${mySchemaNextTrimmed}'=='${myStringCurrent.Schema}' or ${myBooleanValue}==false"><!-- TODO GOON 20151112: Hier pruefen, ob die Variable initialisiert ist -->
 			<echo>Keine Schemaaenderung</echo>
 			<fl:let>myReturnControl.Schema::=false</fl:let>
 										
@@ -1799,14 +1828,20 @@
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
-			<arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/>
+			<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
 																				
 		</fl:when><!-- '${mySchemaCurrent}'=='${myStringCurrent.Schema}' -->
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->		
 			<echo>Schemaaenderung vorhanden!</echo>
 			<fl:let>myReturnControl.Schema::=true</fl:let>
 			
-			<!-- Mache neues Array. Hänge an neues Array an -->
+			<!-- Mache neues Array. Hänge an neues Array an -->			
+			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.Schema"/>
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.Schema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />
+	
+			<!-- Ausgabe des neuen Arrays -->	
+			<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
 					
 		</otherwise>
 	</fl:choose>	
@@ -1818,7 +1853,7 @@
 	<ac:var name="returnString" value="${myReturnString}" />
 	<ac:var name="returnControl.Schema" value="${myReturnControl.Schema}" />
 	<ac:var name="returnString.Schema" value="${myReturnString.Schema}" />		
-	<arrayCopyJsZZZ arrayinput="${mylinea.Schema}" arrayreturn="lineaSchema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${mylineaNext.Schema}" arrayreturn="linea.Schema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
 <!-- ######################################################################### -->
