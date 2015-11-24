@@ -1496,7 +1496,7 @@
 			<!-- END ENTWICKLUNG -->
 				
 			<!-- TODO: Das nach dem SchemaController Aufruf machen, dazu müssen die Eingabeparameterwerte aber umgestellt werden -->
-			<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
+			<antcallback target="-FglVmdController_Main_VERALTET_" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
 			<fl:echo>Ergebnis des VMD Controllers: ${returnString}</fl:echo>
@@ -1672,29 +1672,33 @@
 												<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/>
 												<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 											</antcallback>
-											
-											<!-- Falls der Controller meint returnControl.Schema==true, dann wurde entweder nix mehr gefunden oder das Schema hat gewechselt -->											
-											<!-- Nun anhand des zurückgegebenen returnControl.Schema Werts die Untercontroller aufrufen.
-       											 Der zu übergebende Parameter ist das Array linea.Schema -->
-											
-											
-											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf
-											     fülle linea.Schema als Kopie von lineaCurrent.Schema -->
-												<fl:echo>2a. returnString.Schema:'${returnString.Schema}'</fl:echo>												
+																																
+											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf: Fülle linea.Schema als Kopie von lineaCurrent.Schema -->
+												<!--<fl:echo>2a. returnString.Schema:'${returnString.Schema}'</fl:echo>												
 												<fl:echo>2b. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo>
 												<fl:echo>2c. linea.Schema</fl:echo>
 												<arrayDebugJsZZZ arrayinput="${linea.Schema}" ilevel="1"/>
 												<fl:echo>2d. myLineaCurrent.Schema</fl:echo>
-												<arrayDebugJsZZZ arrayinput="${myLineaCurrent.Schema}" ilevel="1"/>
-												
-												<fl:echo>2e. returnControl.Schema: '${returnControl.Schema}</fl:echo>
+												<arrayDebugJsZZZ arrayinput="${myLineaCurrent.Schema}" ilevel="1"/>												
+												<fl:echo>2e. returnControl.Schema: '${returnControl.Schema}</fl:echo> -->
+											
+											<!-- Falls der Controller meint returnControl.Schema==true, dann wurde entweder nix mehr gefunden oder das Schema hat gewechselt -->																						
 												<isBooleanZZZ valueinput="${returnControl.Schema}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 												<ac:if>
 												  <equals arg1="${myBooleanValue}" arg2="true" />
 												  <ac:then>		
-													<echo>Schemawechsel hat stattgefunden.</echo>
-													<!-- TODO GOON 20151121: Rufe nun die Funktion auf, die das vorherige Schema verarbeiten soll. -->
-													
+													<echo>Schemawechsel hat stattgefunden. Altes Schema ist: '${myStringCurrent.Schema}'</echo>
+													<!-- #### Rufe nun die Funktion auf, die das vorherige Schema verarbeiten soll. #### -->
+													<ac:if>								
+														<ac:equals arg1="${myStringCurrent.Schema}" arg2="vmd" />								
+														<ac:then>
+															<fl:echo>AUFRUF DES VMD-CONTROLLERS</fl:echo>
+															<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
+																<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+															</antcallback>
+														</ac:then>
+													 </ac:if>	
+													<!-- ###################################################### -->
 												  </ac:then>
 												  <ac:else>
 													<echo>Noch hat kein Schemawechsel stattgefunden.</echo>													
@@ -1855,9 +1859,156 @@
 	<ac:var name="returnString.Schema" value="${myReturnString.Schema}" />		
 	<arrayCopyJsZZZ arrayinput="${mylineaNext.Schema}" arrayreturn="linea.Schema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
+<target name="-FglVmdController_Main">
+     <!-- NOCH KAPUTT -->
+	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
+
+	<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
+	<!-- Todo: diese dann auch im Schema "copy" verwenden -->
+	<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filename"/>
+	<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filedir"/>
+	<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filename"/>
+	<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filedir"/>
+			
+	<arrayElementCountJsZZZ arrayinput="${mylineaNext.Schema}" ireturn="myArraySize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<fl:choose>
+	<fl:when  test="${myArraySize}>=1"><!-- Sind Einträge im Array vorhanden. -->
+
+	<!-- 3. Ermittle die Indexposition, den Dateinamen und den Dateipfad -->	
+	<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+	<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+	<var name="op1" value="${myArraySize}"/>
+	<var name="op2" value="1"/>
+	<var name="op" value="-"/>
+	<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+	<echo>Errechneter ubound Wert des Arrays: ${iubound}</echo>
+	
+	<!-- Hole die Werte der aktuellen Arrayposition, das geht nur wenn iubound > icounter, darum muss man doch tatsächlich eine Fallunterscheidung einbauen, wenn param und end gleich sind -->
+	<ac:for param="icounter" end="${iubound}">			
+		<sequential>
+			<echo>icounter is @{icounter}</echo> 
+			<arrayGetJsZZZ arrayinput="${lineaCurrent.Schema}" index="@{icounter}" arrayget="myLineTrimmed"/>
+			<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
+		
+		<!-- Schreibe das in eine Flaka - Variable -->		
+		<fl:let>myLeftPart::=split('${myLineTrimmed}','=')[0]</fl:let>
+		<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
+		<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
+		<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
+																				
+		<!-- TODO: Idee: in der Initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
+		<fl:when test="null('${myRightPart}')">
+			<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): ${myLineTrimmed}</echo>
+			<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+												
+			<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+			<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+			<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+			<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
+		</fl:when>
+		<fl:when test="null('${myLeftPart}')">
+			<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): ${myLineTrimmed}</echo>
+			<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+																							
+			<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+			<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+			<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+			<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
+		</fl:when>
+								
+			<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
+			<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
+					Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
+					<!--<path id="pathTempLeft">
+							<pathelement location="${myLeftPart}"/>
+							</path>
+							<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
+							</pathconvert>
+							<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
+									
+							<path id="pathTempRight">
+							<pathelement location="${myRightPart}"/>
+							</path>
+							<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
+							</pathconvert>
+							<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
+								
+								
+			<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
+			<fl:let>myCase ::= "undefined"</fl:let>																										
+			<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
+				<param name="leftPart" value="${myLeftPart}"/>
+				<param name="rightPart" value="${myRightPart}"/>
+			</antcallback>
+										
+			<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
+				<fl:let>myAnalyze::="${returnString}"</fl:let>
+																			
+				<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
+				<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
+					<param name="analyze" value="${myAnalyze}"/>
+					<param name="leftPart" value="${myLeftPart}"/>
+					<param name="rightPart" value="${myRightPart}"/>												
+				</antcallback>
+				<fl:let>myReturnControl::="${returnControl}"</fl:let>											
+				<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
+				<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
+				<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
+				<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
+				<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
+				<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
+				<arrayCopyJsZZZ arrayinput="${returnDesta.filename}" arrayreturn="myDesta.filename" sflagcontrol="" />
+											
+																	
+				<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
+				<ac:if>
+					<equals arg1="${returnControl}" arg2="true"/>
+					<ac:then>
+						<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
+						<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
+						<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
+		
+						<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
+						<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
+		
+						<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
+						<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
+											
+						<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
+						<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
+					</ac:then>
+					<ac:else>
+							<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
+					</ac:else>
+				</ac:if>
+										
+					<fl:let>myReturnControl ::= true</fl:let>
+					<fl:let>myReturnString ::= "alles ok"</fl:let>		
+
+				</sequential>
+				</ac:for>
+					
+				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
+				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+					<fl:let>myReturnControl ::= false</fl:let>
+					<fl:let>myReturnString ::= "Array für vmd - Schema Zeilen ist leer"</fl:let>
+				</otherwise>
+			</fl:choose>
+			
+			<!-- Rueckgabebwerte -->
+			<ac:var name="returnControl" value="${myReturnControl}" />
+			<ac:var name="returnString" value="${myReturnString}" />
+			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
 
 <!-- ######################################################################### -->
-<target name="-FglVmdController_Main">
+<target name="-FglVmdController_Main_VERALTETE_KANN_GELOESCHT_WERDEN">
+     <!-- FGL: 20151124: Veraltete Version, in der noch die einzelnen Zeilen der Controlldatei durchgegangen wird, OHNE Schema -->
 	<fl:let>myLocalFileControlPath ::= "${localFileControlPath}"</fl:let>
 
 	<!-- Prüfe, ob die Steuerungsdatei überhaupt existiert -->
