@@ -200,7 +200,7 @@
 		]]>
 	</scriptdef>
 	
-	<!-- ############################################################ -->
+<!-- ########################### -->
 	<scriptdef name="arrayDebugJsZZZ" language="javascript">
 		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
 			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
@@ -211,19 +211,20 @@
 				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
 		<attribute name="arrayinput" />
 		<attribute name="ilevel" />	
-		<![CDATA[					
+		<![CDATA[	
+			enableJava();
 			var myArray = attributes.get("arrayinput");					
 			var myLevel = attributes.get("ilevel");					
-			
 			if(myLevel<=0){
 				
 			}else{
 			if(myArray===undefined) print("myarray = undefined");
 			if(myArray==null) print("myarray = NULL");	
 			
-			// Typausgabe				
+			//Typausgabe
 			print("typeof myarray = " + typeof(myArray));
-								
+					
+			
 			var iSize=0;
 			if(Array.isArray(myArray)){
 				print("Array uebergeben bekommen");
@@ -254,6 +255,16 @@
 					};
 					};//myLevel>=2;
 					
+					debugArrayAsString(myArray);
+				}else{
+					print("kein Objekt");
+					debugArrayAsString(myArray);					
+				};
+			};
+			};//myLevel <= 0;
+			
+			
+			function debugArrayAsString(myArray){
 					print("#################################");
 					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
 					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
@@ -283,14 +294,29 @@
 							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
 							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
 						};
-					}else if(typeof(myArray)=='string'){
-						print("kein Objekt sondern String");
-						print(myArray);
-					}else{
-						//print("weder Objekt noch String");
-					};
-			};
-			};//myLevel <= 0;
+			}
+			
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+			
 		]]>
 	</scriptdef>
 	
@@ -1481,48 +1507,12 @@
 			<echo>Copy files general, by property file:</echo>
 			<echo>${conf.copyLocalFilePath}</echo>
 
-			<!-- TODO GOON: Die "Schemata" Untersuchung machen. Dies mit einem -FglSchemaController_Main machen...
-										Darin die Steuerungsdatei Zeile für Zeile auswerten, bis zum nächsten Eintrag, der ein anderes Schema ist.
-										Für den COPY Fall den VmdController aufrufen, bzw. für den VMD Fall ebenfalls den VmdController aufrufen aber mit einem Steuerungsparameter.			                             
-										 Und letztlich beim Kopieren das neue Target -FglCopyLocal_Main aufrufen. 
-										 
-										 Weitere Schema Befehle sind zip:, remove:-->
-			<!-- START ENTWICKLUNG: Diesen Teil auskkommentieren -->								
+			<!-- Arbeite die Steuerungsdatei ab -->					
 			<antcallback target="-FglFileControlController_Main" return="returnString, returnControl">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
-			<fl:echo>Ergebnis des File Controllers: ${returnString}</fl:echo>		
-			<fl:fail message="SICHERHEITSABBRUCH: ENDE WEIL NOCH IN ENTWICKLUNG."/>
-			<!-- END ENTWICKLUNG -->
-				
-			<!-- TODO: Das nach dem SchemaController Aufruf machen, dazu müssen die Eingabeparameterwerte aber umgestellt werden -->
-			<antcallback target="-FglVmdController_Main_VERALTET_" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
-				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
-			</antcallback>      
-			<fl:echo>Ergebnis des VMD Controllers: ${returnString}</fl:echo>
-			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
-			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
-			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
-			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
-			
-			<ac:if>
-				<ac:equals arg1="${returnControl}" arg2="false" />
-				<ac:then>
-					<fl:echo>VMD Controller beendet mit false. Keine weitere Verarbeitung.</fl:echo>
-				</ac:then>
-				<ac:else>
-					<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
-						
-					<antcallback target="-FGLCopyLocal_Main" return="returnString, returnControl">
-						<!-- Scheinbar kann man als Parameter auch arrays uebergeben, nur Arrays zurückgeben ist dann halt etwas schwieriger -->
-						<param name="mySrcaTotal.filedir" value="${srcaTotal.filedir}"/>	
-						<param name="mySrcaTotal.filename" value="${srcaTotal.filename}"/>	
-						<param name="myDestaTotal.filedir" value="${destaTotal.filedir}"/>	
-						<param name="myDestaTotal.filename" value="${destaTotal.filename}"/>	
-					</antcallback>      
-					<fl:echo>Ergebnis des VMD Kopierers: ${returnString}</fl:echo>			
-				</ac:else> <!-- Controller erfolgreich -->
-			</ac:if>
+			<fl:echo>Ergebnis des FileControll Controllers: ${returnString}</fl:echo>		
+										
 		</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
 	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->	
 </target>
@@ -1601,14 +1591,14 @@
 		<fl:when test=" '${myLocalFileControlPath}'.tofile.exists == true ">
 					<echo>Datei existiert: ${myLocalFileControlPath}</echo>
 						
-					<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
+					<!-- 1a. Lies den Inhalt der Datei als Properties-Datei ein. -->	
 					<!--<loadproperties>
 						<file file="${conf.copyGeneralFilePath}"/>
 						</loadproperties> 
 						<echo>test1 hat den Wert: ${test1}</echo> -->
 		
 		
-					<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
+					<!-- 2. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
 					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" /> -->
 					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im VMD_Projekt 'src' ausgegangen -->
 		
@@ -1617,7 +1607,12 @@
 					<!-- <echo>${myfile}</echo> -->
 
 
-					<!--2b. Werte den Inhalt der Datei zeilenweise aus -->
+					<!-- ################################################################ -->
+					<!-- Die "Schemata" Untersuchung machen. Dazu die Steuerungsdatei Zeile für Zeile auswerten, bis zum nächsten Eintrag, der ein anderes Schema ist.
+						Für das Analysierte Schema den passenden Schema-Controller aufrufen. 						
+						Weitere Schema Befehle sind vmd://, copy://, zip://, remove://-->
+										
+					<!-- 1b. Werte den Inhalt der Datei zeilenweise aus -->
 					<!-- Beispiel für eine Schleife in ant, und wie man mit sequentials und dem @ Parameter darin arbeiten kann.  -->			
 					<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
 					<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
@@ -1643,9 +1638,8 @@
 									<fl:let>myLineTrimmed::=trim("@{line}")</fl:let>
 								</ac:else>
 							</ac:if>													
-							<!-- <fl:echo>Zeile trimmed:'${myLineTrimmed}'</fl:echo> -->
-							
-							<!-- <var name="myLineTrimmed.length" unset="true" />
+							<!-- <fl:echo>Zeile trimmed:'${myLineTrimmed}'</fl:echo> 
+							<var name="myLineTrimmed.length" unset="true" />
 							<length string="${myLineTrimmed}" property="myLineTrimmed.length" />
 							<fl:echo>Zeile trimmed Länge ${myLineTrimmed.length}</fl:echo> -->
 							
@@ -1664,10 +1658,9 @@
 											<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
 										</ac:then>
 										<ac:else>
-											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
-											<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->											
-											<fl:echo>1. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo>
-											<antcallback target="-FglSchemaController_Main" return="returnString, returnControl,returnString.Schema,returnControl.Schema,linea.Schema">
+											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>																																																							
+											<!-- <fl:echo>1. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo> -->
+											<antcallback target="-FglSchemaController_Analyzer" return="returnString, returnControl,returnString.Schema,returnControl.Schema,linea.Schema">
 												<param name="lineCurrent" value="${myLineTrimmed}" />
 												<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/>
 												<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
@@ -1688,27 +1681,21 @@
 												  <equals arg1="${myBooleanValue}" arg2="true" />
 												  <ac:then>		
 													<echo>Schemawechsel hat stattgefunden. Altes Schema ist: '${myStringCurrent.Schema}'</echo>
-													<!-- #### Rufe nun die Funktion auf, die das vorherige Schema verarbeiten soll. #### -->
-													<ac:if>								
-														<ac:equals arg1="${myStringCurrent.Schema}" arg2="vmd" />								
-														<ac:then>
-															<fl:echo>AUFRUF DES VMD-CONTROLLERS</fl:echo>
-															<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
-																<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
-															</antcallback>
-														</ac:then>
-													 </ac:if>	
-													<!-- ###################################################### -->
+													
+													<!-- Aufruf des SchemaControllers, der auf die Untercrontroller verteilt -->
+													<fl:echo>AUFRUF DES SCHEMA-CONTROLLERS BEI SCHEMA-WECHSEL</fl:echo>
+													<antcallback target="-FglSchemaController_Controller" return="returnString, returnControl">
+														<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+														<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+													</antcallback>																										
 												  </ac:then>
 												  <ac:else>
 													<echo>Noch hat kein Schemawechsel stattgefunden.</echo>													
 												  </ac:else>
 												</ac:if>
-												<!-- uebernimm das zurueckgebene Schema als neues Schema -->
-												<fl:let>myStringCurrent.Schema::='${returnString.Schema}'</fl:let>
-												<!-- uebernimm das Zeilenarray, ggfs. als neues Schema -->
-												<arrayCopyJsZZZ arrayinput="${linea.Schema}" arrayreturn="myLineaCurrent.Schema" sflagcontrol="" />
-												
+																								
+												<fl:let>myStringCurrent.Schema::='${returnString.Schema}'</fl:let><!-- uebernimm das zurueckgebene Schema als neues Schema -->												
+												<arrayCopyJsZZZ arrayinput="${linea.Schema}" arrayreturn="myLineaCurrent.Schema" sflagcontrol="" /><!-- uebernimm das Zeilenarray, ggfs. als neues Schema -->												
 										</ac:else>	
 									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
 								</ac:else>
@@ -1716,11 +1703,16 @@
 						</sequential>
 					</for><!-- end for param="line"> -->	
 
-					<!-- TODO GOON 20151121: Wenn keine Zeilen mehr zu verarbeiten sind, das letzte Array, des letzen Schemas noch abarbeiten, durch den passenden Funktionsaufruf -->
-					<!-- ${myLineaCurrent.Schema}, myStringCurrent.Schema -->
-					<fl:echo>2xxx. Verabeite das letze Array, fuer das Schema: '${myStringCurrent.Schema}</fl:echo>
-					<arrayDebugJsZZZ arrayinput="${myLineaCurrent.Schema}" ilevel="1"/>
+					<!-- Wenn keine Zeilen mehr zu verarbeiten sind, das letzte Array, des letzen Schemas noch abarbeiten, durch den passenden Funktionsaufruf -->			
+					<!--<fl:echo>2f. Verabeite das letze Array, fuer das Schema: '${myStringCurrent.Schema}</fl:echo>-->
+					<!--<arrayDebugJsZZZ arrayinput="${myLineaCurrent.Schema}" ilevel="1"/>-->
+					<fl:echo>AUFRUF DES ABSCHLIESSENDEN SCHEMA-CONTROLLERS</fl:echo>
+					<antcallback target="-FglSchemaController_Controller" return="returnString, returnControl">
+						<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+						<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+					</antcallback>										
 					
+					<!-- TODO: Die Meldungen aus den aufgerufenen Unterfunktionen zurueckgeben und nicht blos hier alles auf supergut setzen. -->
 					<fl:let>myReturnControl ::= true</fl:let>
 					<fl:let>myReturnString ::= "alles ok"</fl:let>																					
 				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
@@ -1734,14 +1726,14 @@
 			<!-- Rueckgabebwerte -->
 			<ac:var name="returnControl" value="${myReturnControl}" />
 			<ac:var name="returnString" value="${myReturnString}" />
-			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+			<!-- <arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+			<!-- <arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+			<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+			<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
 <!-- ######################################################################### -->
-<target name="-FglSchemaController_Main">
+<target name="-FglSchemaController_Analyzer">
 	<fl:let>myLineNextSchema::="${lineCurrent}"</fl:let>
 	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
 	<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
@@ -1859,8 +1851,63 @@
 	<ac:var name="returnString.Schema" value="${myReturnString.Schema}" />		
 	<arrayCopyJsZZZ arrayinput="${mylineaNext.Schema}" arrayreturn="linea.Schema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
-<target name="-FglVmdController_Main">
-     <!-- NOCH KAPUTT -->
+
+<!-- ######################################################################### -->
+<target name="-FglSchemaController_Controller">
+	<fl:let>myStringCurrentSchema::="${stringCurrent.Schema}"</fl:let>
+	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="myLineaCurrent.Schema" sflagcontrol="" />	
+
+	<!-- ###################################################### -->
+	<!-- #### Rufe nun die Funktion auf, die das vorherige Schema verarbeiten soll. #### -->
+	<ac:if>								
+		<ac:equals arg1="${myStringCurrent.Schema}" arg2="vmd" />								
+		<ac:then>
+			<fl:echo>AUFRUF DES VMD-CONTROLLERS</fl:echo>
+			<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
+				<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+			</antcallback>
+			
+			<fl:echo>Ergebnis des VMD Controllers: ${returnString}</fl:echo>
+			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
+			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
+			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
+			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->
+
+			<ac:if>
+				<ac:equals arg1="${returnControl}" arg2="false" />
+				<ac:then>
+					<fl:echo>VMD Controller beendet mit false. Keine weitere Verarbeitung.</fl:echo>
+				</ac:then>
+				<ac:else>
+					<fl:echo>Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
+					
+<!-- TODO GOON 20151125: Beim VMD-Kopiern ein Flag mitgeben, das erst bewirkt, dass der HOSTNAME als Suffix hinter den Dateinamen kommt -->					
+					<antcallback target="-FGLCopyLocal_Main" return="returnString, returnControl">
+						<!-- Scheinbar kann man als Parameter auch arrays uebergeben, nur Arrays zurückgeben ist dann halt etwas schwieriger -->
+						<param name="mySrcaTotal.filedir" value="${srcaTotal.filedir}"/>	
+						<param name="mySrcaTotal.filename" value="${srcaTotal.filename}"/>	
+						<param name="myDestaTotal.filedir" value="${destaTotal.filedir}"/>	
+						<param name="myDestaTotal.filename" value="${destaTotal.filename}"/>	
+					</antcallback>      
+					<fl:echo>Ergebnis des VMD Kopierers: ${returnString}</fl:echo>			
+				</ac:else> <!-- Controller erfolgreich -->
+			</ac:if><!-- Ergebnis des VMD Controllers -->
+																		
+		</ac:then>
+	 </ac:if>	
+	<!-- ###################################################### -->
+	
+	<fl:let>myReturnControl::=${returnControl}</fl:let>
+	<fl:let>myReturnString::=${returnString}</fl:let>
+		
+	<!-- Rueckgabebwerte -->
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnString" value="${myReturnString}" />
+	<!--<arrayCopyJsZZZ arrayinput="${mylineaNext.Schema}" arrayreturn="linea.Schema" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
+<!-- ######################################################################### -->
+<target name="-FglVmdController_Main">     
 	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
 
 	<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
@@ -2004,7 +2051,6 @@
 			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
-
 
 <!-- ######################################################################### -->
 <target name="-FglVmdController_Main_VERALTETE_KANN_GELOESCHT_WERDEN">
@@ -2220,66 +2266,66 @@
 
 <!-- ######################################################################### -->
 <target name="-FGLCopyLocal_Main">
-					<arrayElementCountJsZZZ arrayinput="${myDestaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-					<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
-					<ac:if>
-						<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
-						<ac:then>							
-							<fl:let>myReturnString ::= "Keine Dateien im Array => keine Verarbeitung"</fl:let>
-							<fl:let>myReturnControl::=false</fl:let>
-						</ac:then>
-						<ac:else>	
-							<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
-							<!-- Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem Postfix _RECHNERNAME ausstatten -->
-							<!-- Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus, danach den Kopiervorgang für die Datei ohne Postfix. -->				
-							<!--### 1. Lauf Kopiere die Dateien (incl. NAMENSERWEITERUNG) der beiden Arrays  ##################### -->
+	<arrayElementCountJsZZZ arrayinput="${myDestaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
+	<ac:if>
+		<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
+		<ac:then>							
+			<fl:let>myReturnString ::= "Keine Dateien im Array => keine Verarbeitung"</fl:let>
+			<fl:let>myReturnControl::=false</fl:let>
+		</ac:then>
+		<ac:else>	
+			<!-- Für VMD Dateien ist es möglich, dass die gleiche VM auf veschiedenen Rechnern läuft -->
+			<!-- Darum sicherheitshalber und zum Abgleich jede Datei noch mit einem Postfix _RECHNERNAME ausstatten -->
+			<!-- Führe aus Sicherheitsgründen zuerst diesen Kopiervorgang aus, danach den Kopiervorgang für die Datei ohne Postfix. -->				
+			<!--### 1. Lauf Kopiere die Dateien (incl. NAMENSERWEITERUNG) der beiden Arrays  ##################### -->
 
-							<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
-							<!-- 1a. Dateiendung entfernen -->
-							<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
-			
-							<!-- 1b. Hostnamen und Endung ausrechnen -->
-							<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
-									dies passiert hier durch flaka´s install-property handler task -->
-							<fl:install-property-handler />
-							<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->			
-							<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
-						
-							<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
-							<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
-					
-							<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
-								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-								<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
-							</antcallback>
-							<fl:let>myReturnControl ::="${returnControl}"</fl:let>
-							<fl:let>myReturnString ::="${returnString}"</fl:let>
-						
-						
-							<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
-							<!-- NEIN 20151005 : So kommt es zu Problemen, weil sich der Inhalt dieser Datei von HostRechner zu HostRechner unterscheidet.
-							                     Eine Alternative Lösung muss her:
-												 Z.B. Erstelle ein Sammeldokument .html, in dem in einzelnen DIVs 
-												 der Inhalt der hostspezifischen Clientdatei eingefügt wird. -->
-							<!--  
-							<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
-								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
-							</antcallback>	
-							<fl:let>myReturnControl ::="${returnControl}"</fl:let>
-							<fl:let>myReturnString ::="${returnString}"</fl:let>
-							-->
-						</ac:else>
-					</ac:if><!-- Anzahl der Dateien pruefen -->
+			<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
+			<!-- 1a. Dateiendung entfernen -->
+			<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
 
-					<!-- Rueckgabewerte -->
-					<ac:var name="returnControl" value="${myReturnControl}" />
-					<ac:var name="returnString" value="${myReturnString}" />
-					<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- Merke: So gibt man einen Arraywertzurueck -->
+			<!-- 1b. Hostnamen und Endung ausrechnen -->
+			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+					dies passiert hier durch flaka´s install-property handler task -->
+			<fl:install-property-handler />
+			<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->			
+			<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
+		
+			<!-- Hänge an alle einträge des arrays den _HOSTNAME + Endung String an -->
+			<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
+	
+			<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
+				<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+				<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+				<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+				<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
+			</antcallback>
+			<fl:let>myReturnControl ::="${returnControl}"</fl:let>
+			<fl:let>myReturnString ::="${returnString}"</fl:let>
+		
+		
+			<!--### 2. Lauf Kopiere die Dateien der beiden Arrays #####################-->
+			<!-- NEIN 20151005 : So kommt es zu Problemen, weil sich der Inhalt dieser Datei von HostRechner zu HostRechner unterscheidet.
+								 Eine Alternative Lösung muss her:
+								 Z.B. Erstelle ein Sammeldokument .html, in dem in einzelnen DIVs 
+								 der Inhalt der hostspezifischen Clientdatei eingefügt wird. -->
+			<!--  
+			<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
+				<param name="srca.filename" value="${mySrcaTotal.filename}"/>
+				<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
+				<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
+				<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+			</antcallback>	
+			<fl:let>myReturnControl ::="${returnControl}"</fl:let>
+			<fl:let>myReturnString ::="${returnString}"</fl:let>
+			-->
+		</ac:else>
+	</ac:if><!-- Anzahl der Dateien pruefen -->
+
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnString" value="${myReturnString}" />
+	<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- Merke: So gibt man einen Arraywertzurueck -->
 </target>
 
 <!-- ######################################################################### -->

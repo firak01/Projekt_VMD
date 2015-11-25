@@ -15,7 +15,6 @@
 	
 	<!-- ########################### -->
 	<scriptdef name="arrayDebugJsZZZ" language="javascript">
-	
 		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
 			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
 			   - der Inhalt
@@ -69,6 +68,16 @@
 					};
 					};//myLevel>=2;
 					
+					debugArrayAsString(myArray);
+				}else{
+					print("kein Objekt");
+					debugArrayAsString(myArray);					
+				};
+			};
+			};//myLevel <= 0;
+			
+			
+			function debugArrayAsString(myArray){
 					print("#################################");
 					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
 					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
@@ -98,11 +107,8 @@
 							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
 							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
 						};
-					}else{
-						//print("kein Objekt");
-					};
-			};
-			};//myLevel <= 0;
+			}
+			
 			
 			//Todo: Diese Funktion in den JSZ Kernel packen
 			function enableJava(){
