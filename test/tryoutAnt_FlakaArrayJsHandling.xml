@@ -228,16 +228,6 @@
 					};
 					};//myLevel>=2;
 					
-					debugArrayAsString(myArray);
-				}else{
-					print("kein Objekt");
-					debugArrayAsString(myArray);					
-				};
-			};
-			};//myLevel <= 0;
-			
-			
-			function debugArrayAsString(myArray){
 					print("#################################");
 					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
 					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
@@ -267,8 +257,11 @@
 							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
 							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
 						};
-			}
-			
+					}else{
+						//print("kein Objekt");
+					};
+			};
+			};//myLevel <= 0;
 			
 			//Todo: Diese Funktion in den JSZ Kernel packen
 			function enableJava(){
@@ -704,7 +697,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
-<target name="compile" depends="-declaration,-myTestArrayDebugJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayLeftBackStringJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -966,7 +959,6 @@
 		<echo>ArrayGroesse: ${myArraySize}</echo>
 		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
 		<echo>myArray nachher: ${myArray}</echo>
-		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 	
 		<!-- Werte eingeben -->
 		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
