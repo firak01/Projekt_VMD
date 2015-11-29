@@ -1,12 +1,15 @@
 ### Private Festplatte mit Spielen ect.
 
 #########################################################
-20151031 : Einbau USB 3.0 Karte und Installation des Treibers von der CD.
 
-20151017 : Updaten VMWare Player auf Version 12, dazu VMWare Player 4 deinstalliert
+20151128: Installation von Space Empires V (aber leider nicht US Version --> maximal Patch 1.74 möglich)
 
-20151003 : Installation des spiels "Star Wars - Empire At War"
+20151031: Einbau USB 3.0 Karte und Installation des Treibers von der CD.
 
-20150426 : Installation von Notepad++
+20151017: Updaten VMWare Player auf Version 12, dazu VMWare Player 4 deinstalliert
 
-20150418 : Installation von GitHub - Client
+20151003: Installation des spiels "Star Wars - Empire At War"
+
+20150426: Installation von Notepad++
+
+20150418: Installation von GitHub - Client

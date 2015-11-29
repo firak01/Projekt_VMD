@@ -1609,8 +1609,8 @@
 
 					<!-- ################################################################ -->
 					<!-- Die "Schemata" Untersuchung machen. Dazu die Steuerungsdatei Zeile für Zeile auswerten, bis zum nächsten Eintrag, der ein anderes Schema ist.
-						Für das Analysierte Schema den passenden Schema-Controller aufrufen. 						
-						Weitere Schema Befehle sind vmd://, copy://, zip://, remove://-->
+						Für das Analysierte Schema den passenden Schema-Controller aufrufen. Orientiere dich bei den Schema-Namen an den DOS Befehlen.						
+						Weitere Schema Befehle sind vmd://, copy://, del://. zip://-->
 										
 					<!-- 1b. Werte den Inhalt der Datei zeilenweise aus -->
 					<!-- Beispiel für eine Schleife in ant, und wie man mit sequentials und dem @ Parameter darin arbeiten kann.  -->			
@@ -1853,6 +1853,10 @@
 </target>
 
 <target name="-FglSchemaController_Controller">
+	<!-- Merke: Orientier dich bei der Vergabe der Schema Namen an den DOS - Befehlen -->
+	<!-- Bisher umgesetzt: vmd, copy -->
+	<!-- TODO umzusetzen: del, zip -->
+
 	<fl:let>myStringCurrentSchema::="${stringCurrent.Schema}"</fl:let>
 	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="myLineaCurrent.Schema" sflagcontrol="" />	
 	
@@ -1974,127 +1978,51 @@
 				<arrayGetJsZZZ arrayinput="${lineaCurrent.Schema}" index="0" arrayget="myLineTrimmed"/>
 				<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 			
-				<!-- TODO goon 20151127: noch kaputt, hier in einem antcallback alles aufrufen, was in der Schleife auch passiert -->
-				<antcallback target="-FglVmdController_LineController" return="returnString, returnControl">
+				<!-- Hier in einem antcallback alles aufrufen, was in der Schleife auch passiert -->
+				<antcallback target="-FglVmdController_LineController" return="returnString, returnControl,return.srcaTotal.filedir,return.srcaTotal.filename,return.destaTotal.filedir,return.destaTotal.filename">
 					<param name="lineCurrent" value="${myLineTrimmed}"/>
+					<param name="srcaTotal.filedir" value="${mySrcaTotal.filedir}" />
+					<param name="srcaTotal.filename" value="${mySrcaTotal.filename}" />
+					<param name="destaTotal.filedir" value="${myDestaTotal.filedir}" />
+					<param name="destaTotal.filename" value="${myDestaTotal.filename}" />
 				</antcallback>
+				<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+				<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filename}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+				<arrayCopyJsZZZ arrayinput="${return.destaTotal.filedir}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+				<arrayCopyJsZZZ arrayinput="${return.destaTotal.filename}" arrayreturn="myDestaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->					
 			</ac:then><!-- iubound = 0 Fall -->
 			<ac:else><!-- iubound > 0 Fall -->	
-			
-			
 				<ac:for param="icounter" end="${iubound}">			
-					<sequential>
-						<echo>icounter is @{icounter}</echo> 
-						<arrayGetJsZZZ arrayinput="${lineaCurrent.Schema}" index="@{icounter}" arrayget="myLineTrimmed"/>
-						<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
-					
-					<!-- TODO goon 20151127: noch kaputt, hier die hier in en antcallback auslagern und für jede Zeile aufrufen. -->
-					
-					
-					<!-- Schreibe das in eine Flaka - Variable -->		
-					<fl:let>myLeftPart::=split('${myLineTrimmed}','=')[0]</fl:let>
-					<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
-					<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
-					<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
-																							
-					<!-- TODO: Idee: in der Initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
-					<fl:when test="null('${myRightPart}')">
-						<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): ${myLineTrimmed}</echo>
-						<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-															
-						<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-						<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-						<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-						<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
-					</fl:when>
-					<fl:when test="null('${myLeftPart}')">
-						<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): ${myLineTrimmed}</echo>
-						<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-																										
-						<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-						<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-						<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-						<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
-					</fl:when>
-											
-						<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
-						<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
-								Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
-								<!--<path id="pathTempLeft">
-										<pathelement location="${myLeftPart}"/>
-										</path>
-										<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
-										</pathconvert>
-										<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
-												
-										<path id="pathTempRight">
-										<pathelement location="${myRightPart}"/>
-										</path>
-										<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
-										</pathconvert>
-										<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
-											
-											
-						<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
-						<fl:let>myCase ::= "undefined"</fl:let>																										
-						<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
-							<param name="leftPart" value="${myLeftPart}"/>
-							<param name="rightPart" value="${myRightPart}"/>
-						</antcallback>
-													
-						<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
-							<fl:let>myAnalyze::="${returnString}"</fl:let>
-																						
-							<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
-							<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
-								<param name="analyze" value="${myAnalyze}"/>
-								<param name="leftPart" value="${myLeftPart}"/>
-								<param name="rightPart" value="${myRightPart}"/>												
-							</antcallback>
-							<fl:let>myReturnControl::="${returnControl}"</fl:let>											
-							<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
-							<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
-							<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
-							<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
-							<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
-							<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
-							<arrayCopyJsZZZ arrayinput="${returnDesta.filename}" arrayreturn="myDesta.filename" sflagcontrol="" />
-														
-																				
-							<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
-							<ac:if>
-								<equals arg1="${returnControl}" arg2="true"/>
-								<ac:then>
-									<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
-									<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
-									<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
-					
-									<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
-									<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
-					
-									<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
-									<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
-														
-									<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
-									<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
-								</ac:then>
-								<ac:else>
-										<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
-								</ac:else>
-							</ac:if>																						
-						</sequential>
-					</ac:for>
-				</ac:else><!-- iubound > 0 Fall -->
-			</ac:if><!-- ubound = 0 tatsaechlich notwendige Abfrage -->
-			<!-- TODO: Hier tatsaechlich den Rueckgabewert vom Kopiererfolg abhaengig machen -->
-			<fl:let>myReturnControl ::= true</fl:let>
-			<fl:let>myReturnString ::= "alles ok"</fl:let>
-		</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
-		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-			<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-			<fl:let>myReturnControl ::= false</fl:let>
-			<fl:let>myReturnString ::= "Array für vmd - Schema Zeilen ist leer"</fl:let>
-		</otherwise>
+				<sequential>
+					<echo>icounter is @{icounter}</echo> 
+					<arrayGetJsZZZ arrayinput="${lineaCurrent.Schema}" index="@{icounter}" arrayget="myLineTrimmed"/>
+					<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
+				
+					<!-- Hier die hier in ein antcallback auslagern und für jede Zeile aufrufen. -->
+					<antcallback target="-FglVmdController_LineController" return="returnString, returnControl,return.srcaTotal.filedir,return.srcaTotal.filename,return.destaTotal.filedir,return.destaTotal.filename">
+						<param name="lineCurrent" value="${myLineTrimmed}"/>
+						<param name="srcaTotal.filedir" value="${mySrcaTotal.filedir}" />
+						<param name="srcaTotal.filename" value="${mySrcaTotal.filename}" />
+						<param name="destaTotal.filedir" value="${myDestaTotal.filedir}" />
+						<param name="destaTotal.filename" value="${myDestaTotal.filename}" />
+					</antcallback>
+					<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+					<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filename}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+					<arrayCopyJsZZZ arrayinput="${return.destaTotal.filedir}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+					<arrayCopyJsZZZ arrayinput="${return.destaTotal.filename}" arrayreturn="myDestaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->					
+					</sequential>
+				</ac:for>
+			</ac:else><!-- iubound > 0 Fall -->
+		</ac:if><!-- ubound = 0 tatsaechlich notwendige Abfrage -->
+		<!-- TODO: Hier tatsaechlich den Rueckgabewert vom Kopiererfolg abhaengig machen -->
+		<fl:let>myReturnControl ::= true</fl:let>
+		<fl:let>myReturnString ::= "alles ok"</fl:let>
+	</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
+	<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+		<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
+		<fl:let>myReturnControl ::= false</fl:let>
+		<fl:let>myReturnString ::= "Array für vmd - Schema Zeilen ist leer"</fl:let>
+	</otherwise>
 	</fl:choose>
 	
 	<!-- Rueckgabebwerte -->
@@ -2107,232 +2035,126 @@
 </target>
 
 <target name="-FglVmdController_LineController"> 
-	<!-- todo: hier den Ablauf innerhalb der Schleife einbauen, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
-	
-	
-</target>
-
-<!-- ######################################################################### -->
-<target name="-FglVmdController_Main_VERALTETE_KANN_GELOESCHT_WERDEN">
-     <!-- FGL: 20151124: Veraltete Version, in der noch die einzelnen Zeilen der Controlldatei durchgegangen wird, OHNE Schema -->
-	<fl:let>myLocalFileControlPath ::= "${localFileControlPath}"</fl:let>
-
-	<!-- Prüfe, ob die Steuerungsdatei überhaupt existiert -->
-	<fl:choose>
-		<fl:when test=" '${myLocalFileControlPath}'.tofile.exists == true ">
-					<echo>Datei existiert: ${myLocalFileControlPath}</echo>
-
-					<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
-					<!-- Todo: diese dann im Schema "copy" verwenden -->
-					<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filename"/>
-					<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filedir"/>
-					<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filename"/>
-					<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filedir"/>
-
-	
-					<!-- 2. Lies den Inhalt der Datei als Properties-Datei ein. -->	
-					<!--<loadproperties>
-						<file file="${conf.copyGeneralFilePath}"/>
-						</loadproperties> 
-						<echo>test1 hat den Wert: ${test1}</echo> -->
+	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
+	<fl:let>myLineTrimmed ::= "${lineCurrent}"</fl:let>
+	<arrayCopyJsZZZ arrayinput="${srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${srcaTotal.filename}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${destaTotal.filedir}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${destaTotal.filename}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />	
 		
-		
-					<!-- 2a. Lies den Inhalt der Datei generell ein. Aber: innerhalb des when test auf Dateipfad funktioniert das nicht, da darin der Pfad an den anderen Pfad angehängt wird.-->				
-					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFilePath}" /> -->
-					<!-- <loadfile property="myfile" srcFile ="${conf.copyGeneralFileName}" /> --><!-- hierbei wird relative vom Script-Verzeichnis (also im VMD_Projekt 'src' ausgegangen -->
-		
-					<!-- Test: Gib den Inhalt der Datei aus -->
-					<!-- <echo>Dateiinhalt als Ganzes:</echo> -->
-					<!-- <echo>${myfile}</echo> -->
-
-
-					<!--2b. Werte den Inhalt der Datei zeilenweise aus -->
-					<!-- Beispiel für eine Schleife in ant, und wie man mit sequentials und dem @ Parameter darin arbeiten kann.  -->			
-					<echo>Dateiinhalt Zeile fuer Zeile:</echo>		
-					<for param="line"><!-- Merke: for, var und if kommen aus der ant-contrib Bibliothek -->
-						<tokens><!-- muss in der for-Schleife stehen, damit es dort eine list, path, sequence gibt, durch die iteriert werden kann. Wahrscheinlich wg. Sichtbarkeit-->
-							<file file="${myLocalFileControlPath}" />
-						</tokens>
-						<sequential>
-							<fl:let>myCase ::= "neue Zeile"</fl:let><!-- für jede Zeile wird der mögliche Verarbeitungsfall neu ermittelt -->
-							
-							<var name="myLine" value="@{line}" />
-							<!-- <fl:echo>Zeile:'${myLine}'</fl:echo> -->					
-							
-							<var name="line.length" unset="true" />
-							<length string="@{line}" property="line.length" /><!-- ueber das length-Tag wird eine property gefüllt, die lediglich so aussieht als wäre sie eine Methode des line-Objekts -->							
-							<!-- <fl:echo>Zeile Länge: ${line.length}</fl:echo> -->
-							
-							<ac:if>
-								<ac:equals arg1="${line.length}" arg2="0" />
-							    <ac:then>
-									<fl:let>myLineTrimmed::=''</fl:let>
-								</ac:then>
-								<ac:else>
-									<fl:let>myLineTrimmed::=trim("@{line}")</fl:let>
-								</ac:else>
-							</ac:if>													
-							<!-- <fl:echo>Zeile trimmed:'${myLineTrimmed}'</fl:echo> -->
-							
-							<!-- <var name="myLineTrimmed.length" unset="true" />
-							<length string="${myLineTrimmed}" property="myLineTrimmed.length" />
-							<fl:echo>Zeile trimmed Länge ${myLineTrimmed.length}</fl:echo> -->
-							
-							<ac:if>								
-								<ac:equals arg1="${myLineTrimmed}" arg2="" />								
-								<ac:then>
-									<!-- <fl:echo>Leerzeile...</fl:echo> -->
-								</ac:then>
-								<ac:else>												
-									<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->																
-									<stringSubStringZZZ text="${myLineTrimmed}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
-									<!-- <fl:echo message="subtext = ${subtext}" /> -->
-									<ac:if>
-										<ac:equals arg1="${subtext}" arg2="#" />
-										<ac:then>
-											<!-- <fl:echo>Kommentarzeile, wird uebersprungen...</fl:echo> -->
-										</ac:then>
-										<ac:else>
-											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
-											<!-- <echo>Steuerungszeile, wird ausgewertet...</echo> -->
-											<!-- +++++++++++++++++++  TODO GOON Hier dann den Schema Controller starten +++++++++  -->
-								
-											<!-- 2c. Splitte die Zeile mit Flaka - Splitt funktion (steht in der Flaka Doku unter EL). -->							 				 							
-											<!-- <fl:echo>linker Teil der Zeile => #{split('@{line}','=')[0]}</fl:echo> --><!-- beachte, dass mit dem #{ ... } die Funktion aufgerufen wird, so dass ihr Ergebnis in den String eingefügt werden kann.-->
-											<!-- <fl:echo>rechter Teil der Zeile => #{split('@{line}','=')[1]}</fl:echo> -->
-
-											<!-- Schreibe das in eine Flaka - Variable -->		
-											<!-- <fl:let>myLeftPart::=split('@{line}','=')[0]</fl:let> -->		
-											<fl:let>myLeftPart::=split('${myLineTrimmed}','=')[0]</fl:let>
-											<!-- <fl:let>myRightPart::=split('@{line}','=')[1]</fl:let> --><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
-											<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
-											<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
-											<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
-																				
-											<!-- TODO: Idee: in der Initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
-											<fl:when test="null('${myRightPart}')">
-												<!-- <echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): @{line}</echo> -->
-												<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): ${myLineTrimmed}</echo>
-												<!-- <fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: @{line}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-												<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-												
-												<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-												<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-												<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-												<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
-											</fl:when>
-											<fl:when test="null('${myLeftPart}')">
-												<!-- <echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): @{line}</echo> -->
-												<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): ${myLineTrimmed}</echo>
-												<!-- <fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: @{line}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-												<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-																							
-												<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-												<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-												<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-												<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
-											</fl:when>
-								
-											<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
-											<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
-												Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
-											<!--<path id="pathTempLeft">
-												<pathelement location="${myLeftPart}"/>
-												</path>
-												<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
-												</pathconvert>
-												<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
-									
-												<path id="pathTempRight">
-												<pathelement location="${myRightPart}"/>
-												</path>
-												<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
-												</pathconvert>
-												<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
-								
-								
-											<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
-											<fl:let>myCase ::= "undefined"</fl:let>																										
-											<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
-												<param name="leftPart" value="${myLeftPart}"/>
-												<param name="rightPart" value="${myRightPart}"/>
-											</antcallback>
-										
-											<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
-											<fl:let>myAnalyze::="${returnString}"</fl:let>
-																			
-											<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
-											<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
-												<param name="analyze" value="${myAnalyze}"/>
-												<param name="leftPart" value="${myLeftPart}"/>
-												<param name="rightPart" value="${myRightPart}"/>												
-											</antcallback>
-											<fl:let>myReturnControl::="${returnControl}"</fl:let>											
-											<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
-											<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
-											<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
-											<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
-											<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
-											<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
-											<arrayCopyJsZZZ arrayinput="${returnDesta.filename}" arrayreturn="myDesta.filename" sflagcontrol="" />
-											
+	<!-- Schreibe das in eine Flaka - Variable -->		
+	<fl:let>myLeftPart::=split('${myLineTrimmed}','=')[0]</fl:let>
+	<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
+	<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
+	<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
 																	
-											<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
-											<ac:if>
-												<equals arg1="${returnControl}" arg2="true"/>
-												<ac:then>
-													<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
-													<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
-													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
-		
-													<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
-													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
-		
-													<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
-													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
-											
-													<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
-													<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
-												</ac:then>
-												<ac:else>
-													<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
-												</ac:else>
-											</ac:if>
-										</ac:else>
-									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
-								</ac:else>
-							</ac:if><!-- end if <ac:equals arg1="${line.length}" arg2="0" /> -->
-						</sequential>
-					</for><!-- end for param="line"> -->		
+	<!-- TODO: Idee: in der Initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
+	<fl:when test="null('${myRightPart}')">
+		<echo>Rechter Teil der Steuerungsanweisung existiert nicht (nach...): ${myLineTrimmed}</echo>
+		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+										
+		<!-- Merke: Das wäre beim Kopieren einer Datei an einen feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+		<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+		<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
+	</fl:when>
+	<fl:when test="null('${myLeftPart}')">
+		<echo>Linker Teil der Steuerungsanweisung existiert nicht (von...): ${myLineTrimmed}</echo>
+		<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+																						
+		<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
+		<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
+		<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
+		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
+	</fl:when>
 					
-					<fl:let>myReturnControl ::= true</fl:let>
-					<fl:let>myReturnString ::= "alles ok"</fl:let>																					
-				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
-				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-					<fl:let>myReturnControl ::= false</fl:let>
-					<fl:let>myReturnString ::= "Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"</fl:let>
-				</otherwise>
-			</fl:choose>
-			
-			<!-- Rueckgabebwerte -->
-			<ac:var name="returnControl" value="${myReturnControl}" />
-			<ac:var name="returnString" value="${myReturnString}" />
-			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-			<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-			<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
+	<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
+			Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
+			<!--<path id="pathTempLeft">
+					<pathelement location="${myLeftPart}"/>
+					</path>
+					<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
+					</pathconvert>
+					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
+							
+					<path id="pathTempRight">
+					<pathelement location="${myRightPart}"/>
+					</path>
+					<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
+					</pathconvert>
+					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
+						
+						
+	<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
+	<fl:let>myCase ::= "undefined"</fl:let>																										
+	<antcallback target="-FGLCopyLocal_Analyze" return="returnAnalyse, returnString">
+		<param name="leftPart" value="${myLeftPart}"/>
+		<param name="rightPart" value="${myRightPart}"/>
+	</antcallback>
+								
+	<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
+	<fl:let>myAnalyze::="${returnString}"</fl:let>
+																
+	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
+	<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
+		<param name="analyze" value="${myAnalyze}"/>
+		<param name="leftPart" value="${myLeftPart}"/>
+		<param name="rightPart" value="${myRightPart}"/>												
+	</antcallback>
+	<fl:let>myReturnControl::="${returnControl}"</fl:let>											
+	<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
+	<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
+	<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
+	<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
+	<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
+	<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
+	<arrayCopyJsZZZ arrayinput="${returnDesta.filename}" arrayreturn="myDesta.filename" sflagcontrol="" />
+								
+															
+	<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
+	<ac:if>
+		<equals arg1="${returnControl}" arg2="true"/>
+		<ac:then>
+			<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
+			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
+			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
+
+			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
+			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
+
+			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
+			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
+								
+			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
+			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
+		</ac:then>
+		<ac:else>
+				<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
+		</ac:else>
+	</ac:if>	
+	
+	<!-- Rueckgabebwerte -->
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnString" value="${myReturnString}" />
+	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="return.srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="return.destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="return.destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	
+	
 </target>
 
 <!-- ######################################################################### -->
 <target name="-FGLCopyLocal_Main"><!-- Parameter controlString: append_hostname, .... -->
-	<fl:let>myControlString::=${constrolString}</fl:let> 					
+	<fl:let>myControlString::='${controlString}'</fl:let> 					
 	<arrayElementCountJsZZZ arrayinput="${myDestaTotal.filename}" ireturn="iSize.SrcaTotal.filename"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-	<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
+	<!--<echo>Anzahl der Dateien: ${iSize.SrcaTotal.filename}</echo>
+	<echo>ControlString: ${myControlString}</echo>-->
 	<ac:if>
 		<equals arg1="0" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
 		<ac:then>							
-			<fl:let>myReturnString ::= "Keine Dateien im Array => keine Verarbeitung"</fl:let>
+			<fl:let>myReturnString::="Keine Dateien im Array => keine Verarbeitung"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 		<ac:else>	
@@ -2350,15 +2172,17 @@
 					dies passiert hier durch flaka´s install-property handler task -->
 			<fl:install-property-handler />
 			<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-            <ac:if>
-				<equals arg1="'append_hostname'" arg2="'${myControlString}"/><!-- der Hostname wird im Fall des 'vmd://' Schemas angehängt -->
-				<ac:then>				
+            <ac:if>			
+				<equals arg1="'append_hostname'" arg2="'${myControlString}'"/><!-- der Hostname wird im Fall des 'vmd://' Schemas angehängt -->
+				<ac:then>						
+					<!--<fl:echo>Erweitere den Dateinamen um HOSTSUFFIX</fl:echo>-->
 					<fl:let>sHostSuffix ::= "_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: COMPUTERNAME kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 			
 				</ac:then>
 				<ac:else>
 					<fl:let>sHostSuffix ::= ".txt"</fl:let>
 				</ac:else>
 			</ac:if>
+			
 		
 			<!-- Hänge an alle Einträge des arrays den _HOSTNAME + Endung String an -->
 			<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
