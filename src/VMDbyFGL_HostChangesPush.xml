@@ -830,6 +830,52 @@
 		 ]]>
 	</scriptdef>
 	
+	<!-- ########################### -->
+	 <scriptdef name="stringContainsStringZZZ" language="javascript">
+	 <!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
+	 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="text" />
+		<attribute name="matchstring" />
+		<attribute name="returnboolean" />     
+		 <![CDATA[
+		   var text = attributes.get("text");
+		   var match = attributes.get("matchstring");
+		   
+		   var bReturn = text.indexOf(match)> -1;
+		   
+		   project.setProperty(attributes.get("returnboolean"), bReturn);
+		 ]]>
+	  </scriptdef>
+  
+	 <!-- ########################### -->
+	 <scriptdef name="stringCountStringZZZ" language="javascript">
+	 <!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
+	 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="text" />
+		<attribute name="matchstring" />
+		<attribute name="returninteger" />     
+		 <![CDATA[
+		   var text = attributes.get("text");
+		   var match = attributes.get("matchstring");
+			   
+		   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.   
+		   String.prototype.count = function(lit, cis) {
+			//lit is the string to search for ( such as 'ex' ), and 
+			//cis is case-insensitivity, defaulted to false, it will allow for choice of case insensitive matches.
+			var m = this.toString().match(new RegExp(lit, ((cis) ? "gi" : "g")));
+			return (m != null) ? m.length : 0;
+		  }
+		  
+		   var iReturn = text.count(match, false);	   
+		   
+		   project.setProperty(attributes.get("returninteger"), iReturn);
+		 ]]>
+	  </scriptdef>
+	
 	<!-- ########################################################### -->
 	 <scriptdef name="stringLeftStringZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
