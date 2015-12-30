@@ -2142,17 +2142,7 @@
 	<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
 	<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
 	<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
-																	
-	<fl:when test="null('${myRightPart}')">
-		<echo>Rechter Teil der Steuerungsanweisung existiert nicht (Dateinamen...): ${myLineTrimmed}</echo>
-		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/>
-										
-		<fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-		<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo>
-	</fl:when>
-	
-	
+		
 	<fl:when test="null('${myLeftPart}')">
 		<echo>Linker Teil der Steuerungsanweisung existiert nicht (Verzeichnis oder Dateinamen): ${myLineTrimmed}</echo>
 		<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
@@ -2162,48 +2152,93 @@
 		<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
 		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 	</fl:when>
-					
-	<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
-	<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
-			Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
-			<!--<path id="pathTempLeft">
-					<pathelement location="${myLeftPart}"/>
-					</path>
-					<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
-					</pathconvert>
-					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
-							
-					<path id="pathTempRight">
-					<pathelement location="${myRightPart}"/>
-					</path>
-					<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
-					</pathconvert>
-					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
-						
-						
-	<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
-	<fl:let>myCase ::= "undefined"</fl:let>																										
-	<antcallback target="-FGLDelLocal_Analyze" return="returnAnalyse, returnString">
-		<param name="leftPart" value="${myLeftPart}"/>
-		<param name="rightPart" value="${myRightPart}"/>
-	</antcallback>
-								
-	<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
-	<fl:let>myAnalyze::="${returnString}"</fl:let>
-																
-	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
-	<antcallback target="-FGLDelLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename">
-		<param name="analyze" value="${myAnalyze}"/>
-		<param name="leftPart" value="${myLeftPart}"/>
-		<param name="rightPart" value="${myRightPart}"/>												
-	</antcallback>
-	<fl:let>myReturnControl::="${returnControl}"</fl:let>											
-	<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
-	<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
-	<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
-	<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
-	<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
-																							
+	
+	
+	<fl:when test="null('${myRightPart}')">
+		<echo>Rechter Teil der Steuerungsanweisung existiert nicht (Dateinamen...): ${myLineTrimmed}</echo>
+		<!--<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/>-->
+										
+		<fl:echo>Starte FglDelLocal_FileSingle</fl:echo>
+		<antcallback target="-FglDelLocal_DelFileSingle" return="returnControl, returnString">
+			<param name="fileSingle" value="${myLeftPart}"/>													
+		</antcallback>
+	</fl:when>
+	
+		
+	<!-- TODO noch kaputt -->
+	<ac:if>
+      <ac:available arg1="${myRightPart}" />        
+	  <ac:then>
+		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (NULLwert): TESTSTOPP"/>
+	   </ac:then>
+	 </ac:if>
+	 
+	 
+	<ac:if>
+      <equals arg1="null('${myRightPart}')" arg2="true"/>        
+	  <ac:then>
+		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (NULLwert): TESTSTOPP"/>
+	   </ac:then>
+	</ac:if>
+	 
+	 
+	 <ac:if>
+      <equals arg1="'${myRightPart}'" arg2="''"/>        
+	  <ac:then>
+		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (Leerwert): TESTSTOPP"/>
+	   </ac:then>
+	 </ac:if>
+	 
+	 <ac:if>
+      <isset property="${myRightPart}" />        
+	  <ac:then>
+		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (isset): TESTSTOPP"/>
+	   </ac:then>
+	 </ac:if>
+	 
+	 	<!-- TODO noch kaputt -->
+	 <ac:if>
+        <and>
+			<not>		
+				<equals arg1="${myRightPart}" arg2=""/>
+			 </not>
+            <not>
+                <!--<isset property="${myRightPart}"/>-->
+				<equals arg1="null(${myRightPart})" arg2="true"/>
+            </not>
+		</and>
+	   <ac:then>
+			<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
+			<fl:let>myCase ::= "undefined"</fl:let>																										
+			<antcallback target="-FGLDelLocal_Analyze" return="returnAnalyse, returnString">
+				<param name="leftPart" value="${myLeftPart}"/>
+				<param name="rightPart" value="${myRightPart}"/>
+			</antcallback>
+										
+			<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
+			<fl:let>myAnalyze::="${returnString}"</fl:let>
+																		
+			<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
+			<antcallback target="-FGLDelLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename">
+				<param name="analyze" value="${myAnalyze}"/>
+				<param name="leftPart" value="${myLeftPart}"/>
+				<param name="rightPart" value="${myRightPart}"/>												
+			</antcallback>
+			<fl:let>myReturnControl::="${returnControl}"</fl:let>											
+			<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
+			<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
+			<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
+			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
+		</ac:then>
+		<ac:else>
+			<fl:echo>Keine weitere Verarbeitung, weil der rechte Teil nicht existiert</fl:echo>	 
+			<fl:let>returnControl::=false</fl:let>
+		</ac:else>
+   </ac:if>			
+
+
+			
 	<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
 	<ac:if>
 		<equals arg1="${returnControl}" arg2="true"/>
@@ -2218,8 +2253,7 @@
 		<ac:else>
 				<fl:echo>Ergebnis von -FGLDelLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
 		</ac:else>
-	</ac:if>	
-	
+	</ac:if>		
 	<!-- ... Ende -->
 	
 	<!-- Rueckgabebwerte -->
@@ -3251,9 +3285,58 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<arrayCopyJsZZZ arrayinput="${myAFiledir}" arrayreturn="returna.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
+<!-- ## Loeschtargets ########################################################## -->
+<target name="-FglDelLocal_DelFileSingle"> 
+	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
+	
+	<!-- Uebernahme von Einzelwerten -->
+	<fl:let>myFile ::= "${fileSingle}"</fl:let>
+	
+	<!-- Uebernahme von Array Werten -->
+	<!--<arrayCopyJsZZZ arrayinput="${srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />-->
+		
+																	
+	<!-- TODO: Idee: in der Initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->
+	<fl:when test="null('${myFile}')">
+		<echo>Uebergabeparemeter ist Null (myFile)</echo>
+		<fl:fail message="Uebergabeparemeter ist Null (myFile)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+	</fl:when>
+	<fl:when test="'${myLeftPart}'==''">
+		<echo>Uebergabeparameter ist Leerwert (myFile)</echo>
+		<fl:fail message="Uebergabeparameter ist Leerwert (myFile)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+	</fl:when>
+	
+	<fl:echo>Uebergabeparemeter ist (myFile) = ${myFile}</fl:echo>
+					
+	<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
+	<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
+			Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
+			<!--<path id="pathTempLeft">
+					<pathelement location="${myLeftPart}"/>
+					</path>
+					<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
+					</pathconvert>
+					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
+							
+					<path id="pathTempRight">
+					<pathelement location="${myRightPart}"/>
+					</path>
+					<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
+					</pathconvert>
+					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
+						
+						
+	<!-- ### TODO GOON: Hole aus dem String den Verzeichnisnamen und den Dateinamen -->
+	
+	<!-- ############### -->
+	<!-- Rueckgabebwerte -->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnString" value="alles o.k." />
+	<!--<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->	
+</target>
+
 
 <!-- ### HILFSTARGETS ########################################################## -->
-
 <!-- ######## Targets ############################################################################--> 	
 <target name="-computeFilenameVMD">
 		<!-- Ermittle den Dateinamen für VMD-Datei, unabhaengig davon ob auf Client oder Hostmaschine. -->
