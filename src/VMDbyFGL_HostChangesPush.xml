@@ -2153,7 +2153,7 @@
 		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 	</fl:when>
 	
-	
+		<!-- TODO noch kaputt -->
 	<fl:when test="null('${myRightPart}')">
 		<echo>Rechter Teil der Steuerungsanweisung existiert nicht (Dateinamen...): ${myLineTrimmed}</echo>
 		<!--<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/>-->
@@ -2166,37 +2166,19 @@
 	
 		
 	<!-- TODO noch kaputt -->
+	<isSetZZZ valueinput="${myRightPart}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<ac:if>
-      <ac:available arg1="${myRightPart}" />        
-	  <ac:then>
-		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (NULLwert): TESTSTOPP"/>
-	   </ac:then>
+	 <equals arg1="${myBooleanValue}" arg2="true" />     
+      <ac:then>
+		<echo>myRightPart ist gesetzt = '${myRightPart}'</echo>
+	  </ac:then>
+	  <ac:else>
+		<echo>myRightPart ist nicht gesetzt</echo>
+	  </ac:else>
 	 </ac:if>
 	 
-	 
-	<ac:if>
-      <equals arg1="null('${myRightPart}')" arg2="true"/>        
-	  <ac:then>
-		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (NULLwert): TESTSTOPP"/>
-	   </ac:then>
-	</ac:if>
-	 
-	 
-	 <ac:if>
-      <equals arg1="'${myRightPart}'" arg2="''"/>        
-	  <ac:then>
-		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (Leerwert): TESTSTOPP"/>
-	   </ac:then>
-	 </ac:if>
-	 
-	 <ac:if>
-      <isset property="${myRightPart}" />        
-	  <ac:then>
-		<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht (isset): TESTSTOPP"/>
-	   </ac:then>
-	 </ac:if>
-	 
-	 	<!-- TODO noch kaputt -->
+	 <!-- TODO noch kaputt -->
 	 <ac:if>
         <and>
 			<not>		

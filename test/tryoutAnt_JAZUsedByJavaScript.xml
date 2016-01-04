@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>  
-<project name="tryoutAnt_JAZUsedByJavaScript"  default="compile" basedir="..">
+<project name="tryoutAnt_JAZUsedByJavaScript"  default="compile" basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka">
 
 	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
 	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
@@ -116,7 +118,19 @@
 		<property name="fs.includes" value="**/*.txt"/>
 		<property name="fs.excludes" value="**/*.tmp"/>
 
-		
+		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
+		<ac:if>
+		<not>
+			<available classname="basic.zBasic.util.datatype.string.StringZZZ" />        
+		</not>
+	  <ac:then>
+		<fl:fail message="StringZZZ existiert nicht."/>
+	   </ac:then>
+	   <ac:else>
+	   <echo message="StringZZZ vorhanden." />
+	   </ac:else>
+	 </ac:if>
+	 
 		<!-- Hier wird die scriptdef Methode tryout_java_file_length aufgerufen -->
 		<tryout_jaz_string_camelcase filename_search="Das_ist_ein_camelcase_test" filenames="myfilenames" filelengths="myfilelengths" tryout="mytryout_string"/>
 		<echo message="mytryout_string = ${mytryout_string}" />
