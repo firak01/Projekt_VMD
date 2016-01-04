@@ -2055,13 +2055,13 @@
 				<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 			
 				<!-- Hier in einem antcallback alles aufrufen, was in der Schleife auch passiert -->
-				<antcallback target="-FglDelController_LineController" return="returnString, returnControl,return.srcaTotal.filedir,return.srcaTotal.filename">
+				<antcallback target="-FglDelController_LineController" return="returnString, returnControl,return.saTotal.filedir,return.saTotal.filename">
 					<param name="lineCurrent" value="${myLineTrimmed}"/>
-					<param name="srcaTotal.filedir" value="${mySrcaTotal.filedir}" />
-					<param name="srcaTotal.filename" value="${mySrcaTotal.filename}" />					
+					<param name="saTotal.filedir" value="${mysaTotal.filedir}" />
+					<param name="saTotal.filename" value="${mysaTotal.filename}" />					
 				</antcallback>
-				<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-				<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filename}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->			
+				<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+				<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->			
 			</ac:then><!-- iubound = 0 Fall -->
 			<ac:else><!-- iubound > 0 Fall -->	
 				<ac:for param="icounter" end="${iubound}">			
@@ -2071,13 +2071,13 @@
 					<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 				
 					<!-- Hier die hier in ein antcallback auslagern und für jede Zeile aufrufen. -->
-					<antcallback target="-FglVmdController_LineController" return="returnString, returnControl,return.srcaTotal.filedir,return.srcaTotal.filename">
+					<antcallback target="-FglDelController_LineController" return="returnString, returnControl,return.saTotal.filedir,return.saTotal.filename">
 						<param name="lineCurrent" value="${myLineTrimmed}"/>
-						<param name="srcaTotal.filedir" value="${mySrcaTotal.filedir}" />
-						<param name="srcaTotal.filename" value="${mySrcaTotal.filename}" />						
+						<param name="saTotal.filedir" value="${mysaTotal.filedir}" />
+						<param name="saTotal.filename" value="${mysaTotal.filename}" />						
 					</antcallback>
-					<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-					<arrayCopyJsZZZ arrayinput="${return.srcaTotal.filename}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->					
+					<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+					<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->					
 					</sequential>
 				</ac:for>
 			</ac:else><!-- iubound > 0 Fall -->
@@ -2130,13 +2130,8 @@
 									
 			   
 	
-	<!-- TODO GOON, noch kaputt: Folgende Zeilen, dann im AntCallback verwenden -->
 	<!-- Start ... -->
-	<!-- TODO: Pruefe, ob in der Zeile ein Gleichheitszeichen ist -->
-			   
-	<!-- ein rechter Teil ist nicht zwingend notwendig für DEL -->
-
-	<!-- Falls ein Gleichheitszeichen vorhanden ist, dann aber analysieren -->
+	<!-- Pruefe, ob in der Zeile ein Gleichheitszeichen ist. Dies steuert auf oberster Ebenen den zu behandelnden Fall -->				
 	<!-- Schreibe das in eine Flaka Variable -->			
 	<fl:let>myLeftPart::=split('${myLineTrimmed}','=')[0]</fl:let>
 	<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
@@ -2153,87 +2148,52 @@
 		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 	</fl:when>
 	
-		<!-- TODO noch kaputt -->
-	<fl:when test="null('${myRightPart}')">
-		<echo>Rechter Teil der Steuerungsanweisung existiert nicht (Dateinamen...): ${myLineTrimmed}</echo>
-		<!--<fl:fail message="Rechter Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/>-->
-										
-		<fl:echo>Starte FglDelLocal_FileSingle</fl:echo>
-		<antcallback target="-FglDelLocal_DelFileSingle" return="returnControl, returnString">
-			<param name="fileSingle" value="${myLeftPart}"/>													
-		</antcallback>
-	</fl:when>
-	
-		
 	<!-- TODO noch kaputt -->
+	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->
 	<isSetZZZ valueinput="${myRightPart}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<ac:if>
 	 <equals arg1="${myBooleanValue}" arg2="true" />     
       <ac:then>
 		<echo>myRightPart ist gesetzt = '${myRightPart}'</echo>
+							
+		<antcallback target="-FGLDelLocal_AnalyseMatrix" return="returnControl, returna.filedir, returna.filename">
+			<param name="analyze" value="${myAnalyze}"/>
+			<param name="leftPart" value="${myLeftPart}"/>
+			<param name="rightPart" value="${myRightPart}"/>												
+		</antcallback>
+		<fl:let>myReturnControl::="${returnControl}"</fl:let>											
+		<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
+		<fl:echo>returna.filedir=${returna.filedir}</fl:echo>
+		<fl:echo>returna.filename=${returna.filename}</fl:echo>
+		<arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="mya.filedir" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mya.filename" sflagcontrol="" />
+
 	  </ac:then>
 	  <ac:else>
-		<echo>myRightPart ist nicht gesetzt</echo>
+		<echo>Nur linker Teil der Steuerungsanweisung existiert (Dateinamen...): ${myLineTrimmed}</echo>
+										
+		<fl:echo>Starte FglDelLocal_AnalyseSingle</fl:echo>
+		<antcallback target="-FglDelLocal_AnalyseSingle" return="returnControl, returnString, returna.filedir, returna.filename">
+			<param name="singlePart" value="${myLeftPart}"/>													
+		</antcallback>
 	  </ac:else>
 	 </ac:if>
 	 
-	 <!-- TODO noch kaputt -->
-	 <ac:if>
-        <and>
-			<not>		
-				<equals arg1="${myRightPart}" arg2=""/>
-			 </not>
-            <not>
-                <!--<isset property="${myRightPart}"/>-->
-				<equals arg1="null(${myRightPart})" arg2="true"/>
-            </not>
-		</and>
-	   <ac:then>
-			<!-- ### Ermittle hier den Fall. Schreibe den Wert in diese Variable und fülle damit ein Array -->
-			<fl:let>myCase ::= "undefined"</fl:let>																										
-			<antcallback target="-FGLDelLocal_Analyze" return="returnAnalyse, returnString">
-				<param name="leftPart" value="${myLeftPart}"/>
-				<param name="rightPart" value="${myRightPart}"/>
-			</antcallback>
-										
-			<fl:echo>Ergebnis der Analyse: ${returnString}</fl:echo>
-			<fl:let>myAnalyze::="${returnString}"</fl:let>
-																		
-			<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
-			<antcallback target="-FGLDelLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename">
-				<param name="analyze" value="${myAnalyze}"/>
-				<param name="leftPart" value="${myLeftPart}"/>
-				<param name="rightPart" value="${myRightPart}"/>												
-			</antcallback>
-			<fl:let>myReturnControl::="${returnControl}"</fl:let>											
-			<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
-			<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
-			<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
-			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
-		</ac:then>
-		<ac:else>
-			<fl:echo>Keine weitere Verarbeitung, weil der rechte Teil nicht existiert</fl:echo>	 
-			<fl:let>returnControl::=false</fl:let>
-		</ac:else>
-   </ac:if>			
-
-
-			
+	
 	<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
 	<ac:if>
 		<equals arg1="${returnControl}" arg2="true"/>
 		<ac:then>
-			<fl:echo>Ergebnis von -FGLDelLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
-			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
-			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
+			<fl:echo>Ergebnis von -FglDelController_LineController: ${returnControl}, haenge Array an.</fl:echo>
+			<arrayAppendArrayJsZZZ arrayinput="${myaTotal.filedir}" array2append="${mya.filedir}" arrayReturn="myArrayTotal"/>
+			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myaTotal.filedir" sflagcontrol="" />
 
-			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
-			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
+			<arrayAppendArrayJsZZZ arrayinput="${myaTotal.filename}" array2append="${mya.filename}" arrayReturn="myArrayTotal"/>
+			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myaTotal.filename" sflagcontrol="" />
 		</ac:then>
 		<ac:else>
-				<fl:echo>Ergebnis von -FGLDelLocal_Control: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
+				<fl:echo>Ergebnis von -FglDelController_LineController: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
 		</ac:else>
 	</ac:if>		
 	<!-- ... Ende -->
@@ -2241,8 +2201,8 @@
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
 	<ac:var name="returnString" value="${myReturnString}" />
-	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="return.srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->		
+	<arrayCopyJsZZZ arrayinput="${myaTotal.filedir}" arrayreturn="return.saTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${myaTotal.filename}" arrayreturn="return.saTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->		
 </target>
 
 <!-- ######################################################################### -->
@@ -3265,6 +3225,56 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="true" />	
 	<arrayCopyJsZZZ arrayinput="${myAFiledir}" arrayreturn="returna.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
+<!-- ## Loeschanalyse/control Targets ########################################## -->
+<target name="-FglDelLocal_AnalyseSingle">
+	<fl:let>mySinglePart ::= "${singlePart}"</fl:let>
+	
+	<!-- Bereite die Rueckgabewerte vor -->
+	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filename"/>
+	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filedir"/>
+	
+	
+	<!-- TODO GOON: Teile die Werte mit Kommata auf -->
+	
+	<!-- TODO GOON: Übernimm nur die Dateien, die existieren, alles andere macht beim Loeschen keinen Sinn -->
+	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
+		<fl:when test=" '${mySinglePart}'.tofile.exists == true ">
+			<echo>Datei/Verzeichnis existiert: ${mySinglePart}</echo>
+																									
+			<!-- Prüfe, ob es ein Verzeichnis ist -->
+			<isDirectoryZZZ text="${mySinglePart}" property="myisdirectoryPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
+			<echo>Teil: isdirectory=${myisdirectoryPart}</echo>
+														
+			<fl:when test="${myisdirectoryPart} == true">
+					<!-- A) Teil - Verzeichnis-Fall: -->
+					<echo>Teil: ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.</echo>
+					<arrayAppendJsZZZ arrayinput="${mysa.filedir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
+					<arrayAppendJsZZZ arrayinput="${mysa.filename}" valueinput="*.*" arrayreturn="mysaTotal.filename" sflagcontrol="" />			
+					
+			</fl:when>
+			<fl:when test="${myisdirectoryPart} != true">			
+					<!-- B) Linker Teil - Dateipfad-Fall:-->
+					<echo>Teil: ist KEIN Verzeichnis</echo>
+					
+					<!-- TODO GOON: Ermittle aus dem Pfad den Verzeichnis und den Dateiteil -->
+					<arrayAppendJsZZZ arrayinput="${mysa.filedir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
+					<arrayAppendJsZZZ arrayinput="${mysa.filename}" valueinput="*.*" arrayreturn="mysaTotal.filename" sflagcontrol="" />
+					
+			</fl:when>
+		</fl:when>
+		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+			<echo>Datei/Verzeichnis existiert NICHT (damit nicht relevant fuer Loeschung): ${myPart}</echo>										  
+		</otherwise>
+	</fl:choose>
+	
+	
+	<!-- Rueckgabebwerte -->
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnString" value="${myReturnString}" />	
+	<arrayCopyJsZZZ arrayinput="${mysa.filedir}" arrayreturn="returna.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->				
+	<arrayCopyJsZZZ arrayinput="${mysa.filename}" arrayreturn="returna.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->				
 </target>
 
 <!-- ## Loeschtargets ########################################################## -->
