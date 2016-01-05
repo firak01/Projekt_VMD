@@ -592,6 +592,78 @@
 		]]>
 	</scriptdef>
 	
+	<!-- ############################################################-->	
+	<scriptdef name="getFilenameFromPathJsZZZ" language="javascript">
+		 <attribute name="pathstring" />
+		 <attribute name="returnfilename" />
+		 <attribute name="returncontrol" />
+		 <attribute name="returnacontrolstring" />
+		 <attribute name="sflagcontrol" />
+		 <![CDATA[
+		   //Hole aus dem angegebenen Dateipfad den Dateinamen
+		   var sPath = attributes.get("pathstring");
+		   
+		   var berg=false;
+		   var myArrayErg = new Array();
+		   var myFlagControl = attributes.get("sflagcontrol");
+		   
+		   print("Starte getFilenameFromPathZZZ '" + sPath + "'");
+
+		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
+		   //      Dies ggfs. in JSZ-Kernel uebernehmen
+		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
+		   
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   enableJava();
+		   importPackage(Packages.basic.zBasic.util.file);
+		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   //var sFilename = FileEasyZZZ.getNameOnly(sPath);
+		   //print("Per JAZ-Kernel ermittelter Dateiname (aus '" + sPath + "'): '" + sFilename +"'");
+		   
+		   var objFile = FileEasyZZZ.getFile(sPath);
+		   //var sDirectoryName = objFile.getParent(); //Holt aus dem Dateinamen den Verzeichnisnamen.
+		   var sFilename = objFile.getName(); //Holt aus dem Pfad den reinen Dateinamen.
+		   
+		   //Hier Rueckgabewert anhand gelungener Dateinamensermittlung
+		   if(sFilename!=""){		   
+			berg =true;
+			myArrayErg[0]="alles o.k.";
+		   }else{
+			berg = false;
+			myArrayErg[0]="alles o.k.";
+		   }
+		   
+		  
+		   project.setProperty(attributes.get("returnfilename"), sFilename);	
+		   project.setProperty(attributes.get("returncontrol"), berg);	
+		   	project.setProperty(attributes.get("returnacontrolstring"), myArrayErg);
+
+		   function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}		   
+		 ]]>
+	</scriptdef>
+	
+	
  	<!-- ############################################################ -->		
 	<scriptdef name="isBooleanZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
@@ -3258,9 +3330,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 					<!-- B) Linker Teil - Dateipfad-Fall:-->
 					<echo>Teil: ist KEIN Verzeichnis</echo>
 					
-					<!-- TODO GOON: Ermittle aus dem Pfad den Verzeichnis und den Dateiteil -->
-					<arrayAppendJsZZZ arrayinput="${mysa.filedir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
-					<arrayAppendJsZZZ arrayinput="${mysa.filename}" valueinput="*.*" arrayreturn="mysaTotal.filename" sflagcontrol="" />
+					<!-- TODO GOON noch kaputt: Ermittle aus dem Pfad den Verzeichnis und den Dateiteil -->
+					<getFilenameFromPathJsZZZ pathstring="${mySinglePart}" returnfilename="myFilename" returncontrol="myReturnControl" returnacontrolstring="myaReturnControl" sflagcontrol="" />
+					<echo>Der Dateiname ist: '${myFilename}'</echo>
+					
+					<stringLeftBackStringZZZ text="${mySinglePart}" matchstring="${myFilename}" returnstring="myDirectoryPath" />
+					<echo>Der Pfad ist: '${myDirectoryPath}'</echo>
+					
+					<arrayAppendJsZZZ arrayinput="${mysa.filedir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
+					<arrayAppendJsZZZ arrayinput="${mysa.filename}" valueinput="${myFilename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
 					
 			</fl:when>
 		</fl:when>
