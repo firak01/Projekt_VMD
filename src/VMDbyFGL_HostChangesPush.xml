@@ -1010,21 +1010,23 @@
 		<attribute name="returnstring" />     
 		 <![CDATA[
 		   var text = attributes.get("text");
+		   //print("entgegengenommenes Attribut text="+text);
 		   var match = attributes.get("matchstring");
+		   //print("entgegengenommenes Attribut matchstring="+match);
 		   
 		    //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
 			var matchToEncode=match;
-			var matchEncoded = encodeMyHtml(matchToEncode);
+			var matchEncoded =encodeMyHtml(matchToEncode);
 			//print("encoded matchstring=" + matchEncoded);
 		   		    
-			var textToEncode=match;
-			var textEncoded = encodeMyHtml(textToEncode);
-			//print("encoded matchstring=" + textEncoded);
+			var textToEncode=text;
+			var textEncoded=encodeMyHtml(textToEncode);
+			//print("encoded textstring=" + textEncoded);
 		   
 		   sReturn = getStrRightStr(textEncoded, matchEncoded);
-		   print("sReturn="+sReturn);
+		   //print("sReturn="+sReturn);
 		   sReturn = unescape(sReturn);
-			print("sReturn unescaped="+sReturn);
+		   //print("sReturn unescaped="+sReturn);
 	   
 		   project.setProperty(attributes.get("returnstring"), sReturn);
 		   
@@ -1837,10 +1839,10 @@
 										<ac:else>
 											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>																																																							
 											<!-- <fl:echo>1. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo> -->
-											<antcallback target="-FglSchemaController_Analyzer" return="returnString, returnControl,returnString.Schema,returnControl.Schema,linea.Schema">
+											<antcallback target="-FglSchemaController_Analyzer" return="returnString, returnControl,returnString.Schema,returnControl.SchemaChanged,linea.UnSchema">
 												<param name="lineCurrent" value="${myLineTrimmed}" />
 												<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/>
-												<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+												<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 											</antcallback>
 																																
 											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf: Fülle linea.Schema als Kopie von lineaCurrent.Schema -->
@@ -1853,7 +1855,7 @@
 												<fl:echo>2e. returnControl.Schema: '${returnControl.Schema}</fl:echo> -->
 											
 											<!-- Falls der Controller meint returnControl.Schema==true, dann hat das Schema gewechselt und damit müssen diese Anweisungen ausgeführt werden. -->																						
-												<isBooleanZZZ valueinput="${returnControl.Schema}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+												<isBooleanZZZ valueinput="${returnControl.SchemaChanged}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
 												<ac:if>
 												  <equals arg1="${myBooleanValue}" arg2="true" />
 												  <ac:then>		
@@ -1863,7 +1865,7 @@
 													<fl:echo>AUFRUF DES SCHEMA-CONTROLLERS BEI SCHEMA-WECHSEL</fl:echo>
 													<antcallback target="-FglSchemaController_Controller" return="returnString, returnControl">
 														<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
-														<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+														<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 													</antcallback>																										
 												  </ac:then>
 												  <ac:else>
@@ -1873,7 +1875,7 @@
 																								
 												<fl:let>myStringCurrent.Schema::='${returnString.Schema}'</fl:let><!-- uebernimm das zurueckgebene Schema als neues Schema -->												
 												<!-- <echo>myStringCurrent.Schema = '${myStringCurrent.Schema}'</echo> -->													 
-												<arrayCopyJsZZZ arrayinput="${linea.Schema}" arrayreturn="myLineaCurrent.Schema" sflagcontrol="" /><!-- uebernimm das Zeilenarray, ggfs. als neues Schema -->												
+												<arrayCopyJsZZZ arrayinput="${linea.UnSchema}" arrayreturn="myLineaCurrent.UnSchema" sflagcontrol="" /><!-- uebernimm das Zeilenarray, ggfs. als neues Schema -->												
 										</ac:else>	
 									</ac:if><!-- end if <ac:equals arg1="${subtext}" arg2="#" /> -->
 								</ac:else>
@@ -1881,13 +1883,13 @@
 						</sequential>
 					</for><!-- end for param="line"> -->	
 
-					<!-- Wenn keine Zeilen mehr zu verarbeiten sind, das letzte Array, des letzen Schemas noch abarbeiten, durch den passenden Funktionsaufruf -->			
+					<!-- Wenn keine Zeilen mehr zu verarbeiten sind, das letzte Array, des letzen Schemas noch abarbeiten, durch den passenden Funktionsaufruf -->								
+					<!--<fl:echo>AUFRUF DES ABSCHLIESSENDEN SCHEMA-CONTROLLERS</fl:echo>-->
 					<!--<fl:echo>2f. Verabeite das letze Array, fuer das Schema: '${myStringCurrent.Schema}</fl:echo>-->
-					<!--<arrayDebugJsZZZ arrayinput="${myLineaCurrent.Schema}" ilevel="1"/>-->
-					<fl:echo>AUFRUF DES ABSCHLIESSENDEN SCHEMA-CONTROLLERS</fl:echo>
+					<!--<arrayDebugJsZZZ arrayinput="${myLineaCurrent.UnSchema}" ilevel="1"/>-->
 					<antcallback target="-FglSchemaController_Controller" return="returnString, returnControl">
 						<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
-						<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+						<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 					</antcallback>										
 					
 					<!-- TODO: Die Meldungen aus den aufgerufenen Unterfunktionen zurueckgeben und nicht blos hier alles auf supergut setzen. -->
@@ -1910,10 +1912,9 @@
 			<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
-<!-- ######################################################################### -->
 <target name="-FglSchemaController_Analyzer">
 	<fl:let>myLineNextSchema::="${lineCurrent}"</fl:let>
-	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />	
 	<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
 	
 	<!-- Prüfe, ob eine Zeile ueberhaupt korrekt uebergeben wurde -->
@@ -1938,11 +1939,11 @@
 	
 	<!-- Uebernimm den vorherigen Schema-Teil -->
 	<fl:let>myStringCurrent.Schema::=trim('${stringCurrent.Schema}')</fl:let>
-	<echo>myStringCurrent.Schema=${myStringCurrent.Schema}</echo>
+	<!--<echo>myStringCurrent.Schema=${myStringCurrent.Schema}</echo>-->
 	
 	<!-- Ermittle den neuen Schema-Teil, falls leer dann mache copy als Default-Schema -->
 	<!-- Ermittle die Zeile ohne Schema-Anfang.-->
-	<echo>myLineNextSchema="${myLineNextSchema}"</echo>
+	<!--<echo>myLineNextSchema="${myLineNextSchema}"</echo>-->
 	<stringLeftStringZZZ text="${myLineNextSchema}" matchstring="://" returnstring="schemanext" />
 	<fl:let>mySchemaNext::="${schemanext}"</fl:let>
 	<!--<echo>mySchemaNext="${mySchemaNext}"</echo>-->
@@ -1955,10 +1956,9 @@
 				<fl:let>myLineNext::="${myLineNextSchema}"</fl:let>
 			</ac:then>
 			<ac:else>
-				<!-- Ermittle die Zeile ohne Schemateil -->
-				<!-- TODO GOON noch kaputt -->
+				<!-- Ermittle die Zeile ohne Schemateil -->				
 				<stringRightStringZZZ text="${myLineNextSchema}" matchstring="${mySchemaNext}://" returnstring="myLineNext" />
-				<echo>myLineNext="${myLineNext}"</echo>
+				<!--<echo>myLineNext="${myLineNext}"</echo>-->
 			</ac:else>
 	</ac:if>
 	<fl:let>myReturnString.Schema::='${mySchemaNextTrimmed}'</fl:let>
@@ -1985,7 +1985,7 @@
 		<echo>Noch nicht gesetztes altes Schema</echo>
 			
 			<!-- Erzeuge das Array zum ersten mal -->
-			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.Schema"/>
+			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.UnSchema"/>
 			
 			<!-- Ausgabe des neuen Arrays -->	
 			<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
@@ -1996,24 +1996,24 @@
 	<fl:choose>		
 		<fl:when test="'${mySchemaNextTrimmed}'=='${myStringCurrent.Schema}' or ${myBooleanValue}==false"><!-- TODO GOON 20151112: Hier pruefen, ob die Variable initialisiert ist -->
 			<echo>Keine Schemaaenderung</echo>
-			<fl:let>myReturnControl.Schema::=false</fl:let>
+			<fl:let>myReturnControl.SchemaChanged::=false</fl:let>
 										
 			<!-- Hänge an bestehendes Array an -->
-			<arrayAppendJsZZZ arrayinput="${mylineaNext.Schema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
-			<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
+			<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.UnSchema}" ilevel="1"/> -->
 																				
 		</fl:when><!-- '${mySchemaCurrent}'=='${myStringCurrent.Schema}' -->
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->		
 			<echo>Schemaaenderung vorhanden!</echo>
-			<fl:let>myReturnControl.Schema::=true</fl:let>
+			<fl:let>myReturnControl.SchemaChanged::=true</fl:let>
 			
 			<!-- Mache neues Array. Hänge an neues Array an -->			
-			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.Schema"/>
-			<arrayAppendJsZZZ arrayinput="${mylineaNext.Schema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />
+			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.UnSchema"/>
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
 			<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
@@ -2026,9 +2026,9 @@
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
 	<ac:var name="returnString" value="${myReturnString}" />
-	<ac:var name="returnControl.Schema" value="${myReturnControl.Schema}" />
+	<ac:var name="returnControl.SchemaChanged" value="${myReturnControl.SchemaChanged}" />
 	<ac:var name="returnString.Schema" value="${myReturnString.Schema}" />		
-	<arrayCopyJsZZZ arrayinput="${mylineaNext.Schema}" arrayreturn="linea.Schema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${mylineaNext.UnSchema}" arrayreturn="linea.UnSchema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
 <target name="-FglSchemaController_Controller">
@@ -2037,7 +2037,8 @@
 	<!-- TODO umzusetzen: del, zip -->
 
 	<fl:let>myStringCurrentSchema::="${stringCurrent.Schema}"</fl:let>
-	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="myLineaCurrent.Schema" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="myLineaCurrent.UnSchema" sflagcontrol="" />	
+	<!--<arrayDebugJsZZZ arrayinput="${myLineaCurrent.UnSchema}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 	
 	<!-- #### Rufe nun die Funktion auf, die das vorherige Schema verarbeiten soll. #### -->
 	<!-- ###################################################### -->
@@ -2046,7 +2047,7 @@
 		<ac:then>
 			<fl:echo>AUFRUF DES VMD-CONTROLLERS FUER DEN VMD-FALL</fl:echo>
 			<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
-				<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+				<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 			</antcallback>
 			
 			<fl:echo>Ergebnis des VMD Controllers fuer den VMD-Fall: ${returnString}</fl:echo>
@@ -2083,7 +2084,7 @@
 		<ac:then>
 			<fl:echo>AUFRUF DES VMD-CONTROLLERS FUER DEN COPY-FALL</fl:echo>
 			<antcallback target="-FglVmdController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename,destaTotal.filedir,destaTotal.filename">
-				<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+				<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 			</antcallback>
 			
 			<fl:echo>Ergebnis des VMD Controllers fuer den COPY-FALL: ${returnString}</fl:echo>
@@ -2120,7 +2121,7 @@
 		<ac:then>
 			<fl:echo>AUFRUF DES CONTROLLERS FUER DEN DEL-FALL</fl:echo>
 			<antcallback target="-FglDelController_Main" return="returnString, returnControl,srcaTotal.filedir,srcaTotal.filename">
-				<param name="lineaCurrent.Schema" value="${myLineaCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
+				<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 			</antcallback>
 			
 			<fl:echo>Ergebnis des Controllers fuer den DEL-FALL: ${returnString}</fl:echo>
@@ -2159,15 +2160,18 @@
 </target>
 
 <!-- ######################################################################### -->
-<target name="-FglDelController_Main">     
-	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="myLineaNext.Schema" sflagcontrol="" />	
+<!-- ######################################################################### -->
+<target name="-FglDelController_Main">  
+	<!--<arrayDebugJsZZZ arrayinput="${lineaCurrent.Schema}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
+
+	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="myLineaNext.UnSchema" sflagcontrol="" />	
 	<!--<arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 
 	<!-- Arrays für alle Dateien, die es dann später zu loeschen gilt -->
 	<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filename"/>
 	<arrayInitJsZZZ isize="0" arrayreturn="mySrcaTotal.filedir"/>
 				
-	<arrayElementCountJsZZZ arrayinput="${myLineaNext.Schema}" ireturn="myArraySize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<arrayElementCountJsZZZ arrayinput="${myLineaNext.UnSchema}" ireturn="myArraySize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 	<fl:choose>
 	<fl:when  test="${myArraySize}>=1"><!-- Sind Einträge im Array vorhanden. -->
 
@@ -2185,8 +2189,8 @@
 			<equals arg1="0" arg2="${iubound}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
 			<ac:then><!-- iubound = 0 Fall -->			
 				<echo>NUR 1 EINTRAG in diesem Schemalauf</echo> 
-				<arrayGetJsZZZ arrayinput="${myLineaNext.Schema}" index="0" arrayget="myLineTrimmed"/>
-				<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
+				<arrayGetJsZZZ arrayinput="${myLineaNext.UnSchema}" index="0" arrayget="myLineTrimmed"/>
+				<fl:echo>zu verarbeitende Zeile (ohne Schema):'${myLineTrimmed}'</fl:echo>
 			
 				<!-- Hier in einem antcallback alles aufrufen, was in der Schleife auch passiert -->
 				<antcallback target="-FglDelController_LineController" return="returnString, returnControl,return.saTotal.filedir,return.saTotal.filename">
@@ -2201,7 +2205,7 @@
 				<ac:for param="icounter" end="${iubound}">			
 				<sequential>
 					<echo>icounter is @{icounter}</echo> 
-					<arrayGetJsZZZ arrayinput="${myLineaNext.Schema}" index="@{icounter}" arrayget="myLineTrimmed"/>
+					<arrayGetJsZZZ arrayinput="${myLineaNext.UnSchema}" index="@{icounter}" arrayget="myLineTrimmed"/>
 					<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 				
 					<!-- Hier die hier in ein antcallback auslagern und für jede Zeile aufrufen. -->
@@ -2236,7 +2240,7 @@
 
 <target name="-FglDelController_LineController"> 
 	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
-	<fl:let>myLineTrimmed ::= "${lineCurrent}"</fl:let>
+	<fl:let>myLineUnschemed::="${lineCurrent}"</fl:let><!-- darin ist kein Schema mehr enthalten -->
 	<arrayCopyJsZZZ arrayinput="${srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${srcaTotal.filename}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />	
 		
@@ -2267,8 +2271,8 @@
 	<!-- Start ... -->
 	<!-- Pruefe, ob in der Zeile ein Gleichheitszeichen ist. Dies steuert auf oberster Ebenen den zu behandelnden Fall -->				
 	<!-- Schreibe das in eine Flaka Variable -->			
-	<fl:let>myLeftPart::=split('${myLineTrimmed}','=')[0]</fl:let>
-	<fl:let>myRightPart::=split('${myLineTrimmed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
+	<fl:let>myLeftPart::=split('${myLineUnschemed}','=')[0]</fl:let>
+	<fl:let>myRightPart::=split('${myLineUnschemed}','=')[1]</fl:let><!-- beachte hier die einfachen Doppelpunkte bei der unveränderbaren Variablenzuweisung. Erst durch den doppelten Doppelpunkt wird die Variable veränderbar Zuweisung oben UND es gibt kein #{ ... }-->							 
 	<fl:echo>Steuerungszeile linker Teil vom '=' => ${myLeftPart}</fl:echo>
 	<fl:echo>Steuerungszeile rechter Teil vom '=' => ${myRightPart}</fl:echo>
 		
@@ -2281,15 +2285,9 @@
 		<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
 		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 	</fl:when>
-	<stringRightStringZZZ text="${myLeftPart}" matchstring="del://" returnstring="myLeftPartUnschemed" />	
-	<echo>Linker Teil der Steuerungsanweisung ohne Schema= ${myLeftPartUnschemed}</echo>
-	<ac:if>
-	 <equals arg1="${myBooleanValue}" arg2="true" />     
-      <ac:then>
-		<echo>Linker Teil der Steuerungsanweisung ist leer: ${myLeftPart}</echo>
-		<fl:fail message="Linker Teil der Steuerungsanweisung ist leer: ${myLeftPart}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->		
-		</ac:then>
-	</ac:if>
+	
+	<!-- TODO: Pruefen, ob die Zeile mit einem Schema beginnt. Falls ja ==> Fehler werfen. -->
+	
 	<!-- TODO noch kaputt -->
 	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->
 	<isSetZZZ valueinput="${myRightPart}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -2301,7 +2299,7 @@
 
 		<antcallback target="-FGLDelLocal_AnalyseMatrix" return="returnControl, returna.filedir, returna.filename">
 			<param name="analyze" value="${myAnalyze}"/>
-			<param name="leftPart" value="${myLeftPartUnschemed}"/>
+			<param name="leftPart" value="${myLeftPart}"/>
 			<param name="rightPart" value="${myRightPart}"/>												
 		</antcallback>
 		<fl:let>myReturnControl::="${returnControl}"</fl:let>											
@@ -2313,9 +2311,9 @@
 
 	  </ac:then>
 	  <ac:else>
-		<echo>Nur linker Teil der Steuerungsanweisung existiert (Dateinamen...): ${myLineTrimmed}</echo>						
+		<echo>Nur linker Teil der Steuerungsanweisung existiert (Dateinamen... ohne Schema): ${myLineTrimmed}</echo>						
 		<antcallback target="-FglDelLocal_AnalyseSingle" return="returnControl, returnString, returna.filedir, returna.filename">
-			<param name="singlePart" value="${myLeftPartUnschemed}"/>													
+			<param name="singlePart" value="${myLeftPart}"/>													
 		</antcallback>
 	  </ac:else>
 	 </ac:if>
@@ -2347,7 +2345,7 @@
 
 <!-- ######################################################################### -->
 <target name="-FglVmdController_Main">     
-	<arrayCopyJsZZZ arrayinput="${lineaCurrent.Schema}" arrayreturn="mylineaNext.Schema" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />	
 
 	<!-- Arrays für alle Dateien, die es dann später zu kopieren gilt -->
 	<!-- Todo: diese dann auch im Schema "copy" verwenden -->
@@ -2356,7 +2354,7 @@
 	<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filename"/>
 	<arrayInitJsZZZ isize="0" arrayreturn="myDestaTotal.filedir"/>
 			
-	<arrayElementCountJsZZZ arrayinput="${mylineaNext.Schema}" ireturn="myArraySize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<arrayElementCountJsZZZ arrayinput="${mylineaNext.UnSchema}" ireturn="myArraySize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 	<fl:choose>
 	<fl:when  test="${myArraySize}>=1"><!-- Sind Einträge im Array vorhanden. -->
 
@@ -2374,7 +2372,7 @@
 			<equals arg1="0" arg2="${iubound}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
 			<ac:then><!-- iubound = 0 Fall -->			
 				<echo>NUR 1 EINTRAG in diesem Schemalauf</echo> 
-				<arrayGetJsZZZ arrayinput="${lineaCurrent.Schema}" index="0" arrayget="myLineTrimmed"/>
+				<arrayGetJsZZZ arrayinput="${lineaCurrent.UnSchema}" index="0" arrayget="myLineTrimmed"/>
 				<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 			
 				<!-- Hier in einem antcallback alles aufrufen, was in der Schleife auch passiert -->
@@ -2394,7 +2392,7 @@
 				<ac:for param="icounter" end="${iubound}">			
 				<sequential>
 					<echo>icounter is @{icounter}</echo> 
-					<arrayGetJsZZZ arrayinput="${lineaCurrent.Schema}" index="@{icounter}" arrayget="myLineTrimmed"/>
+					<arrayGetJsZZZ arrayinput="${lineaCurrent.UnSchema}" index="@{icounter}" arrayget="myLineTrimmed"/>
 					<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 				
 					<!-- Hier die hier in ein antcallback auslagern und für jede Zeile aufrufen. -->
@@ -3381,7 +3379,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- TODO GOON: Übernimm nur die Dateien, die existieren, alles andere macht beim Loeschen keinen Sinn -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
-		<fl:when test="${mySinglePart}.tofile.exists == true ">
+		<fl:when test="'${mySinglePart}'.tofile.exists == true ">
 			<echo>Datei/Verzeichnis existiert: ${mySinglePart}</echo>
 																									
 			<!-- Prüfe, ob es ein Verzeichnis ist -->
