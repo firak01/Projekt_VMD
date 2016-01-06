@@ -974,9 +974,8 @@
 	   
 	   var textToEncode=text;
 	   var textEncoded = encodeMyHtml(textToEncode);
-	   print("encoded textstring=" + textEncoded);
+	   //print("encoded textstring=" + textEncoded);
        sReturn = getStrLeftStr(textEncoded, matchEncoded);
-	   
 	   sReturn = unescape(sReturn);
 	   //print("sReturn="+sReturn);
 	   
@@ -1013,15 +1012,38 @@
 		   var text = attributes.get("text");
 		   var match = attributes.get("matchstring");
 		   
-		   sReturn = getStrRightStr(text, match);
+		    //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+			var matchToEncode=match;
+			var matchEncoded = encodeMyHtml(matchToEncode);
+			//print("encoded matchstring=" + matchEncoded);
+		   		    
+			var textToEncode=match;
+			var textEncoded = encodeMyHtml(textToEncode);
+			//print("encoded matchstring=" + textEncoded);
 		   
+		   sReturn = getStrRightStr(textEncoded, matchEncoded);
+		   print("sReturn="+sReturn);
+		   sReturn = unescape(sReturn);
+			print("sReturn unescaped="+sReturn);
+	   
 		   project.setProperty(attributes.get("returnstring"), sReturn);
 		   
 		   //aus JSZ - Kernel 
 		   function getStrRightStr(sourceStr, keyStr){
 				idx = sourceStr.indexOf(keyStr);
-				return (idx == -1 | keyStr=='') ? '' : sourceStr.substr(idx+ keyStr.length);
+				return (idx == -1 | keyStr=='') ? '' : sourceStr.substr(idx+keyStr.length);
 			}
+				
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
 		 ]]>
 	  </scriptdef>
 	
@@ -1934,6 +1956,7 @@
 			</ac:then>
 			<ac:else>
 				<!-- Ermittle die Zeile ohne Schemateil -->
+				<!-- TODO GOON noch kaputt -->
 				<stringRightStringZZZ text="${myLineNextSchema}" matchstring="${mySchemaNext}://" returnstring="myLineNext" />
 				<echo>myLineNext="${myLineNext}"</echo>
 			</ac:else>
@@ -2258,7 +2281,15 @@
 		<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
 		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 	</fl:when>
-	
+	<stringRightStringZZZ text="${myLeftPart}" matchstring="del://" returnstring="myLeftPartUnschemed" />	
+	<echo>Linker Teil der Steuerungsanweisung ohne Schema= ${myLeftPartUnschemed}</echo>
+	<ac:if>
+	 <equals arg1="${myBooleanValue}" arg2="true" />     
+      <ac:then>
+		<echo>Linker Teil der Steuerungsanweisung ist leer: ${myLeftPart}</echo>
+		<fl:fail message="Linker Teil der Steuerungsanweisung ist leer: ${myLeftPart}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->		
+		</ac:then>
+	</ac:if>
 	<!-- TODO noch kaputt -->
 	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->
 	<isSetZZZ valueinput="${myRightPart}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
@@ -2267,10 +2298,10 @@
 	 <equals arg1="${myBooleanValue}" arg2="true" />     
       <ac:then>
 		<echo>myRightPart ist gesetzt = '${myRightPart}'</echo>
-							
+
 		<antcallback target="-FGLDelLocal_AnalyseMatrix" return="returnControl, returna.filedir, returna.filename">
 			<param name="analyze" value="${myAnalyze}"/>
-			<param name="leftPart" value="${myLeftPart}"/>
+			<param name="leftPart" value="${myLeftPartUnschemed}"/>
 			<param name="rightPart" value="${myRightPart}"/>												
 		</antcallback>
 		<fl:let>myReturnControl::="${returnControl}"</fl:let>											
@@ -2282,11 +2313,9 @@
 
 	  </ac:then>
 	  <ac:else>
-		<echo>Nur linker Teil der Steuerungsanweisung existiert (Dateinamen...): ${myLineTrimmed}</echo>
-										
-		<fl:echo>Starte FglDelLocal_AnalyseSingle</fl:echo>
+		<echo>Nur linker Teil der Steuerungsanweisung existiert (Dateinamen...): ${myLineTrimmed}</echo>						
 		<antcallback target="-FglDelLocal_AnalyseSingle" return="returnControl, returnString, returna.filedir, returna.filename">
-			<param name="singlePart" value="${myLeftPart}"/>													
+			<param name="singlePart" value="${myLeftPartUnschemed}"/>													
 		</antcallback>
 	  </ac:else>
 	 </ac:if>
@@ -3340,6 +3369,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 
 <!-- ## Loeschanalyse/control Targets ########################################## -->
 <target name="-FglDelLocal_AnalyseSingle">
+	<fl:echo>Starte FglDelLocal_AnalyseSingle</fl:echo>
 	<fl:let>mySinglePart ::= "${singlePart}"</fl:let>
 	
 	<!-- Bereite die Rueckgabewerte vor -->
@@ -3351,7 +3381,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- TODO GOON: Übernimm nur die Dateien, die existieren, alles andere macht beim Loeschen keinen Sinn -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
-		<fl:when test=" '${mySinglePart}'.tofile.exists == true ">
+		<fl:when test="${mySinglePart}.tofile.exists == true ">
 			<echo>Datei/Verzeichnis existiert: ${mySinglePart}</echo>
 																									
 			<!-- Prüfe, ob es ein Verzeichnis ist -->
@@ -3383,7 +3413,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			</fl:when>
 		</fl:when>
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-			<echo>Datei/Verzeichnis existiert NICHT (damit nicht relevant fuer Loeschung): ${myPart}</echo>										  
+			<echo>Datei/Verzeichnis existiert NICHT (damit nicht relevant fuer Loeschung): ${mySinglePart}</echo>										  
 		</otherwise>
 	</fl:choose>
 	
