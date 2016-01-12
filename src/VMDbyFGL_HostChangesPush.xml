@@ -3570,16 +3570,22 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 						<arrayGetJsZZZ arrayinput="${mysaTotal.filename}" index="0" arrayget="mysFilename"/>										
 						<echo>Eintrag 0 im Dateiarray: ${mysFilename}</echo>
 						
-						<fl:let>mytemp::='#{format('\\%s', ${mysFiledir})}'</fl:let>
+						<!-- klappt nicht: <fl:let>mytemp::='#{format('\\%s', ${mysFiledir})}'</fl:let> -->
+						<!--<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das funktioniert aber die Backslashe nur verdoppeln reicht nicht -->
+						<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 						<echo>Normierter Verzeichniseintrag: ${mytemp}</echo>
+						<fl:let>mysFiledirNormed::='${mytemp}'</fl:let><!--wichtig: I Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben und einmal die Backslashverdoppelung wieder entfernt. -->							
+						<echo>Normierter Verzeichniseintrag: ${mysFiledirNormed}</echo>
 						
-			<!-- TODO GOON NOCH KAPUTT: Kopiert man mysFilename in eine andere Variable, geht die Referenz verloren.
-                                        ABER: Warum passiert das nur beim sFiledir?			-->				
+						<!-- Kopiert man mysFilename in eine andere Variable, geht die Referenz verloren.
+                               ABER: Warum passiert das nur beim sFiledir?
+							   LÖSUNG: Die einfachen Backslashe verhindern die Übertragung als Parameter für den antcallback. Man muss den Wert in Hochkommata setzen.-->				
 						
 						<antcallback target="-FGLDelLocal_DeleteFileSingle" return="returnControl,returnString">					
 							<!--<param name="sFiledir" value="'${mysFiledir}'"/>--><!-- aufgrund der Backslashe scheint es Probleme zu geben. -->
-							<!-- das funktioniert <param name="sFiledir" value="'c:\\temp\\'"/> -->
-							<param name="sFiledir" value="${mytemp}" />
+							<!--<param name="sFiledir" value="'c:\\temp\\'"/>-->
+							<!--<param name="sFiledir" value="'${mytemp}'" />-->
+							<param name="sFiledir" value="'${mysFiledirNormed}'" /><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben und einmal die Backslashverdoppelung wieder entfernt. -->							
 							<param name="sFilename" value="${mysFilename}"/>						
 						</antcallback>	
 						<fl:let>myReturnControl::="${returnControl}"</fl:let>

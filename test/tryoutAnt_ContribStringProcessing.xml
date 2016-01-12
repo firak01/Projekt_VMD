@@ -1,0 +1,85 @@
+﻿<project name="tryoutAnt_ContribAntcallback"  default="compile" basedir=".."
+		xmlns:ac="antlib://net/sf/antcontrib"><!-- Damit definiert man für AntContrib einen eigenen Namespace -->
+
+<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+	
+	
+<!-- ######### AntContrib: Callback Targets, quasi als ausgelagerte Unterfunktionen ################################-->
+<!--           Merke: Es gibt auch im Standard eine AntCall und AntCallBack Task -->
+
+<!-- ############################################################################### -->
+<target name="-replaceString">   
+	<echo>###################</echo>
+	<property name="normalValueSpaced" value="The quick brown fox jumps" />
+	<echo>Ausgangswert: ${normalValueSpaced}</echo>
+	<echo>Ersetze normalen Wert: fox durch dogge</echo>
+	<propertyregex property="returnNormalValueReplaced" input="${normalValueSpaced}" regexp="fox" replace="dogge" global="true" />
+	<echo>Ersetzter Wert: ${returnNormalValueReplaced}</echo>
+	
+	<echo>###################</echo>
+	<echo>Ausgangswert: ${normalValueSpaced}</echo>
+	<echo>Ersetze normalen Wert: Spaces durch Leerwert</echo>
+	<propertyregex property="returnNormalValueUnspaced" input="${normalValueSpaced}" regexp=" " replace="" global="true" />
+	<echo>Ersetzter Wert: ${returnNormalValueUnspaced}</echo>
+	
+	
+	<echo>###################</echo>
+		<!-- verwende antcontrib und escape mit 7 backslashe (wenn ein backslash am Ende steht) oder ansonsten 8 Backslashe
+	http://mail-archives.apache.org/mod_mbox/ant-dev/200309.mbox/%3C200309051022.57848.peter.reilly@corvil.com%3E -->
+	<!--<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das funktioniert -->
+	
+		<property name="normalValueBackslashed" value="The\quick\brown\fox\jumps\" />
+		<echo>Ausgangswert: ${normalValueBackslashed}</echo>
+	<echo>Ersetze Wert mit Backslashes:</echo>
+   <propertyregex property="returnNormalValueBackslashed" input="${normalValueBackslashed}" regexp="\\" replace="\\\\\\\" global="true" />
+   <echo>Ersetzter Wert: ${returnNormalValueBackslashed}</echo>
+	
+	<echo>###################</echo>
+		<property name="normalValueBackslashed2" value="The\\quick\\brown\\fox\\jumps\\" />
+		<echo>Ausgangswert: ${normalValueBackslashed2}</echo>
+	<echo>Ersetze Wert mit Backslashes2:</echo>
+   <propertyregex property="returnNormalValueBackslashed2" input="${normalValueBackslashed2}" regexp="\\" replace="\\\\\\\" global="true" />
+   <echo>Ersetzter Wert: ${returnNormalValueBackslashed2}</echo>     
+</target>
+
+  
+  
+  <!-- ########################### -->
+  <target name="-declaration"><!-- damit dies ncht z.B. beim Aufruf jedes ant-callback erneut gemacht wird, die Property Dekalarationen in ein eigenes target packen. Aber: Dafür sorgen dass die Deklaration vor allen anderen Targets ausgeführt wird. -->
+	<echo>##############################</echo>
+	<echo>In diesem Tryout werden folgende Punkte ausprobiert, die teilweise nur mit ant-contrib lösbar sind:</echo>
+	<echo>1) Einen Stringwert ersetzen. Interessant wird es beim Ersetzen von Backslashes</echo>
+	
+  </target>
+  
+<!-- ################################################################################# -->
+<!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-declaration, -replaceString">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt und daher zuletzt ausgeführt wird. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+ </project>
