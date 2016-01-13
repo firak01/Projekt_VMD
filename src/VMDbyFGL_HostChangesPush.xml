@@ -161,7 +161,7 @@
 			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
 			for(z in objectArray2append){
 				icountGlobal++;
-				print("Wert anhängen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
+				//print("Wert anhängen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
 				myArrayReturn[icountGlobal]=objectArray2append[z];
 			};			
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
@@ -200,7 +200,7 @@
 		]]>
 	</scriptdef>
 	
-<!-- ########################### -->
+	<!-- ############################################################ -->
 	<scriptdef name="arrayDebugJsZZZ" language="javascript">
 		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
 			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
@@ -320,7 +320,7 @@
 		]]>
 	</scriptdef>
 	
-	 <!-- ############################################################ -->	
+	 <!-- ########################################################### -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
 		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
@@ -377,9 +377,6 @@
 			var lista=attributes.get("arrayinput");		 
 			var iIndex=attributes.get("index");
 			
-			//!!! Die Referenz ging später verloren, wenn man den hieraus geholten Wert in der aufrufenden Funktion in eine andere Variable kopiert hat.
-			//also NICHT: var objReturn=attributes.get("arrayget");
-			//Sondern
 			var objReturn=new Object();
 			objReturn.value="<#!!FGLUNDEFINED!!#>";
 			main:{
@@ -392,8 +389,8 @@
 				//print('typeof(objectArray)=' + typeof(objectArray));
 				if(typeof(objectArray)=="object"){
 				for(x in objectArray){
-					print("x="+x);
-					print("objectArray[x]="+objectArray[x]);
+					//print("x="+x);
+					//print("objectArray[x]="+objectArray[x]);
 					
 					//Undefinierte, d.h. nur initialisierte Arrays abfangen
 					//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
@@ -410,7 +407,7 @@
 					}; //end for
 				}; //end if(typeof(objectArray)=="object")				
 			}; //end main:
-			print("objReturn.value="+objReturn.value);
+			//print("objReturn.value="+objReturn.value);
 			project.setProperty(attributes.get("arrayget"), objReturn.value);
 		]]>
 	</scriptdef>
@@ -514,7 +511,7 @@
 				icount++;
 				if(icount<=iuboundfilled){
 					icountGlobal++;
-					print("Wert wird kopiert und abgeschnitten: '" + objectArray[x]+ "' leftback von '" + myValue + "'");
+					//print("Wert wird kopiert und abgeschnitten: '" + objectArray[x]+ "' leftback von '" + myValue + "'");
 					myArrayReturn[icount]=getStrLeftBackStr(objectArray[x], myValue);
 				}else{
 					//nix
@@ -588,14 +585,13 @@
 				icount++;
 				if(icount<=iuboundfilled){
 					icountGlobal++;
-					print("Wert wird kopiert und erweitert: '" + objectArray[x]+ "' plus '" + myValue + "'");
+					//print("Wert wird kopiert und erweitert: '" + objectArray[x]+ "' plus '" + myValue + "'");
 					myArrayReturn[icount]=objectArray[x] + myValue;
 				}else{
 					//nix
 				}
 			}
-						
-													
+																			
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
 		]]>
 	</scriptdef>
@@ -752,20 +748,20 @@
 		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist Package notwendig
 		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
 		   var text = attributes.get("text");
-		   print ("start isDirectoryZZZ for: '" + text +"'");
+		   //print ("start isDirectoryZZZ for: '" + text +"'");
 		   //var fd = new java.io.File(text);
 		   var fd = new File(text);
 		   var berg = false;
 		   if(fd.exists()){
 		   if (fd.isDirectory()) {
-			   print(fd.getPath()+" => js true");
+			   //print(fd.getPath()+" => js true");
 		       berg = true;
 			} else {
-				print(fd.getPath()+" =>js false");
+				//print(fd.getPath()+" =>js false");
 				berg = false;
 			}
 			}else{
-					print(fd.getPath()+" =>js not existing!");
+				//print(fd.getPath()+" =>js not existing!");
 			}
 			project.setProperty(attributes.get("property"), berg);
 			
@@ -809,7 +805,7 @@
 		   var bIsSet = null;
 		   
 		   var myValueInput = attributes.get("valueinput");
-		   print("myValueInput='"+myValueInput+"'");		   			
+		   //print("myValueInput='"+myValueInput+"'");		   			
 			
 			//Die ersten beiden Zeichen und das letze Zeichen prüfen.
 		    var sBeginning = myValueInput.substring(0, 2);
@@ -1077,7 +1073,7 @@
 	   //print("encoded textstring=" + textEncoded);
 	  
       var sReturn = getStrLeftBackStr(textEncoded, matchEncoded);
-	  print("return vor unescape: getStrLeftBackStr=" + sReturn);
+	  //print("return vor unescape: getStrLeftBackStr=" + sReturn);
 	  sReturn = unescape(sReturn);
       project.setProperty(attributes.get("returnstring"), sReturn);
 	   
@@ -1108,7 +1104,7 @@
 		 encodedHtml = encodedHtml.replace(/&/g,"%26");
 		 encodedHtml = encodedHtml.replace(/@/g,"%40");
 		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+		 //Merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
 	   }
   ]]>
   </scriptdef>
@@ -2174,8 +2170,8 @@
 			</antcallback>
 			
 			<fl:echo>FglSchemaController_Controller: Ergebnis des Controllers fuer den DEL-FALL: ${returnString}</fl:echo>
-			<arrayDebugJsZZZ arrayinput="${saTotal.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
-			<arrayDebugJsZZZ arrayinput="${saTotal.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
+			<!--<arrayDebugJsZZZ arrayinput="${saTotal.filedir}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
+			<!--<arrayDebugJsZZZ arrayinput="${saTotal.filename}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 			<arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
 			<ac:if>
@@ -2212,16 +2208,13 @@
 <!-- ######################################################################### -->
 <!-- ######################################################################### -->
 <target name="-FglDelController_Main">  
-	<!--<arrayDebugJsZZZ arrayinput="${lineaCurrent.Schema}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
-
 	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="myLineaNext.UnSchema" sflagcontrol="" />	
-	<arrayDebugJsZZZ arrayinput="${myLineaNext.UnSchema}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
+	<!--<arrayDebugJsZZZ arrayinput="${myLineaNext.UnSchema}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 
 	<!-- Arrays für alle Dateien, die es dann später zu loeschen gilt -->
 	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filedir"/>
 	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filename"/>
 	
-				
 	<arrayElementCountJsZZZ arrayinput="${myLineaNext.UnSchema}" ireturn="myArraySize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 	<fl:choose>
 	<fl:when  test="${myArraySize}>=1"><!-- Sind Einträge im Array vorhanden. -->
@@ -2289,15 +2282,17 @@
 	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 <target name="-FglDelController_LineController"> 
+	<!--       Singletyp: Man kann eine Datei, inklusive Pfad angeben del://verzeichnisX\y.txt
+	     TODO: Singletyp, mehrere Dateipfade mit Semikolon getrennt del://verzeichnisX\y.txt;verzeichnis\z.txt;verzeichnisB\x.txt
+		 
+		 
+		 TODO: Matrixtyp: Verzeichnis mit mehreren Dateien, oder ohne Dateien, d.h. alle
+		       del://verzeichnisX=y.txt;z.txt;x.txt-->	 
 	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
 	<fl:let>myLineUnschemed::="${lineCurrent}"</fl:let><!-- darin ist kein Schema mehr enthalten -->
 	<arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />	
-		
-	<!-- Man kann eine Datei, inklusive Pfad angeben 
-		del://verzeichnisX\y.txt
-		-->	 	
-		
+				
 	<!-- TODO: Idee: in der Initialisierungsphase alle Steuerungsdateien auf Validität prüfen -->	
 	<!-- IDEE für die Zukunft: Lösche durchaus in einer Zeile mehrere Dateien in einem Verzeichnis
 	           del://verzeichnis=a.txt,b.txt,c.txt
@@ -2329,11 +2324,6 @@
 	<fl:when test="null('${myLeftPart}')">
 		<echo>Linker Teil der Steuerungsanweisung existiert nicht (Verzeichnis oder Dateinamen): ${myLineTrimmed}</echo>
 		<fl:fail message="Linker Teil der Steuerungsanweisung existiert nicht: ${myLineTrimmed}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-																						
-		<!-- Merke: Das wäre beim Kopieren einer Datei von einem feststehenden Ort der Ansatz, man muss nur den Dateinamen aus dem Verzeichnissnamen extrahieren. Das ist also beim Kopieren in das Repository Verzeichnis ggfs. einzusetzen.-->
-		<!-- <fl:echo>rechte Variable ist NULL, nimm den linken Teil.</fl:echo>
-		<fl:let> myRightPart ::= '${myLeftPart}'</fl:let>
-		<fl:echo>rechte Variable wird aus linkem Wert übernommen: ${myRightPart}</fl:echo> -->
 	</fl:when>
 	
 	<!-- TODO: Pruefen, ob die Zeile mit einem Schema beginnt. Falls ja ==> Fehler werfen. -->
@@ -2398,30 +2388,26 @@
 	
 	<!-- Bereite die Rueckgabewerte vor -->
 	<arrayInitJsZZZ isize="0" arrayreturn="mysaFiledir"/>
-	<arrayInitJsZZZ isize="0" arrayreturn="mysaFilename"/>
-	
+	<arrayInitJsZZZ isize="0" arrayreturn="mysaFilename"/>	
 	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filedir"/>
 	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filename"/>
 	
+	<!-- TODO GOON: Teile die Werte der Dateien mit Kommata auf und arbeite die Dateien in einer Schleife ab. 
+	                Falls es Verzeichniswerte mit Komata gibt, ist das hier die falsche Funktion. Verwende ... Matrix ...-->
 	
-	
-	<!-- TODO GOON: Teile die Werte mit Kommata auf -->
-	
-	<!-- TODO GOON: Übernimm nur die Dateien, die existieren, alles andere macht beim Loeschen keinen Sinn -->
+	<!-- ### Übernimm nur die Dateien, die existieren, alles andere macht beim Loeschen keinen Sinn -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
 		<fl:when test="'${mySinglePart}'.tofile.exists == true ">
 			<echo>Datei/Verzeichnis existiert: ${mySinglePart}</echo>
 																									
 			<!-- Prüfe, ob es ein Verzeichnis ist -->
 			<isDirectoryZZZ text="${mySinglePart}" property="myisdirectoryPart" /><!-- anwenden der oben definierten scriptdef funktion isdirectory -->
-			<echo>Teil: isdirectory=${myisdirectoryPart}</echo>
-														
+			<!--<echo>Teil: isdirectory=${myisdirectoryPart}</echo>-->														
 			<fl:when test="${myisdirectoryPart} == true">
 					<!-- A) Teil - Verzeichnis-Fall: -->
 					<echo>Teil: ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.</echo>
 					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
-					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="*.*" arrayreturn="mysaTotal.filename" sflagcontrol="" />			
-					
+					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="*.*" arrayreturn="mysaTotal.filename" sflagcontrol="" />								
 			</fl:when>
 			<fl:when test="${myisdirectoryPart} != true">			
 					<!-- B) Linker Teil - Dateipfad-Fall:-->
@@ -2431,16 +2417,12 @@
 					<getFilenameFromPathJsZZZ pathstring="${mySinglePart}" returnfilename="myFilename" returncontrol="myReturnControl" returnacontrolstring="myaReturnControl" sflagcontrol="" />
 					<echo>Der Dateiname ist: '${myFilename}'</echo>
 					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="${myFilename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
-					
-					<!-- TODO GOON noch kaputt.... der Dateiname wird letztendlich per java ermittelt und der Pfad per JS. 
-					                     beim Pfad fliegt irgendwann die Refernz weg... warum?
-					-->
+
 					<fl:let>myDirectoryPath::=''</fl:let>
 					<stringLeftBackStringZZZ text="${mySinglePart}" matchstring="${myFilename}" returnstring="myDirectoryPath" />
 					<echo>Der Pfad ist: '${myDirectoryPath}'</echo>					
 					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
-					
-					
+										
 					<!-- TODO GOON noch kaputt, hier müsste aus mysaTotal.filedir wieder mysa.filedir gemacht werden, wenn das ganze in einer schleife abläuft. -->
 			</fl:when>
 		</fl:when>
@@ -2650,9 +2632,7 @@
 	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="return.srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 	<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="return.destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-	<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="return.destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-	
-	
+	<arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="return.destaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->	
 </target>
 
 <!-- ######################################################################### -->
@@ -3519,8 +3499,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnString" value="${myReturnString}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- Merke: So gibt man einen Arraywertzurueck -->
 </target>
-<target name="-FGLDelLocal_Delete">
-	<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
+<target name="-FGLDelLocal_Delete">	
     <arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />					
 	<fl:let>bGoon::=true</fl:let>
@@ -3528,9 +3507,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 	
 	<arrayElementCountJsZZZ arrayinput="${mysaTotal.filedir}" ireturn="mysaTotal.filedir.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-	<echo>Anzahl der Eintraege im Verzeichnisarray: ${mysaTotal.filedir.iSize}</echo>			
+	<!--<echo>Anzahl der Eintraege im Verzeichnisarray: ${mysaTotal.filedir.iSize}</echo>-->
 	<arrayElementCountJsZZZ arrayinput="${mysaTotal.filename}" ireturn="mysaTotal.filename.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
-	<echo>Anzahl der Eintraege im Dateiarray: ${mysaTotal.filename.iSize}</echo>	
+	<!--<echo>Anzahl der Eintraege im Dateiarray: ${mysaTotal.filename.iSize}</echo>-->	
 	<ac:if>
 		<or>
 			<equals arg1="0" arg2="${mysaTotal.filedir.iSize}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->		
@@ -3542,13 +3521,13 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		</ac:then>
 	</ac:if>
 	
-	<ac:if>
-		<not>
+	<ac:if>		
 		<and>
-			<equals arg1="${mysaTotal.filedir.iSize}" arg2="${mysaTotal.filename.iSize}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
+			<not>
+				<equals arg1="${mysaTotal.filedir.iSize}" arg2="${mysaTotal.filename.iSize}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
+			</not>		
 			<equals arg1="true" arg2="${bGoon}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->		
-		</and>
-		</not>		
+		</and>		
 		<ac:then>							
 			<fl:let>myReturnString::="Anzahl der Eintraege in den Arrays unterschiedlich => keine Verarbeitung"</fl:let>
 			<fl:let>bGoon::=false</fl:let>
@@ -3565,26 +3544,21 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 						<!-- ###### LOESCHE NUR EINEN WERT ############## -->
 						<!--<fl:let>mysFiledir::=''</fl:let>-->
 						<arrayGetJsZZZ arrayinput="${mysaTotal.filedir}" index="0" arrayget="mysFiledir"/>	
-						<echo>Eintrag 0 im Verzeichnisarray: ${mysFiledir}</echo>						
-											
+						<!--<echo>Eintrag 0 im Verzeichnisarray: ${mysFiledir}</echo>-->											
 						<arrayGetJsZZZ arrayinput="${mysaTotal.filename}" index="0" arrayget="mysFilename"/>										
-						<echo>Eintrag 0 im Dateiarray: ${mysFilename}</echo>
+						<!--<echo>Eintrag 0 im Dateiarray: ${mysFilename}</echo>-->
 						
-						<!-- klappt nicht: <fl:let>mytemp::='#{format('\\%s', ${mysFiledir})}'</fl:let> -->
 						<!--<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das funktioniert aber die Backslashe nur verdoppeln reicht nicht -->
 						<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 						<!--<echo>Normierter Verzeichniseintrag: ${mytemp}</echo>-->
 						<fl:let>mysFiledirNormed::='${mytemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 						<!--<echo>Normierter Verzeichniseintrag: ${mysFiledirNormed}</echo>-->
 						
-						<!-- Kopiert man mysFilename in eine andere Variable, geht die Referenz verloren.
-                               ABER: Warum passiert das nur beim sFiledir?
-							   LÖSUNG: Die einfachen Backslashe verhindern die Übertragung als Parameter für den antcallback. Man muss den Wert in Hochkommata setzen.-->				
+						<!-- SITUATION: Kopiert man mysFilename in eine andere Variable, geht die Referenz verloren.
+                                  ABER: Warum passiert das nur beim sFiledir?
+							    LÖSUNG: Die einfachen Backslashe verhindern die Übertragung als Parameter für den antcallback. Man muss den Wert in Hochkommata setzen.-->				
 						
 						<antcallback target="-FGLDelLocal_DeleteFileSingle" return="returnControl,returnString">					
-							<!--<param name="sFiledir" value="'${mysFiledir}'"/>--><!-- aufgrund der Backslashe scheint es Probleme zu geben. -->
-							<!--<param name="sFiledir" value="'c:\\temp\\'"/>-->
-							<!--<param name="sFiledir" value="'${mytemp}'" />-->
 							<param name="sFiledir" value="${mysFiledirNormed}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 							<param name="sFilename" value="${mysFilename}"/>						
 						</antcallback>	
@@ -3609,17 +3583,12 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnString" value="${myReturnString}" />			
 </target>
 <target name="-FGLDelLocal_DeleteFileSingle"> 
-
-<!-- TODO GOON NOCH KAPUTT -->
 	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
+	<!-- TODO: Den Fall abfangen, falls eine Datei nicht gelöscht werden kann, wg. Rechte, in anderem Programm geöffnet, etc. -->
 	
 	<!-- Uebernahme von Einzelwerten -->
-	<fl:let>myDir::='${sFiledir}'</fl:let>
+	<fl:let>myDir::='${sFiledir}'</fl:let><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
 	<fl:let>myFile::='${sFilename}'</fl:let>
-	
-	<echo>myDir: ${myDir}</echo><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
-	<echo>myFile: ${myFile}</echo>
-	
 	
 	<!-- Uebernahme von Array Werten -->
 	<!--<arrayCopyJsZZZ arrayinput="${srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />-->
@@ -3640,9 +3609,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<fl:when test="'${myDir}'==''">
 		<echo>Uebergabeparameter ist Leerwert (myDir)</echo>
 		<fl:fail message="Uebergabeparameter ist Leerwert (myDir)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-	</fl:when>
-	
-	<fl:echo>Uebergabeparemeter sind (myDir = myFile):  ${myDir} = ${myFile}</fl:echo>
+	</fl:when>	
+	<!--<fl:echo>Uebergabeparemeter sind (myDir = myFile):  ${myDir} = ${myFile}</fl:echo>-->
 					
 	<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
 	<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
@@ -3660,9 +3628,27 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 					<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
 					</pathconvert>
 					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
-						
-						
-	<!-- ### TODO GOON: Hole aus dem String den Verzeichnisnamen und den Dateinamen -->
+											
+	<!-- ### Lösche anhand des Verzeichnis- und Dateinamens -->
+	<!-- TODO GGON: Prüfe, ob der Backslash am Emde steht, ergänze ihn falls notwendig -->
+	<echo>Deleting File ${myDir}${myFile}</echo>
+													
+	<!-- 	Relative Pfade verwenden, auch beim Löschen?:
+	<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
+	<fileset dir="//${mySrc.filedir}">		 -->
+	
+	<!-- absolute Pfade verwenden: -->
+	<delete includeEmptyDirs="true"> 
+		<fileset dir="${myDir}">		
+			<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+			<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
+														
+			<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
+			<include name="${myFile}" />				
+		</fileset>	
+	</delete>
+	
+	
 	
 	<!-- ############### -->
 	<!-- Rueckgabebwerte -->
@@ -3670,8 +3656,6 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnString" value="alles o.k." />
 	<!--<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->	
 </target>
-
-
 
 <!-- ### HILFSTARGETS ########################################################## -->
 <!-- ######## Targets ############################################################################--> 	
