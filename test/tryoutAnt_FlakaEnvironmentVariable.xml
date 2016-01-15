@@ -65,9 +65,9 @@
 	</echo>
 	<!-- nun wird mit der EL Syntax #{userdir_sub} auf einen Eintrag der EL-Tabelle zugegriffen -->
 	
-	<!-- verwende antcontrib und escape mit 7 backslashe (wenn ein backslash am Ende steht) oder ansonsten 8 Backslashe
+	<!-- verwende antcontrib und escape mit 7 backslashe (wenn ein backslash am Ende steht) oder ansonsten 8 Backslashe -->
 	http://mail-archives.apache.org/mod_mbox/ant-dev/200309.mbox/%3C200309051022.57848.peter.reilly@corvil.com%3E -->
-	<!--<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das funktioniert -->
+	<!--<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das funktioniert.  Merke: Property ist nicht veränderbar, darum für jeden Aufruf eine extra Variable verwenden. -->
 	
 	
 	

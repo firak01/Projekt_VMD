@@ -2189,7 +2189,7 @@
 						<param name="saTotal.filedir" value="${mysaTotal.filedir}"/>	
 						<param name="saTotal.filename" value="${mysaTotal.filename}"/>							
 					</antcallback>      
-					<fl:echo>Ergebnis des Kopierens: ${returnString}</fl:echo>			
+					<fl:echo>Ergebnis des Loeschens: ${returnString}</fl:echo>			
 				</ac:else> <!-- Controller erfolgreich -->
 			</ac:if><!-- Ergebnis des VMD Controllers -->																
 		</ac:then>
@@ -2407,14 +2407,16 @@
 					<!-- A) Teil - Verzeichnis-Fall: -->
 					<echo>Teil: ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.</echo>
 					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
-					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="*.*" arrayreturn="mysaTotal.filename" sflagcontrol="" />								
+					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="**.**" arrayreturn="mysaTotal.filename" sflagcontrol="" />								
+					<fl:let>myReturnControl::=true</fl:let>
+					<fl:let>myReturnString::='Del_Local_AnalyseSingle: Alles o.k.'</fl:let>
 			</fl:when>
 			<fl:when test="${myisdirectoryPart} != true">			
 					<!-- B) Linker Teil - Dateipfad-Fall:-->
 					<echo>Teil: ist KEIN Verzeichnis</echo>
 					
 					<!-- Ermittle aus dem Pfad den Verzeichnis und den Dateiteil -->
-					<getFilenameFromPathJsZZZ pathstring="${mySinglePart}" returnfilename="myFilename" returncontrol="myReturnControl" returnacontrolstring="myaReturnControl" sflagcontrol="" />
+					<getFilenameFromPathJsZZZ pathstring="${mySinglePart}" returnfilename="myFilename" returncontrol="mytempReturnControl" returnacontrolstring="myaReturnControl" sflagcontrol="" />
 					<echo>Der Dateiname ist: '${myFilename}'</echo>
 					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="${myFilename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
 
@@ -2424,6 +2426,17 @@
 					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
 										
 					<!-- TODO GOON noch kaputt, hier müsste aus mysaTotal.filedir wieder mysa.filedir gemacht werden, wenn das ganze in einer schleife abläuft. -->
+					
+					<fl:let>myReturnControl::=${mytempReturnControl}</fl:let>
+										
+					<fl:choose>
+						<fl:when test="${myReturnControl}==true">
+							<fl:let>myReturnString::='Del_Local_AnalyseSingle: Alles o.k.'</fl:let>
+						</fl:when>	
+						<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
+							<fl:let>myReturnString::='Del_Local_AnalyseSingle: Ein Fehler muss aufgetreten sein.'</fl:let>
+						</otherwise>
+					</fl:choose>										
 			</fl:when>
 		</fl:when>
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
@@ -2730,12 +2743,30 @@
 					<!-- Leite das Kopieren ein -->
 					<ac:if>				
 					<equals arg1="1" arg2="${iSize.SrcaTotal.filename}"/><!-- Merke: man muss doch tatsächlich ein Fallunterscheidung einbauen, da in ac:for (des aufzurufenden copy Targets) nicht beide Parameter 0 (also gleich) sein dürfen. -->
-					<ac:then>			
+					<ac:then>
+
+						<!-- ###### KOPIERE NUR EINEN WERT ############## -->
+						<arrayGetJsZZZ arrayinput="${mySrcaTotal.filedir}" index="0" arrayget="mySrc.sFiledir"/>	
+						<arrayGetJsZZZ arrayinput="${mySrcaTotal.filename}" index="0" arrayget="mySrc.sFilename"/>	
+						<arrayGetJsZZZ arrayinput="${myDestaTotal.filedir}" index="0" arrayget="myDest.sFiledir"/>	
+						<arrayGetJsZZZ arrayinput="${myDestaTotal.filename}" index="0" arrayget="myDest.sFilename"/>
+					
+						<propertyregex property="mytemp01" input="${mySrc.sFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen. Merke: Property ist nicht veränderbar, darum für jeden Aufruf eine extra Variable verwenden. -->
+						<!--<echo>Normierter Verzeichniseintrag: ${mytemp}</echo>-->
+						<fl:let>mySrc.sFiledirNormed::='${mytemp01}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+						<!--<echo>Normierter Verzeichniseintrag: ${mysFiledirNormed}</echo>-->
+						
+						<propertyregex property="mytemp02" input="${myDest.sFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen. Merke: Property ist nicht veränderbar, darum für jeden Aufruf eine extra Variable verwenden. -->
+						<!--<echo>Normierter Verzeichniseintrag: ${mytemp}</echo>-->
+						<fl:let>myDest.sFiledirNormed::='${mytemp02}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+						<!--<echo>Normierter Verzeichniseintrag: ${mysFiledirNormed}</echo>-->
+						
+					
 						<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnControl,returnString">					
-								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
-								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
-								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
-								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
+								<param name="src.sFiledir" value="${mySrc.sFiledirNormed}"/>
+								<param name="src.sFilename" value="${mySrcaTotal.filename}"/>								
+								<param name="dest.sFiledir" value="${myDest.sFiledirNormed}"/>
+								<param name="dest.sFilename" value="${myDestaTotal.filename}"/>					
 						</antcallback>	
 						<fl:let>myReturnControl ::="${returnControl}"</fl:let>
 						<fl:let>myReturnString ::="${returnString}"</fl:let>
@@ -2843,26 +2874,19 @@
 	<ac:var name="returnString" value="CopyFileByFile: Alles ok." />
 </target>
 <target name="-FGLCopyLocal_CopyFileSingle">
-	<fl:let>mySrca.filedir::="${srca.filedir}"</fl:let>
-	<fl:let>mySrca.filename::="${srca.filename}"</fl:let>
-	<fl:let>myDesta.filedir::="${desta.filedir}"</fl:let>
-	<fl:let>myDesta.filename::="${desta.filename}"</fl:let>
+	<fl:let>mySrc.sFiledir::="${src.sFiledir}"</fl:let>
+	<fl:let>mySrc.sFilename::="${src.sFilename}"</fl:let>
+	<fl:let>myDest.sFiledir::="${dest.sFiledir}"</fl:let>
+	<fl:let>myDest.sFilename::="${dest.sFilename}"</fl:let>
 	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> -->
 	<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-		
-
-	<!-- ###### KOPIERE NUR EINEN WERT ############## -->
-	<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="0" arrayget="mySrc.filedir"/>	
-	<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="0" arrayget="mySrc.filename"/>	
-	<arrayGetJsZZZ arrayinput="${myDesta.filedir}" index="0" arrayget="myDest.filedir"/>	
-	<arrayGetJsZZZ arrayinput="${myDesta.filename}" index="0" arrayget="myDest.filename"/>	
 			
 	<!-- 4. Der eigentliche Kopiervorgang -->
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-	<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Destination: ${myDest.filedir}\${myDest.filename} </echo>
+	<echo>Pushing File ${mySrc.sFiledir}\${mySrc.sFilename} to Destination: ${myDest.sFiledir}\${myDest.sFilename} </echo>
 													
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	 
 	<!-- ACHTUNG: Existiert die Quelldatei nicht, kommt es hier zu einem BUILD Fehler.
@@ -2873,16 +2897,16 @@
 	<fileset dir="//${mySrc.filedir}">		 -->
 	
 	<!-- absolute Pfade verwenden: -->
-	<copy todir="${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
-		<fileset dir="${mySrc.filedir}">		
+	<copy todir="${myDest.sFiledir}" overwrite="false"  preservelastmodified="true"> 
+		<fileset dir="${mySrc.sFiledir}">		
 		<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 		<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
 		<!-- Ziel: Keine txt-Dateien aus Unterverzeichnissen oder Unterverzeichnisse selbst holen -->
 														
 			<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
-			<include name="${mySrc.filename}" />				
+			<include name="${mySrc.sFilename}" />				
 		</fileset>
-		<globmapper from="${mySrc.filename}" to="${myDest.filename}"/>
+		<globmapper from="${mySrc.sFilename}" to="${myDest.sFilename}"/>
 	</copy>
 	
 	<!-- Rueckgabewerte -->
@@ -3489,8 +3513,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 				<param name="saTotal.filedir" value="${mysaTotal.filedir}"/>
 				<param name="saTotal.filename" value="${mysaTotal.filename}"/>				
 			</antcallback>
-			<fl:let>myReturnControl ::="${returnControl}"</fl:let>
-			<fl:let>myReturnString ::="${returnString}"</fl:let>							
+			<fl:let>myReturnControl::="${returnControl}"</fl:let>
+			<fl:let>myReturnString::="${returnString}"</fl:let>							
 		</ac:else>
 	</ac:if><!-- Anzahl der Dateien pruefen -->
 
@@ -3630,7 +3654,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
 											
 	<!-- ### Lösche anhand des Verzeichnis- und Dateinamens -->
-	<!-- TODO GGON: Prüfe, ob der Backslash am Emde steht, ergänze ihn falls notwendig -->
+	<!-- TODO GGON noch kaputt: Prüfe, ob der Backslash am Emde steht, ergänze ihn falls notwendig -->
 	<echo>Deleting File ${myDir}${myFile}</echo>
 													
 	<!-- 	Relative Pfade verwenden, auch beim Löschen?:
