@@ -122,9 +122,10 @@
 			var iuboundfilled=-1;
 			var bnormal=true;
 						
-			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".		
+			print("Uebernimm Werte des Ausgangsarrays:");
 			for(x in objectArray){
-				print("Wert: '" + objectArray[x]+ "'");
+				print("Wert vom Ausgangsarray: '" + objectArray[x]+ "'");
 				icount++;
 			
 				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
@@ -2173,15 +2174,15 @@
 		<ac:equals arg1="${myStringCurrent.Schema}" arg2="del" />								
 		<ac:then>
 			<fl:echo>${sScript}AUFRUF DES CONTROLLERS FUER DEN DEL-FALL</fl:echo>			
-			<antcallback target="-FglDelController_Main" return="returnString, returnControl,saTotal.filedir,saTotal.filename">
+			<antcallback target="-FglDelController_Main" return="returnString, returnControl,return.saTotal.filedir,return.saTotal.filename">
 				<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 			</antcallback>
 			
 			<fl:echo>${sScript}Ergebnis des Controllers fuer den DEL-FALL: ${returnString}</fl:echo>
-			<arrayDebugJsZZZ arrayinput="${saTotal.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
-			<arrayDebugJsZZZ arrayinput="${saTotal.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
-			<arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />
-			<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
+			<arrayDebugJsZZZ arrayinput="${return.saTotal.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
+			<arrayDebugJsZZZ arrayinput="${return.saTotal.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
+			<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />
+			<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
 			<ac:if>
 				<ac:equals arg1="${returnControl}" arg2="false" />
 				<ac:then>
@@ -2241,7 +2242,7 @@
 		<ac:if>
 			<equals arg1="0" arg2="${iubound}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
 			<ac:then><!-- iubound = 0 Fall -->			
-				<echo>${sScript}NUR 1 EINTRAG in diesem Schemalauf</echo> 
+				<echo>##################${sScript}NUR 1 EINTRAG in diesem Schemalauf</echo> 
 				<arrayGetJsZZZ arrayinput="${myLineaNext.UnSchema}" index="0" arrayget="myLineTrimmed"/>
 				<fl:echo>${sScript}zu verarbeitende Zeile (ohne Schema):'${myLineTrimmed}'</fl:echo>
 			
@@ -2251,15 +2252,26 @@
 					<param name="saTotal.filedir" value="${mysaTotal.filedir}" />
 					<param name="saTotal.filename" value="${mysaTotal.filename}" />					
 				</antcallback>
-				<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="saTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-				<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="saTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->			
+				<arrayDebugJsZZZ arrayinput="${return.saTotal.filedir}" ilevel="1"/>
+				<arrayDebugJsZZZ arrayinput="${return.saTotal.filename}" ilevel="1"/>
+				<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+				<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->			
 			</ac:then><!-- iubound = 0 Fall -->
 			<ac:else><!-- iubound > 0 Fall -->	
+			
+				<!-- Ermittle die Anzahl, der Dateien -->	
+				<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+				<!-- Den ubound des Arrays um +1 erhöhen, um die Anzahl zu bekommen. -->
+				<var name="op1" value="${iubound}"/>
+				<var name="op2" value="1"/>
+				<var name="op" value="+"/>
+				<math result="iAnzahl" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>						
+				<echo>######################${sScript} ${iAnzahl} EINTRAEGE in diesem Schemalauf</echo> 
 				<ac:for param="icounter" end="${iubound}">			
 				<sequential>
-					<echo>${sScript}icounter ist @{icounter}</echo> 
+					<echo>##################${sScript}icounter ist @{icounter}</echo> 
 					<arrayGetJsZZZ arrayinput="${myLineaNext.UnSchema}" index="@{icounter}" arrayget="myLineTrimmed"/>
-					<fl:echo>${sScript}zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
+					<fl:echo>${sScript}zu verarbeitende Zeile (ohne Schema) @{icounter} :'${myLineTrimmed}'</fl:echo>
 				
 					<!-- Hier die hier in ein antcallback auslagern und für jede Zeile aufrufen. -->
 					<antcallback target="-FglDelController_LineController" return="returnString, returnControl,return.saTotal.filedir,return.saTotal.filename">
@@ -2267,15 +2279,19 @@
 						<param name="saTotal.filedir" value="${mysaTotal.filedir}" />
 						<param name="saTotal.filename" value="${mysaTotal.filename}" />						
 					</antcallback>
-					<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="saTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-					<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="saTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->					
+					
+					<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+					<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->					
+					<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>
+					<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>
 					</sequential>
 				</ac:for>
 			</ac:else><!-- iubound > 0 Fall -->
 		</ac:if><!-- ubound = 0 tatsaechlich notwendige Abfrage -->
+			
 		<!-- TODO: Hier tatsaechlich den Rueckgabewert vom Kopiererfolg abhaengig machen -->
 		<fl:let>myReturnControl ::= true</fl:let>
-		<fl:let>myReturnString ::= "${sScript}alles ok"</fl:let>
+		<fl:let>myReturnString ::= "${sScript}Alles ok"</fl:let>
 	</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
 	<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 		<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
@@ -2287,8 +2303,8 @@
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
 	<ac:var name="returnString" value="${myReturnString}" />
-	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
-	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${mysaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
+	<arrayCopyJsZZZ arrayinput="${mysaTotal.filename}" arrayreturn="return.srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
 <target name="-FglDelController_LineController"> 
 	<fl:let>sScript::='-FglDelController_LineController: '</fl:let>
@@ -2300,6 +2316,10 @@
 		       del://verzeichnisX=y.txt;z.txt;x.txt-->	 
 	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
 	<fl:let>myLineUnschemed::="${lineCurrent}"</fl:let><!-- darin ist kein Schema mehr enthalten -->
+	<fl:echo>${sScript}EINGANGSARRAY: saTotal.filedir</fl:echo>
+	<arrayDebugJsZZZ arrayinput="${saTotal.filedir}" ilevel="1"/>
+	<fl:echo>${sScript}EINGANGSARRAY: saTotal.filename</fl:echo>
+	<arrayDebugJsZZZ arrayinput="${saTotal.filename}" ilevel="1"/>
 	<arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />	
 				
@@ -2360,6 +2380,10 @@
 		</antcallback>
 	  </ac:else>
 	 </ac:if>
+	 <echo>######${sScript}zurueckgegebene und entegegengenommene Arrays aus -FglDelLocal_AnalyseSingle:</echo>
+	 <arrayDebugJsZZZ arrayinput="${returna.filedir}" ilevel="1"/>
+	 <arrayDebugJsZZZ arrayinput="${returna.filename}" ilevel="1"/>
+	 
 	 <fl:let>myReturnControl::="${returnControl}"</fl:let>		
 	<fl:choose>
 		<fl:when test="${myReturnControl}==true">
@@ -2383,10 +2407,13 @@
 		<ac:then>
 			<fl:echo>${sScript}Ergebnis: ${returnControl}, haenge Array an.</fl:echo>
 			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filedir}" array2append="${mysaFiledir}" arrayReturn="myArrayTotal1"/>
-			<arrayCopyJsZZZ arrayinput="${myArrayTotal1}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />
-
+			<arrayCopyJsZZZ arrayinput="${myArrayTotal1}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />						
 			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filename}" array2append="${mysaFilename}" arrayReturn="myArrayTotal2"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal2}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
+			
+			<fl:echo>${sScript}Ergebnis mit angehaengtem Array:</fl:echo>
+			<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>
+			<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>
 		</ac:then>
 		<ac:else>
 			<fl:echo>${sScript}Ergebnis: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
@@ -2403,6 +2430,7 @@
 
 <target name="-FglDelLocal_AnalyseSingle">
 	<fl:let>sScript::='-FglDelLocal_AnalyseSingle: '</fl:let>	
+	<!-- MERKE: Hier wird keine Array reingegeben, sondern nur ein Array rausgegeben. -->
 	<fl:let>mySinglePart ::= "${singlePart}"</fl:let>
 	
 	<!-- Bereite die Rueckgabewerte vor -->
@@ -2424,15 +2452,15 @@
 			<!--<echo>Teil: isdirectory=${myisdirectoryPart}</echo>-->														
 			<fl:when test="${myisdirectoryPart} == true">
 					<!-- A) Teil - Verzeichnis-Fall: -->
-					<echo>${sScript}Teil: ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.</echo>
+					<echo>${sScript}Teil: Ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.</echo>
 					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
 					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="**.**" arrayreturn="mysaTotal.filename" sflagcontrol="" />								
 					<fl:let>myReturnControl::=true</fl:let>
-					<fl:let>myReturnString::='Del_Local_AnalyseSingle: Alles o.k.'</fl:let>
+					<fl:let>myReturnString::='${sScript}Alles o.k.'</fl:let>
 			</fl:when>
 			<fl:when test="${myisdirectoryPart} != true">			
 					<!-- B) Linker Teil - Dateipfad-Fall:-->
-					<echo>${sScript}Teil: ist KEIN Verzeichnis</echo>
+					<echo>${sScript}Teil: Ist KEIN Verzeichnis</echo>
 					
 					<!-- Ermittle aus dem Pfad den Verzeichnis und den Dateiteil -->
 					<getFilenameFromPathJsZZZ pathstring="${mySinglePart}" returnfilename="myFilename" returncontrol="mytempReturnControl" returnacontrolstring="myaReturnControl" sflagcontrol="" />
@@ -2443,11 +2471,8 @@
 					<stringLeftBackStringZZZ text="${mySinglePart}" matchstring="${myFilename}" returnstring="myDirectoryPath" />
 					<echo>${sScript}Der Pfad ist: '${myDirectoryPath}'</echo>					
 					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
-										
-					<!-- TODO GOON noch kaputt, hier müsste aus mysaTotal.filedir wieder mysa.filedir gemacht werden, wenn das ganze in einer schleife abläuft. -->
-					
-					<fl:let>myReturnControl::=${mytempReturnControl}</fl:let>
-										
+															
+					<fl:let>myReturnControl::=${mytempReturnControl}</fl:let>									
 					<fl:choose>
 						<fl:when test="${myReturnControl}==true">
 							<fl:let>myReturnString::='${sScript}Alles o.k.'</fl:let>
@@ -2463,7 +2488,7 @@
 			
 			<!-- Eingabearray gleich Ausgabearray, trotzdem wieder zurückgeben. -->
 			<fl:let>myReturnControl::=true</fl:let>
-			<fl:let>myReturnString::="DelLocal_AnalyseSingle: Trotzdem alles o.k."</fl:let>
+			<fl:let>myReturnString::="${sScript}: Datei/Verzeichnis existiert NICHT. Trotzdem alles o.k."</fl:let>
 		</otherwise>
 	</fl:choose>
 	
