@@ -132,10 +132,14 @@
 			};
 						
 			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
-			for(z in objectArray2append){
-				icountGlobal++;
-				print("Wert anhängen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
-				myArrayReturn[icountGlobal]=objectArray2append[z];
+			for(z in objectArray2append){								
+				if(objectArray2append[z]=="<#!!FGLUNDEFINED!!#>"){
+					print("<#!!FGLUNDEFINED!!#> Wert NICHT anhaengen.");
+				}else{
+					icountGlobal++;
+					print("Wert anhaengen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
+					myArrayReturn[icountGlobal]=objectArray2append[z];
+				};							
 			};			
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
 		]]>
