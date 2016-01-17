@@ -123,9 +123,9 @@
 			var bnormal=true;
 						
 			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".		
-			print("Uebernimm Werte des Ausgangsarrays:");
+			//print("Uebernimm Werte des Ausgangsarrays:");
 			for(x in objectArray){
-				print("Wert vom Ausgangsarray: '" + objectArray[x]+ "'");
+				//print("Wert vom Ausgangsarray: '" + objectArray[x]+ "'");
 				icount++;
 			
 				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
@@ -152,7 +152,7 @@
 				icount++;
 				if(icount<=iuboundfilled){
 					icountGlobal++;
-					print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
 					myArrayReturn[icount]=objectArray[x];
 				}else{
 					//nix
@@ -162,10 +162,10 @@
 			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
 			for(z in objectArray2append){								
 				if(objectArray2append[z]=="<#!!FGLUNDEFINED!!#>"){
-					print("<#!!FGLUNDEFINED!!#> Wert NICHT anhaengen.");
+					//print("<#!!FGLUNDEFINED!!#> Wert NICHT anhaengen.");
 				}else{
 					icountGlobal++;
-					print("Wert anhaengen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
+					//print("Wert anhaengen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
 					myArrayReturn[icountGlobal]=objectArray2append[z];
 				};
 				
@@ -2252,8 +2252,8 @@
 					<param name="saTotal.filedir" value="${mysaTotal.filedir}" />
 					<param name="saTotal.filename" value="${mysaTotal.filename}" />					
 				</antcallback>
-				<arrayDebugJsZZZ arrayinput="${return.saTotal.filedir}" ilevel="1"/>
-				<arrayDebugJsZZZ arrayinput="${return.saTotal.filename}" ilevel="1"/>
+				<!--<arrayDebugJsZZZ arrayinput="${return.saTotal.filedir}" ilevel="1"/>-->
+				<!--<arrayDebugJsZZZ arrayinput="${return.saTotal.filename}" ilevel="1"/>-->
 				<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 				<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->			
 			</ac:then><!-- iubound = 0 Fall -->
@@ -2282,8 +2282,8 @@
 					
 					<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 					<arrayCopyJsZZZ arrayinput="${return.saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->					
-					<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>
-					<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>
+					<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>-->
+					<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>-->
 					</sequential>
 				</ac:for>
 			</ac:else><!-- iubound > 0 Fall -->
@@ -2316,10 +2316,10 @@
 		       del://verzeichnisX=y.txt;z.txt;x.txt-->	 
 	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
 	<fl:let>myLineUnschemed::="${lineCurrent}"</fl:let><!-- darin ist kein Schema mehr enthalten -->
-	<fl:echo>${sScript}EINGANGSARRAY: saTotal.filedir</fl:echo>
-	<arrayDebugJsZZZ arrayinput="${saTotal.filedir}" ilevel="1"/>
-	<fl:echo>${sScript}EINGANGSARRAY: saTotal.filename</fl:echo>
-	<arrayDebugJsZZZ arrayinput="${saTotal.filename}" ilevel="1"/>
+	<!--<fl:echo>${sScript}EINGANGSARRAY: saTotal.filedir</fl:echo>-->
+	<!--<arrayDebugJsZZZ arrayinput="${saTotal.filedir}" ilevel="1"/>-->
+	<!--<fl:echo>${sScript}EINGANGSARRAY: saTotal.filename</fl:echo>-->
+	<!--<arrayDebugJsZZZ arrayinput="${saTotal.filename}" ilevel="1"/>-->
 	<arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />	
 				
@@ -2380,40 +2380,54 @@
 		</antcallback>
 	  </ac:else>
 	 </ac:if>
-	 <echo>######${sScript}zurueckgegebene und entegegengenommene Arrays aus -FglDelLocal_AnalyseSingle:</echo>
-	 <arrayDebugJsZZZ arrayinput="${returna.filedir}" ilevel="1"/>
-	 <arrayDebugJsZZZ arrayinput="${returna.filename}" ilevel="1"/>
+	 <!--<echo>######${sScript}zurueckgegebene und entegegengenommene Arrays aus -FglDelLocal_AnalyseSingle:</echo>-->
+	 <!--<arrayDebugJsZZZ arrayinput="${returna.filedir}" ilevel="1"/>-->
+	 <!--<arrayDebugJsZZZ arrayinput="${returna.filename}" ilevel="1"/>-->
 	 
 	 <fl:let>myReturnControl::="${returnControl}"</fl:let>		
 	<fl:choose>
 		<fl:when test="${myReturnControl}==true">
-			<fl:let>myReturnString::='${sScript}Alles o.k.'</fl:let>
+			<fl:let>myReturnString::='${sScript}Alles o.k.| ${returnString}'</fl:let>
 		</fl:when>	
 		<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
-			<fl:let>myReturnString::='${sScript}Ein Fehler muss aufgetreten sein.'</fl:let>
+			<fl:let>myReturnString::='${sScript}Ein Fehler muss aufgetreten sein. | ${returnString}'</fl:let>
 		</otherwise>
 	</fl:choose>	
-					
+			 		
 	 <fl:echo>${sScript}Ergebnis von -FGLDelLocal_AnalyseMatrix bzw. -FglDelLocal_AnalyseSingle=${myReturnControl}</fl:echo>
 	 <fl:echo>${sScript}returna.filedir=${returna.filedir}</fl:echo>
 	 <fl:echo>${sScript}returna.filename=${returna.filename}</fl:echo>
 	 <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="mysaFiledir" sflagcontrol="" />
 	 <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mysaFilename" sflagcontrol="" />
-	 
-	
+
 	<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->																	
 	<ac:if>
-		<equals arg1="${returnControl}" arg2="true"/>
-		<ac:then>
+		<and>
+			<equals arg1="${returnControl}" arg2="true"/>
+			<or>
+				<not>
+					<!-- TODO GOON noch kaputt: mache isArrayEmptyJsZZZ und prüfe dort auf leer ab.... -->
+					<equals arg1="${mysaFiledir}" arg2="<#''!!FGLUNDEFINED!!''#>"/>
+				</not>
+				<!-- Auch ohne Dateien, sollte das Verzeichnis geloescht werden.
+				<not>
+					<equals arg1="${mysaFilename}" arg2="true"/>
+				</not>-->
+			</or>		
+		</and>
+		
+		
+		
+		<ac:then>		
 			<fl:echo>${sScript}Ergebnis: ${returnControl}, haenge Array an.</fl:echo>
 			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filedir}" array2append="${mysaFiledir}" arrayReturn="myArrayTotal1"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal1}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />						
 			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filename}" array2append="${mysaFilename}" arrayReturn="myArrayTotal2"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal2}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
 			
-			<fl:echo>${sScript}Ergebnis mit angehaengtem Array:</fl:echo>
-			<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>
-			<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>
+			<!--<fl:echo>${sScript}Ergebnis mit angehaengtem Array:</fl:echo>-->
+			<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>-->
+			<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>-->
 		</ac:then>
 		<ac:else>
 			<fl:echo>${sScript}Ergebnis: ${returnControl} => kein Arraywert anzuhaengen.</fl:echo>
@@ -2439,8 +2453,8 @@
 	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filedir"/>
 	<arrayInitJsZZZ isize="0" arrayreturn="mysaTotal.filename"/>
 	
-	<!-- TODO GOON: Teile die Werte der Dateien mit Kommata auf und arbeite die Dateien in einer Schleife ab. 
-	                Falls es Verzeichniswerte mit Komata gibt, ist das hier die falsche Funktion. Verwende ... Matrix ...-->
+	<!-- TODO GOON noch kaputt: Teile die Werte der Dateien mit Kommata auf und arbeite die Dateien in einer Schleife ab. 
+	                            Falls es Verzeichniswerte mit Komata gibt, ist das hier die falsche Funktion. Verwende ... Matrix ...-->
 	
 	<!-- ### Übernimm nur die Dateien, die existieren, alles andere macht beim Loeschen keinen Sinn -->
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
@@ -2864,7 +2878,7 @@
 				<fl:echo message="Alle Arrays haben gleich viel Elemente: ${iSize.Srca.filedir} " />				
 		</ac:then>
 		<ac:else>
-				<fl:fail message="Unterschiedliche Anzahl an Elementen in den Arrays: iSize.Srca.filedir={$iSize.Srca.filedir} | iSize.Srca.filename=${iSize.Srca.filename} | iSize.Desta.filedir=${iSize.Desta.filedir} | iSize.Desta.filename=${iSize.Desta.filename}  "/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+				<fl:fail message="Unterschiedliche Anzahl an Elementen in den Arrays: iSize.Srca.filedir=${iSize.Srca.filedir} | iSize.Srca.filename=${iSize.Srca.filename} | iSize.Desta.filedir=${iSize.Desta.filedir} | iSize.Desta.filename=${iSize.Desta.filename}  "/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
 		</ac:else>
 	</ac:if>
 	
@@ -3321,14 +3335,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<antcallback target="-FGLCopyLocal_Control_F_Part" return="returnControl, returna.filedir, returna.filename">
 		<param name="sPart" value="${myRightPart}"/>
 	</antcallback>
-	<fl:let>myDesta.filedir::="${returna.filedir}"</fl:let><!-- klappt das mit dem fl:let so, oder sollte man doch das array kopieren? -->
-	<fl:let>myDesta.filename::="${returna.filename}"</fl:let>
-	<!-- <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
-	<!-- <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="myDesta.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	<fl:let>myReturnControl::="${returnControl}"</fl:let>
 	
+	<!--<fl:let>myDesta.filedir::="${returna.filedir}"</fl:let>--><!-- klappt das mit dem fl:let so, oder sollte man doch das array kopieren? -->
+	<!--<fl:let>myDesta.filename::="${returna.filename}"</fl:let>-->
+	<arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" /><!-- So nimmt man einen Arraywert entgegen. -->	
+	<arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="myDesta.filename" sflagcontrol="" /><!-- So nimmt man einen Arraywert entgegen. -->	
 	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 	<!-- <arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
-	<fl:let>myReturnControl::="${returnControl}"</fl:let>
+	
 	
 	<ac:if>
 		<ac:equals arg1="${returnControl}" arg2="false"/>										
@@ -3346,19 +3361,12 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<fl:let>mySrca.filedir::="${returna.filedir}"</fl:let><!-- klappt das mit dem fl:let so, oder sollte man doch das array kopieren? -->
 			<fl:let>mySrca.filename::="${myDesta.filename}"</fl:let><!-- WICHTIG: HIER WIRD DER ZIELDATEINAME ALS QUELLDATEINAME UEBERNOMMEN -->
 			<fl:let>myReturnControl::="${returnControl}"</fl:let>
-			<!-- <arrayCopyJsZZZ arrayinput="${returna.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
-			<!-- <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mySrca.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
-	
-	
+
 			<!-- Rückagebwerte: Sie werden dann bis in die eigentliche Kopierfunktionalität weitergeschleift. -->
 			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 			<!-- <arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->				
 		</ac:else>
 	</ac:if>
-	
-	
-	<!-- TODO GOON noch kaputt: Wie -FGLCopyLocal_Control_DF, aber erst den rechten Teil behandeln, dann den linken und dabei den Dateinamen nach links übernehmen -->
-	<!-- <fl:let>returnControl ::= false</fl:let> -->
 		
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />		
@@ -3577,7 +3585,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
     <arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />					
 	<fl:let>bGoon::=true</fl:let>
-	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
+	<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
 	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 	
 	<arrayElementCountJsZZZ arrayinput="${mysaTotal.filedir}" ireturn="mysaTotal.filedir.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
@@ -3624,11 +3632,10 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 						
 						<!--<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das funktioniert aber die Backslashe nur verdoppeln reicht nicht -->
 						<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
-						<!--<echo>Normierter Verzeichniseintrag: ${mytemp}</echo>-->
 						<fl:let>mysFiledirNormed::='${mytemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 						<!--<echo>Normierter Verzeichniseintrag: ${mysFiledirNormed}</echo>-->
 						
-						<!-- SITUATION: Kopiert man mysFilename in eine andere Variable, geht die Referenz verloren.
+						<!-- SITUATION: Kopiert man mysFilename in eine andere Variable, geht scheinbar die Referenz verloren.
                                   ABER: Warum passiert das nur beim sFiledir?
 							    LÖSUNG: Die einfachen Backslashe verhindern die Übertragung als Parameter für den antcallback. Man muss den Wert in Hochkommata setzen.-->				
 						
@@ -3642,8 +3649,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 					<ac:else> 
 			<!-- TODO GOON NOCH KAPUTT -->					
 						<antcallback target="-FGLDelLocal_DeleteFileByFile" return="returnControl,returnString">					
-							<param name="saFiledir" value="${mysaTotal.filedir}"/>
-							<param name="saFilename" value="${mysaTotal.filename}"/>														
+							<param name="saTotal.sFiledir" value="${mysaTotal.filedir}"/>
+							<param name="saTotal.sFilename" value="${mysaTotal.filename}"/>														
 						</antcallback>
 						<fl:let>myReturnControl::="${returnControl}"</fl:let>
 						<fl:let>myReturnString::="${returnString}"</fl:let>
@@ -3658,7 +3665,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 </target>
 <target name="-FGLDelLocal_DeleteFileSingle"> 
 	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
-	<!-- TODO: Den Fall abfangen, falls eine Datei nicht gelöscht werden kann, wg. Rechte, in anderem Programm geöffnet, etc. -->
+	<!-- TODO GOON noch kaputt: Den Fall abfangen, falls eine Datei nicht gelöscht werden kann, wg. Rechte, in anderem Programm geöffnet, etc. -->
 	
 	<!-- Uebernahme von Einzelwerten -->
 	<fl:let>myDir::='${sFiledir}'</fl:let><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
@@ -3668,8 +3675,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!--<arrayCopyJsZZZ arrayinput="${srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />-->
 
 	<fl:when test="null('${myFile}')">
-		<echo>Uebergabeparemeter ist Null (myFile)</echo>
-		<fl:fail message="Uebergabeparemeter ist Null (myFile)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+		<echo>Uebergabeparameter ist Null (myFile)</echo>
+		<fl:fail message="Uebergabeparameter ist Null (myFile)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 	</fl:when>
 	<fl:when test="'${myFile}'==''">
 		<echo>Uebergabeparameter ist Leerwert (myFile)</echo>
@@ -3677,14 +3684,14 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	</fl:when>
 	
 	<fl:when test="null('${myDir}')">
-		<echo>Uebergabeparemeter ist Null (myDir)</echo>
-		<fl:fail message="Uebergabeparemeter ist Null (myDir)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+		<echo>Uebergabeparameter ist Null (myDir)</echo>
+		<fl:fail message="Uebergabeparameter ist Null (myDir)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 	</fl:when>
 	<fl:when test="'${myDir}'==''">
 		<echo>Uebergabeparameter ist Leerwert (myDir)</echo>
 		<fl:fail message="Uebergabeparameter ist Leerwert (myDir)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 	</fl:when>	
-	<!--<fl:echo>Uebergabeparemeter sind (myDir = myFile):  ${myDir} = ${myFile}</fl:echo>-->
+	<!--<fl:echo>Uebergabeparameter sind (myDir = myFile):  ${myDir} = ${myFile}</fl:echo>-->
 					
 	<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
 	<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
@@ -3713,7 +3720,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- absolute Pfade verwenden: -->
 	<delete includeEmptyDirs="true"> 
-		<fileset dir="${myDir}">		
+		<fileset dir="${myDir}" includes="${myFile}" defaultexcludes="false"><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->		
 			<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 			<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
 														
@@ -3722,15 +3729,75 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		</fileset>	
 	</delete>
 	
-	
-	
 	<!-- ############### -->
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="true" />
 	<ac:var name="returnString" value="alles o.k." />
 	<!--<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->	
 </target>
+<target name="-FGLDelLocal_DeleteFileByFile">
+	<fl:let>sScript::='-FGLDelLocal_DeleteFileByFile: '</fl:let>	
+	<arrayCopyJsZZZ arrayinput="${saTotal.sFiledir}" arrayreturn="mysaTotal.sFiledir" sflagcontrol="" />	
+	<arrayCopyJsZZZ arrayinput="${saTotal.sFilename}" arrayreturn="mysaTotal.sFilename" sflagcontrol="" />
+	<echo>${sScript}Uebergebene Eingangs-Arrays:</echo>
+	<arrayDebugJsZZZ arrayinput="${mysaTotal.sFiledir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${mysaTotal.sFilename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	
+	<!-- Prüfen: Alle Arrays sollen gleich lang sein.-->
+	<arrayElementCountJsZZZ arrayinput="${mysaTotal.sFiledir}" ireturn="mysaTotal.sFiledir.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
+	<arrayElementCountJsZZZ arrayinput="${mysaTotal.sFilename}" ireturn="mysaTotal.sFilename.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->	
+	<ac:if>
+		<equals arg1="${mysaTotal.sFiledir.iSize}" arg2="${mysaTotal.sFilename.iSize}" />
+		<ac:then>		
+				<fl:echo message="${sScript}Alle Arrays haben gleich viel Elemente: ${mysaTotal.sFilename.iSize} " />				
+		</ac:then>
+		<ac:else>
+				<fl:fail message="${sScript}Unterschiedliche Anzahl an Elementen in den Arrays: mysaTotal.sFiledir.iSize=${mysaTotal.sFiledir.iSize} | mysaTotal.sFilename.iSize=${mysaTotal.sFilename.iSize}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+		</ac:else>
+	</ac:if>
+	
+	<!-- Merke es gibt ein antcontrib Target 'Pathtofileset' dies hier vielleicht anwenden ? -->
+	
+	<!-- Schleife über alle Arraypositionen-->
+	<!-- TODO IDEE: Ermittle den letzten wert des arrays -->
 
+	<!-- 3. Ermittle die Indexposition, den Dateinamen und den Dateipfad -->	
+	<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+	<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+	<var name="op1" value="${mysaTotal.sFilename.iSize}"/>
+	<var name="op2" value="1"/>
+	<var name="op" value="-"/>
+	<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+	<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>
+	
+	<!-- Hole die Werte der aktuellen Arrayposition, das geht nur wenn iubound > icounter, darum muss man doch tatsächlich eine Fallunterscheidung einbauen, wenn param und end gleich sind -->
+	<ac:for param="icounter" end="${iubound}">			
+		<sequential>
+			<echo>${sScript}icounter is @{icounter}</echo> 
+			<arrayGetJsZZZ arrayinput="${mysaTotal.sFiledir}" index="@{icounter}" arrayget="sFiledir"/>	
+			<arrayGetJsZZZ arrayinput="${mysaTotal.sFilename}" index="@{icounter}" arrayget="sFilename"/>	
+							
+			<!-- Aufruf des Single-File Kopiervorgang -->
+			<!-- TODO GOON noch kaputt: Dies in ein extra Target verlagern. Da sich der Wert einer Property nie ändert. -->
+			<propertyregex property="mytemp" input="${sFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+			<fl:let>mysFiledirNormed::='${mytemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+			<echo>${sScript}Normierter Verzeichniseintrag: ${mysFiledirNormed}</echo>
+			<fl:let>mysFilename::='${sFilename}'</fl:let>									
+			<antcallback target="-FGLDelLocal_DeleteFileSingle" return="returnControl,returnString">					
+					<param name="sFiledir" value="${mysFiledirNormed}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+					<param name="sFilename" value="${mysFilename}"/>						
+			</antcallback>	
+			<fl:let>myReturnControl::="${returnControl}"</fl:let>
+			
+			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
+			<fl:let>myReturnString::="${returnString}"</fl:let>
+		</sequential>
+		</ac:for>		
+
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnString" value="CopyFileByFile: Alles ok." />
+</target>
 <!-- ### HILFSTARGETS ########################################################## -->
 <!-- ######## Targets ############################################################################--> 	
 <target name="-computeFilenameVMD">
