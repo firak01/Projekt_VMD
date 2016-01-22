@@ -839,6 +839,46 @@
 	</scriptdef>
 	
 	<!-- ########################### -->
+	<scriptdef name="isLessThanJsZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob der erste Wert kleiner als der 2. Wert ist. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+												
+		<attribute name="inputvalue01" />
+		<attribute name="inputvalue02" />
+		<attribute name="returnboolean" />
+		<attribute name="sflagcontrol" />
+		<attribute name="returntrace" />
+		<![CDATA[		   		  
+		   var bReturn = true;	
+		   var sScript = "isLessThanJsZZZ";
+		   var sTrace = sScript;
+		   
+		   var myValueInput01 = attributes.get("inputvalue01");
+		   var myValueInput02 = attributes.get("inputvalue01");
+		   print("InputValue01='"+myInputValue01+"'");		   			
+		   print("InputValue02='"+myInputValue02+"'");		   			
+			
+			//Wertevergleich starten			
+			main:{		
+
+				//FGL: 20160122: Code kommt aus einer "compare" Funktio und muss noch angepasst werden.
+				//               ABER: ist das mit dem parseInt noch generisch?
+				//<!-- returns the same results as Java's compareTo() method: -->
+				//<!-- -1 if arg1 < arg2, 0 if arg1 = arg2, 1 if arg1 > arg2 -->
+				var val1 = parseInt(attributes.get("arg1"));
+				var val2 = parseInt(attributes.get("arg2"));
+				var result = (val1 > val2 ? 1 : (val1 < val2 ? -1 : 0));
+ 						
+			}; //end main:	
+			project.setProperty(attributes.get("returnboolean"), bReturn);
+			project.setProperty(attributes.get("returntrace"), sTrace);
+		 ]]>
+	</scriptdef>	
+	
+	<!-- ########################### -->
 	<scriptdef name="isSetZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie als gesetzt interpretiert werden kann. -->
 		<!-- Es werden Ausdrücke, die ${ } entsprechen als nicht gesetzt angesehen.
@@ -957,6 +997,7 @@
 			}		   
 		 ]]>
 	</scriptdef>
+		
 	
 	<!-- ########################### -->
 	 <scriptdef name="stringContainsStringZZZ" language="javascript">
@@ -3978,6 +4019,56 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 	</target>
 	
+	
+	<!-- FGL 20160122 noch kaputt, testen -->
+<target name ="-isGreaterThanZZZ">
+	<fl:let>sScript::='-isGreaterThanZZZ: '</fl:let>
+	<fl:let>sTrace::=${sScript}</fl:let>
+	
+	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
+							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
+	<fl:let>myInputValue01::=${inputvalue01}"</fl:let>
+	<fl:let>myInputValue02::=${inputvalue02}</fl:let>
+	<fl:let>returnBoolean::=false</fl:let>
+	
+	<fl:let>returnControl::=false</fl:let>
+	<fl:let>returnTrace::=${sTrace}</fl:let>
+	<fl:let>returnString::="${stringInput}"</fl:let>
+
+	 <macrodef name="greaterthan">
+       <attribute name="resultprop" default="NOT SET"/>
+       <attribute name="arg1" default="NOT SET"/>
+       <attribute name="arg2" default="NOT SET"/>
+      <sequential>
+         <math result="gt_tmp" datatype="int">
+           <op op="max" >
+             <num value="@{arg1}"/>
+             <num value="@{arg2}"/>
+           </op>
+         </math>
+         <echo>${gt_tmp}</echo>
+         <if>
+           <equals arg1="@{arg1}" arg2="${gt_tmp}" />
+           <then>
+             <property name="@{resultprop}" value="1" />
+           </then>
+           <else>
+             <property name="@{resultprop}" value="0" />
+           </else>
+         </if>
+       </sequential>
+    </macrodef> 
+	
+	<!-- Wichtig: Das Macro muss in den Zeilen oberhalb definiert worden sein -->
+	<greaterthan arg1="100" arg2="20" resultprop="well" />   
+	<echo>GREATERTHAN: ${well}</echo> 
+	 
+	<!-- Rueckgabebwerte -->			
+		<ac:var name="returnBoolean" value="${well}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+</target>
+	
+	
 <!-- ######## Targets ############################################################################--> 	
  <target name="-stringEscapeBackslashZZZ">
 	<fl:let>sScript::='-stringEscapeBackslashZZZ: '</fl:let>
@@ -3989,6 +4080,13 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<fl:let>myiNumber::=${intNumber}</fl:let>
 	<fl:let>returnControl::=false</fl:let>
 	<fl:let>returnString::="${stringInput}"</fl:let>				
+	
+	<!-- FGL noch kaput - testen und weiterentwickeln 20160122 -->	
+	<antcallback target="-isGreaterThanZZZ" return="returnboolean,returncontrol">
+						<param name="inputvalue01" value="100"/>					
+						<param name="inputvalue02" value="20"/>	
+	</antcallback>				 
+    <echo>GREATERTHAN: ${mybool}</echo> 
 	
 	<echo message="${sScript}myiNumber=${myiNumber}" />
 	<ac:if>
@@ -4090,6 +4188,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnTrace" value="${sScript} Alles ok.|${sTrace}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
 </target>
+	
+	
+	
 	
 	<!-- ######## Targets ############################################################################--> 	
  <target name="-isHostVMD">

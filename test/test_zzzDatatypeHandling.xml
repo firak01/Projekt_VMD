@@ -1,0 +1,42 @@
+﻿<project>
+<!--20160122 DARAUS eine allgemeingueltige Funktion machen
+    Merke: Noch Fehler bei println...eval ..... -->
+<property name="foo" value="23"/>
+<property name="limit" value="22"/>
+
+<macrodef name="math">
+ <attribute name="operation"/>
+ <attribute name="operator1"/>
+ <attribute name="operator2"/>
+ <attribute name="result"/>
+ <attribute name="when"/>
+ <sequential>
+ <script language="javascript">
+   // note => use attribute @{when} without ''  !
+   if(eval(@{when})) {
+    tmp = 0;
+    switch ("@{operation}") {
+    case "+" :
+      tmp = parseInt("@{operator1}") + parseInt("@{operator2}");
+      break;
+    case "-" :
+      tmp = parseInt("@{operator1}") - parseInt("@{operator2}");
+      break;
+    case "*" :
+      tmp = parseInt("@{operator1}") * parseInt("@{operator2}");
+      break;
+    case "/" :
+      tmp = parseInt("@{operator1}") / parseInt("@{operator2}");
+      break;
+    }
+   project.setProperty("@{result}", tmp);
+   } else {
+     println("Condition: @{when} false !");
+   }
+ </script>
+ </sequential>
+</macrodef>
+
+<math operation="/" operator1="${foo}" operator2="11" result="foooo" when=" ${foo} &lt; ${limit} "/>
+
+</project>
