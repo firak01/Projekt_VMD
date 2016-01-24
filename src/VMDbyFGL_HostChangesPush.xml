@@ -674,7 +674,6 @@
 		 ]]>
 	</scriptdef>
 	
-	
 	<!-- ########################### -->
 	<scriptdef name="isArrayEmptyJsZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob das Array nur Werte hat, die aber als Leerwert gekennzeichet ist. -->
@@ -839,6 +838,7 @@
 	</scriptdef>
 	
 	<!-- ########################### -->
+	<!-- Todo noch kaputt: Es gibt statt einer direkten JvaScript Lösung einen Lösung über Hilfstarget mit Macrodef -->
 	<scriptdef name="isLessThanJsZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der erste Wert kleiner als der 2. Wert ist. -->
 		
@@ -998,7 +998,6 @@
 		 ]]>
 	</scriptdef>
 		
-	
 	<!-- ########################### -->
 	 <scriptdef name="stringContainsStringZZZ" language="javascript">
 	 <!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
@@ -1044,8 +1043,6 @@
 		   project.setProperty(attributes.get("returninteger"), iReturn);
 		 ]]>
 	  </scriptdef>
-	
-	
 	
 	<!-- ########################################################### -->
 	 <scriptdef name="stringLeftStringZZZ" language="javascript">
@@ -1223,51 +1220,88 @@
 		   }
 		 ]]>
 	</scriptdef>
-
 	   
-	<!-- ############################################################-->
-	<!-- ZUM EXPERIMENTIEREN -->
-	<scriptdef name="valueCopyJsZZZ" language="javascript">
-		<!-- Hiermit kopiert man einen Wert in einen neuen Wert.
-             Beispielsweise sinnvoll, wenn man befürchtet, das die SpeicherReferenz verloren geht.
-			 Durch diese Erfahrung wurde in arrayGetJS ebenfalls mit dem new Object() gearbeitet. -->
-		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="valueinput" />
-		<attribute name="valuereturn" />
-		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+<!-- ##### Macrodefs, gesammelt in einem Target, das dann von den Untertargets eingebunden werden kann ##### -->
+<target name="-initMacrodef">
+ 
+	 <!-- ############## macrodefs ############################ -->
+	 <macrodef name="mathMacroZZZ">
+		 <!-- Verwende ein Macrodef für allgemeine mathematische operationen -->
+		 <!-- Aufrufbeispiel: <math operation="/" operator1="${foo}" operator2="11" result="foooo" when=" ${foo} &lt; ${limit} "/> -->
+	   <attribute name="operation"/>
+	   <attribute name="operator1"/>
+	   <attribute name="operator2"/>
+	   <attribute name="result"/>
+	   <attribute name="when"/>
+	    
+		<!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+	   <sequential>
+		<script language="javascript">
 		<![CDATA[
-			var myValue = attributes.get("valueinput");	
-			var myFlagControl = attributes.get("sflagcontrol");
-			if(myFlagControl=="value"){
-			
-			//for(x in myValue){
-			//		print("x="+x);
-			//		print("myValue[x]="+myValue[x]);
-			//}
-				
-				//var objReturn=myValue.toString();
-				//print("myValue.toString="+objReturn);
-				
-				var obj = new Value[myValue];
-				var objReturn = obj["value"];
-			}else{			
-				//var objReturn = new Object();							
-				//objReturn.value = myValue;
-				
-				var objReturn = new Value(myValue);
-			}												
-			project.setProperty(attributes.get("valuereturn"), objReturn);
-			
-			
-			function Value(myValue){
-			     this.value=myValue;
+		 // note => use attribute @{when} without ''  !
+		 if(eval(@{when})) {    
+			 //println("operator1="+@{operator1}+" | operator2="+@{operator2});
+			 var tmp = 0;
+			 switch ("@{operation}")
+			 {
+			  case "+" :
+			   tmp = parseInt("@{operator1}") + parseInt("@{operator2}");
+			   break;
+			  case "-" :
+			   tmp = parseInt("@{operator1}") - parseInt("@{operator2}");
+			   break;
+			  case "*" :
+			   tmp = parseInt("@{operator1}") * parseInt("@{operator2}");
+			   break;
+			  case "/" :
+			   tmp = parseInt("@{operator1}") / parseInt("@{operator2}");
+			   break;
+			  case "max" :
+			   if(parseInt("@{operator1}") > parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;
+				};
+				break;
+			 case "min" :
+				//Merke: Das 'kleiner Zeichen' kann hier in den Code nicht eingebaut werden. Wird als XML erkannt. Darum Negierung als Notlösung.
+				//if(!(parseInt("@{operator1}") > parseInt("@{operator2}"))){
+				//Wenn man ein cdata um den script-teil packt, klappt es auch mit den 'kleiner Zeichen'.
+				if(parseInt("@{operator1}") < parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;			
+				}
+				break;
+			 }
+			 //println("math result="+tmp);
+			 project.setProperty("@{result}", tmp);
+		   } else {
+				//println("Condition: @{when} false !");
 			}
-		]]>
-	</scriptdef>
+		 ]]>
+		</script>
+	   </sequential>
+	 </macrodef>
+	 
+	  <!-- probier mal ein macrodef zu verschachteln ... klappt -->
+	  <macrodef name="greaterthanMacroZZZ">  
+		   <attribute name="resultprop" default="NOT SET"/>
+		   <attribute name="arg1" default="NOT SET"/>
+		   <attribute name="arg2" default="NOT SET"/>	
+		    
+		   <!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+		  <sequential>
+			<!--<echo>-greaterhan: arg1=@{arg1} | arg2=@{arg2}</echo>-->
+			<mathMacroZZZ operation="max" operator1="@{arg1}" operator2="@{arg2}" result="resultgth" when="true"/>		
+			 <!--<echo>-greaterthan: result=${resultgth}</echo>-->
+			 <property name="@{resultprop}" value="${resultgth}" />         
+		  </sequential>
+		</macrodef>
+ 
+ </target>  
 	   
   <!-- ######### Set global properties for this build ####################################################-->
   <!-- Example for using an environment variable, which is defined e.g. in windows: 
@@ -1495,6 +1529,7 @@
 	<echo>Current Timestamp: ${current.time}</echo>
 	<echo>Backup-Filenames: ${backup_RepositoryArchive.name}, ${backup_RepositoryMisc.name}</echo>
 </target>
+
 
 <!-- ################################################################################# -->  
 <target name="-FglRepository_Main">	
@@ -2920,22 +2955,14 @@
 						<!--<fl:let>myDest.sFiledirNormed::='${mytemp02}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 						<!--<echo>Normierter Verzeichniseintrag: ${mysFiledirNormed}</echo>-->
 						
-						<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
-							<param name="stringInput" value="${mySrc.sFiledir}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+						<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">
+							<param name="stringInput" value="${myDest.sFiledir}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
 							<param name="intNumber" value="1" />
-						</antcallback>
+						</antcallback>													
 						<echo>${sScript}Normierter Verzeichniseintrag: ${returnString}</echo>
 						<fl:let>mySrc.sFiledirNormed::='${returnString}'</fl:let>
 						<echo>${sScript}Normierter Verzeichniseintrag: ${mySrc.sFiledirNormed}</echo>
-						
-						<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
-							<param name="stringInput" value="${myDest.sFiledir}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
-							<param name="intNumber" value="1" />
-						</antcallback>
-						<echo>${sScript}Normierter Verzeichniseintrag: ${returnString}</echo>
-						<fl:let>myDest.sFiledirNormed::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-						<echo>${sScript}Normierter Verzeichniseintrag: ${myDest.sFiledirNormed}</echo>
-						
+											
 					
 						<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnControl,returnString">					
 								<param name="src.sFiledir" value="${mySrc.sFiledirNormed}"/>
@@ -3925,7 +3952,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnString" value="${sScript} Alles ok." />
 </target>
 <!-- ### HILFSTARGETS ########################################################## -->
-<!-- ######## Targets ############################################################################--> 	
+<!-- ######## Hilfstargets ############################################################################--> 	
 <target name="-computeFilenameVMD">
 		<!-- Ermittle den Dateinamen für VMD-Datei, unabhaengig davon ob auf Client oder Hostmaschine. -->
 		<fl:let>myOsUsed::="${osUsed}"</fl:let>
@@ -3984,7 +4011,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 	</target>
  
-<!-- ######## Targets ############################################################################--> 	
+<!-- ######## Hilfstargets ############################################################################--> 	
 <target name="-computeFilenameHostVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
 		<fl:let>myOsUsed::="${osUsed}"</fl:let>
@@ -4001,7 +4028,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 	</target>
 	
-	<!-- ######## Targets ############################################################################--> 	
+<!-- ######## Hilfstargets ############################################################################--> 	
 <target name="-computeFilenameClientHostNamedVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
 		<fl:let>myOsUsed::="${osUsed}"</fl:let>
@@ -4013,86 +4040,70 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
 		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
 		<fl:let>myFilename::="VM_FGL${myOsUsed}_${env.COMPUTERNAME}_${myHostUsed}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-
+ 
 		<!-- Rueckgabebwerte -->			
 		<ac:var name="returnFilename" value="${myFilename}" />
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
 	</target>
 	
-	
-	<!-- FGL 20160122 noch kaputt, testen -->
-<target name ="-isGreaterThanZZZ">
+<!-- ######## Hilfstargets ############################################################################--> 
+<target name ="-isGreaterThanZZZ" depends="-initMacrodef">
 	<fl:let>sScript::='-isGreaterThanZZZ: '</fl:let>
-	<fl:let>sTrace::=${sScript}</fl:let>
-	
-	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
-							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
-	<fl:let>myInputValue01::=${inputvalue01}"</fl:let>
-	<fl:let>myInputValue02::=${inputvalue02}</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<!-- das isgreaterthan von antcontrib funktioniert nicht, darum diese Lösung -->
+		
+	<fl:let>myInputValue01::="${inputvalue01}"</fl:let>
+	<fl:let>myInputValue02::="${inputvalue02}"</fl:let><!-- wichtig: In Hochkommata setzen. So wird ein call by value sichergestellt und die Referenzen gehen nicht verloren.-->
 	<fl:let>returnBoolean::=false</fl:let>
-	
-	<fl:let>returnControl::=false</fl:let>
-	<fl:let>returnTrace::=${sTrace}</fl:let>
-	<fl:let>returnString::="${stringInput}"</fl:let>
-
-	 <macrodef name="greaterthan">
-       <attribute name="resultprop" default="NOT SET"/>
-       <attribute name="arg1" default="NOT SET"/>
-       <attribute name="arg2" default="NOT SET"/>
-      <sequential>
-         <math result="gt_tmp" datatype="int">
-           <op op="max" >
-             <num value="@{arg1}"/>
-             <num value="@{arg2}"/>
-           </op>
-         </math>
-         <echo>${gt_tmp}</echo>
-         <if>
-           <equals arg1="@{arg1}" arg2="${gt_tmp}" />
-           <then>
-             <property name="@{resultprop}" value="1" />
-           </then>
-           <else>
-             <property name="@{resultprop}" value="0" />
-           </else>
-         </if>
-       </sequential>
-    </macrodef> 
-	
-	<!-- Wichtig: Das Macro muss in den Zeilen oberhalb definiert worden sein -->
-	<greaterthan arg1="100" arg2="20" resultprop="well" />   
-	<echo>GREATERTHAN: ${well}</echo> 
-	 
+		
+	<!-- Wichtig: Das Makro muss in den Zeilen vorher definiert worden sein -->
+	<greaterthanMacroZZZ arg1="${myInputValue01}" arg2="${myInputValue02}" resultprop="myReturnValue" />   
+	<!--<echo>-isGreaterThanZZZ: ${myReturnValue}</echo>-->
+	<ac:if>
+		<ac:equals arg1="${myReturnValue}" arg2="1" />
+		<ac:then>
+			<fl:let>myReturnBoolean::=true</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:let>myReturnBoolean::=false</fl:let>
+		</ac:else>		
+	</ac:if>
+		 		
 	<!-- Rueckgabebwerte -->			
-		<ac:var name="returnBoolean" value="${well}" />
-		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+	<ac:var name="returnBoolean" value="${myReturnBoolean}" />
+	<fl:let>returnControl::=true</fl:let>
+	<fl:let>returnTrace::="${sScript}Alles o.k. | ${sTrace}"</fl:let>
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 </target>
-	
-	
-<!-- ######## Targets ############################################################################--> 	
- <target name="-stringEscapeBackslashZZZ">
+	 	
+<!-- ######## Hilfstargets ############################################################################--> 	
+<target name="-stringEscapeBackslashZZZ">
 	<fl:let>sScript::='-stringEscapeBackslashZZZ: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
 	
 	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
 							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
 	<fl:let>mysString::="${stringInput}"</fl:let>
-	<fl:let>myiNumber::=${intNumber}</fl:let>
+	<fl:let>myiNumber::="${intNumber}"</fl:let><!-- wichtig: in Hochkommata setzen. Nur so wird der Wert gerettet, weil call by value-->
 	<fl:let>returnControl::=false</fl:let>
 	<fl:let>returnString::="${stringInput}"</fl:let>				
 	
-	<!-- FGL noch kaput - testen und weiterentwickeln 20160122 -->	
-	<antcallback target="-isGreaterThanZZZ" return="returnboolean,returncontrol">
-						<param name="inputvalue01" value="100"/>					
-						<param name="inputvalue02" value="20"/>	
+	<!-- FGL noch kaput - testen und weiterentwickeln 20160122 -->
+	<!-- das isgreaterthan von antcontrib funktioniert nicht, darum diese Lösung -->	
+	<echo message="${sScript}myiNumber=${myiNumber}" />	
+	<antcallback target="-isGreaterThanZZZ" return="returnBoolean,returnControl,returnTrace">
+		<param name="inputvalue01" value="${myiNumber}"/>					
+		<param name="inputvalue02" value="0"/>	
 	</antcallback>				 
-    <echo>GREATERTHAN: ${mybool}</echo> 
+    <echo>${sScript}returnBoolean=${returnBoolean}</echo> 
+	<echo>${sScript}returnControl=${returnControl}</echo>
+	<echo>${sScript}returnTrace=${returnTrace}</echo>
 	
-	<echo message="${sScript}myiNumber=${myiNumber}" />
+	
 	<ac:if>
-		<ac:bool></ac:bool>
+		<ac:bool>
 			<islessthan arg1="${myiNumber}" arg2="0" />
-		<ac:bool></ac:bool>
+		</ac:bool>
 		<ac:then>		
 				<fl:fail message="${sScript}Die Anzahl der Escape - Backslash kleiner 0. Unerwarteter Parameter"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
 		</ac:then>
@@ -4189,11 +4200,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
 </target>
 	
-	
-	
-	
-	<!-- ######## Targets ############################################################################--> 	
- <target name="-isHostVMD">
+<!-- ######## Hilfstargets ############################################################################--> 	
+<target name="-isHostVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
 		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
 		<fl:let>returnBoolean::=false</fl:let>			
@@ -4235,17 +4243,30 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
 	</target>
 	
- <!-- ######## Targets ############################################################################--> 	
- <target name="-isClientVMD">
+<!-- ######## Hilfstargets ############################################################################--> 	
+<target name="-isClientVMD">
 		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
 		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
 		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
 		<fl:let>returnBoolean::=false</fl:let>			
 		<fl:let>returnControl::=false</fl:let>
 				
+		
+				
 		<!-- Den Dateinamen tatsächlich berechnen -->
 		<!-- <fl:install-property-handler /> Das ist in Untertargets nicht erlaubt!!! -->
 		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		
+		<!-- 3. Ermittle die Indexposition, den Dateinamen und den Dateipfad -->	
+		<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+		<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+		<var name="op1" value="${mysaTotal.sFilename.iSize}"/>
+		<var name="op2" value="1"/>
+		<var name="op" value="-"/>
+		<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+		<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>
+	
+		
 		<echo>VMD_OS= ${env.VMD_OS}</echo>
 		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
 		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">

@@ -1,42 +1,220 @@
-﻿<project>
-<!--20160122 DARAUS eine allgemeingueltige Funktion machen
-    Merke: Noch Fehler bei println...eval ..... -->
-<property name="foo" value="23"/>
-<property name="limit" value="22"/>
+﻿<?xml version="1.0" encoding="UTF-8" ?> 
+<project  default="compile" basedir=".."
+		  xmlns:fl="antlib:it.haefelinger.flaka"
+		  xmlns:ac="antlib://net/sf/antcontrib"><!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
 
-<macrodef name="math">
- <attribute name="operation"/>
- <attribute name="operator1"/>
- <attribute name="operator2"/>
- <attribute name="result"/>
- <attribute name="when"/>
- <sequential>
- <script language="javascript">
-   // note => use attribute @{when} without ''  !
-   if(eval(@{when})) {
-    tmp = 0;
-    switch ("@{operation}") {
-    case "+" :
-      tmp = parseInt("@{operator1}") + parseInt("@{operator2}");
-      break;
-    case "-" :
-      tmp = parseInt("@{operator1}") - parseInt("@{operator2}");
-      break;
-    case "*" :
-      tmp = parseInt("@{operator1}") * parseInt("@{operator2}");
-      break;
-    case "/" :
-      tmp = parseInt("@{operator1}") / parseInt("@{operator2}");
-      break;
-    }
-   project.setProperty("@{result}", tmp);
-   } else {
-     println("Condition: @{when} false !");
-   }
- </script>
- </sequential>
-</macrodef>
+<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+<!-- ######## Hilfstargets ############################################################################--> 
 
-<math operation="/" operator1="${foo}" operator2="11" result="foooo" when=" ${foo} &lt; ${limit} "/>
+<!-- #### Scriptdefs ####################################################-->
+<!-- ZUM EXPERIMENTIEREN -->
+	<scriptdef name="valueCopyJsZZZ" language="javascript">
+		<!-- Hiermit kopiert man einen Wert in einen neuen Wert.
+             Beispielsweise sinnvoll, wenn man befürchtet, das die SpeicherReferenz verloren geht.
+			 Durch diese Erfahrung wurde in arrayGetJS ebenfalls mit dem new Object() gearbeitet. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="valueinput" />
+		<attribute name="valuereturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myValue = attributes.get("valueinput");	
+			var myFlagControl = attributes.get("sflagcontrol");
+			if(myFlagControl=="value"){
+			
+			//for(x in myValue){
+			//		print("x="+x);
+			//		print("myValue[x]="+myValue[x]);
+			//}
+				
+				//var objReturn=myValue.toString();
+				//print("myValue.toString="+objReturn);
+				
+				var obj = new Value[myValue];
+				var objReturn = obj["value"];
+			}else{			
+				//var objReturn = new Object();							
+				//objReturn.value = myValue;
+				
+				var objReturn = new Value(myValue);
+			}												
+			project.setProperty(attributes.get("valuereturn"), objReturn);
+			
+			
+			function Value(myValue){
+			     this.value=myValue;
+			}
+		]]>
+	</scriptdef>
+
+<!-- #### Hilfstargets ########################################################-->
+
+<!-- ######## Hilfstargets ############################################################################--> 
+<target name ="-isGreaterThanZZZ" depends="-initMacrodef">
+	<fl:let>sScript::='-isGreaterThanZZZ: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<!-- das isgreaterthan von antcontrib funktioniert nicht, darum diese Lösung -->
+		
+	<fl:let>myInputValue01::="${inputvalue01}"</fl:let>
+	<fl:let>myInputValue02::="${inputvalue02}"</fl:let><!-- wichtig: In Hochkommata setzen. So wird ein call by value sichergestellt und die Referenzen gehen nicht verloren.-->
+	<fl:let>returnBoolean::=false</fl:let>
+		
+	<!-- Wichtig: Das Makro muss in den Zeilen vorher definiert worden sein -->
+	<greaterthanMacroZZZ arg1="${myInputValue01}" arg2="${myInputValue02}" resultprop="myReturnValue" />   
+	<echo>-isGreaterThanZZZ: ${myReturnValue}</echo> 
+	<ac:if>
+		<ac:equals arg1="${myReturnValue}" arg2="1" />
+		<ac:then>
+			<fl:let>myReturnBoolean::=true</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:let>myReturnBoolean::=false</fl:let>
+		</ac:else>		
+	</ac:if>
+		 		
+	<!-- Rueckgabebwerte -->			
+	<ac:var name="returnBoolean" value="${myReturnBoolean}" />
+	<fl:let>returnControl::=true</fl:let>
+	<fl:let>returnTrace::="${sScript}Alles o.k. | ${sTrace}"</fl:let>
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
+<!-- ####### Macrodefs, gesammelt in einem Target, das dann von den Untertargets eingebunden werden kann ######## -->
+<target name="-initMacrodef">
+ 
+	 <!-- ############## macrodefs ############################ -->
+	 <macrodef name="mathMacroZZZ">
+		 <!-- Verwende ein Macrodef für allgemeine mathematische operationen -->
+		 <!-- Aufrufbeispiel: <math operation="/" operator1="${foo}" operator2="11" result="foooo" when=" ${foo} &lt; ${limit} "/> -->
+	   <attribute name="operation"/>
+	   <attribute name="operator1"/>
+	   <attribute name="operator2"/>
+	   <attribute name="result"/>
+	   <attribute name="when"/>
+	    
+		<!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+	   <sequential>
+		<script language="javascript">
+		<![CDATA[
+		 // note => use attribute @{when} without ''  !
+		 if(eval(@{when})) {    
+			 //println("operator1="+@{operator1}+" | operator2="+@{operator2});
+			 var tmp = 0;
+			 switch ("@{operation}")
+			 {
+			  case "+" :
+			   tmp = parseInt("@{operator1}") + parseInt("@{operator2}");
+			   break;
+			  case "-" :
+			   tmp = parseInt("@{operator1}") - parseInt("@{operator2}");
+			   break;
+			  case "*" :
+			   tmp = parseInt("@{operator1}") * parseInt("@{operator2}");
+			   break;
+			  case "/" :
+			   tmp = parseInt("@{operator1}") / parseInt("@{operator2}");
+			   break;
+			  case "max" :
+			   if(parseInt("@{operator1}") > parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;
+				};
+				break;
+			 case "min" :
+				//Merke: Das 'kleiner Zeichen' kann hier in den Code nicht eingebaut werden. Wird als XML erkannt. Darum Negierung als Notlösung.
+				//if(!(parseInt("@{operator1}") > parseInt("@{operator2}"))){
+				//Wenn man ein cdata um den script-teil packt, klappt es auch mit den 'kleiner Zeichen'.
+				if(parseInt("@{operator1}") < parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;			
+				}
+				break;
+			 }
+			 //println("math result="+tmp);
+			 project.setProperty("@{result}", tmp);
+		   } else {
+		 println("Condition: @{when} false !");
+	   }
+		 ]]>
+		</script>
+	   </sequential>
+	 </macrodef>
+	 
+	  <!-- probier mal ein macrodef zu verschachteln ... klappt -->
+	  <macrodef name="greaterthanMacroZZZ">  
+		   <attribute name="resultprop" default="NOT SET"/>
+		   <attribute name="arg1" default="NOT SET"/>
+		   <attribute name="arg2" default="NOT SET"/>	
+		    
+		   <!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+		  <sequential>
+			<echo>-greaterhanMacroZZZ: arg1=@{arg1} | arg2=@{arg2}</echo>
+			<mathMacroZZZ operation="max" operator1="@{arg1}" operator2="@{arg2}" result="resultgth" when="true"/>		
+			 <echo>-greaterthanMacroZZZ: result=${resultgth}</echo>		 
+			 <property name="@{resultprop}" value="${resultgth}" />         
+		  </sequential>
+		</macrodef>
+ 
+ </target>
+
+
+<!-- ################################################################################# -->
+	<!-- Die einzelnen Tests im depends hinzufügen -->
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <!-- <target name="compile" depends="-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
+ <target name="compile" depends="-myTestIsGreaterThan">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+ </target>
+ 
+ <target name="-myTestIsGreaterThan">
+	<fl:let>sScript::='-myTestIsGreaterThan: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<echo>${sScript}Start</echo>
+	
+	<fl:let>myiNumber::=10</fl:let>
+	
+	<!-- Hier wird die scriptdef Methode aufgerufen -->
+	<antcallback target="-isGreaterThanZZZ" return="returnBoolean,returnControl,returnTrace">
+		<param name="inputvalue01" value="${myiNumber}"/>					
+		<param name="inputvalue02" value="0"/>	
+	</antcallback>				 
+    <echo>${sScript}returnBoolean=${returnBoolean}</echo> 
+	<echo>${sScript}returnControl=${returnControl}</echo>
+	<echo>${sScript}returnTrace=${returnTrace}</echo>
+</target> 
+
+
 
 </project>
