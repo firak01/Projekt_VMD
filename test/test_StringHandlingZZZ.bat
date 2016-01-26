@@ -3,7 +3,7 @@ REM KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkann
 
 REM Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist.
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
-echo start test_zzzDatatypeHandling
+echo start test_StringHandlingZZZ
 
 REM Wir wollen hier keine Java Files builden
 REM call ant -buildfile testFlaka_Patton.xml
@@ -79,8 +79,8 @@ ECHO VersionMajar.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%Vers
 ECHO VersionName: %VersionName%
 ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
 
-call ant -f test_zzzDatatypeHandling.xml
+call ant -f test_StringHandlingZZZ.xml
 
-echo Ende test_zzzDatatypeHandling
+echo Ende test_StringHandlingZZZ
 pause
 REM timeout /T 20 /nobreak

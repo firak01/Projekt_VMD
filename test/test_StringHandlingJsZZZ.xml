@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>  
-<project name="tryoutAnt_StringProcessingWithJavaScript"  default="compile" basedir="..">
+<project name="test_StringHandlingJsZZZ"  default="compile" basedir="..">
 
 <!-- ######## Scriptdefs ############################################################################--> 
 

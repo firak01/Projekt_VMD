@@ -3,15 +3,15 @@ REM KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkann
 
 REM Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist.
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
-echo start tryoutAnt_StringProcessingWithJavaScript
+echo start test_StringHandlingJsZZZ
 
 REM Wir wollen hier keine Java Files builden
 REM call ant -buildfile testFlaka_Patton.xml
 
 REM Wir wollen hier nicht auf umgebungsvariablen zugreifen SET TRYOUT_ANT="Das ist ein Test"
 
-call ant -f tryoutAnt_StringProcessingWithJavaScript.xml
+call ant -f test_StringHandlingJsZZZ.xml
 
-echo Ende tryoutAnt_StringProcessingWithJavaScript
+echo Ende test_StringHandlingJsZZZ
 pause
 REM timeout /T 20 /nobreak

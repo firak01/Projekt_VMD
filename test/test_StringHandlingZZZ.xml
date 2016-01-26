@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?> 
+<project  name="test_DatatypeHandlingJsZZZ" default="compile" basedir=".."
+		  xmlns:fl="antlib:it.haefelinger.flaka"
+		  xmlns:ac="antlib://net/sf/antcontrib"><!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
+
+<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+<!-- ##### Macrodefs, gesammelt in einem Target, das dann von den Untertargets eingebunden werden kann ##### -->
+<target name="-initMacrodef">
+ 
+	 <!-- ############## macrodefs ############################ -->
+	 <macrodef name="mathMacroZZZ">
+		 <!-- Verwende ein Macrodef für allgemeine mathematische operationen -->
+		 <!-- Aufrufbeispiel: <math operation="/" operator1="${foo}" operator2="11" result="foooo" when=" ${foo} &lt; ${limit} "/> -->
+	   <attribute name="operation"/>
+	   <attribute name="operator1"/>
+	   <attribute name="operator2"/>
+	   <attribute name="result"/>
+	   <attribute name="when"/>
+	    
+		<!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+	   <sequential>
+		<script language="javascript">
+		<![CDATA[
+		 // note => use attribute @{when} without ''  !
+		 if(eval(@{when})) {    
+			 //println("operator1="+@{operator1}+" | operator2="+@{operator2});
+			 var tmp = 0;
+			 switch ("@{operation}")
+			 {
+			  case "+" :
+			   tmp = parseInt("@{operator1}") + parseInt("@{operator2}");
+			   break;
+			  case "-" :
+			   tmp = parseInt("@{operator1}") - parseInt("@{operator2}");
+			   break;
+			  case "*" :
+			   tmp = parseInt("@{operator1}") * parseInt("@{operator2}");
+			   break;
+			  case "/" :
+			   tmp = parseInt("@{operator1}") / parseInt("@{operator2}");
+			   break;
+			  case "max" :
+			   if(parseInt("@{operator1}") > parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;
+				};
+				break;
+			 case "min" :
+				//Merke: Das 'kleiner Zeichen' kann hier in den Code nicht eingebaut werden. Wird als XML erkannt. Darum Negierung als Notlösung.
+				//if(!(parseInt("@{operator1}") > parseInt("@{operator2}"))){
+				//Wenn man ein cdata um den script-teil packt, klappt es auch mit den 'kleiner Zeichen'.
+				if(parseInt("@{operator1}") < parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;			
+				}
+				break;
+			 }
+			 //println("math result="+tmp);
+			 project.setProperty("@{result}", tmp);
+		   } else {
+				//println("Condition: @{when} false !");
+			}
+		 ]]>
+		</script>
+	   </sequential>
+	 </macrodef>
+	 
+	  <!-- probier mal ein macrodef zu verschachteln ... klappt -->
+	  <macrodef name="greaterthanMacroZZZ">  
+		   <attribute name="resultprop" default="NOT SET"/>
+		   <attribute name="arg1" default="NOT SET"/>
+		   <attribute name="arg2" default="NOT SET"/>	
+		    
+		   <!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+		  <sequential>
+			<!--<echo>-greaterhan: arg1=@{arg1} | arg2=@{arg2}</echo>-->
+			<mathMacroZZZ operation="max" operator1="@{arg1}" operator2="@{arg2}" result="resultgth" when="true"/>		
+			 <!--<echo>-greaterthan: result=${resultgth}</echo>-->
+			 <property name="@{resultprop}" value="${resultgth}" />         
+		  </sequential>
+		</macrodef>
+		
+		<!-- probier mal ein macrodef zu verschachteln ... klappt -->
+	  <macrodef name="lessthanMacroZZZ">  
+		   <attribute name="resultprop" default="NOT SET"/>
+		   <attribute name="arg1" default="NOT SET"/>
+		   <attribute name="arg2" default="NOT SET"/>	
+		    
+		   <!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+		  <sequential>
+			<echo>-lessthanMacroZZZ: arg1=@{arg1} | arg2=@{arg2}</echo>
+			<mathMacroZZZ operation="min" operator1="@{arg1}" operator2="@{arg2}" result="resultgth" when="true"/>		
+			 <echo>-lessthanMacroZZZ: result=${resultgth}</echo>		 
+			 <property name="@{resultprop}" value="${resultgth}" />         
+		  </sequential>
+		</macrodef>
+ 
+ </target>  	
+	
+<!-- ######## Hilfstargets ############################################################################--> 
+<target name ="-isLessThanZZZ" depends="-initMacrodef">
+	<fl:let>sScript::='-isLessThanZZZ: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<!-- das isgreaterthan von antcontrib funktioniert nicht, darum diese Lösung -->
+		
+	<fl:let>myInputValue01::="${inputvalue01}"</fl:let>
+	<fl:let>myInputValue02::="${inputvalue02}"</fl:let><!-- wichtig: In Hochkommata setzen. So wird ein call by value sichergestellt und die Referenzen gehen nicht verloren.-->
+	<fl:let>returnBoolean::=false</fl:let>
+		
+	<!-- Wichtig: Das Makro muss in den Zeilen vorher definiert worden sein -->
+	<lessthanMacroZZZ arg1="${myInputValue01}" arg2="${myInputValue02}" resultprop="myReturnValue" />   
+	<echo>${sScript}${myReturnValue}</echo> 
+	<ac:if>
+		<ac:equals arg1="${myReturnValue}" arg2="1" />
+		<ac:then>
+			<fl:let>myReturnBoolean::=true</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:let>myReturnBoolean::=false</fl:let>
+		</ac:else>		
+	</ac:if>
+		 		
+	<!-- Rueckgabebwerte -->			
+	<ac:var name="returnBoolean" value="${myReturnBoolean}" />
+	<fl:let>returnControl::=true</fl:let>
+	<fl:let>returnTrace::="${sScript}Alles o.k. | ${sTrace}"</fl:let>
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
+<target name="-stringEscapeBackslashZZZ">
+	<fl:let>sScript::='-stringEscapeBackslashZZZ: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	
+	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
+							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->	
+
+<!-- Scheint ein Fehler in antcontrib zu sein. Vielleicht auch alternative Lösung durch FLAKA ....
+	<project xmlns:fl="antlib:it.haefelinger.flaka">
+
+  <property name="digitA" value="42"/>
+  <property name="digitB" value="23"/>
+  <property name="wordA"  value="abcd"/>
+  <property name="wordB"  value="efgh"/>
+
+  <!- compare of digits ->
+  <fl:when test=" '${digitA}' > '${digitB}' ">
+    <echo>${digitA} gt ${digitB}</echo>
+  </fl:when>
+
+  <!- example with string compare in switch ->
+  <fl:switch value="${wordA}">
+    <cmp gt="${wordB}">
+      <echo>${wordA} gt ${wordB}</echo>
+    </cmp>
+    <cmp lt="${wordB}">
+    <echo>${wordA} lt ${wordB}</echo>
+    </cmp>
+  </fl:switch>
+
+</project>-->
+							   
+	<fl:let>mysString::="${stringInput}"</fl:let>
+	<fl:let>myiNumber::="${intNumber}"</fl:let><!-- wichtig: in Hochkommata setzen. Nur so wird der Wert gerettet, weil call by value-->
+	<fl:let>returnControl::=false</fl:let>
+						
+	<!--<echo message="${sScript}myiNumber=${myiNumber}" />-->
+	<ac:if>
+		<ac:equals arg1="${myiNumber}" arg2="0" />
+		<ac:then>
+			<!-- mache nix -->
+			<fl:let>mysString::="${stringInput}"</fl:let>			
+		</ac:then>
+		<ac:elseif>
+			<ac:equals arg1="${myiNumber}" arg2="1" />
+			<ac:then>
+				<!--ac:for erwartet immer ungleiche Parameterwerte. D.h. Schleife ueber ein Element geht nicht. Darum hier separat aufrufen. --> 
+				<!-- Hier: 1-mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
+				<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+						<param name="stringInput" value="${mysString}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+				</antcallback>
+				
+				<!--<fl:let>mysStringNormed::='${returnString}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+				<!--<echo>${sScript}Normierter Verzeichniseintrag: ${mysStringNormed}</echo>-->
+				<fl:let>mysString::='${returnString}'</fl:let>
+				
+			</ac:then>
+		</ac:elseif>
+		<ac:else>
+		    <!-- Merke: AntContib islessthan funktioniert nicht als condition in ac:if (weil Bug), darum meine eigene Methode nutzen -->
+			<antcallback target="-isLessThanZZZ" return="returnBoolean,returnControl,returnTrace">
+				<param name="inputvalue01" value="${myiNumber}"/>					
+				<param name="inputvalue02" value="0"/>	
+			</antcallback>				 
+			<!--<echo>${sScript}returnBoolean=${returnBoolean}</echo>-->
+			<!--<echo>${sScript}returnControl=${returnControl}</echo>-->
+			<!--<echo>${sScript}returnTrace=${returnTrace}</echo>-->
+			<fl:let>myLessThanZero::=${returnBoolean}</fl:let>
+			<ac:if>
+				<ac:equals arg1="${myLessThanZero}" arg2="true" />
+				<ac:then>
+					<fl:fail message="${sScript}Die Anzahl der Escape - Backslash kleiner 0. Unerwarteter Parameter"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+				</ac:then>
+				<ac:else>
+					<!-- 3. Reduziere die Anzahl um -1 -->	
+					<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+					<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+					<var name="op1" value="${myiNumber}"/>
+					<var name="op2" value="1"/>
+					<var name="op" value="-"/>
+					<math result="myiNumberIndexed" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+					<!--<echo>${sScript}Errechneter ubound Wert: ${myiNumberIndexed}</echo>-->
+					
+					
+					<ac:for param="icounter" end="${myiNumberIndexed}">			
+						<sequential>
+							<!--<echo>${sScript}icounter ist @{icounter}</echo>-->
+							
+							<!-- Hier: x mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
+							<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+									<param name="stringInput" value="${mysString}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+							</antcallback>
+							
+							<!--<fl:let>mysStringNormed::='${returnString}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+							<!--<echo>${sScript}Normierter Verzeichniseintrag: ${mysStringNormed}</echo>-->
+							<fl:let>mysString::='${returnString}'</fl:let>
+					
+						</sequential>
+					</ac:for>		
+				</ac:else>		
+			</ac:if>									
+		</ac:else>
+	</ac:if><!-- Gleichheitszeichen -->
+	
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnString" value="${mysString}" />
+	<!--<echo message="${sScript}'returnString'=${returnString}" />-->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnTrace" value="${sScript} Alles ok.|${sTrace}" />
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
+</target>
+
+<target name="--stringEscapeBackslashZZZ">
+	<fl:let>sScript::='--stringEscapeBackslashZZZ: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	
+	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
+							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
+	<fl:let>mysString::="${stringInput}"</fl:let>
+	<fl:let>returnControl::=false</fl:let>
+	<fl:let>returnString::="${stringInput}"</fl:let>				
+	
+	
+	<!-- Das eigentliche Escapen -->
+	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
+	<propertyregex property="mytemp" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	
+	<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
+	<!-- Aufruf des propertyregex Targets: Hier zum erneuten vervierfachen der Backslashe -->	
+	<!--<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das waere wieder verdoppeln -->
+	<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<fl:let>mysString::='${mytemp02}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<!--<echo message="${sScript}'mysString'=${mysString}" />-->
+	
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnString" value="${mysString}" />
+	<!--<echo message="${sScript}'returnString'=${returnString}" />-->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnTrace" value="${sScript} Alles ok.|${sTrace}" />
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywert zurueck -->			
+</target>
+
+<!-- #### Scriptdefs ####################################################-->
+
+<!-- ################################################################################# -->
+	<!-- Die einzelnen Tests im depends hinzufügen -->
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <target name="compile" depends="-myTestStringEscapeBackslash">
+ <!--<target name="compile" depends="-myTestStringEscapeBackslash">-->
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+ </target>
+ 
+ <target name="-myTestStringEscapeBackslash">
+	<fl:let>sScript::='-myTestStringEscapeBackslash: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<echo>${sScript}Start</echo>
+	
+	<echo>##################################</echo>
+	<fl:let>sString2escape::='c:\test\directory\nocheins'</fl:let>
+	<echo>${sScript}sString2escape=${sString2escape}</echo>
+	<echo> </echo>
+	<echo>##################################</echo>
+	<echo>#####Fall 0 mal escapen ##########</echo>
+	<!-- Hier wird das Hilfstarget aufgerufen -->
+	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
+	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+		<param name="stringInput" value="${sString2escape}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+		<param name="intNumber" value="0" />					
+	</antcallback>
+	
+	<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
+	<fl:let>mysFiledirEscapeTemp::=${returnString}</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>	
+	<fl:let>mysFiledirEscapeValue::='${mysFiledirEscapeTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo>
+	
+	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	<fl:let>mysFiledirEscapeByValueTemp::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp mit byValue): ${mysFiledirEscapeByValueTemp}</echo>
+	<!-- Beweis, dass jede Uebernahme mit Hochkommata einmal das Escapen mit Backslash wieder rueckgaengig macht. -->
+	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo>
+	<echo> </echo>
+	<echo>##################################</echo>
+	<echo>#####Fall 1 mal escapen ##########</echo>
+	<!-- Hier wird das Hilfstarget aufgerufen -->
+	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
+	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+		<param name="stringInput" value="${sString2escape}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+		<param name="intNumber" value="1" />					
+	</antcallback>
+	
+	<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
+	<fl:let>mysFiledirEscapeTemp::=${returnString}</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>	
+	<fl:let>mysFiledirEscapeValue::='${mysFiledirEscapeTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo>
+	
+	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	<fl:let>mysFiledirEscapeByValueTemp::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp mit byValue): ${mysFiledirEscapeByValueTemp}</echo>
+	<!-- Beweis, dass jede Uebernahme mit Hochkommata einmal das Escapen mit Backslash wieder rueckgaengig macht. -->
+	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo>
+	<echo> </echo>
+	<echo>##################################</echo>
+	<echo>#####Fall 2 mal escapen ##########</echo>
+	<!-- Hier wird das Hilfstarget aufgerufen -->
+	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
+	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+		<param name="stringInput" value="${sString2escape}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+		<param name="intNumber" value="2" />					
+	</antcallback>
+	
+	<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
+	<fl:let>mysFiledirEscapeTemp::=${returnString}</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>	
+	<fl:let>mysFiledirEscapeValue::='${mysFiledirEscapeTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo>
+	
+	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	<fl:let>mysFiledirEscapeByValueTemp::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp mit byValue): ${mysFiledirEscapeByValueTemp}</echo>
+	<!-- Beweis, dass jede Uebernahme mit Hochkommata einmal das Escapen mit Backslash wieder rueckgaengig macht. -->
+	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo>
+	<echo> </echo>
+	<echo>##################################</echo>
+	<echo>##### Fehlerfall -1 mal escapen ###</echo>
+	<!-- Hier wird das Hilfstarget aufgerufen -->
+	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
+	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+		<param name="stringInput" value="${sString2escape}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+		<param name="intNumber" value="-1" />					
+	</antcallback>
+	
+	<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
+	<fl:let>mysFiledirEscapeTemp::=${returnString}</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>	
+	<fl:let>mysFiledirEscapeValue::='${mysFiledirEscapeTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo>
+	
+	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	<fl:let>mysFiledirEscapeByValueTemp::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp mit byValue): ${mysFiledirEscapeByValueTemp}</echo>
+	<!-- Beweis, dass jede Uebernahme mit Hochkommata einmal das Escapen mit Backslash wieder rueckgaengig macht. -->
+	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo>
+</target> 
+
+</project>
