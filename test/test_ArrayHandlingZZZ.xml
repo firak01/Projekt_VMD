@@ -1,0 +1,1131 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
+	xmlns:fl="antlib:it.haefelinger.flaka" 
+	xmlns:ac="antlib://net/sf/antcontrib"><!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
+	
+	<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+	<!-- ##### Macrodefs, gesammelt in einem Target, das dann von den Untertargets eingebunden werden kann ##### -->
+	<target name="-initMacrodef">
+ 
+	 <!-- ############## macrodefs ############################ -->
+	 <macrodef name="mathMacroZZZ">
+		 <!-- Verwende ein Macrodef für allgemeine mathematische operationen -->
+		 <!-- Aufrufbeispiel: <math operation="/" operator1="${foo}" operator2="11" result="foooo" when=" ${foo} &lt; ${limit} "/> -->
+	   <attribute name="operation"/>
+	   <attribute name="operator1"/>
+	   <attribute name="operator2"/>
+	   <attribute name="result"/>
+	   <attribute name="when"/>
+	    
+		<!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+	   <sequential>
+		<script language="javascript">
+		<![CDATA[
+		 // note => use attribute @{when} without ''  !
+		 if(eval(@{when})) {    
+			 //println("operator1="+@{operator1}+" | operator2="+@{operator2});
+			 var tmp = 0;
+			 switch ("@{operation}")
+			 {
+			  case "+" :
+			   tmp = parseInt("@{operator1}") + parseInt("@{operator2}");
+			   break;
+			  case "-" :
+			   tmp = parseInt("@{operator1}") - parseInt("@{operator2}");
+			   break;
+			  case "*" :
+			   tmp = parseInt("@{operator1}") * parseInt("@{operator2}");
+			   break;
+			  case "/" :
+			   tmp = parseInt("@{operator1}") / parseInt("@{operator2}");
+			   break;
+			  case "max" :
+			   if(parseInt("@{operator1}") > parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;
+				};
+				break;
+			 case "min" :
+				//Merke: Das 'kleiner Zeichen' kann hier in den Code nicht eingebaut werden. Wird als XML erkannt. Darum Negierung als Notlösung.
+				//if(!(parseInt("@{operator1}") > parseInt("@{operator2}"))){
+				//Wenn man ein cdata um den script-teil packt, klappt es auch mit den 'kleiner Zeichen'.
+				if(parseInt("@{operator1}") < parseInt("@{operator2}")){
+					tmp=1;
+				}else{
+					tmp=0;			
+				}
+				break;
+			 }
+			 //println("math result="+tmp);
+			 project.setProperty("@{result}", tmp);
+		   } else {
+				//println("Condition: @{when} false !");
+			}
+		 ]]>
+		</script>
+	   </sequential>
+	 </macrodef>
+	 
+	  <!-- probier mal ein macrodef zu verschachteln ... klappt -->
+	  <macrodef name="greaterthanMacroZZZ">  
+		   <attribute name="resultprop" default="NOT SET"/>
+		   <attribute name="arg1" default="NOT SET"/>
+		   <attribute name="arg2" default="NOT SET"/>	
+		    
+		   <!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+		  <sequential>
+			<!--<echo>-greaterhan: arg1=@{arg1} | arg2=@{arg2}</echo>-->
+			<mathMacroZZZ operation="max" operator1="@{arg1}" operator2="@{arg2}" result="resultgth" when="true"/>		
+			 <!--<echo>-greaterthan: result=${resultgth}</echo>-->
+			 <property name="@{resultprop}" value="${resultgth}" />         
+		  </sequential>
+		</macrodef>
+		
+		<!-- probier mal ein macrodef zu verschachteln ... klappt -->
+	  <macrodef name="lessthanMacroZZZ">  
+		   <attribute name="resultprop" default="NOT SET"/>
+		   <attribute name="arg1" default="NOT SET"/>
+		   <attribute name="arg2" default="NOT SET"/>	
+		    
+		   <!-- Merke: Die Tags echo und math arbeiten nur innerhalb des sequential-Tags.
+				Darin müssen die 'Variablen' mit @ angesprochen werden.-->
+		  <sequential>
+			<echo>-lessthanMacroZZZ: arg1=@{arg1} | arg2=@{arg2}</echo>
+			<mathMacroZZZ operation="min" operator1="@{arg1}" operator2="@{arg2}" result="resultgth" when="true"/>		
+			 <echo>-lessthanMacroZZZ: result=${resultgth}</echo>		 
+			 <property name="@{resultprop}" value="${resultgth}" />         
+		  </sequential>
+		</macrodef>
+ 
+ </target>  
+
+	<!-- ######## Scriptdefs #############################################-->
+	<!-- ############################################################-->
+	<scriptdef name="arrayAppendJsZZZ" language="javascript">
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="valueinput" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myValue = attributes.get("valueinput");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+			
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					}
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
+			icount=-1; icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					myArrayReturn[icount]=objectArray[x];
+				}else{
+					//nix
+				}
+			}
+						
+			//3. Erweitere das Array
+			icountGlobal++;
+			//print("Wert anhängen an position " + icountGlobal + ": '" + myValue + "'");
+			
+			//TODO An dieser Stelle bei der Erweiterung arrays anzuhängen: Prüfen, ob das ein Einzelwert oder ein Array ist.
+			myArrayReturn[icountGlobal]=myValue;
+																						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->
+	<scriptdef name="arrayAppendArrayJsZZZ" language="javascript">
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="array2append" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myArray2append = attributes.get("array2append");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+			
+			var objectArray2append = myArray2append.split(',');  //Merke: Versuche so ein Array zu machen.							
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+						
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					};
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugebende Array
+			icount=-1; 
+			var icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					myArrayReturn[icount]=objectArray[x];
+				}else{
+					//nix
+				};
+			};
+						
+			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
+			for(z in objectArray2append){								
+				if(objectArray2append[z]=="<#!!FGLUNDEFINED!!#>"){
+					print("<#!!FGLUNDEFINED!!#> Wert NICHT anhaengen.");
+				}else{
+					icountGlobal++;
+					print("Wert anhaengen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
+					myArrayReturn[icountGlobal]=objectArray2append[z];
+				};							
+			};			
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->
+	<scriptdef name="arrayCopyJsZZZ" language="javascript">
+		<!-- Hiermit man ein Array in eine anderes neues Array.
+             Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
+             man aber noch mit dem alten 'Variablennamen' weiterarbeiten möchte.			 -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			
+			//Kopiervorgang, noch ohne irgendwelche FlagControl Erweiterungen.			
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+				myArrayReturn[icount]=objectArray[x];
+			};
+															
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ########################### -->
+	<scriptdef name="arrayDebugJsZZZ" language="javascript">
+		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
+			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
+			   - der Inhalt
+			   - die Größe des Arrays			-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="arrayinput" />
+		<attribute name="ilevel" />	
+		<![CDATA[	
+			enableJava();
+			var myArray = attributes.get("arrayinput");					
+			var myLevel = attributes.get("ilevel");					
+			if(myLevel<=0){
+				
+			}else{
+			if(myArray===undefined) print("myarray = undefined");
+			if(myArray==null) print("myarray = NULL");	
+			
+			//Typausgabe
+			print("typeof myarray = " + typeof(myArray));
+					
+			
+			var iSize=0;
+			if(Array.isArray(myArray)){
+				print("Array uebergeben bekommen");
+				iSize = myArray.length;
+				print("Arraygroesse="+iSize);
+				
+				//TODO: Die gleichen Ausgaben wie im KEIN ARRAY Fall.
+				//- Werte
+			}else{
+				print("kein Array uebergeben bekommen.");
+				
+				var icount=0;					
+				if(typeof(myArray)=="object"){
+					print("Object uebergeben bekommen.");
+					
+					if(myLevel>=2){
+					//das listet alle Methoden des objekts auf.... scheint ein String zu sein....
+					//print("ALLE METHODEN DES OBJEKTS:");
+					//for(x in myArray){
+					//	print(x);		
+					//};	
+					
+					print("#################################");
+					print("ALLE METHODEN UND CODEINHALT DES OBJEKTS:");
+					for(xx in myArray){
+						print("xx: '"+ xx + "'");		//ABER: Damit bekommt man die Namen der Methoden
+						print("zugriff ueber xx: '" + myArray[xx] + "'"); //damit bekommt man codeinhalt der Methoden.
+					};
+					};//myLevel>=2;
+					
+					debugArrayAsString(myArray);
+				}else{
+					print("kein Objekt");
+					debugArrayAsString(myArray);					
+				};
+			};
+			};//myLevel <= 0;
+			
+			
+			function debugArrayAsString(myArray){
+					print("#################################");
+					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
+					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
+					
+					print("splitte diesen String nach Komma.");
+					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
+					for(x in objectArray){
+						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					};
+					
+					//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
+					//for(x2 in objectArray02){
+					//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
+					//};
+					
+					//var objectArrayString = myArray.toString();
+					//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
+					//for(z in objectArray03){
+					//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
+					//};
+					
+					print("#################################");
+					print("Versuch die Werte auszugeben: ");	
+					//Merke: Voraussetzung ist:
+					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					 for(yy in objectArray){
+							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
+							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
+						};
+			}
+			
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+			
+		]]>
+	</scriptdef>
+	
+	 <!-- ########################### -->	
+	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
+		<attribute name="arrayinput" />
+		<attribute name="ireturn" />
+		<![CDATA[
+			var lista = attributes.get("arrayinput");		 
+			var iReturn = -1;
+										
+			//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+			var icount=0;
+			var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+			if(typeof(objectArray)=="object"){
+			for(x in objectArray){
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				}else{
+					icount++;
+				};				
+			}							
+			}else{
+				iReturn=0;
+			}
+			
+			iReturn = icount;
+			
+			project.setProperty(attributes.get("ireturn"), iReturn);
+		]]>
+	</scriptdef>
+			
+	<!-- ########################### -->	
+	<scriptdef name="arrayGetJsZZZ" language="javascript">
+		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
+		<attribute name="arrayinput" />
+		<attribute name="index" />
+		<attribute name="arrayget" />
+		<![CDATA[
+			var lista = attributes.get("arrayinput");		 
+			var iIndex = attributes.get("index");
+			var objReturn="<#!!FGLUNDEFINED!!#>";
+			main:{
+				if(iIndex <= -1) break main;
+				
+				//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+				var icount=-1;
+				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+				if(typeof(objectArray)=="object"){
+				for(x in objectArray){
+					//print("x="+x);
+					//print("objectArray[x]="+objectArray[x]);
+					
+					//Undefinierte, d.h. nur initialisierte Arrays abfangen
+					//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
+					if(objectArray.length<=1 && objectArray[x]=="<#!!FGLUNDEFINED!!#>"){						
+						break main;
+					}else{
+						icount++;
+						if(icount==iIndex){
+							objReturn = objectArray[x];
+							break main;
+						}				
+					}; //end if
+					}; //end for
+				}; //end if(typeof(objectArray)=="object")				
+			}; //end main:
+			project.setProperty(attributes.get("arrayget"), objReturn);
+		]]>
+	</scriptdef>
+			
+	<!-- ############################################################-->		
+	<scriptdef name="arrayInitJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Erstellung eines Arrays.
+			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="isize" />
+		<attribute name="arrayreturn" />		
+		<![CDATA[										 
+			var mySize = attributes.get("isize");	
+			//print("iSize = '" + mySize + "'");
+			
+			//Prüfen, ob mySize eine Zahl ist. 
+			//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
+			//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
+			if(isNumber(mySize)){
+				//print("eine Zahl");
+				var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
+				
+				if(mySize==0){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+				}
+				if(mySize>=1){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					for(icount=0; icount<=mySize-1; icount++){
+						myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
+					}												
+				}								
+			}else{
+				//print("KEINE Zahl");
+				var myArrayReturn = new Array();
+
+				//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+				myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+			}
+						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
+		]]>
+	</scriptdef>
+				
+	<!-- ############################################################-->	
+	<scriptdef name="arrayLeftBackStringJsZZZ" language="javascript">
+		<!-- Hiermit schneodet man von den Werten eines Arrays einen Stringwert ab. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="sinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'before' von vorne bzw. 'behind' von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myValue = attributes.get("sinput");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+			
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					}
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
+			//   UND erweitere jeden Arrayeintrag um den gewünschten String.
+			//   TODO: sFlagControl auswerten, zum unterscheiden ob der String vorangestellt oder angehängt wird.
+			icount=-1; icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					print("Wert wird kopiert und abgeschnitten: '" + objectArray[x]+ "' leftback von '" + myValue + "'");
+					myArrayReturn[icount]=getStrLeftBackStr(objectArray[x], myValue);
+				}else{
+					//nix
+				}
+			}
+						
+													
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);			
+			
+			//äquivalent zu JSZ - Kernel
+			//@LeftBack equivalent, !!! casesensitive
+			function getStrLeftBackStr(sourceStr, keyStr){
+				arr = sourceStr.split(keyStr);
+				//arr.pop();		//entfernt das letzte Element aus dem Array
+				arr.shift();		//entfernt das erste Element aus dem Array
+				return (keyStr==null | keyStr=='') ? '' : arr.join();		
+			}
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->	
+	<scriptdef name="arrayPlusStringJsZZZ" language="javascript">
+		<!-- Hiermit häng man an die Werte eines Arrays einen Stringwert an. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="sinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'before' von vorne bzw. 'behind' von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myValue = attributes.get("sinput");
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+			
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					}
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
+			//   UND erweitere jeden Arrayeintrag um den gewünschten String.
+			//   TODO: sFlagControl auswerten, zum unterscheiden ob der String vorangestellt oder angehängt wird.
+			icount=-1; icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					print("Wert wird kopiert und erweitert: '" + objectArray[x]+ "' plus '" + myValue + "'");
+					myArrayReturn[icount]=objectArray[x] + myValue;
+				}else{
+					//nix
+				}
+			}
+						
+													
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->	
+	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
+		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
+			 TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
+				   Damit soll das Auffüllen der Testwerte auf einen bestimmten Indexbereich beschränkt werden. -->
+		
+		<!-- Merke: Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="arrayinput" />
+		<attribute name="ilbound" />
+		<attribute name="iubound" />
+		<attribute name="arrayreturn" />
+		<attribute name="ireturn" /><!-- true, false -->
+		<![CDATA[
+			enableJava();
+			var myArray = attributes.get("arrayinput");		 
+			var iReturn = false;
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			for(x in objectArray){
+				//print("Wert vorher: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+					myArrayReturn[icount]="<#!!FGLUNDEFINED!!#>";		//Wenn undefiniert, dann bleibt der Wert undefiniert.
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					myArrayReturn[icount]="Neuer Wert "+ icount; 		//Leere Werte werden automatisch erzeugt.
+				}else{
+					myArrayReturn[icount]=objectArray[x]+ " " + icount; //Bestehende Werte werden verändert.
+				};				
+			}	
+
+			//for(x in myArrayReturn){
+			//	print("Wert nachher: '" + myArrayReturn[x]+ "'");
+			//}														
+			iReturn = true;											
+		
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			project.setProperty(attributes.get("ireturn"), iReturn);
+			
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+		]]>
+	</scriptdef>
+					
+	<!-- ########################### -->
+	<scriptdef name="isArrayEmptyJsZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob das Array nur Werte hat, die aber als Leerwert gekennzeichet ist. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+												
+		<attribute name="arrayinput" />
+		<attribute name="returnboolean" />
+		<attribute name="sflagcontrol" />
+		<![CDATA[		   		  
+		   var bReturn = true;		   
+		   var myArrayInput = attributes.get("arrayinput");
+		   //print("myArrayInput='"+myArrayInput+"'");		   			
+			
+			//Das Array in einer Schleife durchgehen			
+			main:{				
+				//Merke: arrayinput ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+			
+				var icount=-1;
+				var objectArray = myArrayInput.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+				//print('typeof(objectArray)=' + typeof(objectArray));
+				if(typeof(objectArray)=="object"){
+					if(objectArray.length<=0)break main;
+					
+					var btemp=false;
+					for(x in objectArray){
+						//print("x="+x);
+						//print("objectArray[x]="+objectArray[x]);
+											
+						//Prüfe alle Werte ab, ob man nicht doch noch einen definierten Wert im Array findet.
+						if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+							btemp=true;							
+						}else{							
+							break main;
+						}; //end if
+					}; //end for
+					bReturn=btemp;
+				}; //end if(typeof(objectArray)=="object")				
+			}; //end main:	
+			project.setProperty(attributes.get("returnboolean"), bReturn);						
+		 ]]>
+	</scriptdef>	
+	
+ <!-- ########################### -->
+ <scriptdef name="stringLeftStringZZZ" language="javascript">
+ <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+	<attribute name="text" />
+    <attribute name="matchstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	   var text = attributes.get("text");
+       var match = attributes.get("matchstring");
+       
+       sReturn = getStrLeftStr(text, match);
+	   
+       project.setProperty(attributes.get("returnstring"), sReturn);
+	   
+	   //aus JSZ - Kernel 
+	   function getStrLeftStr(sourceStr, keyStr){
+		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
+		}
+     ]]>
+  </scriptdef>
+
+  <!-- ########################### -->
+  <scriptdef name="stringLeftBackStringZZZ" language="javascript">
+   <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+   <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+	<attribute name="text" />
+    <attribute name="matchstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	  var text = attributes.get("text");
+	  var match = attributes.get("matchstring");
+       
+      sReturn = getStrLeftBackStr(text, match);
+	   
+      project.setProperty(attributes.get("returnstring"), sReturn);
+	   
+	//äquivalent zu JSZ - Kernel
+	//@LeftBack equivalent, !!! casesensitive
+	function getStrLeftBackStr(sourceStr, keyStr){
+		arr = sourceStr.split(keyStr)
+		arr.pop();
+		return (keyStr==null | keyStr=='') ? '' : arr.join(keyStr)
+	}
+  ]]>
+  </scriptdef>
+  
+  <!-- ############################################################ -->
+	<scriptdef name="stringSubStringZZZ" language="javascript">
+	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
+		 <attribute name="text" />
+		 <attribute name="start" />
+		 <attribute name="end" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   var text = attributes.get("text");
+		   var start = attributes.get("start");
+		   var end = attributes.get("end") || text.length();
+		   project.setProperty(attributes.get("property"), text.substring(start, end));
+		 ]]>
+	</scriptdef>
+
+<!-- ############## Hilfstargets ############################################################-->
+	<!-- ######## Hilfstargets ###########################################--> 
+<target name ="-arrayStringEscapeBackslashZZZ">
+	<fl:let>sScript::='-arrayStringEscapeBackslashZZZ: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<!-- das isgreaterthan von antcontrib funktioniert nicht, darum diese Lösung -->
+		
+	<!-- Uebergabewerte entgegennehmen -->
+	<!--<fl:let>myInputValue02::="${inputvalue02}"</fl:let>--><!-- So nimmt man Strings entgegen. Wichtig: In Hochkommata setzen. So wird ein call by value sichergestellt und die Referenzen gehen nicht verloren.-->
+	<arrayCopyJsZZZ arrayinput="${inputArray}" arrayreturn="myInputArray" sflagcontrol="" />
+	
+	<!-- Das temporaere Array fuer die Rueckgabewerte initialisieren -->
+	<arrayInitJsZZZ isize="0" arrayreturn="myArrayTemp"/>
+	
+	<!-- Verarbeitung: In einer Schleife fuer jeden String StringEscapeBackslashZZZ aufrufen und  den Ergebniswert in das Rueckgabearray packen. -->	   
+	<ac:for param="myStringTemp" list="${myInputArray}"><!-- Beachte das for nur für sequential funktioniert und darin mit @ auf die Param-Variable zugegriffen werden kann. -->
+		<sequential>
+			<echo>${sScript}myStringTemp=@{myStringTemp}</echo> 
+			<!-- ähem, das macht daraus wohl ein Array, also nix was direkt den Backslash ersetzt <fl:let>myStringTempEscaped ::= split('@{myStringTemp}','\\\\')</fl:let>--><!-- 4 Backslashe um den 1 Backslash zu escapen in der split - Funktion -->
+			
+			<!-- TODO Goon noch kaputt: 20160128 -->
+			<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
+			<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">
+				<param name="stringInput" value="@{myStringTemp}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+				<param name="intNumber" value="1" />					
+			</antcallback>
+			
+			<echo>${sScript}myStringTempEscaped=${returnString}</echo> 
+		</sequential>				
+	</ac:for>
+	 		
+	<!-- Rueckgabebwerte -->			
+	<!--<ac:var name="returnBoolean" value="${myReturnBoolean}" />-->
+	<arrayCopyJsZZZ arrayinput="${myArrayTemp}" arrayreturn="returnArray" sflagcontrol="" />
+	<fl:let>returnControl::=true</fl:let>
+	<fl:let>returnTrace::="${sScript}Alles o.k. | ${sTrace}"</fl:let>
+	
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
+</target>
+
+<!-- ######## Hilfstargets ############################################################################--> 	
+<target name="-stringEscapeBackslashZZZ">
+	<fl:let>sScript::='-stringEscapeBackslashZZZ: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	
+	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
+							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->	
+
+<!-- Scheint ein Fehler in antcontrib zu sein. Vielleicht auch alternative Lösung durch FLAKA ....
+	<project xmlns:fl="antlib:it.haefelinger.flaka">
+
+  <property name="digitA" value="42"/>
+  <property name="digitB" value="23"/>
+  <property name="wordA"  value="abcd"/>
+  <property name="wordB"  value="efgh"/>
+
+  <!- compare of digits ->
+  <fl:when test=" '${digitA}' > '${digitB}' ">
+    <echo>${digitA} gt ${digitB}</echo>
+  </fl:when>
+
+  <!- example with string compare in switch ->
+  <fl:switch value="${wordA}">
+    <cmp gt="${wordB}">
+      <echo>${wordA} gt ${wordB}</echo>
+    </cmp>
+    <cmp lt="${wordB}">
+    <echo>${wordA} lt ${wordB}</echo>
+    </cmp>
+  </fl:switch>
+
+</project>-->
+							   
+	<fl:let>mysString::="${stringInput}"</fl:let>
+	<fl:let>myiNumber::="${intNumber}"</fl:let><!-- wichtig: in Hochkommata setzen. Nur so wird der Wert gerettet, weil call by value-->
+	<fl:let>returnControl::=false</fl:let>
+						
+	<!--<echo message="${sScript}myiNumber=${myiNumber}" />-->
+	<ac:if>
+		<ac:equals arg1="${myiNumber}" arg2="0" />
+		<ac:then>
+			<!-- mache nix -->
+			<fl:let>mysString::="${stringInput}"</fl:let>			
+		</ac:then>
+		<ac:elseif>
+			<ac:equals arg1="${myiNumber}" arg2="1" />
+			<ac:then>
+				<echo message="${sScript}0:'mysString'=${mysString}" />
+			
+				<!--ac:for erwartet immer ungleiche Parameterwerte. D.h. Schleife ueber ein Element geht nicht. Darum hier separat aufrufen. --> 
+				<!-- Hier: 1-mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
+				<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+						<param name="stringInput" value="${mysString}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+				</antcallback>
+				
+				<!--<fl:let>mysStringNormed::='${returnString}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+				<!--<echo>${sScript}Normierter Verzeichniseintrag: ${mysStringNormed}</echo>-->
+				<fl:let>mysString::='${returnString}'</fl:let>
+				
+			</ac:then>
+		</ac:elseif>
+		<ac:else>
+		    <!-- Merke: AntContib islessthan funktioniert nicht als condition in ac:if (weil Bug), darum meine eigene Methode nutzen -->
+			<antcallback target="-isLessThanZZZ" return="returnBoolean,returnControl,returnTrace">
+				<param name="inputvalue01" value="${myiNumber}"/>					
+				<param name="inputvalue02" value="0"/>	
+			</antcallback>				 
+			<!--<echo>${sScript}returnBoolean=${returnBoolean}</echo>-->
+			<!--<echo>${sScript}returnControl=${returnControl}</echo>-->
+			<!--<echo>${sScript}returnTrace=${returnTrace}</echo>-->
+			<fl:let>myLessThanZero::=${returnBoolean}</fl:let>
+			<ac:if>
+				<ac:equals arg1="${myLessThanZero}" arg2="true" />
+				<ac:then>
+					<fl:fail message="${sScript}Die Anzahl der Escape - Backslash kleiner 0. Unerwarteter Parameter"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+				</ac:then>
+				<ac:else>
+					<!-- 3. Reduziere die Anzahl um -1 -->	
+					<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+					<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+					<var name="op1" value="${myiNumber}"/>
+					<var name="op2" value="1"/>
+					<var name="op" value="-"/>
+					<math result="myiNumberIndexed" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+					<!--<echo>${sScript}Errechneter ubound Wert: ${myiNumberIndexed}</echo>-->
+					
+					
+					<ac:for param="icounter" end="${myiNumberIndexed}">			
+						<sequential>
+							<!--<echo>${sScript}icounter ist @{icounter}</echo>-->
+							<echo message="${sScript}1:'mysString'=${mysString}" />
+							
+							<!-- Hier: x mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
+							<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+									<param name="stringInput" value="${mysString}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+							</antcallback>
+							
+							<!--<fl:let>mysStringNormed::='${returnString}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+							<!--<echo>${sScript}Normierter Verzeichniseintrag: ${mysStringNormed}</echo>-->
+							<fl:let>mysString::='${returnString}'</fl:let>
+							
+						</sequential>
+					</ac:for>		
+				</ac:else>		
+			</ac:if>									
+		</ac:else>
+	</ac:if><!-- Gleichheitszeichen -->
+	
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnString" value="${mysString}" />
+	<!--<echo message="${sScript}'returnString'=${returnString}" />-->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnTrace" value="${sScript} Alles ok.|${sTrace}" />
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
+</target>
+
+<target name="--stringEscapeBackslashZZZ">
+	<fl:let>sScript::='--stringEscapeBackslashZZZ: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	
+	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
+							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
+	<fl:let>mysString::="${stringInput}"</fl:let>
+	<echo message="${sScript}0:'mysString'=${mysString}" />
+	<fl:let>returnControl::=false</fl:let>
+	<fl:let>returnString::="${stringInput}"</fl:let>				
+	
+	
+	<!-- Das eigentliche Escapen -->
+	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
+	<propertyregex property="mytemp" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<fl:let>mysString::='${mytemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo message="${sScript}1:'mysString'=${mysString}" />
+	
+	<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
+	<!-- Aufruf des propertyregex Targets: Hier zum erneuten vervierfachen der Backslashe -->	
+	<!--<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das waere wieder verdoppeln -->
+	<propertyregex property="mytemp02" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<fl:let>mysString::='${mytemp02}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo message="${sScript}2:'mysString'=${mysString}" />
+	
+	<!-- Rueckgabewerte -->
+	<ac:var name="returnString" value="${mysString}" />
+	<!--<echo message="${sScript}'returnString'=${returnString}" />-->
+	<ac:var name="returnControl" value="true" />
+	<ac:var name="returnTrace" value="${sScript} Alles ok.|${sTrace}" />
+	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywert zurueck -->			
+</target>
+
+<!-- ################################################################################# -->
+<!-- Die einzelnen Tests im depends hinzufügen -->
+<!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+			 
+<!-- TODO Test für isarrayEmptyJsZZZ -->			 
+			 
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
+<target name="compile" depends="-declaration,-myTestArrayStringEscapeBackslash">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+  <target name="-declaration">
+	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	  dies passiert hier durch flaka´s install-property handler task -->
+	  <fl:install-property-handler />	
+  </target>
+  
+   <target name="-myTestArrayStringEscapeBackslash">
+	<fl:let>sScript::='-myTesArraytStringEscapeBackslash: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<echo>${sScript}Start</echo>
+	
+	<echo>##################################</echo>
+	<!-- Das Testarray initialisieren -->
+	<arrayInitJsZZZ isize="0" arrayreturn="myArrayTemp"/>
+	<fl:let>sString2escape::='c:\test\directory\nocheins'</fl:let>
+	<echo>${sScript}1. sString2escape=${sString2escape}</echo>
+	<arrayAppendJsZZZ arrayinput="${myArrayTemp}" valueinput="${sString2escape}" arrayreturn="myArrayValue" sflagcontrol="" />
+	
+	<arrayCopyJsZZZ arrayinput="${myArrayValue}" arrayreturn="myArrayTemp" sflagcontrol="" />
+	<fl:let>sString2escape::='c:\test\directory\zweites'</fl:let>
+	<echo>${sScript}2. sString2escape=${sString2escape}</echo>	
+	<arrayAppendJsZZZ arrayinput="${myArrayTemp}" valueinput="${sString2escape}" arrayreturn="myArrayValue" sflagcontrol="" />
+	
+	<arrayCopyJsZZZ arrayinput="${myArrayValue}" arrayreturn="myArrayTemp" sflagcontrol="" />
+	<fl:let>sString2escape::='c:\test\directory\drittesBeachteEndezeichen\\'</fl:let><!-- Der abschliessende Backslasch muss schon escaped werden, wg. der Hochkommata.-->
+	<echo>${sScript}3. sString2escape=${sString2escape}</echo>	
+	<arrayAppendJsZZZ arrayinput="${myArrayTemp}" valueinput="${sString2escape}" arrayreturn="myArrayValue" sflagcontrol="" />
+	
+	<arrayDebugJsZZZ arrayinput="${myArrayValue}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	
+	
+	<!-- Hier wird das Hilfstarget aufgerufen -->
+	<antcallback target="-arrayStringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+		<param name="inputArray" value="${myArrayValue}" />
+		<!--wichtig fuer Strings: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+	</antcallback>	
+	
+	
+	<echo> </echo>
+	<echo>##################################</echo>
+	
+</target> 
+		<!-- Beispiel für JAVA Arrays
+		<scriptdef name="validateTimeZone" language="javascript">
+    <attribute name="zone" />
+    <![CDATA[
+        importClass(java.util.TimeZone);
+        importClass(java.util.Arrays);
+        var tz = attributes.get("zone"); //get attribute defined for scriptdef
+        println("    got attribute: " + tz);
+        var result = Arrays.asList(TimeZone.getAvailableIDs()).contains(tz); //testing if timezone is known
+        project.setProperty("zoneIsValid", result);
+    ]]> 
+</scriptdef> 
+-->
+		
+ </project>
