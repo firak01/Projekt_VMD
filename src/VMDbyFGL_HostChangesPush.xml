@@ -30,6 +30,7 @@
 		
     <!-- ######## Scriptdefs ############################################################################--> 		
 	<!-- ############################################################-->
+	<!-- ############################################################-->
 	<scriptdef name="arrayAppendJsZZZ" language="javascript">
 		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
 		
@@ -79,22 +80,36 @@
 			for(x in objectArray){
 				icount++;
 				if(icount<=iuboundfilled){
-					icountGlobal++;
-					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					icountGlobal++;					
 					myArrayReturn[icount]=objectArray[x];
 				}else{
 					//nix
 				}
 			}
 						
-			//3. Erweitere das Array
+			//3. Erweitere das Array UM ENCODIERTEN WERT
 			icountGlobal++;
-			//print("Wert anhängen an position " + icountGlobal + ": '" + myValue + "'");
+			print("Wert encoded anhängen an position " + icountGlobal + ": '" + myValue + "'");
+			var textEncoded = encodeMyHtml(myValue);
+			print("Encoded Wert wird kopiert: '" + textEncoded + "'");
 			
 			//TODO An dieser Stelle bei der Erweiterung arrays anzuhängen: Prüfen, ob das ein Einzelwert oder ein Array ist.
-			myArrayReturn[icountGlobal]=myValue;
+			myArrayReturn[icountGlobal]=textEncoded;
 																						
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			
+		//TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
 		]]>
 	</scriptdef>
 	
@@ -366,7 +381,7 @@
 		]]>
 	</scriptdef>
 	
-	<!-- ############################################################ -->	
+	<!-- ########################### -->	
 	<scriptdef name="arrayGetJsZZZ" language="javascript">
 		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
 		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
@@ -381,11 +396,9 @@
 		<attribute name="index" />
 		<attribute name="arrayget" />
 		<![CDATA[
-			var lista=attributes.get("arrayinput");		 
-			var iIndex=attributes.get("index");
-			
-			var objReturn=new Object();
-			objReturn.value="<#!!FGLUNDEFINED!!#>";
+			var lista = attributes.get("arrayinput");		 
+			var iIndex = attributes.get("index");
+			var objReturn="<#!!FGLUNDEFINED!!#>";
 			main:{
 				if(iIndex <= -1) break main;
 				
@@ -393,7 +406,6 @@
 			
 				var icount=-1;
 				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
-				//print('typeof(objectArray)=' + typeof(objectArray));
 				if(typeof(objectArray)=="object"){
 				for(x in objectArray){
 					//print("x="+x);
@@ -406,16 +418,15 @@
 					}else{
 						icount++;
 						if(icount==iIndex){
-						    print("icount==iIndex|" + icount+"=="+iIndex );
-							objReturn.value=objectArray[x];
+							var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
+							objReturn = textUnescaped;
 							break main;
 						}				
 					}; //end if
 					}; //end for
 				}; //end if(typeof(objectArray)=="object")				
 			}; //end main:
-			print("objReturn.value="+objReturn.value);
-			project.setProperty(attributes.get("arrayget"), objReturn.value);
+			project.setProperty(attributes.get("arrayget"), objReturn);
 		]]>
 	</scriptdef>
 	
@@ -4263,23 +4274,24 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
 							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
 	<fl:let>mysString::="${stringInput}"</fl:let>
-	<echo message="${sScript}0:'mysString'=${mysString}" />
 	<fl:let>returnControl::=false</fl:let>
 	<fl:let>returnString::="${stringInput}"</fl:let>				
 	
 	
-	<!-- Das eigentliche Escapen -->
+	<!-- Das eigentliche Escapen -->	
 	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
-	<propertyregex property="mytemp" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
-	<fl:let>mysString::='${mytemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-	<echo message="${sScript}1:'mysString'=${mysString}" />
+	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
+	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
+	<propertyregex property="mytemp" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mysString}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 	
 	<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
 	<!-- Aufruf des propertyregex Targets: Hier zum erneuten vervierfachen der Backslashe -->	
+	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
+	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
 	<!--<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das waere wieder verdoppeln -->
-	<propertyregex property="mytemp02" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mytemp}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 	<fl:let>mysString::='${mytemp02}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-	<echo message="${sScript}2:'mysString'=${mysString}" />
+	<!--<echo message="${sScript}'mysString'=${mysString}" />-->
 	
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnString" value="${mysString}" />

@@ -3,15 +3,15 @@ REM KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkann
 
 REM Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist.
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
-echo start test_ArrayJsHandlingZZZ
+echo start test_ArrayHandlingJsZZZ
 
 REM Wir wollen hier keine Java Files builden
 REM call ant -buildfile testFlaka_Patton.xml
 
 REM Wir wollen hier ggfs. Dateien verarbeiten
 SET TRYOUT_ANT="Das ist ein Test"
-call ant -f test_ArrayJsHandlingZZZ.xml
+call ant -f test_ArrayHandlingJsZZZ.xml
 
-echo Ende test_ArrayJsHandlingZZZ
+echo Ende test_ArrayHandlingJsZZZ
 pause
 REM timeout /T 20 /nobreak

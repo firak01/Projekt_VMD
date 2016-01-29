@@ -269,14 +269,18 @@
 	<fl:let>returnString::="${stringInput}"</fl:let>				
 	
 	
-	<!-- Das eigentliche Escapen -->
+	<!-- Das eigentliche Escapen -->	
 	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
-	<propertyregex property="mytemp" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
+	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
+	<propertyregex property="mytemp" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mysString}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 	
 	<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
 	<!-- Aufruf des propertyregex Targets: Hier zum erneuten vervierfachen der Backslashe -->	
+	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
+	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
 	<!--<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das waere wieder verdoppeln -->
-	<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" /><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mytemp}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 	<fl:let>mysString::='${mytemp02}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 	<!--<echo message="${sScript}'mysString'=${mysString}" />-->
 	
@@ -343,7 +347,28 @@
 	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo>
 	<echo> </echo>
 	<echo>##################################</echo>
-	<echo>#####Fall 1 mal escapen ##########</echo>
+	<echo>#####Fall 1 mal escapen a) ohne Backslashes ##########</echo>
+	<!-- Hier wird das Hilfstarget aufgerufen -->
+	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
+	<fl:let>sString2escapeWithoutPattern::='das ist ein normaler text'</fl:let>
+	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+		<param name="stringInput" value="${sString2escapeWithoutPattern}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+		<param name="intNumber" value="1" />					
+	</antcallback>
+	
+	<fl:let>mysFiledirEscapeTemp::=${returnString}</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>	<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
+	<fl:let>mysFiledirEscapeValue::='${mysFiledirEscapeTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo>	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	
+	<fl:let>mysFiledirEscapeByValueTemp::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp mit byValue): ${mysFiledirEscapeByValueTemp}</echo> 	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+
+	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo> 	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	<echo> </echo>
+	<echo>##################################</echo>
+	<echo>#####Fall 1 mal escapen b) mit zu escapenden Backslashes ##########</echo>
 	<!-- Hier wird das Hilfstarget aufgerufen -->
 	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
 	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
@@ -351,13 +376,11 @@
 		<param name="intNumber" value="1" />					
 	</antcallback>
 	
-	<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
 	<fl:let>mysFiledirEscapeTemp::=${returnString}</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>	
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>		<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
 	<fl:let>mysFiledirEscapeValue::='${mysFiledirEscapeTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo>
-	
-	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo> 	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+
 	<fl:let>mysFiledirEscapeByValueTemp::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 	<echo>${sScript}Escapeter Verzeichniseintrag (temp mit byValue): ${mysFiledirEscapeByValueTemp}</echo>
 	<!-- Beweis, dass jede Uebernahme mit Hochkommata einmal das Escapen mit Backslash wieder rueckgaengig macht. -->

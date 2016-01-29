@@ -52,28 +52,43 @@
 			for(x in objectArray){
 				icount++;
 				if(icount<=iuboundfilled){
-					icountGlobal++;
-					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					icountGlobal++;					
 					myArrayReturn[icount]=objectArray[x];
 				}else{
 					//nix
 				}
 			}
 						
-			//3. Erweitere das Array
+			//3. Erweitere das Array UM ENCODIERTEN WERT
 			icountGlobal++;
-			//print("Wert anhängen an position " + icountGlobal + ": '" + myValue + "'");
+			print("Wert encoded anhängen an position " + icountGlobal + ": '" + myValue + "'");
+			var textEncoded = encodeMyHtml(myValue);
+			print("Encoded Wert wird kopiert: '" + textEncoded + "'");
 			
 			//TODO An dieser Stelle bei der Erweiterung arrays anzuhängen: Prüfen, ob das ein Einzelwert oder ein Array ist.
-			myArrayReturn[icountGlobal]=myValue;
+			myArrayReturn[icountGlobal]=textEncoded;
 																						
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			
+		//TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
 		]]>
 	</scriptdef>
 	
 	<!-- ############################################################-->
 	<scriptdef name="arrayAppendArrayJsZZZ" language="javascript">
-		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an.
+             Merke: Hier wird nicht encoded da davon ausgegangen wird, das die anzuhängenden Werte schon encoded erzeugt wurden.-->
 		
 		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
 			 
@@ -373,7 +388,8 @@
 					}else{
 						icount++;
 						if(icount==iIndex){
-							objReturn = objectArray[x];
+							var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
+							objReturn = textUnescaped;
 							break main;
 						}				
 					}; //end if
@@ -755,7 +771,7 @@
 <!-- TODO Test für isarrayEmptyJsZZZ -->			 
 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
-<target name="compile" depends="-declaration,-myTestArrayDebugJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayGetJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -1004,6 +1020,22 @@
 		<!-- Hole Wert an Stellen 4 -->		
 		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue"/>
 		<echo> 4: Geholter Wert: ${myValue}</echo>
+		
+		<echo>###  5. Testaufbau: Wert 'mit BACKSLASH am Ende' an das Array anhängen ########################################################</echo>
+		<fl:let>
+			mySingleValue::= "angehängte Endung beachten\\"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+		
+		<!-- Hole Wert an Stelle 4 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue"/>
+		<echo> 4: Geholter Wert: ${myValue}</echo>	
+				
+		<!-- Hole Wert an Stellen 4 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="5" arrayget="myValue"/>
+		<echo> 5: Geholter Wert: ${myValue}</echo>
 		
 	</target>
 
