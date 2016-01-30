@@ -233,12 +233,36 @@
 		   }
 		 ]]>
 	</scriptdef>
+	
+  <!-- ########################### -->
+  <scriptdef name="stringUnencodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
+		print("Starte stringUnencodeJsZZZ");
+	   
+       var myString = attributes.get("inputstring");
+       print("myString="+myString);
+	  
+	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+	   var myStringUnencoded=unescape(myString);	  
+	   print("myStringUnencoded =" + myStringUnencoded);
+	   
+       project.setProperty(attributes.get("returnstring"), myStringUnencoded);
+	   
+     ]]>
+  </scriptdef>
   
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!-- <target name="compile" depends="-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
+ <!-- TODO Test für stringUnencodeJsZZZ -->
  <target name="compile" depends="-myTestStringRightString">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->

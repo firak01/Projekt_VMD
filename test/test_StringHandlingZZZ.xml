@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?> 
-<project  name="test_DatatypeHandlingJsZZZ" default="compile" basedir=".."
+<project  name="test_StringHandlingJsZZZ" default="compile" basedir=".."
 		  xmlns:fl="antlib:it.haefelinger.flaka"
 		  xmlns:ac="antlib://net/sf/antcontrib"><!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
 
@@ -146,6 +146,7 @@
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
+<!-- ######## Hilfstargets ############################################################################--> 	
 <target name="-stringEscapeBackslashZZZ">
 	<fl:let>sScript::='-stringEscapeBackslashZZZ: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
@@ -192,6 +193,8 @@
 		<ac:elseif>
 			<ac:equals arg1="${myiNumber}" arg2="1" />
 			<ac:then>
+				<echo message="${sScript}0:'mysString'=${mysString}" />
+			
 				<!--ac:for erwartet immer ungleiche Parameterwerte. D.h. Schleife ueber ein Element geht nicht. Darum hier separat aufrufen. --> 
 				<!-- Hier: 1-mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
 				<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
@@ -233,6 +236,7 @@
 					<ac:for param="icounter" end="${myiNumberIndexed}">			
 						<sequential>
 							<!--<echo>${sScript}icounter ist @{icounter}</echo>-->
+							<echo message="${sScript}1:'mysString'=${mysString}" />
 							
 							<!-- Hier: x mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
 							<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
@@ -242,7 +246,7 @@
 							<!--<fl:let>mysStringNormed::='${returnString}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 							<!--<echo>${sScript}Normierter Verzeichniseintrag: ${mysStringNormed}</echo>-->
 							<fl:let>mysString::='${returnString}'</fl:let>
-					
+							
 						</sequential>
 					</ac:for>		
 				</ac:else>		
@@ -262,18 +266,23 @@
 	<fl:let>sScript::='--stringEscapeBackslashZZZ: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
 	
-	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
+	<!-- Escape den Backslash. Dies in ein Hilfstarget gepackt, da propertyRegex mit einer Property statt Variablen arbeitet.
 							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
 	<fl:let>mysString::="${stringInput}"</fl:let>
 	<fl:let>returnControl::=false</fl:let>
-	<fl:let>returnString::="${stringInput}"</fl:let>				
+	<fl:let>returnString::="${stringInput}"</fl:let>	
+
+	<!-- TODO noch kaputt --> 
+	<!-- Ggfs. ist der String durch JavaScript encoded worden, hier also erst einmal unencoden -->
+	<!-- Hier wird die scriptdef Methode aufgerufen -->
+	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" />
+	<echo message="mysStringUnecoded = ${mysStringUnencoded}" />
 	
-	
-	<!-- Das eigentliche Escapen -->	
+	<!-- Das eigentliche Escapen des Backslashs -->	
 	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
 	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
 	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
-	<propertyregex property="mytemp" input="${mysString}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mysString}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<propertyregex property="mytemp" input="${mysStringUnencoded}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mysString}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 	
 	<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
 	<!-- Aufruf des propertyregex Targets: Hier zum erneuten vervierfachen der Backslashe -->	
@@ -293,7 +302,28 @@
 </target>
 
 <!-- #### Scriptdefs ####################################################-->
-
+<!-- ########################### -->
+  <scriptdef name="stringUnencodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
+		print("Starte stringUnencodeJsZZZ");
+	   
+       var myString = attributes.get("inputstring");
+       print("myString="+myString);
+	  
+	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+	   var myStringUnencoded=unescape(myString);	  
+	   print("myStringUnencoded =" + myStringUnencoded);
+	   
+       project.setProperty(attributes.get("returnstring"), myStringUnencoded);
+	   
+     ]]>
+  </scriptdef>
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.

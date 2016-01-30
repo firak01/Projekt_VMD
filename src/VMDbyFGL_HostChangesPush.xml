@@ -418,6 +418,7 @@
 					}else{
 						icount++;
 						if(icount==iIndex){
+							//TODO noch kaputt GOON 20160130: Per Schalter dies abstellbar machen. Also auf Wunsche keine unescapten Werte zurückliefern.
 							var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
 							objReturn = textUnescaped;
 							break main;
@@ -1233,8 +1234,31 @@
 		   }
 		 ]]>
 	</scriptdef>
+	
+	<!-- ########################### -->
+	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputstring" />
+    <attribute name="returnstring" />     
+     <![CDATA[
+	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
+		print("Starte stringUnencodeJsZZZ");
 	   
-<!-- ##### Macrodefs, gesammelt in einem Target, das dann von den Untertargets eingebunden werden kann ##### -->
+       var myString = attributes.get("inputstring");
+       print("myString="+myString);
+	  
+	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+	   var myStringUnencoded=unescape(myString);	  
+	   print("myStringUnencoded =" + myStringUnencoded);
+	   
+       project.setProperty(attributes.get("returnstring"), myStringUnencoded);
+	   
+     ]]>
+  </scriptdef>	
+
+  <!-- ##### Macrodefs, gesammelt in einem Target, das dann von den Untertargets eingebunden werden kann ##### -->
 <target name="-initMacrodef">
  
 	 <!-- ############## macrodefs ############################ -->
@@ -1744,6 +1768,7 @@
 	<arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->		
 </target>
      
+
 <target name="-FglRepositoryBackup">	
 	<fl:let>myTargetDirectory ::= "${targetDirectory}"</fl:let>
 	<echo>Creating Backup: ${myTargetDirectory}</echo>
@@ -3967,9 +3992,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<fl:let>mysFiledir::='${sFiledir}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 			<echo message="${sScript}@{icounter}ter:'mysFiledir'=${mysFiledir}" />				
 			<!-- Aufruf des Single-File Kopiervorgang -->
-			<!-- TODO GOON noch kaputt: Dies in ein extra Target verlagern. Da sich der Wert einer Property nie ändert. -->
-			<!--<propertyregex property="mytemp" input="${sFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" />--><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
-			
+
 			<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
 			<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
 				<param name="stringInput" value="${mysFiledir}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
