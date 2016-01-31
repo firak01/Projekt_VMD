@@ -384,9 +384,9 @@
 	<!-- ########################### -->	
 	<scriptdef name="arrayGetJsZZZ" language="javascript">
 		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
-		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-		
-		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	-->
+				
+		<!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
 		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
 					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
 					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
@@ -395,9 +395,11 @@
 		<attribute name="arrayinput" />
 		<attribute name="index" />
 		<attribute name="arrayget" />
+		<attribute name="sflagcontrol" /><!-- sflagcontrol werte: raw=mache kein unescape. -->
 		<![CDATA[
 			var lista = attributes.get("arrayinput");		 
 			var iIndex = attributes.get("index");
+			var mysFlagControl = attributes.get("sflagcontrol");
 			var objReturn="<#!!FGLUNDEFINED!!#>";
 			main:{
 				if(iIndex <= -1) break main;
@@ -408,8 +410,8 @@
 				var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
 				if(typeof(objectArray)=="object"){
 				for(x in objectArray){
-					//print("x="+x);
-					//print("objectArray[x]="+objectArray[x]);
+					print("x="+x);
+					print("objectArray[x]="+objectArray[x]);
 					
 					//Undefinierte, d.h. nur initialisierte Arrays abfangen
 					//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
@@ -418,9 +420,13 @@
 					}else{
 						icount++;
 						if(icount==iIndex){
-							//TODO noch kaputt GOON 20160130: Per Schalter dies abstellbar machen. Also auf Wunsche keine unescapten Werte zurückliefern.
-							var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
-							objReturn = textUnescaped;
+							//Per Schalter das unescapen abstellbar machen. Also auf Wunsch also die 'raw Werte' zurückliefern.
+							if(mysFlagControl=='raw'){
+							    objReturn = objectArray[x];
+							}else{
+								var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
+								objReturn = textUnescaped;								
+							}
 							break main;
 						}				
 					}; //end if
@@ -1245,16 +1251,52 @@
      <![CDATA[
 	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
 		print("Starte stringUnencodeJsZZZ");
-	   
+		
+	   //falls es die endswith funktion in dem Js noch nicht gibt hier hinzufuegen
+	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.
+	   //       ABER: Diese Methode darf z.B. nicht in der entsprechenden Java-Klasse vorhanden sein, sonst wird die Java-Methode gesucht, auch hinsichtlich der Methodenueberladung.
+	   //             Darum heisst die Funktion hier nicht endsWith sonder endsWithPos !	   	   
+	   //TODO: Dies in den ZKernel packen
+	   if (!String.prototype.endsWithPos) {
+		  String.prototype.endsWithPos = function(searchString, position) {
+		      //position ist ein optionaler Parameter.
+			  //position bedeutet, dass der String auf der Position mit dem String endet.
+			  print("typeof position: " + typeof position);
+			  var mySearchString=new String(searchString);
+			  var mySubjectString=this.toString();
+			  if(typeof position!='undefined'){
+				  if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > mySubjectString.length) {
+					position = mySubjectString.length();
+				  }
+				  position -= mySearchString.length();
+				  var lastIndex = mySubjectString.indexOf(mySearchString, position);
+				  return lastIndex !== -1 && lastIndex === position;
+			  }else{
+				  print("no position paramater available");
+				  var myPosition = mySubjectString.length();
+				  print("mySubjectstring.length()="+myPosition);
+				  print("mySearchString="+mySearchString);
+				  print("mySearchString.length="+mySearchString.length);
+				  var myPosition = mySubjectString.length()-mySearchString.length;//!!! hier duerfen keine Klammern () dies als funktion ausweisen.
+				  var lastIndex = mySubjectString.indexOf(mySearchString, myPosition);
+				  return lastIndex !== -1 && lastIndex === myPosition;			  
+			  };
+		  };
+		}
+	 
        var myString = attributes.get("inputstring");
        print("myString="+myString);
 	  
-	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
+		if(myString.endsWithPos('%5C')){
+			print("myStringUnencoded. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
+			myString=myString+"%5C";
+		};
+	   
 	   var myStringUnencoded=unescape(myString);	  
 	   print("myStringUnencoded =" + myStringUnencoded);
 	   
        project.setProperty(attributes.get("returnstring"), myStringUnencoded);
-	   
      ]]>
   </scriptdef>	
 
@@ -2420,7 +2462,7 @@
 			<equals arg1="0" arg2="${iubound}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
 			<ac:then><!-- iubound = 0 Fall -->			
 				<echo>##################${sScript}NUR 1 EINTRAG in diesem Schemalauf</echo> 
-				<arrayGetJsZZZ arrayinput="${myLineaNext.UnSchema}" index="0" arrayget="myLineTrimmed"/>
+				<arrayGetJsZZZ arrayinput="${myLineaNext.UnSchema}" index="0" arrayget="myLineTrimmed" sflagcontrol=""/>
 				<fl:echo>${sScript}zu verarbeitende Zeile (ohne Schema):'${myLineTrimmed}'</fl:echo>
 			
 				<!-- Hier in einem antcallback alles aufrufen, was in der Schleife auch passiert -->
@@ -2723,7 +2765,7 @@
 			<equals arg1="0" arg2="${iubound}"/><!-- Merke: man muss doch tatsächlich Sicherheitsabfrage einbauen, da in ac:for (des aufzurufenden copy Targets) der zweite Parameter nicht kleiner dem ersten sein darf. -->
 			<ac:then><!-- iubound = 0 Fall -->			
 				<echo>NUR 1 EINTRAG in diesem Schemalauf</echo> 
-				<arrayGetJsZZZ arrayinput="${lineaCurrent.UnSchema}" index="0" arrayget="myLineTrimmed"/>
+				<arrayGetJsZZZ arrayinput="${lineaCurrent.UnSchema}" index="0" arrayget="myLineTrimmed" sflagcontrol=""/>
 				<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 			
 				<!-- Hier in einem antcallback alles aufrufen, was in der Schleife auch passiert -->
@@ -2744,7 +2786,7 @@
 				<ac:for param="icounter" end="${iubound}">			
 				<sequential>
 					<echo>icounter is @{icounter}</echo> 
-					<arrayGetJsZZZ arrayinput="${lineaCurrent.UnSchema}" index="@{icounter}" arrayget="myLineTrimmed"/>
+					<arrayGetJsZZZ arrayinput="${lineaCurrent.UnSchema}" index="@{icounter}" arrayget="myLineTrimmed" sflagcontrol=""/>
 					<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>
 				
 					<!-- Hier die hier in ein antcallback auslagern und für jede Zeile aufrufen. -->
@@ -2994,10 +3036,10 @@
 					<ac:then>
 
 						<!-- ###### KOPIERE NUR EINEN WERT ############## -->
-						<arrayGetJsZZZ arrayinput="${mySrcaTotal.filedir}" index="0" arrayget="mySrc.sFiledir"/>	
-						<arrayGetJsZZZ arrayinput="${mySrcaTotal.filename}" index="0" arrayget="mySrc.sFilename"/>	
-						<arrayGetJsZZZ arrayinput="${myDestaTotal.filedir}" index="0" arrayget="myDest.sFiledir"/>	
-						<arrayGetJsZZZ arrayinput="${myDestaTotal.filename}" index="0" arrayget="myDest.sFilename"/>
+						<arrayGetJsZZZ arrayinput="${mySrcaTotal.filedir}" index="0" arrayget="mySrc.sFiledir" sflagcontrol=""/>	
+						<arrayGetJsZZZ arrayinput="${mySrcaTotal.filename}" index="0" arrayget="mySrc.sFilename" sflagcontrol=""/>	
+						<arrayGetJsZZZ arrayinput="${myDestaTotal.filedir}" index="0" arrayget="myDest.sFiledir" sflagcontrol=""/>	
+						<arrayGetJsZZZ arrayinput="${myDestaTotal.filename}" index="0" arrayget="myDest.sFilename" sflagcontrol=""/>
 					
 						<!--<propertyregex property="mytemp01" input="${mySrc.sFiledir}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" />--><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen. Merke: Property ist nicht veränderbar, darum für jeden Aufruf eine extra Variable verwenden. -->
 						<!--<echo>Normierter Verzeichniseintrag: ${mytemp}</echo>-->
@@ -3103,10 +3145,10 @@
 	<ac:for param="icounter" end="${iubound}">			
 		<sequential>
 			<echo>icounter is @{icounter}</echo> 
-			<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="@{icounter}" arrayget="mySrc.filedir"/>	
-			<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="@{icounter}" arrayget="mySrc.filename"/>	
-			<arrayGetJsZZZ arrayinput="${myDesta.filedir}" index="@{icounter}" arrayget="myDest.filedir"/>	
-			<arrayGetJsZZZ arrayinput="${myDesta.filename}" index="@{icounter}" arrayget="myDest.filename"/>	
+			<arrayGetJsZZZ arrayinput="${mySrca.filedir}" index="@{icounter}" arrayget="mySrc.filedir" sflagcontrol=""/>	
+			<arrayGetJsZZZ arrayinput="${mySrca.filename}" index="@{icounter}" arrayget="mySrc.filename" sflagcontrol=""/>	
+			<arrayGetJsZZZ arrayinput="${myDesta.filedir}" index="@{icounter}" arrayget="myDest.filedir" sflagcontrol=""/>	
+			<arrayGetJsZZZ arrayinput="${myDesta.filename}" index="@{icounter}" arrayget="myDest.filename" sflagcontrol=""/>	
 				
 			<!-- 4. Der eigentliche Kopiervorgang -->
 			<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
@@ -3830,9 +3872,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 					<ac:then>	
 						<!-- ###### LOESCHE NUR EINEN WERT ############## -->
 						<!--<fl:let>mysFiledir::=''</fl:let>-->
-						<arrayGetJsZZZ arrayinput="${mysaTotal.filedir}" index="0" arrayget="mysFiledir"/>	
+						<arrayGetJsZZZ arrayinput="${mysaTotal.filedir}" index="0" arrayget="mysFiledir" sflagcontrol=""/>	
 						<!--<echo>Eintrag 0 im Verzeichnisarray: ${mysFiledir}</echo>-->											
-						<arrayGetJsZZZ arrayinput="${mysaTotal.filename}" index="0" arrayget="mysFilename"/>										
+						<arrayGetJsZZZ arrayinput="${mysaTotal.filename}" index="0" arrayget="mysFilename" sflagcontrol=""/>										
 						<!--<echo>Eintrag 0 im Dateiarray: ${mysFilename}</echo>-->
 						
 						<!--<propertyregex property="mytemp" input="${mysFiledir}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das funktioniert aber die Backslashe nur verdoppeln reicht nicht -->
@@ -3987,12 +4029,19 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:for param="icounter" end="${iubound}">			
 		<sequential>
 			<echo>${sScript}icounter is @{icounter}</echo> 
-			<arrayGetJsZZZ arrayinput="${mysaTotal.sFiledir}" index="@{icounter}" arrayget="sFiledir"/>	
-			<arrayGetJsZZZ arrayinput="${mysaTotal.sFilename}" index="@{icounter}" arrayget="sFilename"/>	
+			<arrayGetJsZZZ arrayinput="${mysaTotal.sFiledir}" index="@{icounter}" arrayget="sFiledir" sflagcontrol="raw"/>	
+			<arrayGetJsZZZ arrayinput="${mysaTotal.sFilename}" index="@{icounter}" arrayget="sFilename" sflagcontrol=""/>	
 			<fl:let>mysFiledir::='${sFiledir}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-			<echo message="${sScript}@{icounter}ter:'mysFiledir'=${mysFiledir}" />				
-			<!-- Aufruf des Single-File Kopiervorgang -->
+			<echo message="${sScript}@{icounter}ter:'mysFiledir' raw='${mysFiledir}'" />		
 
+			<stringUnencodeJsZZZ inputstring="${sFiledir}" returnstring="sFiledirUnencoded" />
+			<!-- noch kaputt 20160131: Den unecoded String bekommt man nicht zurück. 
+			      Lösungsansatz: in stringUnencodeJsZZZ auf einen abshcliessenden %5C Wert pruefen. Diesen dann 'verdoppeln'.-->
+			
+			<fl:let>mysFiledir::='${sFiledirUnencoded}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+			<echo message="${sScript}@{icounter}ter:'mysFiledir' unencoded='${mysFiledir}'" />		
+
+			<!-- Aufruf des Single-File Kopiervorgang -->			
 			<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
 			<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
 				<param name="stringInput" value="${mysFiledir}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	

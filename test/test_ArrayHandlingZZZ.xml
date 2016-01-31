@@ -463,12 +463,12 @@
 		]]>
 	</scriptdef>
 			
-	<!-- ########################### -->	
+<!-- ########################### -->	
 	<scriptdef name="arrayGetJsZZZ" language="javascript">
 		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
-		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-		
-		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	-->
+				
+		<!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
 		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
 					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
 					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
@@ -477,9 +477,11 @@
 		<attribute name="arrayinput" />
 		<attribute name="index" />
 		<attribute name="arrayget" />
+		<attribute name="sflagcontrol" /><!-- sflagcontrol werte: raw=mache kein unescape. -->
 		<![CDATA[
 			var lista = attributes.get("arrayinput");		 
 			var iIndex = attributes.get("index");
+			var mysFlagControl = attributes.get("sflagcontrol");
 			var objReturn="<#!!FGLUNDEFINED!!#>";
 			main:{
 				if(iIndex <= -1) break main;
@@ -500,8 +502,13 @@
 					}else{
 						icount++;
 						if(icount==iIndex){
-							var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
-							objReturn = textUnescaped;
+							//Per Schalter das unescapen abstellbar machen. Also auf Wunsch also die 'raw Werte' zurückliefern.
+							if(mysFlagControl=='raw'){
+							    objReturn = objectArray[x];
+							}else{
+								var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
+								objReturn = textUnescaped;								
+							}
 							break main;
 						}				
 					}; //end if
@@ -874,7 +881,7 @@
 		 ]]>
 	</scriptdef>
 
-	<!-- ########################### -->
+  <!-- ########################### -->
   <scriptdef name="stringUnencodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -922,7 +929,7 @@
 				<param name="intNumber" value="1" />					
 			</antcallback>
 							
-			<!-- den unescapten String in das Rueckgabearray packen -->
+			<!-- den unescapten String in das Rueckgabearray packen, dabei wird zwar wieder encoded, aber der Backslash ist doppelt! -->
 			<echo>${sScript}myStringTempUnescaped=${returnString}</echo>
 			<fl:let>myStringUnescaped::="${returnString}"</fl:let><!-- So nimmt man Strings entgegen. Wichtig: In Hochkommata setzen. So wird ein call by value sichergestellt und die Referenzen gehen nicht verloren.-->
 			<echo>${sScript}myStringUnescaped=${myStringUnescaped}</echo>
@@ -939,7 +946,6 @@
 	
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 </target>
-
 
 <!-- ######## Hilfstargets ############################################################################--> 
 <target name ="-isLessThanZZZ" depends="-initMacrodef">

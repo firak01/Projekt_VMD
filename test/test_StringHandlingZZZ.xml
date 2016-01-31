@@ -303,7 +303,7 @@
 
 <!-- #### Scriptdefs ####################################################-->
 <!-- ########################### -->
-  <scriptdef name="stringUnencodeJsZZZ" language="javascript">
+	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
@@ -312,18 +312,124 @@
      <![CDATA[
 	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
 		print("Starte stringUnencodeJsZZZ");
-	   
+		
+	   //falls es die endswith funktion in dem Js noch nicht gibt hier hinzufuegen
+	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.
+	   //       ABER: Diese Methode darf z.B. nicht in der entsprechenden Java-Klasse vorhanden sein, sonst wird die Java-Methode gesucht, auch hinsichtlich der Methodenueberladung.
+	   //             Darum heisst die Funktion hier nicht endsWith sonder endsWithPos !	   	   
+	   //TODO: Dies in den ZKernel packen
+	   if (!String.prototype.endsWithPos) {
+		  String.prototype.endsWithPos = function(searchString, position) {
+		      //position ist ein optionaler Parameter.
+			  //position bedeutet, dass der String auf der Position mit dem String endet.
+			  //print("typeof position: " + typeof position);
+			  var mySearchString=new String(searchString);
+			  var mySubjectString=this.toString();
+			  if(typeof position!='undefined'){
+				  if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > mySubjectString.length) {
+					position = mySubjectString.length();
+				  }
+				  position -= mySearchString.length();
+				  var lastIndex = mySubjectString.indexOf(mySearchString, position);
+				  return lastIndex !== -1 && lastIndex === position;
+			  }else{
+				  //print("no position paramater available");
+				  var myPosition = mySubjectString.length();
+				  //print("mySubjectstring.length()="+myPosition);
+				  //print("mySearchString="+mySearchString);
+				  //print("mySearchString.length="+mySearchString.length);
+				  var myPosition = mySubjectString.length()-mySearchString.length;//!!! hier duerfen keine Klammern () dies als funktion ausweisen.
+				  var lastIndex = mySubjectString.indexOf(mySearchString, myPosition);
+				  return lastIndex !== -1 && lastIndex === myPosition;			  
+			  };
+		  };
+		}
+	 
        var myString = attributes.get("inputstring");
        print("myString="+myString);
 	  
-	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
+		if(myString.endsWithPos('%5C')){
+			print("myStringUnencoded. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
+			myString=myString+"%5C";
+		};
+	   
 	   var myStringUnencoded=unescape(myString);	  
 	   print("myStringUnencoded =" + myStringUnencoded);
 	   
        project.setProperty(attributes.get("returnstring"), myStringUnencoded);
-	   
      ]]>
-  </scriptdef>
+  </scriptdef>	
+  
+  <!-- ########################### -->
+	<scriptdef name="stringEnsureAntValidityJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+
+	<!-- Strings duerfen keinen abschliessenden Backslash haben, sonst werden Sie beim 'antcallback' Aufruf nicht korrekt uebergeben. 
+	     Darum sorgt diese Scriptdef-Methode dafür, dass ein einzelner abschliessender String 'vermehrt' wird. 
+		 ABER: Verdoppeln reicht nicht, also vervierfachen! -->
+	<attribute name="inputstring" />
+    <attribute name="returnstring" /> 
+	<attribute name="returncontrol" />    
+     <![CDATA[
+	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
+		print("Starte EnsureAntValidityJsZZZ");
+		
+	   //falls es die endswith funktion in dem Js noch nicht gibt hier hinzufuegen
+	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.
+	   //       ABER: Diese Methode darf z.B. nicht in der entsprechenden Java-Klasse vorhanden sein, sonst wird die Java-Methode gesucht, auch hinsichtlich der Methodenueberladung.
+	   //             Darum heisst die Funktion hier nicht endsWith sonder endsWithPos !	   	   
+	   //TODO: Dies in den ZKernel packen
+	   if (!String.prototype.endsWithPos) {
+		  String.prototype.endsWithPos = function(searchString, position) {
+		      //position ist ein optionaler Parameter.
+			  //position bedeutet, dass der String auf der Position mit dem String endet.
+			  //print("typeof position: " + typeof position);
+			  var mySearchString=new String(searchString);
+			  var mySubjectString=this.toString();
+			  if(typeof position!='undefined'){
+				  if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > mySubjectString.length) {
+					position = mySubjectString.length();
+				  }
+				  position -= mySearchString.length();
+				  var lastIndex = mySubjectString.indexOf(mySearchString, position);
+				  return lastIndex !== -1 && lastIndex === position;
+			  }else{
+				  //print("no position paramater available");
+				  var myPosition = mySubjectString.length();
+				  //print("mySubjectstring.length()="+myPosition);
+				  //print("mySearchString="+mySearchString);
+				  //print("mySearchString.length="+mySearchString.length);
+				  var myPosition = mySubjectString.length()-mySearchString.length;//!!! hier duerfen keine Klammern () dies als funktion ausweisen.
+				  var lastIndex = mySubjectString.indexOf(mySearchString, myPosition);
+				  return lastIndex !== -1 && lastIndex === myPosition;			  
+			  };
+		  };
+		}
+	 
+	   var myReturnControl = false;
+       var myString = attributes.get("inputstring");
+       print("myString="+myString);
+	  
+	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
+		if(myString.endsWithPos('\\')){
+			//print("myString. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
+			//myString=myString+"\\";
+			
+			print("myString. Abschliessenden Backslash gefunden. Schneide ihn ab, sonst kann der Wert nicht zurueckgegeben werden.");
+			myString=myString.substring(0,(myString.length()-1));
+			myReturnControl = true;
+		};
+	   	   	 
+	   print("myString=" + myString);
+	   
+       project.setProperty(attributes.get("returnstring"), myString);
+	   project.setProperty(attributes.get("returncontrol"), myReturnControl);
+     ]]>
+  </scriptdef>	
+  
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
@@ -351,11 +457,11 @@
 	<echo>${sScript}Start</echo>
 	
 	<echo>##################################</echo>
+	<echo>#####Fall 0 mal escapen ##########</echo>
+	<echo>##################################</echo>
 	<fl:let>sString2escape::='c:\test\directory\nocheins'</fl:let>
 	<echo>${sScript}sString2escape=${sString2escape}</echo>
 	<echo> </echo>
-	<echo>##################################</echo>
-	<echo>#####Fall 0 mal escapen ##########</echo>
 	<!-- Hier wird das Hilfstarget aufgerufen -->
 	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
 	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
@@ -378,9 +484,12 @@
 	<echo> </echo>
 	<echo>##################################</echo>
 	<echo>#####Fall 1 mal escapen a) ohne Backslashes ##########</echo>
+	<echo>##################################</echo>
+	<fl:let>sString2escapeWithoutPattern::='das ist ein normaler text'</fl:let>	
+	<echo>${sScript}sString2escapeWithoutPattern=${sString2escapeWithoutPattern}</echo>
+	<echo> </echo>
 	<!-- Hier wird das Hilfstarget aufgerufen -->
-	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
-	<fl:let>sString2escapeWithoutPattern::='das ist ein normaler text'</fl:let>
+	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->	
 	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
 		<param name="stringInput" value="${sString2escapeWithoutPattern}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
 		<param name="intNumber" value="1" />					
@@ -397,8 +506,12 @@
 	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo> 	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
 	<echo> </echo>
+	
 	<echo>##################################</echo>
 	<echo>#####Fall 1 mal escapen b) mit zu escapenden Backslashes ##########</echo>
+	<fl:let>sString2escape::='c:\test\directory\nocheins'</fl:let>
+	<echo>${sScript}sString2escape=${sString2escape}</echo>
+	<echo> </echo>
 	<!-- Hier wird das Hilfstarget aufgerufen -->
 	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
 	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
@@ -417,6 +530,41 @@
 	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo>
 	<echo> </echo>
+	
+	<echo>#####################################################################</echo>
+	<echo>#####Fall 1 mal escapen c) mit abschliessendem Backslashes ##########</echo>
+	<echo>#####################################################################</echo>
+	<fl:let>sString2escapeEndingPattern::='c:\test\directory\nocheins\\'</fl:let><!-- muss hier mit doppeltem Backslash angegeben werden, sonst wird noch nicht mal die Variable korrekt initialisiert. -->	
+	<echo>${sScript}sString2escapeEndingPattern=${sString2escapeEndingPattern}</echo>
+	<echo> </echo>
+	
+	<!-- VOR DEM AUFRUF DES HILFSTARGETS SICHERSTELLEN, DASS DER STRINGPARAMETER VALIDE IST (fuer ant...) -->
+	<stringEnsureAntValidityJsZZZ inputstring="${sString2escapeEndingPattern}" returnstring="stemp" returncontrol="btemp" />
+	<echo>${sScript}stemp nach validitycheck=${stemp}</echo>
+	<echo>${sScript}btemp nach validitycheck=${btemp}</echo>
+	<fl:let>sString2escapeEndingPattern::=${stemp}\\\</fl:let>	
+	<echo> </echo>
+	<!-- Hier wird das Hilfstarget aufgerufen -->
+	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->	
+	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
+		<param name="stringInput" value="${sString2escapeEndingPattern}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+		<param name="intNumber" value="1" />					
+	</antcallback>
+	
+	<fl:let>mysFiledirEscapeTemp::=${returnString}</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp): ${mysFiledirEscapeTemp}</echo>	<!-- Beweis, dass die Referenz verloren geht ohne 'byValue' Übernahme durch Hochkommata. -->
+	<fl:let>mysFiledirEscapeValue::='${mysFiledirEscapeTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (ohne byValue): ${mysFiledirEscapeValue}</echo>	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	
+	<fl:let>mysFiledirEscapeByValueTemp::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (temp mit byValue): ${mysFiledirEscapeByValueTemp}</echo> 	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+
+	<fl:let>mysFiledirEscapeByValue::='${mysFiledirEscapeByValueTemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo> 	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
+	<echo> </echo>
+	
+	
+	
 	<echo>##################################</echo>
 	<echo>#####Fall 2 mal escapen ##########</echo>
 	<!-- Hier wird das Hilfstarget aufgerufen -->

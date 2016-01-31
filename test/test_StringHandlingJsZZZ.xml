@@ -234,8 +234,8 @@
 		 ]]>
 	</scriptdef>
 	
-  <!-- ########################### -->
-  <scriptdef name="stringUnencodeJsZZZ" language="javascript">
+ <!-- ########################### -->
+	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
@@ -244,18 +244,54 @@
      <![CDATA[
 	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
 		print("Starte stringUnencodeJsZZZ");
-	   
+		
+	   //falls es die endswith funktion in dem Js noch nicht gibt hier hinzufuegen
+	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.
+	   //       ABER: Diese Methode darf z.B. nicht in der entsprechenden Java-Klasse vorhanden sein, sonst wird die Java-Methode gesucht, auch hinsichtlich der Methodenueberladung.
+	   //             Darum heisst die Funktion hier nicht endsWith sonder endsWithPos !	   	   
+	   //TODO: Dies in den ZKernel packen
+	   if (!String.prototype.endsWithPos) {
+		  String.prototype.endsWithPos = function(searchString, position) {
+		      //position ist ein optionaler Parameter.
+			  //position bedeutet, dass der String auf der Position mit dem String endet.
+			  //print("typeof position: " + typeof position);
+			  var mySearchString=new String(searchString);
+			  var mySubjectString=this.toString();
+			  if(typeof position!='undefined'){
+				  if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > mySubjectString.length) {
+					position = mySubjectString.length();
+				  }
+				  position -= mySearchString.length();
+				  var lastIndex = mySubjectString.indexOf(mySearchString, position);
+				  return lastIndex !== -1 && lastIndex === position;
+			  }else{
+				  //print("no position paramater available");
+				  var myPosition = mySubjectString.length();
+				  //print("mySubjectstring.length()="+myPosition);
+				  //print("mySearchString="+mySearchString);
+				  //print("mySearchString.length="+mySearchString.length);
+				  var myPosition = mySubjectString.length()-mySearchString.length;//!!! hier duerfen keine Klammern () dies als funktion ausweisen.
+				  var lastIndex = mySubjectString.indexOf(mySearchString, myPosition);
+				  return lastIndex !== -1 && lastIndex === myPosition;			  
+			  };
+		  };
+		}
+	 
        var myString = attributes.get("inputstring");
        print("myString="+myString);
 	  
-	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
+	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
+		if(myString.endsWithPos('%5C')){
+			print("myStringUnencoded. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
+			myString=myString+"%5C";
+		};
+	   
 	   var myStringUnencoded=unescape(myString);	  
 	   print("myStringUnencoded =" + myStringUnencoded);
 	   
        project.setProperty(attributes.get("returnstring"), myStringUnencoded);
-	   
      ]]>
-  </scriptdef>
+  </scriptdef>	
   
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->

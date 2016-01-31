@@ -354,9 +354,9 @@
 	<!-- ########################### -->	
 	<scriptdef name="arrayGetJsZZZ" language="javascript">
 		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
-		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
-		
-		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	-->
+				
+		<!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
 		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
 					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
 					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
@@ -365,9 +365,11 @@
 		<attribute name="arrayinput" />
 		<attribute name="index" />
 		<attribute name="arrayget" />
+		<attribute name="sflagcontrol" /><!-- sflagcontrol werte: raw=mache kein unescape. -->
 		<![CDATA[
 			var lista = attributes.get("arrayinput");		 
 			var iIndex = attributes.get("index");
+			var mysFlagControl = attributes.get("sflagcontrol");
 			var objReturn="<#!!FGLUNDEFINED!!#>";
 			main:{
 				if(iIndex <= -1) break main;
@@ -388,8 +390,13 @@
 					}else{
 						icount++;
 						if(icount==iIndex){
-							var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
-							objReturn = textUnescaped;
+							//Per Schalter das unescapen abstellbar machen. Also auf Wunsch also die 'raw Werte' zurückliefern.
+							if(mysFlagControl=='raw'){
+							    objReturn = objectArray[x];
+							}else{
+								var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
+								objReturn = textUnescaped;								
+							}
 							break main;
 						}				
 					}; //end if
@@ -975,13 +982,13 @@
 		<echo>myArray nachher: ${myArray}</echo>
 		
 		<!-- Hole Wert an den Stellen -1, 0, 1 -->
-		<arrayGetJsZZZ arrayinput="${myArray}" index="-1" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="-1" arrayget="myValue" sflagcontrol=""/>
 		<echo>-1: Geholter Wert: ${myValue}</echo> 
 		
-		<arrayGetJsZZZ arrayinput="${myArray}" index="0" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="0" arrayget="myValue" sflagcontrol=""/>
 		<echo> 0: Geholter Wert: ${myValue}</echo>
 		
-		<arrayGetJsZZZ arrayinput="${myArray}" index="1" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="1" arrayget="myValue" sflagcontrol=""/>
 		<echo> 1: Geholter Wert: ${myValue}</echo>
 			
 		<echo>###  2. Testaufbau: Array mit 3 'initialisieren'  ########################################################</echo>
@@ -993,7 +1000,7 @@
 		<echo>myArray nachher: ${myArray}</echo>
 		
 		<!-- Hole Wert an Stelle 1 -->		
-		<arrayGetJsZZZ arrayinput="${myArray}" index="1" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="1" arrayget="myValue" sflagcontrol=""/>
 		<echo> 1: Geholter Wert: ${myValue}</echo>
 	
 		<echo>### 3. Testaufbau: Werte eingeben ########################################################</echo>
@@ -1014,11 +1021,11 @@
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
 		<!-- Hole Wert an Stelle 3 -->		
-		<arrayGetJsZZZ arrayinput="${myArray}" index="3" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="3" arrayget="myValue" sflagcontrol=""/>
 		<echo> 3: Geholter Wert: ${myValue}</echo>	
 				
 		<!-- Hole Wert an Stellen 4 -->		
-		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue" sflagcontrol=""/>
 		<echo> 4: Geholter Wert: ${myValue}</echo>
 		
 		<echo>###  5. Testaufbau: Wert 'mit BACKSLASH am Ende' an das Array anhängen ########################################################</echo>
@@ -1029,12 +1036,23 @@
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
+		<echo>###  5a. Fall unescape ########################################################</echo>
 		<!-- Hole Wert an Stelle 4 -->		
-		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue" sflagcontrol=""/>
 		<echo> 4: Geholter Wert: ${myValue}</echo>	
 				
 		<!-- Hole Wert an Stellen 4 -->		
-		<arrayGetJsZZZ arrayinput="${myArray}" index="5" arrayget="myValue"/>
+		<arrayGetJsZZZ arrayinput="${myArray}" index="5" arrayget="myValue" sflagcontrol=""/>
+		<echo> 5: Geholter Wert: ${myValue}</echo>
+		
+		
+		<echo>###  5b. Fall raw. ########################################################</echo>		
+		<!-- Hole Wert an Stelle 4 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="4" arrayget="myValue" sflagcontrol="raw"/>
+		<echo> 4: Geholter Wert: ${myValue}</echo>	
+				
+		<!-- Hole Wert an Stellen 5 -->		
+		<arrayGetJsZZZ arrayinput="${myArray}" index="5" arrayget="myValue" sflagcontrol="raw"/>
 		<echo> 5: Geholter Wert: ${myValue}</echo>
 		
 	</target>
