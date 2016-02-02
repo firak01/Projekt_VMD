@@ -283,7 +283,8 @@
 	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
 		if(myString.endsWithPos('%5C')){
 			print("myStringUnencoded. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
-			myString=myString+"%5C";
+			print("myStringUnencoded. Abschliessenden Backslash gefunden. TEST: Keine Verdopplung des abschliessenden Backslashs.");
+			//myString=myString+"%5C";
 		};
 	   
 	   var myStringUnencoded=unescape(myString);	  
