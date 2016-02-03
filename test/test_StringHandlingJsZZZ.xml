@@ -52,6 +52,49 @@
      ]]>
   </scriptdef>
 
+   <!-- ########################### -->
+<scriptdef name="stringEncodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputstring" />
+    <attribute name="returnstring" /> 
+	<attribute name="returncontrol" />     
+     <![CDATA[
+	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
+		print("Starte stringEncodeJsZZZ");
+			  	
+       var myString = attributes.get("inputstring");
+       print("myString="+myString);
+	   
+	   var myReturnControl=false;
+
+	   var textEncoded = encodeMyHtml(myString);
+	   print("encoded textstring=" + textEncoded);
+	  
+	   //Feedback, ob etwas geändert worden ist.	  
+	   if(textEncoded!=myString){			
+			myReturnControl = true;
+		};
+	   	   	 
+       project.setProperty(attributes.get("returnstring"), textEncoded);
+	   project.setProperty(attributes.get("returncontrol"), myReturnControl);
+	   
+	   
+	   //TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
+     ]]>
+  </scriptdef>	
+  
  <!-- ########################### -->
   <scriptdef name="stringLeftStringZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -240,56 +283,25 @@
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
 	<attribute name="inputstring" />
-    <attribute name="returnstring" />     
+    <attribute name="returnstring" />
+    <attribute name="returncontrol" />	
      <![CDATA[
 	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-		print("Starte stringUnencodeJsZZZ");
-		
-	   //falls es die endswith funktion in dem Js noch nicht gibt hier hinzufuegen
-	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.
-	   //       ABER: Diese Methode darf z.B. nicht in der entsprechenden Java-Klasse vorhanden sein, sonst wird die Java-Methode gesucht, auch hinsichtlich der Methodenueberladung.
-	   //             Darum heisst die Funktion hier nicht endsWith sonder endsWithPos !	   	   
-	   //TODO: Dies in den ZKernel packen
-	   if (!String.prototype.endsWithPos) {
-		  String.prototype.endsWithPos = function(searchString, position) {
-		      //position ist ein optionaler Parameter.
-			  //position bedeutet, dass der String auf der Position mit dem String endet.
-			  //print("typeof position: " + typeof position);
-			  var mySearchString=new String(searchString);
-			  var mySubjectString=this.toString();
-			  if(typeof position!='undefined'){
-				  if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > mySubjectString.length) {
-					position = mySubjectString.length();
-				  }
-				  position -= mySearchString.length();
-				  var lastIndex = mySubjectString.indexOf(mySearchString, position);
-				  return lastIndex !== -1 && lastIndex === position;
-			  }else{
-				  //print("no position paramater available");
-				  var myPosition = mySubjectString.length();
-				  //print("mySubjectstring.length()="+myPosition);
-				  //print("mySearchString="+mySearchString);
-				  //print("mySearchString.length="+mySearchString.length);
-				  var myPosition = mySubjectString.length()-mySearchString.length;//!!! hier duerfen keine Klammern () dies als funktion ausweisen.
-				  var lastIndex = mySubjectString.indexOf(mySearchString, myPosition);
-				  return lastIndex !== -1 && lastIndex === myPosition;			  
-			  };
-		  };
-		}
-	 
-       var myString = attributes.get("inputstring");
-       print("myString="+myString);
+	 //TODO: Die Erweiterung endsWithPos in den JSZ - Kernel packen
+	 print("Starte stringUnencodeJsZZZ");
 	  
-	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
-		if(myString.endsWithPos('%5C')){
-			print("myStringUnencoded. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
-			print("myStringUnencoded. Abschliessenden Backslash gefunden. TEST: Keine Verdopplung des abschliessenden Backslashs.");
-			//myString=myString+"%5C";
-		};
+	 var myString = attributes.get("inputstring");
+     //print("myString="+myString); 
+	 var myReturnControl=false;
+			  	  
+	 var myStringUnencoded=unescape(myString);	  
+	 //print("myStringUnencoded =" + myStringUnencoded);
 	   
-	   var myStringUnencoded=unescape(myString);	  
-	   print("myStringUnencoded =" + myStringUnencoded);
-	   
+	 //Feedback, ob etwas geändert worden ist.	  
+	 if(myStringUnencoded!=myString){			
+		myReturnControl = true;
+	 };
+	   project.setProperty(attributes.get("returncontrol"), myReturnControl);	   	   	 			
        project.setProperty(attributes.get("returnstring"), myStringUnencoded);
      ]]>
   </scriptdef>	
@@ -299,7 +311,7 @@
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!-- <target name="compile" depends="-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
- <!-- TODO Test für stringUnencodeJsZZZ -->
+ <!-- TODO Test für stringUnencodeJsZZZ und stringEncodeJsZZZ -->
  <target name="compile" depends="-myTestStringRightString">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->

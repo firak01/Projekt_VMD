@@ -562,6 +562,7 @@
    <then>
    -->
 	<!-- es gibt zusätzlich zu <equals> noch weitere conditions in antcontrib, z.B.:   <isgreaterthan arg1="100" arg2="10"/> -->
+	<!-- aber: ist greaterthan funktioniert nicht... -->
 	<if>
 		<equals arg1="${mytest01}" arg2="0" />
 		<then>

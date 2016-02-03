@@ -152,6 +152,7 @@
 	
 	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
 							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->	
+	<!-- Steuerungsflag: 'encoded' -->
 
 <!-- Scheint ein Fehler in antcontrib zu sein. Vielleicht auch alternative Lösung durch FLAKA ....
 	<project xmlns:fl="antlib:it.haefelinger.flaka">
@@ -177,7 +178,7 @@
   </fl:switch>
 
 </project>-->
-							   
+	<fl:let>mysFlagControl::="${stringInputControl}"</fl:let>
 	<fl:let>mysString::="${stringInput}"</fl:let>
 	<fl:let>myiNumber::="${intNumber}"</fl:let><!-- wichtig: in Hochkommata setzen. Nur so wird der Wert gerettet, weil call by value-->
 	<fl:let>returnControl::=false</fl:let>
@@ -198,6 +199,7 @@
 				<!-- Hier: 1-mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
 				<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
 						<param name="stringInput" value="${mysString}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+						<param name="stringInputControl" value="${mysFlagControl}" />
 				</antcallback>
 				
 				<!--<fl:let>mysStringNormed::='${returnString}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
@@ -266,25 +268,41 @@
 	<fl:let>sTrace::=""</fl:let>
 	
 	<!-- Escape den Backslash. Dies in ein Hilfstarget gepackt, da propertyRegex mit einer Property statt Variablen arbeitet.
-							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
+							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->
+    <!-- Steuerungsflag: 'encoded' -->
+    <fl:let>mysFlagControl::="${stringInputControl}"</fl:let>							   
 	<fl:let>mysString::="${stringInput}"</fl:let>
 	<fl:let>returnControl::=false</fl:let>
 	<fl:let>returnString::="${stringInput}"</fl:let>	
 
 	<!-- Ggfs. ist der String durch JavaScript encoded worden, dies macht z.B. arrayAppend vom mir automatisch.
-	hier also erst einmal unencoden -->
-	<!--<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" returncontrol="bcontrol" />-->
-	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded"/>
-	<echo message="${sScript}mysStringUnecoded = ${mysStringUnencoded}" />
+	hier also erst einmal unencoden -->	
+	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" returncontrol="bControl" />
+	<echo message="${sScript}bcontrol | mysStringUnecoded = ${bControl} | ${mysStringUnencoded}" />
 	
 	<!-- Das eigentliche Escapen des Backslashs -->	
 	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
-	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
-	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
+	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. -->
+	            <!-- d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
 	<propertyregex property="mytemp" input="${mysStringUnencoded}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mysString}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
 	<!--<echo message="${sScript}mytemp = ${mytemp}" />-->
-	
-	<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
+		
+	<!-- Ggfs. je nachdem wie bcontrol aussieht (s. stringUnencodeJsZZZ) den String wieder in seine Encoded Form versetzten -->
+	<!-- Das ueber einen sFlagControl Parameter steuerbar machen. -->
+	<if>
+		<and>
+			<equals arg1="${mysFlagControl}" arg2="encoded" />
+			<equals arg1="${bControl}" arg2="true" />
+		</and>
+		<then>
+			<echo message="${sScript}Encoded wiederherstellen" />
+			<stringEncodeJsZZZ inputstring="${mysString}" returnstring="mysStringEncoded" returncontrol="bcontrol" />
+			<fl:let>mysString::="${mysStringEncoded}"</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben-->
+		</then>
+		<else>
+			<echo message="${sScript}Unencoded lassen" />
+			
+			<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
 	<!-- Aufruf des propertyregex Targets: Hier zum erneuten vervierfachen der Backslashe -->	
 	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
 	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
@@ -294,9 +312,11 @@
 	<fl:let>mysString::='${mytemp02}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 	<!--<echo message="${sScript}'mysString'=${mysString}" />-->
 	
-	<!-- TODO GOON 20160202, ggfs. je nachdem wie bcontrol aussieht (s. stringUnencodeJsZZZ) den String wieder in seine Encoded Form versetzten -->
-	<!-- das ueber einen sFlagControl Parameter steuerbar machen. -->
-	
+			
+			<!-- mache nix hinsichtlich codierung -->
+		</else>
+	</if>
+		
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnString" value="${mysString}" />
 	<!--<echo message="${sScript}'returnString'=${returnString}" />-->
@@ -350,62 +370,31 @@
   </scriptdef>	
   
 <!-- #### Scriptdefs ####################################################-->
-<!-- ########################### -->
+	<!-- ########################### -->
 	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
 	<attribute name="inputstring" />
-    <attribute name="returnstring" />     
+    <attribute name="returnstring" />
+    <attribute name="returncontrol" />	
      <![CDATA[
 	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-		print("Starte stringUnencodeJsZZZ");
-		
-	   //falls es die endswith funktion in dem Js noch nicht gibt hier hinzufuegen
-	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.
-	   //       ABER: Diese Methode darf z.B. nicht in der entsprechenden Java-Klasse vorhanden sein, sonst wird die Java-Methode gesucht, auch hinsichtlich der Methodenueberladung.
-	   //             Darum heisst die Funktion hier nicht endsWith sonder endsWithPos !	   	   
-	   //TODO: Dies in den ZKernel packen
-	   if (!String.prototype.endsWithPos) {
-		  String.prototype.endsWithPos = function(searchString, position) {
-		      //position ist ein optionaler Parameter.
-			  //position bedeutet, dass der String auf der Position mit dem String endet.
-			  //print("typeof position: " + typeof position);
-			  var mySearchString=new String(searchString);
-			  var mySubjectString=this.toString();
-			  if(typeof position!='undefined'){
-				  if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > mySubjectString.length) {
-					position = mySubjectString.length();
-				  }
-				  position -= mySearchString.length();
-				  var lastIndex = mySubjectString.indexOf(mySearchString, position);
-				  return lastIndex !== -1 && lastIndex === position;
-			  }else{
-				  //print("no position paramater available");
-				  var myPosition = mySubjectString.length();
-				  //print("mySubjectstring.length()="+myPosition);
-				  //print("mySearchString="+mySearchString);
-				  //print("mySearchString.length="+mySearchString.length);
-				  var myPosition = mySubjectString.length()-mySearchString.length;//!!! hier duerfen keine Klammern () dies als funktion ausweisen.
-				  var lastIndex = mySubjectString.indexOf(mySearchString, myPosition);
-				  return lastIndex !== -1 && lastIndex === myPosition;			  
-			  };
-		  };
-		}
-	 
-       var myString = attributes.get("inputstring");
-       print("myString="+myString);
+	 //TODO: Die Erweiterung endsWithPos in den JSZ - Kernel packen
+	 print("Starte stringUnencodeJsZZZ");
 	  
-	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
-		if(myString.endsWithPos('%5C')){
-			print("myStringUnencoded. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
-			print("myStringUnencoded. Abschliessenden Backslash gefunden. TEST: Keine Verdopplung des abschliessenden Backslashs.");
-			//myString=myString+"%5C";
-		};
+	 var myString = attributes.get("inputstring");
+     //print("myString="+myString); 
+	 var myReturnControl=false;
+			  	  
+	 var myStringUnencoded=unescape(myString);	  
+	 //print("myStringUnencoded =" + myStringUnencoded);
 	   
-	   var myStringUnencoded=unescape(myString);	  
-	   print("myStringUnencoded =" + myStringUnencoded);
-	   
+	 //Feedback, ob etwas geändert worden ist.	  
+	 if(myStringUnencoded!=myString){			
+		myReturnControl = true;
+	 };
+	   project.setProperty(attributes.get("returncontrol"), myReturnControl);	   	   	 			
        project.setProperty(attributes.get("returnstring"), myStringUnencoded);
      ]]>
   </scriptdef>	
@@ -424,13 +413,13 @@
 	<attribute name="returncontrol" />    
      <![CDATA[
 	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
+	 //TODO: Die Erweiterung endsWithPos in den JSZ - Kernel packen
 		print("Starte EnsureAntValidityJsZZZ");
 		
 	   //falls es die endswith funktion in dem Js noch nicht gibt hier hinzufuegen
 	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.
 	   //       ABER: Diese Methode darf z.B. nicht in der entsprechenden Java-Klasse vorhanden sein, sonst wird die Java-Methode gesucht, auch hinsichtlich der Methodenueberladung.
 	   //             Darum heisst die Funktion hier nicht endsWith sonder endsWithPos !	   	   
-	   //TODO: Dies in den ZKernel packen
 	   if (!String.prototype.endsWithPos) {
 		  String.prototype.endsWithPos = function(searchString, position) {
 		      //position ist ein optionaler Parameter.
@@ -462,11 +451,8 @@
        var myString = attributes.get("inputstring");
        print("myString="+myString);
 	  
-	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum verdoppeln.	  
-		if(myString.endsWithPos('\\')){
-			//print("myString. Abschliessenden Backslash gefunden. Verdopple ihn, sonst kann der Wert nicht zurueckgegeben werden.");
-			//myString=myString+"\\";
-			
+	   //! FEHLER, BEI EINEM ENDENDEN BACKSLASH BEKOMMT MAN DEN WERT NICHT ZURUECK, darum abschneiden und flag-wert setzen.	  
+		if(myString.endsWithPos('\\')){			
 			print("myString. Abschliessenden Backslash gefunden. Schneide ihn ab, sonst kann der Wert nicht zurueckgegeben werden.");
 			myString=myString.substring(0,(myString.length()-1));
 			myReturnControl = true;
@@ -639,6 +625,7 @@
 	<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->	
 	<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
 		<param name="stringInput" value="${sString2escapeEndingPattern}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
+		<param name="stringInputControl" value="encoded" />
 		<param name="intNumber" value="1" />					
 	</antcallback>
 	
@@ -654,7 +641,15 @@
 	<echo>${sScript}Escapeter Verzeichniseintrag (mit byValue): ${mysFiledirEscapeByValue}</echo> 	<!-- Beweis, dass die Referenz erhalten bleibt durch 'byValue' Übernahme durch Hochkommata -->
 	<echo> </echo>
 	
-		
+	<stringUnencodeJsZZZ inputstring="${mysFiledirEscapeByValue}" returnstring="stemp" returncontrol="btemp" />
+	<echo>${sScript} 1. btemp | stemp nach stringUnencode=${btemp} | ${stemp}</echo>			
+    <echo> </echo>
+
+	<fl:let>mysFiledirEscapeByValue::='${stemp}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->								
+	<stringUnencodeJsZZZ inputstring="${mysFiledirEscapeByValue}" returnstring="stemp" returncontrol="btemp" />
+	<echo>${sScript} 2. btemp | stemp nach stringUnencode=${btemp} | ${stemp}</echo>			
+    <echo> </echo>
+	
 	<echo>###################################################################</echo>
 	<echo>#####Fall 2 mal escapen a) mit zu escapenden Backslashes ##########</echo>
 	<fl:let>sString2escape::='c:\test\directory\nocheins'</fl:let>

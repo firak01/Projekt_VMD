@@ -882,27 +882,33 @@
 	</scriptdef>
 
   <!-- ########################### -->
-  <scriptdef name="stringUnencodeJsZZZ" language="javascript">
+	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
 	<attribute name="inputstring" />
-    <attribute name="returnstring" />     
+    <attribute name="returnstring" />
+    <attribute name="returncontrol" />	
      <![CDATA[
 	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-		print("Starte stringUnencodeJsZZZ");
-	   
-       var myString = attributes.get("inputstring");
-       print("myString="+myString);
+	 //TODO: Die Erweiterung endsWithPos in den JSZ - Kernel packen
+	 print("Starte stringUnencodeJsZZZ");
 	  
-	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
-	   var myStringUnencoded=unescape(myString);	  
-	   print("myStringUnencoded =" + myStringUnencoded);
+	 var myString = attributes.get("inputstring");
+     //print("myString="+myString); 
+	 var myReturnControl=false;
+			  	  
+	 var myStringUnencoded=unescape(myString);	  
+	 //print("myStringUnencoded =" + myStringUnencoded);
 	   
+	 //Feedback, ob etwas geändert worden ist.	  
+	 if(myStringUnencoded!=myString){			
+		myReturnControl = true;
+	 };
+	   project.setProperty(attributes.get("returncontrol"), myReturnControl);	   	   	 			
        project.setProperty(attributes.get("returnstring"), myStringUnencoded);
-	   
      ]]>
-  </scriptdef>
+  </scriptdef>	
 	
 <!-- ############## Hilfstargets ############################################################-->
 	<!-- ######## Hilfstargets ###########################################--> 
@@ -978,12 +984,14 @@
 </target>
 
 <!-- ######## Hilfstargets ############################################################################--> 	
+<!-- ######## Hilfstargets ############################################################################--> 	
 <target name="-stringEscapeBackslashZZZ">
 	<fl:let>sScript::='-stringEscapeBackslashZZZ: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
 	
 	<!-- Escape den Backslash. Dies in ein Hilfstarget packen, das propertyRegex mit einer Property statt Variablen arbeitet.
 							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->	
+	<!-- Steuerungsflag: 'encoded' -->
 
 <!-- Scheint ein Fehler in antcontrib zu sein. Vielleicht auch alternative Lösung durch FLAKA ....
 	<project xmlns:fl="antlib:it.haefelinger.flaka">
@@ -1009,7 +1017,7 @@
   </fl:switch>
 
 </project>-->
-							   
+	<fl:let>mysFlagControl::="${stringInputControl}"</fl:let>
 	<fl:let>mysString::="${stringInput}"</fl:let>
 	<fl:let>myiNumber::="${intNumber}"</fl:let><!-- wichtig: in Hochkommata setzen. Nur so wird der Wert gerettet, weil call by value-->
 	<fl:let>returnControl::=false</fl:let>
@@ -1030,6 +1038,7 @@
 				<!-- Hier: 1-mal Das eigentliche Escapen aufrufen. Man beachte die voranstehenden doppelten Minuszeichen. -->
 				<antcallback target="--stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
 						<param name="stringInput" value="${mysString}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+						<param name="stringInputControl" value="${mysFlagControl}" />
 				</antcallback>
 				
 				<!--<fl:let>mysStringNormed::='${returnString}'</fl:let>--><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
@@ -1098,40 +1107,62 @@
 	<fl:let>sTrace::=""</fl:let>
 	
 	<!-- Escape den Backslash. Dies in ein Hilfstarget gepackt, da propertyRegex mit einer Property statt Variablen arbeitet.
-							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->		
+							   Properties aendern aber nicht ihren Wert innerhalb eines Targets, was unguenstig fuer Schleifen ist.		-->
+    <!-- Steuerungsflag: 'encoded' -->
+    <fl:let>mysFlagControl::="${stringInputControl}"</fl:let>							   
 	<fl:let>mysString::="${stringInput}"</fl:let>
 	<fl:let>returnControl::=false</fl:let>
 	<fl:let>returnString::="${stringInput}"</fl:let>	
 
-	<!-- TODO noch kaputt --> 
-	<!-- Ggfs. ist der String durch JavaScript encoded worden, hier also erst einmal unencoden -->
-	<!-- Hier wird die scriptdef Methode aufgerufen -->
-	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" />
-	<echo message="mysStringUnecoded = ${mysStringUnencoded}" />
+	<!-- Ggfs. ist der String durch JavaScript encoded worden, dies macht z.B. arrayAppend vom mir automatisch.
+	hier also erst einmal unencoden -->	
+	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" returncontrol="bControl" />
+	<echo message="${sScript}bcontrol | mysStringUnecoded = ${bControl} | ${mysStringUnencoded}" />
 	
 	<!-- Das eigentliche Escapen des Backslashs -->	
 	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
-	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
-	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
+	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. -->
+	            <!-- d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
 	<propertyregex property="mytemp" input="${mysStringUnencoded}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mysString}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
-	
-	<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
+	<!--<echo message="${sScript}mytemp = ${mytemp}" />-->
+		
+	<!-- Ggfs. je nachdem wie bcontrol aussieht (s. stringUnencodeJsZZZ) den String wieder in seine Encoded Form versetzten -->
+	<!-- Das ueber einen sFlagControl Parameter steuerbar machen. -->
+	<if>
+		<and>
+			<equals arg1="${mysFlagControl}" arg2="encoded" />
+			<equals arg1="${bControl}" arg2="true" />
+		</and>
+		<then>
+			<echo message="${sScript}Encoded wiederherstellen" />
+			<stringEncodeJsZZZ inputstring="${mysString}" returnstring="mysStringEncoded" returncontrol="bcontrol" />
+			<fl:let>mysString::="${mysStringEncoded}"</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben-->
+		</then>
+		<else>
+			<echo message="${sScript}Unencoded lassen" />
+			
+			<!-- wegen der vielen Zwischenschritte reicht auch das vervierfachen nicht.-->
 	<!-- Aufruf des propertyregex Targets: Hier zum erneuten vervierfachen der Backslashe -->	
 	<!-- Merke: It is important to note that when doing a "replace" operation, if the input string does not match the regular expression, then the property is not set. You can change this behavior by supplying the "defaultValue" attribute. This attribute should contain the value to set the property to in this case. 
 	            d.h. nutze 'defaultValue', sonst bleibt der Rueckgabewert leer, wenn durch die RegEx-Operation nichts gefunden wird. -->
 	<!--<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\" global="true" />--><!-- das waere wieder verdoppeln -->
 	<propertyregex property="mytemp02" input="${mytemp}" regexp="\\" replace="\\\\\\\\\\\\\\\" global="true" defaultValue="${mytemp}"/><!-- das funktioniert aber die Backslashe nur zu verdoppeln reicht nicht, hier: vervierfachen -->
+	<!--<echo message="${sScript}mytemp02 = ${mytemp02}" />-->
 	<fl:let>mysString::='${mytemp02}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 	<!--<echo message="${sScript}'mysString'=${mysString}" />-->
 	
+			
+			<!-- mache nix hinsichtlich codierung -->
+		</else>
+	</if>
+		
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnString" value="${mysString}" />
 	<!--<echo message="${sScript}'returnString'=${returnString}" />-->
 	<ac:var name="returnControl" value="true" />
-	<ac:var name="returnTrace" value="${sScript} Alles ok.|${sTrace}" />
+	<ac:var name="returnTrace" value="${sScript}Alles ok.|${sTrace}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywert zurueck -->			
 </target>
-
 
 
 <!-- ################################################################################# -->
@@ -1186,9 +1217,10 @@
 	<echo>${sScript}3. sString2escape=${sString2escape}</echo>	
 	<arrayAppendJsZZZ arrayinput="${myArrayTemp}" valueinput="${sString2escape}" arrayreturn="myArrayValue" sflagcontrol="" />
 	
+	<echo>#### EINGABEWERTE - ENCODED im Array ####################</echo>
 	<arrayDebugJsZZZ arrayinput="${myArrayValue}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 	
-	
+	<echo>#### VERARBEITUNG ####################</echo>
 	<!-- Hier wird das Hilfstarget aufgerufen -->
 	<antcallback target="-arrayStringEscapeBackslashZZZ" return="returnControl,returnTrace,returnArray">					
 		<param name="inputArray" value="${myArrayValue}" />
@@ -1197,7 +1229,7 @@
 	
 	
 	<echo> </echo>
-	<echo>#### ERGEBNIS ####################</echo>
+	<echo>#### ERGEBNISWERTE - ENCODED im Array (2mal %5C hintereinander) ####################</echo>
 	<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArrayValue" sflagcontrol="" />
 	<arrayDebugJsZZZ arrayinput="${myArrayValue}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
 	<echo> </echo>
