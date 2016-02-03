@@ -2590,8 +2590,6 @@
 	 <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mysaFilename" sflagcontrol="" />
 
 	<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->	
-	<!-- TODO GOON noch kaputt: mache isArrayEmptyJsZZZ und prüfe dort auf leer ab.... -->
-				<!--<equals arg1="${mysaFiledir}" arg2="<#''!!FGLUNDEFINED!!''#>"/>-->
 	<isArrayEmptyJsZZZ arrayinput="${mysaFilename}" returnboolean="myArrayIsEmpty" sflagcontrol="" />
 	<fl:echo>${sScript}myArrayIsEmpty=${myArrayIsEmpty}</fl:echo>
 	<ac:if>
