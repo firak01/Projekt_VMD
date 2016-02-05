@@ -3941,6 +3941,12 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
 	<fileset dir="//${mySrc.filedir}">		 -->
 	
+	<!--
+	<delete includeemptydirs="true">
+  <fileset dir="onlyifempty" excludes="**/*" />
+</delete>
+	-->
+	
 	<!-- absolute Pfade verwenden: -->
 	<delete includeEmptyDirs="true"> 
 		<fileset dir="${myDir}" includes="${myFile}" defaultexcludes="false"><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->		
@@ -3950,6 +3956,13 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
 			<include name="${myFile}" />				
 		</fileset>	
+		
+		<!-- Lösche das Ausgangsverzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
+		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->
+		
+		<!-- TODO GOON Problem: Damit wird aber nicht der ganze Pfad gelöscht, falls er nur aus leeren Verzeichnissen besteht. -->
+		<!-- Lösungsansatz: Mache eine Funktion, mit der man einen String in ein Array zerlegen kann.
+		                    Dieses Array dann in einer Schleife durchgehen -->
 	</delete>
 	
 	<!-- ############### -->
