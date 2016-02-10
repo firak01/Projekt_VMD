@@ -1064,6 +1064,109 @@
 		 ]]>
 	  </scriptdef>
 	
+	 <!-- ########################### -->
+	<scriptdef name="stringEncodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputstring" />
+    <attribute name="returnstring" /> 
+	<attribute name="returncontrol" />     
+     <![CDATA[
+	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
+		print("Starte stringEncodeJsZZZ");
+			  	
+       var myString = attributes.get("inputstring");
+       print("myString="+myString);
+	   
+	   var myReturnControl=false;
+
+	   var textEncoded = encodeMyHtml(myString);
+	   print("encoded textstring=" + textEncoded);
+	  
+	   //Feedback, ob etwas geändert worden ist.	  
+	   if(textEncoded!=myString){			
+			myReturnControl = true;
+		};
+	   	   	 
+       project.setProperty(attributes.get("returnstring"), textEncoded);
+	   project.setProperty(attributes.get("returncontrol"), myReturnControl);
+	   
+	   
+	   //TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
+     ]]>
+  </scriptdef>	
+	
+	 <!-- ########################### -->
+  <scriptdef name="stringExplodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputstring" />
+	<attribute name="inputdelimiter"/>
+
+    <attribute name="returnarraystring" /> 
+	<attribute name="returncontrol" /> 
+	
+    <![CDATA[
+		var myString = attributes.get("inputstring");
+		var myDelimiter = attributes.get("inputdelimiter") ;
+		
+		var myArrayReturn = new Array();
+		var bReturnControl = true;
+		if(myString===undefined){
+			print("myString = undefined");
+			bReturnControl = false;
+		}else if(myString===''){
+			print("myString = leer");			
+			bReturnControl = false;
+		}else{
+			if(myDelimiter===undefined){
+				print("myDelimiter = 'undefined'");
+				myArrayReturn[0]=myString;
+				bReturnControl = false;
+			}else if(myDelimiter===''){
+				print("myDelimiter = 'leer'");
+				myArrayReturn[0]=myString;
+				bReturnControl = false;
+			}else{	
+				var myStringEncoded = encodeMyHtml(myString);
+				var myDelimiterEncoded = encodeMyHtml(myDelimiter);
+		
+				 values = myStringEncoded.split(myDelimiterEncoded);
+				 for(i=0; i<values.length; i++) {
+					//So wird ein Array künstlich erzeugt.... project.setNewProperty(attributes.get("inputprefix")+i, values[i]);
+					myArrayReturn[i]=unescape(values[i]);//Das encoden wieder rueckgaengig machen.
+				 }				 		
+			}
+		}				 
+		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
+		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+		
+			//TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
+     ]]>
+	</scriptdef>
+	
 	<!-- ########################################################### -->
 	 <scriptdef name="stringLeftStringZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -3934,6 +4037,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
 											
 	<!-- ### Lösche anhand des Verzeichnis- und Dateinamens -->
+	<!-- TODO Fange Fehler ab, wenn eine Datei / ein Verzeichnis nicht (mehr) vorhanden ist -->
 	<!-- TODO GGON noch kaputt: Prüfe, ob der Backslash am Emde steht, ergänze ihn falls notwendig -->
 	<echo>Deleting File ${myDir}${myFile}</echo>
 													
@@ -3958,11 +4062,25 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		</fileset>	
 		
 		<!-- Lösche das Ausgangsverzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
-		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->
-		
+		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->							
+	</delete>
+	
 		<!-- TODO GOON Problem: Damit wird aber nicht der ganze Pfad gelöscht, falls er nur aus leeren Verzeichnissen besteht. -->
 		<!-- Lösungsansatz: Mache eine Funktion, mit der man einen String in ein Array zerlegen kann.
 		                    Dieses Array dann in einer Schleife durchgehen -->
+		<!-- ABER: Delete Target erlaubt keine anderen Scriptdefs innerhalb. 
+		                 Daher 1) ein neues/eigenes  delete Targets für Verzeichnisse verwenden 
+						    und 2) das Array ausserhalb dieses neuentargets aufbauen und dieses neue Target in der Schleife ausführen -->
+		<arrayInitJsZZZ isize="0" arrayreturn="myReturnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>		
+	
+		<!-- TODO Baue aus dem Array immer wieder neu den absoluten Verzeichnispfad, aber immer wieder um eine obere Indexposition weniger -->
+		<!-- stringImplodeJsZZZ ..... -->
+	<delete includeEmptyDirs="true"> 
+		<!-- Lösche das Verzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
+		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->				
 	</delete>
 	
 	<!-- ############### -->

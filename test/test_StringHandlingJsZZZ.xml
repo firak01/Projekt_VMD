@@ -1,10 +1,54 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>  
-<project name="test_StringHandlingJsZZZ"  default="compile" basedir="..">
+<project name="test_StringHandlingJsZZZ"   default="compile" basedir=".."
+	xmlns:fl="antlib:it.haefelinger.flaka" 
+	xmlns:ac="antlib://net/sf/antcontrib"><!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
 
+	<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
 <!-- ######## Scriptdefs ############################################################################--> 
+<!-- ############################################################-->
+	<scriptdef name="arrayCopyJsZZZ" language="javascript">
+		<!-- Hiermit man ein Array in eine anderes neues Array.
+             Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
+             man aber noch mit dem alten 'Variablennamen' weiterarbeiten möchte.			 -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="arrayreturn" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myFlagControl = attributes.get("sflagcontrol");
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			
+			//Kopiervorgang, noch ohne irgendwelche FlagControl Erweiterungen.			
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+				myArrayReturn[icount]=objectArray[x];
+			};
+															
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+		]]>
+	</scriptdef>
 
-
-<!-- ########################### -->
 <!-- ########################### -->
 	<scriptdef name="arrayDebugJsZZZ" language="javascript">
 		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
@@ -125,7 +169,52 @@
 		]]>
 	</scriptdef>
 
+<!-- ############################################################-->		
+	<scriptdef name="arrayInitJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Erstellung eines Arrays.
+			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+		
+		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="isize" />
+		<attribute name="arrayreturn" />		
+		<![CDATA[										 
+			var mySize = attributes.get("isize");	
+			//print("iSize = '" + mySize + "'");
+			
+			//Prüfen, ob mySize eine Zahl ist. 
+			//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
+			//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
+			if(isNumber(mySize)){
+				//print("eine Zahl");
+				var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
+				
+				if(mySize==0){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+				}
+				if(mySize>=1){
+					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+					for(icount=0; icount<=mySize-1; icount++){
+						myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
+					}												
+				}								
+			}else{
+				//print("KEINE Zahl");
+				var myArrayReturn = new Array();
 
+				//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
+				myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+			}
+						
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
+		]]>
+	</scriptdef>	
+	
 <!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
  <scriptdef name="stringContainsStringZZZ" language="javascript">
  <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -216,7 +305,7 @@
      ]]>
   </scriptdef>	
   
-  
+  <!-- ########################### -->
   <scriptdef name="stringExplodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -229,7 +318,8 @@
 	
     <![CDATA[
 		var myString = attributes.get("inputstring");
-		var myDelimiter = attributes.get("inputdelimiter") 
+		var myDelimiter = attributes.get("inputdelimiter") ;
+		
 		var myArrayReturn = new Array();
 		var bReturnControl = true;
 		if(myString===undefined){
@@ -248,15 +338,30 @@
 				myArrayReturn[0]=myString;
 				bReturnControl = false;
 			}else{	
-				 values = myString.split(myDelimiter);
+				var myStringEncoded = encodeMyHtml(myString);
+				var myDelimiterEncoded = encodeMyHtml(myDelimiter);
+		
+				 values = myStringEncoded.split(myDelimiterEncoded);
 				 for(i=0; i<values.length; i++) {
 					//So wird ein Array künstlich erzeugt.... project.setNewProperty(attributes.get("inputprefix")+i, values[i]);
-					myArrayReturn[i]=values[i];
+					myArrayReturn[i]=unescape(values[i]);//Das encoden wieder rueckgaengig machen.
 				 }				 		
 			}
 		}				 
 		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
 		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+		
+			//TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
      ]]>
 	</scriptdef>
   
@@ -511,8 +616,7 @@
 		<echo message="bcontains = ${bcontains}" />
 		
 	</target> 
-	
-	
+		
 	<target name="-myTestStringCountString">
 		<echo>myTestStringCountString: </echo>
 		<property name="totaltext01" value="asdfasdfasdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich -->	
@@ -533,13 +637,62 @@
 	</target> 
 
 	<target name="-myTestStringExplode">
-		<property name="sValue" value="a,b,c"/>
+		<fl:let>sScript::='-myTestStringExplode: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<echo>${sScript}Start</echo>
+		<echo>#### Eingabewert ohne Backslash ##############################</echo>
+		<fl:let>sValue::="a,b,c"</fl:let>
 		<echoproperties prefix="sValue"/>
 		
-		<property name="sDelimiter" value=","/>
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myArray" returncontrol="myReturnControl"/>
+		<fl:let>sDelimiter::=","</fl:let>
+		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+		<echo> </echo>
+		<echo>#### Eingabewert mit Backslash, Delimiter normales Zeichen ##############</echo>
+		<fl:let>sValue::='c:\test\directory\nocheins'</fl:let>
+		<echoproperties prefix="sValue"/>
+		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
+		<fl:let>sDelimiter::="i"</fl:let>
+		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 		
+				
+		<echo> </echo>
+		<echo>#### Eingabewert mit abschliessendem Backslash, Delimiter normales Zeichen ##############</echo>
+		<fl:let>sValue::='c:\test\directory\nocheins\\'</fl:let><!-- Der Backslash muss maskiert werden -->
+		<echoproperties prefix="sValue"/>
+		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
+		<fl:let>sDelimiter::="i"</fl:let>
+		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+		
+		<echo> </echo>
+		<echo>#### Eingabewert mit Backslash, Delimiter Backslash ##############</echo>
+		<fl:let>sValue::='c:\test\directory\nocheins'</fl:let>
+		<echoproperties prefix="sValue"/>
+		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
+		<fl:let>sDelimiter::="\\"</fl:let><!-- Der Backslash muss maskiert werden -->
+		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+		
+		<echo> </echo>
+		<echo>#### Eingabewert mit abschliessendem Backslash, Delimiter Backslash ##############</echo>
+		<fl:let>sValue::='c:\test\directory\nocheins\\'</fl:let><!-- Der Backslash muss maskiert werden -->
+		<echoproperties prefix="sValue"/>
+		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
+		<fl:let>sDelimiter::="\\"</fl:let><!-- Der Backslash muss maskiert werden -->
+		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 	</target>
 	
 	<target name="-myTestStringSubstring">
