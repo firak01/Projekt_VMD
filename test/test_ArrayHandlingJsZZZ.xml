@@ -592,6 +592,99 @@
 		]]>
 	</scriptdef>
 	
+	<!-- ########################### -->
+  <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputarraystring" />
+	<attribute name="inputdelimiter"/>
+	<attribute name="inputindexlow"/>
+	<attribute name="inputindexhigh"/>
+
+    <attribute name="returnstring" /> 
+	<attribute name="returncontrol" /> 
+	
+    <![CDATA[
+		//normalerweise verwendet man join, wie in dem Beispiel:
+		//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
+		//var myarray = str_to_split.split(",");
+		//var output=myarray.join("");
+		//
+		//Aber hier soll nur ein bestimmter Bereich von... bis... gejoint werden. 
+		//Sinnvoll um vom Array vorne oder hinten etwas abzuschneiden.
+	    
+		var myArrayString = attributes.get("inputarraystring");		
+		var myDelimiter = attributes.get("inputdelimiter");
+		var myiIndexLow = attributes.get("inputindexlow");
+		var myiIndexHigh = attributes.get("inputindexhigh");
+		
+		var myStringReturn = "";
+		var bReturnControl = true;
+		
+		if(myArrayString===undefined){
+			//print("myString = undefined");
+			bReturnControl = false;
+		}else if(myArrayString===null){
+			//print("myString = null");			
+			bReturnControl = false;
+		}else{
+			if(myDelimiter===undefined){
+				//print("myDelimiter = 'undefined'");
+				myStringReturn=myArrayString.join("");
+				bReturnControl = false;
+			}else if(myDelimiter===''){
+				//print("myDelimiter = 'leer'");
+				myStringReturn=myArrayString.join("");
+				bReturnControl = false;
+			}else{	
+				//print("myDelimiter = " + myDelimiter);
+			
+				if(myiIndexLow===undefined){
+					myiIndexLow=0;
+				}else if(myiIndexLow==null){
+					myiIndexLow=0;
+				}else if(myiIndexLow<=-1){
+					myiIndexLow=0;
+				}
+				
+				//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
+				var objectArray = myArrayString.split(',');  
+										
+				//Hole die Anzahl der Einträge im Array, ggfs. für einen ungueltigen oberen Wert
+				myiIndexMax = objectArray.length-1;
+				//print("myiIndexMax="+myiIndexMax);
+				if(myiIndexHigh===undefined){
+					myiIndexHigh=myiIndexMax;
+				}else if(myiIndexLow==null){
+					myiIndexHigh=myiIndexMax;
+				}else if(myiIndexHigh>myiIndexMax){
+					myiIndexHigh=myiIndexMax;
+				}else if(myiIndexHigh<=-1){
+					myiIndexHigh=myiIndexMax;
+				}
+				
+				//Falsch: damit geht man Buchstabe für Buchstabe vor: 
+				//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
+				//	print("myArrayString[i]="+myArrayString[i]);
+				//	myStringReturn+=myArrayString[i];
+				//	print("myStringReturn="+myStringReturn);
+				//}						 		
+				
+				for(x in objectArray){
+					//print("objectArray[x]="+objectArray[x]);
+					if(myStringReturn!="") myStringReturn+=myDelimiter;
+					myStringReturn+=objectArray[x];					
+					//print("myStringReturn="+myStringReturn);
+				}								
+			}
+		}				 
+		project.setProperty(attributes.get("returnstring"), myStringReturn);
+		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+				
+     ]]>
+	</scriptdef>	
+	
 	<!-- ############################################################-->	
 	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
 		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
@@ -777,8 +870,8 @@
 			 
 <!-- TODO Test für isarrayEmptyJsZZZ -->			 
 			 
-<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
-<target name="compile" depends="-declaration,-myTestArrayGetJsZZZ">
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
+<target name="compile" depends="-declaration,-myTestArrayStringImplodeJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -1222,6 +1315,45 @@
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>				
 	</target>
   
+  <target name="-myTestArrayStringImplodeJsZZZ">
+		<fl:let>sScript::='-myTestArrayStringImplodeJsZZZ: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<fl:logo>${sScript}Start
+		Meine Loesung: Scriptdef arrayStringImplodeJsZZZ</fl:logo>
+		<echo> </echo>
+		<echo>#### Eingabewert ohne Backslash, Delimiter ohne Backslash ##############################</echo>
+		<fl:let>myArraySize::=3;</fl:let>
+		<echo>${sScript}ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>${sScript}myArray vorher: ${myArray}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
+				
+		<fl:let>sDelimiter::="x"</fl:let>
+		<arrayCopyJsZZZ arrayinput="${myArray}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayStringImplodeJsZZZ inputarraystring="${myArrayNew}" inputdelimiter="${sDelimiter}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString" returncontrol="myReturnControl"/>
+		<echo>${sScript}Ergebnisstring: ${myReturnString}</echo>
+
+		<echo> </echo>
+		<echo>#### Eingabewert ohne Backslash, Delimiter MIT Backslash ##############################</echo>
+		<fl:let>myArraySize::=3;</fl:let>
+		<echo>${sScript}ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray2"/>
+		<echo>${sScript}myArray vorher: ${myArray2}</echo>
+	
+		<!-- Werte eingeben -->
+		<arrayValueTestFillJsZZZ arrayinput="${myArray2}" ilbound="0" iubound="" arrayreturn="myArray2New" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArray2New}" arrayreturn="myArray2" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>
+				
+		<fl:let>sDelimiter2::="\\"</fl:let><!-- Backslash muss maskiert werden -->
+		<arrayCopyJsZZZ arrayinput="${myArray2}" arrayreturn="myArray2New" sflagcontrol="" />
+		<arrayStringImplodeJsZZZ inputarraystring="${myArray2New}" inputdelimiter="${sDelimiter2}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString2" returncontrol="myReturnControl"/>
+		<echo>${sScript}Ergebnisstring: ${myReturnString2}</echo>		
+	</target>
 
 		<!-- Beispiel für JAVA Arrays
 		<scriptdef name="validateTimeZone" language="javascript">
