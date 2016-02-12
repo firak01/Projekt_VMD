@@ -923,7 +923,8 @@
 	<!-- Das temporaere Array fuer die Rueckgabewerte initialisieren -->
 	<arrayInitJsZZZ isize="0" arrayreturn="myArrayReturnTemp"/>   	
 	
-	<!-- Verarbeitung: In einer Schleife fuer jeden String StringEscapeBackslashZZZ aufrufen und  den Ergebniswert in das Rueckgabearray packen. -->	   
+	<!-- Verarbeitung: In einer Schleife fuer jeden String StringEscapeBackslashZZZ aufrufen und  den Ergebniswert in das Rueckgabearray packen. -->
+	<!-- Alternativer Aufbau der For Schleife: <ac:for param="i" end="1" begin="1"> 	-->
 	<ac:for param="myStringTemp" list="${myInputArray}"><!-- Beachte das for nur für sequential funktioniert und darin mit @ auf die Param-Variable zugegriffen werden kann. -->
 		<sequential>
 			<echo>${sScript}myStringTemp=@{myStringTemp}</echo> 

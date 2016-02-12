@@ -621,11 +621,13 @@
 		]]>
 	</scriptdef>
 	
-		<!-- ########################### -->
+  <!-- ########################### -->
   <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+				
+	<!-- Fügt die Strings eines Arrays zusammen. Dabei untere / oberen Indes als Grenze der zu verarbeitenden Arraywerte angeben. -1 ist jeweils min / max. -->
 	<attribute name="inputarraystring" />
 	<attribute name="inputdelimiter"/>
 	<attribute name="inputindexlow"/>
@@ -647,6 +649,9 @@
 		var myDelimiter = attributes.get("inputdelimiter");
 		var myiIndexLow = attributes.get("inputindexlow");
 		var myiIndexHigh = attributes.get("inputindexhigh");
+		print("myiIndexLow=" + myiIndexLow);
+		print("myiIndexHigh=" + myiIndexHigh);
+		
 		
 		var myStringReturn = "";
 		var bReturnControl = true;
@@ -699,12 +704,16 @@
 				//	myStringReturn+=myArrayString[i];
 				//	print("myStringReturn="+myStringReturn);
 				//}						 		
-				
+				var iIndexCount=-1;
 				for(x in objectArray){
+					iIndexCount++;
 					//print("objectArray[x]="+objectArray[x]);
-					if(myStringReturn!="") myStringReturn+=myDelimiter;
-					myStringReturn+=objectArray[x];					
-					//print("myStringReturn="+myStringReturn);
+					if(iIndexCount>=myiIndexLow){
+						if(iIndexCount >= myiIndexHigh) break;
+						if(myStringReturn!="") myStringReturn+=myDelimiter;
+						myStringReturn+=objectArray[x];					
+						//print("myStringReturn="+myStringReturn);
+					}
 				}								
 			}
 		}				 
@@ -4148,7 +4157,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	-->
 	
 	<!-- absolute Pfade verwenden: -->
-	<delete includeEmptyDirs="true"> 
+	<!-- temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen <delete includeEmptyDirs="true"> -->
 		<fileset dir="${myDir}" includes="${myFile}" defaultexcludes="false"><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->		
 			<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 			<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
@@ -4159,7 +4168,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		
 		<!-- Lösche das Ausgangsverzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
 		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->							
-	</delete>
+	<!--temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen  </delete>-->
 	
 		<!-- TODO GOON Problem: Damit wird aber nicht der ganze Pfad gelöscht, falls er nur aus leeren Verzeichnissen besteht. -->
 		<!-- Lösungsansatz: Mache eine Funktion, mit der man einen String in ein Array zerlegen kann.
@@ -4174,15 +4183,48 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>		
 	
-		<!-- Baue aus dem Array immer wieder neu den absoluten Verzeichnispfad, aber immer wieder um eine obere Indexposition weniger -->
-		<!-- TODO GOON 20160210: Schleife und darin inputindexhigh immer um 1 reduzieren. -->
-		<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString" returncontrol="myReturnControl"/>
-		<echo>Verzeichnis xxx ${myReturnString}</echo>
+		<!-- TODO GOON 20150212: Trimme das Array, dadurch wird ein leeres Element, z.B. erzeugt durch einen abschliessenden Backslash entfernt -->
 		
-	<delete includeEmptyDirs="true"> 
-		<!-- Lösche das Verzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
-		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->				
-	</delete>
+		
+	
+		<!-- Ermittle die Indexposition, den Dateinamen und den Dateipfad -->	
+		<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+		<arrayElementCountJsZZZ arrayinput="${myArray}" ireturn="myArray.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->			
+		
+		<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+		<var name="op1" value="${myArray.iSize}"/>
+		<var name="op2" value="1"/>
+		<var name="op" value="-"/>
+		<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+		<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>
+	
+		<!-- <ac:for param="i" end="1" begin="1"> -->
+		<ac:for param="icounter" end="${iubound}">			
+		<sequential>
+			<echo>${sScript}icounter=@{icounter}</echo> 
+						
+			<var name="op1" value="${iubound}"/>
+			<var name="op2" value="@{icounter}"/>
+			<var name="op" value="-"/>
+			<math result="iIndexTemp" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+			<echo>${sScript}Errechnete Obergrenze des Arrays fuer diesen Lauf: ${iIndexTemp}</echo>
+			
+			<!-- Baue aus dem Array immer wieder neu den absoluten Verzeichnispfad, aber immer wieder um eine obere Indexposition weniger -->
+			<!-- TODO GOON 20160210: Schleife und darin inputindexhigh immer um 1 reduzieren. -->
+			<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub"/>
+			<echo>Verzeichnis xxx ${myReturnStringSub}</echo>
+						
+			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
+			<fl:let>myReturnControl::="${returnControlSub}"</fl:let>			
+			
+			<fl:let>myDir::="${myReturnStringSub}"</fl:let>
+			<!--<delete includeEmptyDirs="true"> -->
+				<!-- Lösche das Verzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
+				<!--<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" />--><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->				
+			<!--</delete>			-->
+		</sequential>
+		</ac:for>		
+
 	
 	<!-- ############### -->
 	<!-- Rueckgabebwerte -->

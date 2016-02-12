@@ -592,11 +592,13 @@
 		]]>
 	</scriptdef>
 	
-	<!-- ########################### -->
+  <!-- ########################### -->
   <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+				
+	<!-- Fügt die Strings eines Arrays zusammen. Dabei untere / oberen Indes als Grenze der zu verarbeitenden Arraywerte angeben. -1 ist jeweils min / max. -->
 	<attribute name="inputarraystring" />
 	<attribute name="inputdelimiter"/>
 	<attribute name="inputindexlow"/>
@@ -618,6 +620,9 @@
 		var myDelimiter = attributes.get("inputdelimiter");
 		var myiIndexLow = attributes.get("inputindexlow");
 		var myiIndexHigh = attributes.get("inputindexhigh");
+		print("myiIndexLow=" + myiIndexLow);
+		print("myiIndexHigh=" + myiIndexHigh);
+		
 		
 		var myStringReturn = "";
 		var bReturnControl = true;
@@ -670,12 +675,16 @@
 				//	myStringReturn+=myArrayString[i];
 				//	print("myStringReturn="+myStringReturn);
 				//}						 		
-				
+				var iIndexCount=-1;
 				for(x in objectArray){
+					iIndexCount++;
 					//print("objectArray[x]="+objectArray[x]);
-					if(myStringReturn!="") myStringReturn+=myDelimiter;
-					myStringReturn+=objectArray[x];					
-					//print("myStringReturn="+myStringReturn);
+					if(iIndexCount>=myiIndexLow){
+						if(iIndexCount >= myiIndexHigh) break;
+						if(myStringReturn!="") myStringReturn+=myDelimiter;
+						myStringReturn+=objectArray[x];					
+						//print("myStringReturn="+myStringReturn);
+					}
 				}								
 			}
 		}				 
