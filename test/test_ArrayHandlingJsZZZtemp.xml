@@ -685,7 +685,7 @@
      ]]>
 	</scriptdef>	
 	
-	 <!-- ########################### -->
+   <!-- ########################### -->
   <scriptdef name="arrayStringTrimJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.

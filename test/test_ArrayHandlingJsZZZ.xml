@@ -592,7 +592,7 @@
 		]]>
 	</scriptdef>
 	
-  <!-- ########################### -->
+   <!-- ########################### -->
   <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -680,7 +680,7 @@
 					iIndexCount++;
 					//print("objectArray[x]="+objectArray[x]);
 					if(iIndexCount>=myiIndexLow){
-						if(iIndexCount >= myiIndexHigh) break;
+						if(iIndexCount > myiIndexHigh) break;
 						if(myStringReturn!="") myStringReturn+=myDelimiter;
 						myStringReturn+=objectArray[x];					
 						//print("myStringReturn="+myStringReturn);
@@ -689,6 +689,95 @@
 			}
 		}				 
 		project.setProperty(attributes.get("returnstring"), myStringReturn);
+		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+				
+     ]]>
+	</scriptdef>
+	
+   <!-- ########################### -->
+  <scriptdef name="arrayStringTrimJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+				
+	<!-- Entfernt leere Strings aus einem Array. bReturnControl=true, wenn etwas entfernt wurde. -->
+	<!-- Controlstring: "trim = die einzelnen Strings sollen einem trim zur Pruefung unterzogen werden. Keine Veraenderung des Werts"
+						 trimmed = wie trim, aber Veraenderung des Werts.-->
+	<attribute name="inputarraystring" />
+	<attribute name="inputcontrolstring" /> <!-- so mögliche Erweiterungen wie 'fulltrim' realisieren. -->
+	
+    <attribute name="returnarraystring" /> 
+	<attribute name="returncontrol" /> 
+	
+    <![CDATA[
+		var myArrayString = attributes.get("inputarraystring");		
+		var myControlString = attributes.get("inputcontrolstring");	
+	
+		var myArrayReturn = new Array();			
+		var bReturnControl = false;
+		
+		if(myArrayString===undefined){
+			//print("myString = undefined");
+			bReturnControl = false;
+		}else if(myArrayString===null){
+			//print("myString = null");			
+			bReturnControl = false;
+		}else{
+						
+				//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
+				var objectArray = myArrayString.split(',');  
+														
+				//Falsch: damit geht man Buchstabe für Buchstabe vor: 
+				//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
+				//	print("myArrayString[i]="+myArrayString[i]);
+				//	myStringReturn+=myArrayString[i];
+				//	print("myStringReturn="+myStringReturn);
+				//}	
+
+			
+				
+				
+				var iIndexCount = -1;
+				for(x in objectArray){
+					print("objectArray[x]="+objectArray[x]);
+					var sCheckValue = objectArray[x];
+					var sValue = objectArray[x];
+					if(myControlString=="trimmed"){
+						sCheckValue = objectArray[x].trim();
+						sValue= objectArray[x].trim();						
+					}else if(myControlString=="trim"){	
+						sCheckValue = objectArray[x].trim();
+						//Keine Veraenderung des Werts
+					};	
+					
+					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+					if(sCheckValue=="<#!!FGLUNDEFINED!!#>"){
+						//mache nix... myArrayReturn[icount]="<#!!FGLUNDEFINED!!#>";		//Wenn undefiniert, dann bleibt der Wert undefiniert.
+						bReturnControl=true;
+					}else if(sCheckValue=="<#!!FGLEMPTY!!#>"){
+						//mache nix... myArrayReturn[icount]="Neuer Wert "+ icount; 		//Leere Werte werden automatisch erzeugt.
+						bReturnControl=true;
+					}else if(sCheckValue==""){
+						//mache nix...
+						bReturnControl=true;
+					}else{						
+						iIndexCount++;
+						myArrayReturn[iIndexCount]=sValue; //Bestehende Werte werden nur kopiert.
+						if(sValue==objectArray[x]){
+							//mache nix...
+						}else{	
+							bReturnControl=true;
+						};
+					};		
+				}								
+			}	
+			
+			//abschliessende Pruefung
+			if(myArrayReturn.lenght==0){
+				print("Setze undefined Dummy - Wert.");
+				myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
+			};	
+		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
 		project.setProperty(attributes.get("returncontrol"), bReturnControl);
 				
      ]]>
@@ -807,6 +896,66 @@
 		 ]]>
 	</scriptdef>	
 	
+	  <!-- ########################### -->
+  <scriptdef name="stringExplodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="inputstring" />
+	<attribute name="inputdelimiter"/>
+
+    <attribute name="returnarraystring" /> 
+	<attribute name="returncontrol" /> 
+	
+    <![CDATA[
+		var myString = attributes.get("inputstring");
+		var myDelimiter = attributes.get("inputdelimiter") ;
+		
+		var myArrayReturn = new Array();
+		var bReturnControl = true;
+		if(myString===undefined){
+			print("myString = undefined");
+			bReturnControl = false;
+		}else if(myString===''){
+			print("myString = leer");			
+			bReturnControl = false;
+		}else{
+			if(myDelimiter===undefined){
+				print("myDelimiter = 'undefined'");
+				myArrayReturn[0]=myString;
+				bReturnControl = false;
+			}else if(myDelimiter===''){
+				print("myDelimiter = 'leer'");
+				myArrayReturn[0]=myString;
+				bReturnControl = false;
+			}else{	
+				var myStringEncoded = encodeMyHtml(myString);
+				var myDelimiterEncoded = encodeMyHtml(myDelimiter);
+		
+				 values = myStringEncoded.split(myDelimiterEncoded);
+				 for(i=0; i<values.length; i++) {
+					//So wird ein Array künstlich erzeugt.... project.setNewProperty(attributes.get("inputprefix")+i, values[i]);
+					myArrayReturn[i]=unescape(values[i]);//Das encoden wieder rueckgaengig machen.
+				 }				 		
+			}
+		}				 
+		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
+		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+		
+			//TODO: In den JSZ Kernel bringen
+		function encodeMyHtml(htmlToEncode) {
+		 var encodedHtml = escape(htmlToEncode);
+		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
+		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
+		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
+		 encodedHtml = encodedHtml.replace(/&/g,"%26");
+		 encodedHtml = encodedHtml.replace(/@/g,"%40");
+		 return encodedHtml;
+		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
+	   }
+     ]]>
+	</scriptdef>
+	
  <!-- ########################### -->
  <scriptdef name="stringLeftStringZZZ" language="javascript">
  <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -879,8 +1028,8 @@
 			 
 <!-- TODO Test für isarrayEmptyJsZZZ -->			 
 			 
-<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayStringImplodeJsZZZ">
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
+<target name="compile" depends="-declaration,-myTestArrayStringTrimJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -1364,6 +1513,61 @@
 		<echo>${sScript}Ergebnisstring: ${myReturnString2}</echo>		
 	</target>
 
+  <target name="-myTestArrayStringTrimJsZZZ">
+		<fl:let>sScript::='-myTestArrayStringTrimJsZZZ: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<fl:logo>${sScript}Start
+		Meine Loesung: Scriptdef arrayStringTrimJsZZZ</fl:logo>
+		<echo> </echo>
+		<echo>#### Eingabewert mit abschliessendem Leerstring, Delimiter Backslash ==> Erzeugt leeres letzes Arrayelement ##############</echo>		
+		<fl:let>sValue::='c:\test\directory\nocheins\ '</fl:let><!-- Der Backslash muss maskiert werden --><!-- Leerzeichen angehängt -->
+		<echoproperties prefix="sValue"/>
+		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
+		<fl:let>sDelimiter::="\\"</fl:let>
+		<arrayInitJsZZZ isize="0" arrayreturn="myReturnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>			
+		<echo> </echo>
+		<echo>${sScript}# Nun inputcontrolstring='trim' ##############</echo>
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returncontrol="myReturnControl2"/>
+		<echo>${sScript}# myReturnControl2 nach arrayStringTrimJsZZZ=${myReturnControl2}</echo>
+		<arrayCopyJsZZZ arrayinput="${myReturnArray2}" arrayreturn="myArray2" sflagcontrol="" />		
+		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>
+		<echo> </echo>
+		<echo>${sScript}# Nun inputcontrolstring='trimmed' ##############</echo>
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trimmed" returnarraystring="myReturnArray2" returncontrol="myReturnControl2"/>
+		<echo>${sScript}# myReturnControl2 nach arrayStringTrimJsZZZ=${myReturnControl2}</echo>
+		<arrayCopyJsZZZ arrayinput="${myReturnArray2}" arrayreturn="myArray2" sflagcontrol="" />		
+		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>
+		<echo> </echo>			
+
+		<echo> </echo>			
+		<echo>#### Eingabewert mit abschliessendem trimmbaren String, Delimiter Backslash ==> Erzeugt trimmbares letzes Arrayelement ##############</echo>
+		<fl:let>sValue::='c:\test\directory\nocheins\\ xyz '</fl:let><!-- Der Backslash muss maskiert werden --><!-- Leerzeichen angehängt -->
+		<echoproperties prefix="sValue"/>
+		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
+		<fl:let>sDelimiter::="\\"</fl:let>
+		<arrayInitJsZZZ isize="0" arrayreturn="myReturnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
+		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>			
+		<echo> </echo>
+		<echo>${sScript}# Nun inputcontrolstring='trim' ##############</echo>
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returncontrol="myReturnControl2"/>
+		<echo>${sScript}# myReturnControl2 nach arrayStringTrimJsZZZ=${myReturnControl2}</echo>
+		<arrayCopyJsZZZ arrayinput="${myReturnArray2}" arrayreturn="myArray2" sflagcontrol="" />		
+		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>
+		<echo> </echo>
+		<echo>${sScript}# Nun inputcontrolstring='trimmed' ##############</echo>
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trimmed" returnarraystring="myReturnArray2" returncontrol="myReturnControl2"/>
+		<echo>${sScript}# myReturnControl2 nach arrayStringTrimJsZZZ=${myReturnControl2}</echo>
+		<arrayCopyJsZZZ arrayinput="${myReturnArray2}" arrayreturn="myArray2" sflagcontrol="" />		
+		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>
+		<echo> </echo>								
+	</target>
+
+	
 		<!-- Beispiel für JAVA Arrays
 		<scriptdef name="validateTimeZone" language="javascript">
     <attribute name="zone" />
