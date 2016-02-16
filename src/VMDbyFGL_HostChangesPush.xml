@@ -30,7 +30,6 @@
 		
     <!-- ######## Scriptdefs ############################################################################--> 		
 	<!-- ############################################################-->
-	<!-- ############################################################-->
 	<scriptdef name="arrayAppendJsZZZ" language="javascript">
 		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
 		
@@ -709,7 +708,7 @@
 					iIndexCount++;
 					//print("objectArray[x]="+objectArray[x]);
 					if(iIndexCount>=myiIndexLow){
-						if(iIndexCount > myiIndexHigh) break;// noch kaputt testen: >= verwenden, nur um jetzt 20160215 einen Fehler zu erzeugen
+						if(iIndexCount > myiIndexHigh) break;//Zum noch kaputt testen: >= statt nur > verwenden, nur um jetzt 20160215 einen Fehler zu erzeugen
 						if(myStringReturn!="") myStringReturn+=myDelimiter;
 						myStringReturn+=objectArray[x];					
 						//print("myStringReturn="+myStringReturn);
@@ -1080,9 +1079,25 @@
 			bErg = FileEasyZZZ.isRoot(myFilepath);
 			print("bErg="+bErg);
 			
+			}catch (err if err.javaException instanceof ExceptionZZZ) {  //So geht das nur mit RHINO, erst die genau definierten Fehler abfangen, dann die allgemeinen.
+				print("ExceptionZZZ Fehler abgefangen");
+				print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
 			}catch(err) {
 				//document.getElementById("demo").innerHTML = err.message;
-				print("Error: " + err.getMessageLast());
+				print("typeof err: "+typeof(err));
+				print("err.contructor.name="+err.constructor.name);				
+				if(err.constructor.name=='JavaException'){
+					print("Error.name=" + err.name);
+				    print("Error=" + err);
+					print("Error.getCause=" + err.getCause); //Ergebnis: undefined
+					//print("Error.getCause()=" + err.getCause());
+					print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
+				    //print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
+					//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
+					//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
+					print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+				}
+				//Das wäre ExceptionZZZ, was aber leider hier nicht ankommt.... print("Error: " + err.getMessageLast());
 				bErg = false; //sicher ist sicher....
 				myReturnControl = false;
 				myReturnControlString = "Error: " + err.getMessageLast();
@@ -4271,9 +4286,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:var name="returnString" value="${myReturnString}" />			
 </target>
 <target name="-FGLDelLocal_DeleteFileSingle"> 
-	<!-- Durch dieses Target kann ein antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
-	<!-- TODO GOON noch kaputt: Den Fall abfangen, falls eine Datei nicht gelöscht werden kann, wg. Rechte, in anderem Programm geöffnet, etc. -->
-	
+	<!-- Durch dieses gekapselte Target kann in antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
+		
 	<!-- Uebernahme von Einzelwerten -->
 	<fl:let>myDir::='${sFiledir}'</fl:let><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
 	<fl:let>myFile::='${sFilename}'</fl:let>
@@ -4319,24 +4333,28 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 											
 	<!-- ### Lösche anhand des Verzeichnis- und Dateinamens -->
 	<!-- TODO Fange Fehler ab, wenn eine Datei / ein Verzeichnis nicht (mehr) vorhanden ist -->
+	<!-- TODO GOON noch kaputt: Den Fall abfangen, falls eine Datei nicht gelöscht werden kann, wg. Rechte, in anderem Programm geöffnet, etc. -->
 	<!-- TODO GGON noch kaputt: Prüfe, ob der Backslash am Emde steht, ergänze ihn falls notwendig -->
 	<echo>Deleting File ${myDir}${myFile}</echo>
-													
+											
+    <!-- Dokumentation: -->											
 	<!-- 	Relative Pfade verwenden, auch beim Löschen?:
 	<copy todir="//${myDest.filedir}" overwrite="false"  preservelastmodified="true"> 
 	<fileset dir="//${mySrc.filedir}">		 -->
 	
-	<!--
+	<!-- Von mir verwendetere Ausdruck zum Löschen von Verzeichnissen, nur wenn sie leer sind.
 	<delete includeemptydirs="true">
-  <fileset dir="onlyifempty" excludes="**/*" />
-</delete>
-	-->
+		<fileset dir="onlyifempty" excludes="**/*" />
+	</delete>       -->
 	
+	<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
+	<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
+			
+		
 	<!-- absolute Pfade verwenden: -->
-	<!-- temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen <delete includeEmptyDirs="true"> -->
+	<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
+	<delete includeEmptyDirs="true"> -->
 		<fileset dir="${myDir}" includes="${myFile}" defaultexcludes="false"><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->		
-			<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
-			<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
 														
 			<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
 			<include name="${myFile}" />				
@@ -4344,32 +4362,33 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		
 		<!-- Lösche das Ausgangsverzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
 		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->							
-	<!--temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen  </delete>-->
+		<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
+	</delete>-->
 	
-		<!-- TODO GOON Problem: Damit wird aber nicht der ganze Pfad gelöscht, falls er nur aus leeren Verzeichnissen besteht. -->
+		<!-- Problem: Damit wird aber nicht der ganze Pfad gelöscht, falls er nur aus leeren Verzeichnissen besteht. -->
 		<!-- Lösungsansatz: Mache eine Funktion, mit der man einen String in ein Array zerlegen kann.
 		                    Dieses Array dann in einer Schleife durchgehen -->
 		<!-- ABER: Delete Target erlaubt keine anderen Scriptdefs innerhalb. 
 		                 Daher 1) ein neues/eigenes  delete Targets für Verzeichnisse verwenden 
 						    und 2) das Array ausserhalb dieses neuentargets aufbauen und dieses neue Target in der Schleife ausführen -->
-		<echo>Exploding directory path to array: ${myDir}</echo>
+		<!--<echo>Exploding directory path to array: ${myDir}</echo>-->
 		<arrayInitJsZZZ isize="0" arrayreturn="myReturnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
 		<fl:let>sDelimiter::='\\'</fl:let><!-- escapter Backslash -->
 		<stringExplodeJsZZZ inputstring="${myDir}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
 		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
-		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>		
+		<!--<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>-->
 	
-		<!-- TODO GOON 20150212: Trimme das Array, dadurch wird ein leeres Element, z.B. erzeugt durch einen abschliessenden Backslash entfernt -->
+		<!-- Trimme das Array, dadurch wird ein leeres Element, z.B. erzeugt durch einen abschliessenden Backslash entfernt -->
 		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returncontrol="myReturnControl2"/>
 		<ac:if>
 			<equals arg1="true" arg2="${myReturnControl2}"/>
 			<ac:then>			
-				<echo>${sScript}Array wurde getrimmt. myReturnControl2=${myReturnControl2}</echo>
+				<!--<echo>${sScript}Array wurde getrimmt. myReturnControl2=${myReturnControl2}</echo>-->
 				<arrayCopyJsZZZ arrayinput="${myReturnArray2}" arrayreturn="myArray" sflagcontrol="" />
-				<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>							
+				<!--<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>	-->						
 			</ac:then>
 			<ac:else>
-				<echo>${sScript}Nichts aus dem Array weggetrimmt. myReturnControl2=${myReturnControl2}</echo>
+				<!--<echo>${sScript}Nichts aus dem Array weggetrimmt. myReturnControl2=${myReturnControl2}</echo>-->
 			</ac:else>			
 		</ac:if>
 			
@@ -4389,9 +4408,11 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<trycatch property="myError" reference="myErrorObject">
 		<try>
     
- 	
-		<!-- <ac:for param="i" end="1" begin="1"> -->
-		<ac:for param="icounter" end="${iubound}" keepgoing="true">			
+		<!-- Baue aus dem Array immer wieder neu den absoluten Verzeichnispfad, aber immer wieder um eine obere Indexposition weniger -->
+		<!-- Verwende dazu eine Schleife und inputindexhigh wird darin immer um 1 reduziert. -->
+		<!-- <ac:for param="i" end="1" begin="1"> --><!-- nettes Attribut: beginn -->
+		<!-- <ac:for param="icounter" end="${iubound}" keepgoing="true">	--><!-- keepgoing sorgt dafuer, dass die Schleife selbst nicht abgebrochen wird. Der Fehler würde anschliessend geworfen. -->
+		<ac:for param="icounter" end="${iubound}" >
 		<sequential>
 			<echo>${sScript}icounter=@{icounter}</echo> 
 						
@@ -4401,10 +4422,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<math result="iIndexTemp" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
 			<echo>${sScript}Errechnete Obergrenze des Arrays fuer diesen Lauf: ${iIndexTemp}</echo>
 			
-			<!-- Baue aus dem Array immer wieder neu den absoluten Verzeichnispfad, aber immer wieder um eine obere Indexposition weniger -->
-			<!-- Schleife und darin inputindexhigh immer um 1 reduzieren. -->
 			<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub"/>
-			<echo>Verzeichnis xxx ${myReturnStringSub}</echo>
+			<echo>${sScript}Verzeichnis ${myReturnStringSub}</echo>
 						
 			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
 			<fl:let>myReturnControl::="${returnControlSub}"</fl:let>
@@ -4429,16 +4448,18 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 				<echo>${sScript}Root noch nicht erreicht. Weitere Verarbeitung moeglich.</echo>
 				
 				<fl:let>myDir::="${myReturnStringSub}"</fl:let>
-			<!--<delete includeEmptyDirs="true"> -->
+				<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
+				<delete includeEmptyDirs="true"> -->
 				<!-- Lösche das Verzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
 				<!--<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" />--><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->				
-			<!--</delete>			-->
+			    <!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
+				</delete>			-->
 			</ac:then>
 			</ac:elseif>
 			<ac:else>
 			    <!-- Fehlerfall -->
 				<echo>${sScript}Fehler geworfen: ${myReturnControlString2}</echo>	
-				<fail/><!-- das keepgoing-Attribut in der for-Schleife sollte sicherstellen, das jetzt nicht alles komplett aufhört -->
+				<fail message="${myError}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->
 			</ac:else>			
 		</ac:if>
 			
@@ -4448,6 +4469,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		</try>
 		<catch>
 			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler abgefangen: ${myError}</echo>
 		</catch>
 
 		<finally>
