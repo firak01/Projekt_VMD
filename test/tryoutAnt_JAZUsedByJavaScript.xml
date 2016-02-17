@@ -91,6 +91,144 @@
 	      ]]>
   </scriptdef>
   
+    <!-- ########################### -->
+ <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
+ <scriptdef name="tryout_jaz_errorHandlingJs" language="javascript">
+     <attribute name="inputfilepath" />
+     <attribute name="returnboolean" />
+	 <attribute name="returncontrol" />
+	 <attribute name="returncontrolstring" />
+     <![CDATA[
+			enableJava();
+		   
+			//Allgemein für Import Statements gilt:
+			//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
+			//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
+	 
+			// import statements, funktionieren beide
+			//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
+			//importPackage(basic.zBasic.util.datatype.string);
+			importClass(Packages.basic.zBasic.ExceptionZZZ);
+			importPackage(Packages.basic.zBasic.util.file);
+	 			
+			//#############
+			//#### EINGABE ######	 
+			var myFilepath = attributes.get("inputfilepath");
+			print("myFilepath="+myFilepath);
+			
+			var bErg = false;
+			var myReturnControl = true;
+			var myReturnControlString = "Alles o.k.";
+			
+			//#### ERROR HANDLING #######
+			try{
+			
+			//#### Java, etc.
+			bErg = FileEasyZZZ.isRoot(myFilepath);
+			print("bErg="+bErg);
+			
+			
+			//var serg = StringZZZ.toCamelCase(myFilepath,"_");
+			//println("serg="+serg);
+			
+			// create and use a Task via Ant API
+			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
+			//echo = self.getProject().createTask("echo");
+			//echo.setMessage("Ergebnis + ": " + serg);
+			//echo.perform();
+         
+			}catch (err if err.javaException instanceof ExceptionZZZ) {  //So geht das nur mit RHINO, erst die genau definierten Fehler abfangen, dann die allgemeinen.
+				print("ExceptionZZZ Fehler abgefangen");
+				print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+				
+				bErg = false; //sicher ist sicher....
+				myReturnControl = false;
+				myReturnControlString = "Error: " + err.getMessageLast();
+			}catch(err) {
+				//document.getElementById("demo").innerHTML = err.message;
+				var version = java.lang.System.getProperty("java.version");
+				if(version.substring(0,3)=="1.8"){
+					print ("Javascript Engine: 'Nashorn'");
+					print("typeof err: "+typeof(err));
+					
+					print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+					
+					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+						print("ExceptionZZZ Fehler abgefangen");
+						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
+					}
+					bErg = false; //sicher ist sicher....
+					myReturnControl = false;
+					myReturnControlString = "Error: " + err.getMessageLast();
+				}else{
+					print ("Javascript Engine: 'Rhino'");
+					print("typeof err: "+typeof(err));
+					print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
+					if(err.constructor.name=='JavaException'){
+						print("Error.name=" + err.name);
+						print("Error=" + err);
+						print("Error.getCause=" + err.getCause); //Ergebnis: undefined
+						//print("Error.getCause()=" + err.getCause());
+						print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
+						//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
+						//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
+						//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
+						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+					}		
+					bErg = false; //sicher ist sicher....
+					myReturnControl = false;
+					myReturnControlString = "Error: " + err.javaException.getMessageLast();
+				}
+			}
+			
+			// create and use a Task via Ant API
+			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
+			//echo = self.getProject().createTask("echo");
+			//echo.setMessage("Ergebnis + ": " + serg);
+			//echo.perform();
+         
+			 //Beispiel für die Array-Rueckgabe 
+			//	var arrayFilenames=new Array();
+			//	var arrayFilelengths=new Array();
+			
+			//	arrayFilenames.push('Woa'); 
+			//	arrayFilenames.push('Wob'); 
+			//	arrayFilelengths.push(1234); 
+			
+			
+			//#### RÜCKGABE #####
+			project.setProperty(attributes.get("returnboolean"), bErg);
+			project.setProperty(attributes.get("returncontrol"), myReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);			
+			//	project.setProperty(attributes.get("filenames"), arrayFilenames);
+			//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
+		
+		
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				var version = java.lang.System.getProperty("java.version");
+				print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+					print("Verwende das alte Rhino unter Java 8");
+				}catch(e){
+					print("Verwende Standard JavaScript Engine");
+				}
+			}
+	      ]]>
+  </scriptdef>
+  
   <!-- ########################### -->
  <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
  <scriptdef name="tryout_jaz_fileeasy_isRoot" language="javascript">
@@ -175,8 +313,8 @@
 <!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <!--<target name="compile" depends="-myTestJAZUsedByJavaScript_StringZZZ, -myTestJAZUsedByJavaScript_FileEasyZZZ">-->
- <target name="compile" depends="-myTestJAZUsedByJavaScript_FileEasyZZZ">
+ <!--<target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandling, -myTestJAZUsedByJavaScript_FileEasyZZZ, -myTestJAZUsedByJavaScript_StringZZZ, ">-->
+ <target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandling">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -191,36 +329,62 @@
     </javac>
 	-->
   </target>
-  
-	<target name="-myTestJAZUsedByJavaScript_StringZZZ">
-		<echo>myTestJavaUsedByJavaScript: </echo>
-		<property name="fs.dir" value="../testused"/>
-		<property name="fs.includes" value="**/*.txt"/>
-		<property name="fs.excludes" value="**/*.tmp"/>
+  	
+	<target name="-myTestJAZUsedByJavaScript_ErrorHandling">
+		<fl:let>sScript::='-myTestJAZUsedByJavaScript_ErrorHandling: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<echo>${sScript}Start</echo>
 
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+		
 		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
 		<ac:if>
-		<not>
-			<available classname="basic.zBasic.util.datatype.string.StringZZZ" />        
-		</not>
-	  <ac:then>
-		<fl:fail message="StringZZZ existiert nicht."/>
-	   </ac:then>
-	   <ac:else>
-	   <echo message="StringZZZ vorhanden." />
-	   </ac:else>
-	 </ac:if>
-	 
-		<!-- Hier wird die scriptdef Methode tryout_java_file_length aufgerufen -->
-		<tryout_jaz_string_camelcase filename_search="Das_ist_ein_camelcase_test" filenames="myfilenames" filelengths="myfilelengths" tryout="mytryout_string"/>
-		<echo message="mytryout_string = ${mytryout_string}" />
+			<not>
+				<available classname="basic.zBasic.util.file.FileEasyZZZ" />        
+			</not>
+			<ac:then>
+				<fl:fail message="FileEasyZZZ existiert nicht."/>
+			</ac:then>
+			<ac:else>
+				<echo message="FileEasyZZZ vorhanden." />
+			 </ac:else>
+		 </ac:if>
+	 		
+		<!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
+		<tryout_jaz_errorHandlingJs inputfilepath="c:\\temp" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler geworfen: ${myReturnControlString2}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		
-		<!-- Verwende antcontrib für eine Schleife über die Arrays --><!-- do something with @{myelement} -->
-<!-- 		<for list="${myfilenames}" param="myelement">
-			<sequential>				
-				<echo>myelement= @{myelement}</echo>
-			</sequential>
-		</for> -->
+		
+		<tryout_jaz_errorHandlingJs inputfilepath="" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler geworfen: ${myReturnControlString2}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
+		
+		</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler in Ant abgefangen: ${myError}</echo>
+		</catch>
+
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+	</trycatch>
+		
 		
 	</target> 
 	
@@ -249,6 +413,38 @@
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
 		<tryout_jaz_fileeasy_isRoot inputfilepath="c:\\temp" returnboolean="myReturnValue"/>
 		<echo message="myReturnValue = ${myReturnValue}" />
+		
+		<!-- Verwende antcontrib für eine Schleife über die Arrays --><!-- do something with @{myelement} -->
+<!-- 		<for list="${myfilenames}" param="myelement">
+			<sequential>				
+				<echo>myelement= @{myelement}</echo>
+			</sequential>
+		</for> -->
+		
+	</target> 
+	
+	<target name="-myTestJAZUsedByJavaScript_StringZZZ">
+		<echo>myTestJavaUsedByJavaScript: </echo>
+		<property name="fs.dir" value="../testused"/>
+		<property name="fs.includes" value="**/*.txt"/>
+		<property name="fs.excludes" value="**/*.tmp"/>
+
+		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
+		<ac:if>
+		<not>
+			<available classname="basic.zBasic.util.datatype.string.StringZZZ" />        
+		</not>
+	  <ac:then>
+		<fl:fail message="StringZZZ existiert nicht."/>
+	   </ac:then>
+	   <ac:else>
+	   <echo message="StringZZZ vorhanden." />
+	   </ac:else>
+	 </ac:if>
+	 
+		<!-- Hier wird die scriptdef Methode tryout_java_file_length aufgerufen -->
+		<tryout_jaz_string_camelcase filename_search="Das_ist_ein_camelcase_test" filenames="myfilenames" filelengths="myfilelengths" tryout="mytryout_string"/>
+		<echo message="mytryout_string = ${mytryout_string}" />
 		
 		<!-- Verwende antcontrib für eine Schleife über die Arrays --><!-- do something with @{myelement} -->
 <!-- 		<for list="${myfilenames}" param="myelement">

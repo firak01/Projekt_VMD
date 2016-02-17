@@ -708,7 +708,7 @@
 					iIndexCount++;
 					//print("objectArray[x]="+objectArray[x]);
 					if(iIndexCount>=myiIndexLow){
-						if(iIndexCount > myiIndexHigh) break;//Zum noch kaputt testen: >= statt nur > verwenden, nur um jetzt 20160215 einen Fehler zu erzeugen
+						if(iIndexCount >= myiIndexHigh) break;//Zum noch kaputt testen: >= statt nur > verwenden, nur um jetzt 20160215 einen Fehler zu erzeugen
 						if(myStringReturn!="") myStringReturn+=myDelimiter;
 						myStringReturn+=objectArray[x];					
 						//print("myStringReturn="+myStringReturn);
@@ -1082,51 +1082,60 @@
 			}catch (err if err.javaException instanceof ExceptionZZZ) {  //So geht das nur mit RHINO, erst die genau definierten Fehler abfangen, dann die allgemeinen.
 				print("ExceptionZZZ Fehler abgefangen");
 				print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-			}catch(err) {
-				//document.getElementById("demo").innerHTML = err.message;
-				print("typeof err: "+typeof(err));
-				print("err.contructor.name="+err.constructor.name);				
-				if(err.constructor.name=='JavaException'){
-					print("Error.name=" + err.name);
-				    print("Error=" + err);
-					print("Error.getCause=" + err.getCause); //Ergebnis: undefined
-					//print("Error.getCause()=" + err.getCause());
-					print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
-				    //print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
-					//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
-					//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
-					print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-				}
-				//Das wäre ExceptionZZZ, was aber leider hier nicht ankommt.... print("Error: " + err.getMessageLast());
+				
 				bErg = false; //sicher ist sicher....
 				myReturnControl = false;
 				myReturnControlString = "Error: " + err.getMessageLast();
+			}catch(err) {
+				//document.getElementById("demo").innerHTML = err.message;
+				var version = java.lang.System.getProperty("java.version");
+				if(version.substring(0,3)=="1.8"){
+					print ("Javascript Engine: 'Nashorn'");
+					print("typeof err: "+typeof(err));
+					
+					print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+					
+					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+						print("ExceptionZZZ Fehler abgefangen");
+						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
+					}
+					bErg = false; //sicher ist sicher....
+					myReturnControl = false;
+					myReturnControlString = "Error: " + err.getMessageLast();
+				}else{
+					print ("Javascript Engine: 'Rhino'");
+					print("typeof err: "+typeof(err));
+					print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
+					if(err.constructor.name=='JavaException'){
+						print("Error.name=" + err.name);
+						print("Error=" + err);
+						print("Error.getCause=" + err.getCause); //Ergebnis: undefined
+						//print("Error.getCause()=" + err.getCause());
+						print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
+						//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
+						//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
+						//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
+						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+					}		
+					bErg = false; //sicher ist sicher....
+					myReturnControl = false;
+					myReturnControlString = "Error: " + err.javaException.getMessageLast();
+				}
 			}
+			
 			
 			// create and use a Task via Ant API
 			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
 			//echo = self.getProject().createTask("echo");
 			//echo.setMessage("Ergebnis + ": " + serg);
 			//echo.perform();
-         
-			 //Beispiel für die Array-Rueckgabe 
-		//	var arrayFilenames=new Array();
-		//	var arrayFilelengths=new Array();
-			
-		//	arrayFilenames.push('Woa'); 
-		//	arrayFilenames.push('Wob'); 
-		//	arrayFilelengths.push(1234); 
-			
-			
+         			
 			//#### RÜCKGABE #####
 			project.setProperty(attributes.get("returnboolean"), bErg);
 			project.setProperty(attributes.get("returncontrol"), myReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);			
-		//	project.setProperty(attributes.get("filenames"), arrayFilenames);
-		//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
-		
-		
-		
+
+				
 		//Todo: Diese Funktion in den JSZ Kernel packen
 			function enableJava(){
 			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
@@ -4459,7 +4468,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<ac:else>
 			    <!-- Fehlerfall -->
 				<echo>${sScript}Fehler geworfen: ${myReturnControlString2}</echo>	
-				<fail message="${myError}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->
+				<fail message="${myReturnControlString2}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->
 			</ac:else>			
 		</ac:if>
 			
