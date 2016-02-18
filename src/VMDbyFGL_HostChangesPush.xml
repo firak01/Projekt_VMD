@@ -1079,50 +1079,13 @@
 			bErg = FileEasyZZZ.isRoot(myFilepath);
 			print("bErg="+bErg);
 			
-			}catch (err if err.javaException instanceof ExceptionZZZ) {  //So geht das nur mit RHINO, erst die genau definierten Fehler abfangen, dann die allgemeinen.
-				print("ExceptionZZZ Fehler abgefangen");
-				print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-				
+			}catch(err) {
 				bErg = false; //sicher ist sicher....
 				myReturnControl = false;
-				myReturnControlString = "Error: " + err.getMessageLast();
-			}catch(err) {
-				//document.getElementById("demo").innerHTML = err.message;
-				var version = java.lang.System.getProperty("java.version");
-				if(version.substring(0,3)=="1.8"){
-					print ("Javascript Engine: 'Nashorn'");
-					print("typeof err: "+typeof(err));
-					
-					print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
-					
-					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
-						print("ExceptionZZZ Fehler abgefangen");
-						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
-					}
-					bErg = false; //sicher ist sicher....
-					myReturnControl = false;
-					myReturnControlString = "Error: " + err.getMessageLast();
-				}else{
-					print ("Javascript Engine: 'Rhino'");
-					print("typeof err: "+typeof(err));
-					print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
-					if(err.constructor.name=='JavaException'){
-						print("Error.name=" + err.name);
-						print("Error=" + err);
-						print("Error.getCause=" + err.getCause); //Ergebnis: undefined
-						//print("Error.getCause()=" + err.getCause());
-						print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
-						//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
-						//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
-						//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
-						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-					}		
-					bErg = false; //sicher ist sicher....
-					myReturnControl = false;
-					myReturnControlString = "Error: " + err.javaException.getMessageLast();
-				}
+				myReturnControlString = handleError(err);
 			}
 			
+		
 			
 			// create and use a Task via Ant API
 			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
@@ -1136,7 +1099,7 @@
 			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);			
 
 				
-		//Todo: Diese Funktion in den JSZ Kernel packen
+			//Todo: Diese Funktion in den JSZ Kernel packen
 			function enableJava(){
 			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
 			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
@@ -1144,8 +1107,8 @@
 			*/
 			
 				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
+				var version = java.lang.System.getProperty("java.version");
+				print("Java Version:" + version);
 				
 				//var test = java.lang.System.getProperty("java.class.path");
 				//println("classpath="+test);
@@ -1153,8 +1116,55 @@
 				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
 				try{
 					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
-			}
+					print("Verwende das alte Rhino unter Java 8");
+				}catch(e){
+					print("Verwende Standard JavaScript Engine dieser Java Vesion.");
+				}
+			}//End function enableJava
+			
+			function handleError(err){
+				//document.getElementById("demo").innerHTML = err.message;
+				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
+				//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
+					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+						print("ExceptionZZZ Fehler abgefangen (NASHORN)");
+						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
+						myReturnControlString = "Error: " + err.getMessageLast();
+					}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
+						print("ExceptionZZZ Fehler abgefangen (RHINO)");
+						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+						myReturnControlString = "Error: " + err.javaException.getMessageLast();
+					}else{
+					   //weitere, unbestimmte Fehler abfangen
+					   print("Unbestimmten Fehler abfangen.");
+					   var version = java.lang.System.getProperty("java.version");
+					   print("JavaVersion: " + version);
+					   print("typeof err: "+typeof(err));					   
+						if(version.substring(0,3)=="1.8"){
+							print ("Javascript Engine: 'Nashorn'");
+							print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+							myReturnControlString = "Error: " + err.message;												
+						}else{
+							print ("Javascript Engine: 'Rhino'");
+							print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
+							if(err.constructor.name=='JavaException'){
+								print("Error.name=" + err.name);
+								print("Error=" + err);
+								print("Error.getCause=" + err.getCause); //Ergebnis: undefined
+								//print("Error.getCause()=" + err.getCause());
+								print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
+								//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
+								//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
+								//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
+								print("err.javaException.getMessage()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+								myReturnControlString = "Error: " + err.javaException.getMessage();
+							}else{
+								print("normaler Fehler.  Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+							    myReturnControlString = "Error: " + err.message;
+							}									
+						}
+					}							
+			}//End function handleError
 	      ]]>
   </scriptdef>
 	

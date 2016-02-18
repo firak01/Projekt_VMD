@@ -137,48 +137,22 @@
 			//echo.setMessage("Ergebnis + ": " + serg);
 			//echo.perform();
          
-			}catch (err if err.javaException instanceof ExceptionZZZ) {  //So geht das nur mit RHINO, erst die genau definierten Fehler abfangen, dann die allgemeinen.
-				print("ExceptionZZZ Fehler abgefangen");
-				print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+		    //Doku:
+			//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
+			//Da dies in einer einzelnen Funktion gekapselt werden soll, machen wir einen catch und darin if - Abfragen.
+			//}catch (err if err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO, 
+			//		myReturnControlString = "Error: " + err.javaException.getMessageLast();
+			//.................................................	
+			//}catch (err if err.instanceof ExceptionZZZ) {  // So geht das nur mit NASHORN, 
+			//    myReturnControlString = "Error: " + err.getMessageLast();
+			//}catch(err){
+			// ................................................
+			//}				
 				
+			}catch(err) {
 				bErg = false; //sicher ist sicher....
 				myReturnControl = false;
-				myReturnControlString = "Error: " + err.getMessageLast();
-			}catch(err) {
-				//document.getElementById("demo").innerHTML = err.message;
-				var version = java.lang.System.getProperty("java.version");
-				if(version.substring(0,3)=="1.8"){
-					print ("Javascript Engine: 'Nashorn'");
-					print("typeof err: "+typeof(err));
-					
-					print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
-					
-					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
-						print("ExceptionZZZ Fehler abgefangen");
-						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
-					}
-					bErg = false; //sicher ist sicher....
-					myReturnControl = false;
-					myReturnControlString = "Error: " + err.getMessageLast();
-				}else{
-					print ("Javascript Engine: 'Rhino'");
-					print("typeof err: "+typeof(err));
-					print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
-					if(err.constructor.name=='JavaException'){
-						print("Error.name=" + err.name);
-						print("Error=" + err);
-						print("Error.getCause=" + err.getCause); //Ergebnis: undefined
-						//print("Error.getCause()=" + err.getCause());
-						print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
-						//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
-						//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
-						//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
-						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-					}		
-					bErg = false; //sicher ist sicher....
-					myReturnControl = false;
-					myReturnControlString = "Error: " + err.javaException.getMessageLast();
-				}
+				myReturnControlString = handleError(err);
 			}
 			
 			// create and use a Task via Ant API
@@ -223,9 +197,53 @@
 					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
 					print("Verwende das alte Rhino unter Java 8");
 				}catch(e){
-					print("Verwende Standard JavaScript Engine");
+					print("Verwende Standard JavaScript Engine dieser Java Vesion.");
 				}
-			}
+			}//End function enableJava
+			
+			function handleError(err){
+				//document.getElementById("demo").innerHTML = err.message;
+				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
+				//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
+					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+						print("ExceptionZZZ Fehler abgefangen (NASHORN)");
+						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
+						myReturnControlString = "Error: " + err.getMessageLast();
+					}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
+						print("ExceptionZZZ Fehler abgefangen (RHINO)");
+						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+						myReturnControlString = "Error: " + err.javaException.getMessageLast();
+					}else{
+					   //weitere, unbestimmte Fehler abfangen
+					   print("Unbestimmten Fehler abfangen.");
+					   var version = java.lang.System.getProperty("java.version");
+					   print("JavaVersion: " + version);
+					   print("typeof err: "+typeof(err));					   
+						if(version.substring(0,3)=="1.8"){
+							print ("Javascript Engine: 'Nashorn'");
+							print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+							myReturnControlString = "Error: " + err.message;												
+						}else{
+							print ("Javascript Engine: 'Rhino'");
+							print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
+							if(err.constructor.name=='JavaException'){
+								print("Error.name=" + err.name);
+								print("Error=" + err);
+								print("Error.getCause=" + err.getCause); //Ergebnis: undefined
+								//print("Error.getCause()=" + err.getCause());
+								print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
+								//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
+								//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
+								//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
+								print("err.javaException.getMessage()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+								myReturnControlString = "Error: " + err.javaException.getMessage();
+							}else{
+								print("normaler Fehler.  Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+							    myReturnControlString = "Error: " + err.message;
+							}									
+						}
+					}							
+			}//End function handleError
 	      ]]>
   </scriptdef>
   
@@ -358,7 +376,7 @@
 		<ac:if>
 			<equals arg1="false" arg2="${myReturnControl}"/>
 			<ac:then>							
-				<echo>${sScript}Fehler geworfen: ${myReturnControlString2}</echo>	
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString2}</echo>	
 				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
 			</ac:then>		
 		</ac:if>
@@ -369,15 +387,15 @@
 		<ac:if>
 			<equals arg1="false" arg2="${myReturnControl}"/>
 			<ac:then>							
-				<echo>${sScript}Fehler geworfen: ${myReturnControlString2}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sicherstellen, das jetzt nicht alles komplett aufhört -->				
 			</ac:then>		
 		</ac:if>
 		
 		</try>
 		<catch>
 			<echo>In &lt;catch&gt;.</echo>
-			<echo>Fehler in Ant abgefangen: ${myError}</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
 		</catch>
 
 		<finally>
