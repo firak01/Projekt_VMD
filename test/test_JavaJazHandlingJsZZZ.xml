@@ -242,7 +242,8 @@
 							    myReturnControlString = "Error: " + err.message;
 							}									
 						}
-					}							
+					}					
+					return myReturnControlString;
 			}//End function handleError
 	      ]]>
   </scriptdef>

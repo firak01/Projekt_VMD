@@ -648,8 +648,8 @@
 		var myDelimiter = attributes.get("inputdelimiter");
 		var myiIndexLow = attributes.get("inputindexlow");
 		var myiIndexHigh = attributes.get("inputindexhigh");
-		print("myiIndexLow=" + myiIndexLow);
-		print("myiIndexHigh=" + myiIndexHigh);
+		//print("myiIndexLow=" + myiIndexLow);
+		//print("myiIndexHigh=" + myiIndexHigh);
 		
 		
 		var myStringReturn = "";
@@ -708,7 +708,7 @@
 					iIndexCount++;
 					//print("objectArray[x]="+objectArray[x]);
 					if(iIndexCount>=myiIndexLow){
-						if(iIndexCount >= myiIndexHigh) break;//Zum noch kaputt testen: >= statt nur > verwenden, nur um jetzt 20160215 einen Fehler zu erzeugen
+						if(iIndexCount >= myiIndexHigh) break;
 						if(myStringReturn!="") myStringReturn+=myDelimiter;
 						myStringReturn+=objectArray[x];					
 						//print("myStringReturn="+myStringReturn);
@@ -1068,7 +1068,7 @@
 			//#############
 			 //#### EINGABE ######	 
 			var myFilepath = attributes.get("inputfilepath");
-			print("myFilepath="+myFilepath);
+			//print("myFilepath="+myFilepath);
 			
 			//#### Java, etc.
 			var bErg = false;
@@ -1077,7 +1077,7 @@
 			
 			try{
 			bErg = FileEasyZZZ.isRoot(myFilepath);
-			print("bErg="+bErg);
+			//print("bErg="+bErg);
 			
 			}catch(err) {
 				bErg = false; //sicher ist sicher....
@@ -1108,7 +1108,7 @@
 			
 				//zu Testzwecken:
 				var version = java.lang.System.getProperty("java.version");
-				print("Java Version:" + version);
+				//print("Java Version:" + version);
 				
 				//var test = java.lang.System.getProperty("java.class.path");
 				//println("classpath="+test);
@@ -1116,9 +1116,9 @@
 				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
 				try{
 					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-					print("Verwende das alte Rhino unter Java 8");
+					//print("Verwende das alte Rhino unter Java 8");
 				}catch(e){
-					print("Verwende Standard JavaScript Engine dieser Java Vesion.");
+					//print("Verwende Standard JavaScript Engine dieser Java Vesion.");
 				}
 			}//End function enableJava
 			
@@ -1163,7 +1163,8 @@
 							    myReturnControlString = "Error: " + err.message;
 							}									
 						}
-					}							
+					}	
+				return myReturnControlString;					
 			}//End function handleError
 	      ]]>
   </scriptdef>
@@ -2278,6 +2279,14 @@
 <!-- ######################################################### -->
 <!-- HOST - SPEZIFISCHE AUFGABEN -->
 <target name="-FglVmd_Main">
+	<fl:let>sScript::='-FglVmd_Main: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+		
+		<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
 	<echo>######################################</echo>
 	<!-- Fuehre die in der Steuereungsdatei definierten Aktionen aus. -->
 	<!-- Gesteuert wird das über eine Datei, die für jeden HOST-Rechner individuell ist. 
@@ -2346,13 +2355,33 @@
 			<echo>${conf.copyLocalFilePath}</echo>
 
 			<!-- Arbeite die Steuerungsdatei ab -->					
-			<antcallback target="-FglFileControlController_Main" return="returnString, returnControl">
+			<antcallback target="-FglFileControlController_Main" return="returnControlString, returnControl">
 				<param name="localFileControlPath" value="${conf.copyLocalFilePath}"/>												
 			</antcallback>      
-			<fl:echo>Ergebnis des FileControll Controllers: ${returnString}</fl:echo>		
+			<fl:echo>Ergebnis des FileControll Controllers: ${returnControlString}</fl:echo>		
 										
 		</ac:else>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->
 	</ac:if>	<!-- Alle Projekt-Konfigurationsparameter sind vorhanden -->	
+	
+	
+		</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+					
+			<ac:var name="myReturnControl" value="false" />
+			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+		</ac:catch>
+
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>			
+	
 </target>
 
 <target name="-FglCheckProjectPropertiesVmd">
@@ -2423,8 +2452,17 @@
 <!-- ######################################################################### -->
 <target name="-FglFileControlController_Main">
 	<fl:let>sScript::='-FglFileControlController_Main: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+		
+		<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+		
 	<fl:let>myLocalFileControlPath ::= "${localFileControlPath}"</fl:let>
 
+	
 	<!-- Prüfe, ob die Steuerungsdatei überhaupt existiert -->
 	<fl:choose>
 		<fl:when test=" '${myLocalFileControlPath}'.tofile.exists == true ">
@@ -2523,7 +2561,7 @@
 													
 													<!-- Aufruf des SchemaControllers, der auf die Untercrontroller verteilt -->
 													<fl:echo>AUFRUF DES SCHEMA-CONTROLLERS BEI SCHEMA-WECHSEL</fl:echo>
-													<antcallback target="-FglSchemaController_Controller" return="returnString, returnControl">
+													<antcallback target="-FglSchemaController_Controller" return="returnControlString, returnControl">
 														<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 														<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 													</antcallback>																										
@@ -2547,25 +2585,45 @@
 					<fl:echo>AUFRUF DES ABSCHLIESSENDEN SCHEMA-CONTROLLERS</fl:echo>
 					<!--<fl:echo>2f. Verabeite das letze Array, fuer das Schema: '${myStringCurrent.Schema}</fl:echo>-->
 					<!--<arrayDebugJsZZZ arrayinput="${myLineaCurrent.UnSchema}" ilevel="1"/>-->
-					<antcallback target="-FglSchemaController_Controller" return="returnString, returnControl">
+					<antcallback target="-FglSchemaController_Controller" return="returnControlString, returnControl">
 						<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 						<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 					</antcallback>										
 					
 					<!-- TODO: Die Meldungen aus den aufgerufenen Unterfunktionen zurueckgeben und nicht blos hier alles auf supergut setzen. -->
-					<fl:let>myReturnControl ::= true</fl:let>
-					<fl:let>myReturnString ::= "alles ok"</fl:let>																					
+					<ac:var name="myReturnControl" value="${returnControl}" />
+					<ac:var name="myReturnControlString" value="${returnControlString}"/>																					
 				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
 				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
-					<fl:let>myReturnControl ::= false</fl:let>
-					<fl:let>myReturnString ::= "Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"</fl:let>
+					<ac:var name="myReturnControl" value="false" />
+					<ac:var name="myReturnControlString" value="Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"/>	
 				</otherwise>
 			</fl:choose>
 			
+			
+			
+			</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+					
+			<ac:var name="myReturnControl" value="false" />
+			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+		</ac:catch>
+
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>			
+			
 			<!-- Rueckgabebwerte -->
 			<ac:var name="returnControl" value="${myReturnControl}" />
-			<ac:var name="returnString" value="${myReturnString}" />
+			<ac:var name="returnControlString" value="${myReturnControlString}" />
 			<!-- <arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 			<!-- <arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 			<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
@@ -2693,6 +2751,9 @@
 
 <target name="-FglSchemaController_Controller">
 	<fl:let>sScript::='-FglSchemaController_Controller: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
 	<!-- Merke: Orientier dich bei der Vergabe der Schema Namen an den DOS - Befehlen -->
 	<!-- Bisher umgesetzt: vmd, copy -->
 	<!-- TODO umzusetzen: del, zip -->
@@ -2700,6 +2761,12 @@
 	<fl:let>myStringCurrentSchema::="${stringCurrent.Schema}"</fl:let>
 	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="myLineaCurrent.UnSchema" sflagcontrol="" />	
 	<!--<arrayDebugJsZZZ arrayinput="${myLineaCurrent.UnSchema}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
+	
+		<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+		
+	
 	
 	<!-- #### Rufe nun die Funktion auf, die das vorherige Schema verarbeiten soll. #### -->
 	<!-- ###################################################### -->
@@ -2711,7 +2778,7 @@
 				<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 			</antcallback>
 			
-			<fl:echo>${sScript}FglSchemaController_Controller: Ergebnis des VMD Controllers fuer den VMD-Fall: ${returnString}</fl:echo>
+			<fl:echo>${sScript}Ergebnis des VMD Controllers fuer den VMD-Fall: ${returnString}</fl:echo>
 			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
 			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
 			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
@@ -2748,7 +2815,7 @@
 				<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 			</antcallback>
 			
-			<fl:echo>${sScript}FglSchemaController_Controller: Ergebnis des VMD Controllers fuer den COPY-FALL: ${returnString}</fl:echo>
+			<fl:echo>${sScript}Ergebnis des VMD Controllers fuer den COPY-FALL: ${returnString}</fl:echo>
 			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
 			<!-- <arrayDebugJsZZZ arrayinput="${srcaTotal.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
 			<!-- <arrayDebugJsZZZ arrayinput="${destaTotal.filedir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays	-->
@@ -2781,11 +2848,11 @@
 		<ac:equals arg1="${myStringCurrent.Schema}" arg2="del" />								
 		<ac:then>
 			<fl:echo>${sScript}AUFRUF DES CONTROLLERS FUER DEN DEL-FALL</fl:echo>			
-			<antcallback target="-FglDelController_Main" return="returnString, returnControl,return.saTotal.filedir,return.saTotal.filename">
+			<antcallback target="-FglDelController_Main" return="returnControlString, returnControl,return.saTotal.filedir,return.saTotal.filename">
 				<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 			</antcallback>
 			
-			<fl:echo>${sScript}Ergebnis des Controllers fuer den DEL-FALL: ${returnString}</fl:echo>
+			<fl:echo>${sScript}Ergebnis des Controllers fuer den DEL-FALL: ${returnControlString}</fl:echo>
 			<arrayDebugJsZZZ arrayinput="${return.saTotal.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
 			<arrayDebugJsZZZ arrayinput="${return.saTotal.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
 			<arrayCopyJsZZZ arrayinput="${return.saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />
@@ -2799,25 +2866,44 @@
 					<fl:echo>${sScript}DEL Controller beendet mit true. Fahre fort.</fl:echo>
 					
 					<!-- Starte das Loeschen der durch die Arrays beschriebenen Dateien -->					
-					<antcallback target="-FGLDelLocal_Main" return="returnString, returnControl">
+					<antcallback target="-FGLDelLocal_Main" return="returnControlString, returnControl">
 						<param name="controlString" value=""/>	
 						<!-- Scheinbar kann man als Parameter auch arrays direkt uebergeben, nur Arrays zurückgeben ist dann halt etwas schwieriger -->
 						<param name="saTotal.filedir" value="${mysaTotal.filedir}"/>	
 						<param name="saTotal.filename" value="${mysaTotal.filename}"/>							
 					</antcallback>      
-					<fl:echo>${sScript}Ergebnis des Loeschens: ${returnString}</fl:echo>			
+					<fl:echo>${sScript}Ergebnis des Loeschens: ${returnControlString}</fl:echo>			
 				</ac:else> <!-- Controller erfolgreich -->
 			</ac:if><!-- Ergebnis des VMD Controllers -->																
 		</ac:then>
 	 </ac:if>	
-	<!-- ###################################################### -->
-	
+	<!-- ###################################################### -->	
 	<fl:let>myReturnControl::=${returnControl}</fl:let>
-	<fl:let>myReturnString::=${returnString}</fl:let>
+	<!--<fl:let>myReturnControlString::=${returnControlString}</fl:let>-->
+	<ac:var name="myReturnControlString" value="${returnControlString}"/>
+		
+		
+		</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+					
+			<ac:var name="myReturnControl" value="false" />
+			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+		</ac:catch>
+
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>			
 		
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControlString" value="${myReturnControlString}" />
 	<!--<arrayCopyJsZZZ arrayinput="${mylineaNext.Schema}" arrayreturn="linea.Schema" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
@@ -4174,10 +4260,22 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 
 <!-- ## Loeschanalyse/control Targets ########################################## -->
 <target name="-FGLDelLocal_Main"><!-- Parameter controlString: Noch nix -->
+	<fl:let>sScript::='-FGLDelLocal_Main: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	
 	<fl:let>myControlString::='${controlString}'</fl:let> 	
-	<echo>ControlString: ${myControlString}</echo>
+	<echo>ControlString: ${myControlString}</echo>	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />	
+	
+		<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+		
+	
+	
 	<fl:let>bGoon::=true</fl:let>
 	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
@@ -4198,27 +4296,54 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<!--### Lösche die Dateien, beschrieben durch die beiden Arrays  ##################### -->
 			<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 			<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
-			<antcallback target="-FGLDelLocal_Delete" return="returnControl,returnString">					
+			<antcallback target="-FGLDelLocal_Delete" return="returnControl,returnControlString">					
 				<param name="saTotal.filedir" value="${mysaTotal.filedir}"/>
 				<param name="saTotal.filename" value="${mysaTotal.filename}"/>				
 			</antcallback>
 			<fl:let>myReturnControl::="${returnControl}"</fl:let>
-			<fl:let>myReturnString::="${returnString}"</fl:let>							
+			<!--<fl:let>myReturnControlString::="${returnControlString}"</fl:let>	-->
+			<ac:var name="myReturnControlString" value="${returnControlString}"/>			
 		</ac:else>
 	</ac:if><!-- Anzahl der Dateien pruefen -->
 
+		</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+					
+			<ac:var name="myReturnControl" value="false" />
+			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+		</ac:catch>
+
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>		
+		
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControlString" value="${myReturnControlString}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- Merke: So gibt man einen Arraywertzurueck -->
 </target>
 <target name="-FGLDelLocal_Delete">
 	<fl:let>sScript::='-FGLDelLocal_Delete: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
     <arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
-	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />					
+	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />	
+
+		<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+		
+	
 	<fl:let>bGoon::=true</fl:let>
-	<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays	-->
+	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filedir}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.filename}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays	-->
 	
 	<arrayElementCountJsZZZ arrayinput="${mysaTotal.filedir}" ireturn="mysaTotal.filedir.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
@@ -4280,39 +4405,87 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
                                   ABER: Warum passiert das nur beim sFiledir?
 							    LÖSUNG: Die einfachen Backslashe verhindern die Übertragung als Parameter für den antcallback. Man muss den Wert in Hochkommata setzen.-->				
 						
-						<antcallback target="-FGLDelLocal_DeleteFileSingle" return="returnControl,returnString">					
+						<antcallback target="-FGLDelLocal_DeleteFileSingle" return="returnControl,returnControlString">					
 							<param name="sFiledir" value="${mysFiledirNormed}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 							<param name="sFilename" value="${mysFilename}"/>						
 						</antcallback>	
-						<fl:let>myReturnControl::="${returnControl}"</fl:let>
-						<fl:let>myReturnString::="${returnString}"</fl:let>
+						<fl:let>myReturnControl::="${returnControl}"</fl:let>						
+						<!--<echo>${sScript}direkter Rueckgabewert abgeholt: ${returnControlString}</echo>-->
+						<ac:var name="myReturnControlString" value="${returnControlString}"/>						
+						<ac:if>
+							<equals arg1="${myReturnControl}" arg2="false" />
+							<ac:then>		
+									<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - '${myReturnControlString}'" />				
+									<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+							</ac:then>
+							<ac:else>						
+							</ac:else>
+						</ac:if>
 					</ac:then>
 					<ac:else> 
-			<!-- TODO GOON NOCH KAPUTT -->					
-						<antcallback target="-FGLDelLocal_DeleteFileByFile" return="returnControl,returnString">					
+						<!-- 20160221: TODO GOON NOCH KAPUTT -->					
+						<antcallback target="-FGLDelLocal_DeleteFileByFile" return="returnControl,returnControlString">					
 							<param name="saTotal.sFiledir" value="${mysaTotal.filedir}"/>
 							<param name="saTotal.sFilename" value="${mysaTotal.filename}"/>														
 						</antcallback>
-						<fl:let>myReturnControl::="${returnControl}"</fl:let>
-						<fl:let>myReturnString::="${returnString}"</fl:let>
+						<fl:let>myReturnControl::="${returnControl}"</fl:let>						
+						<!--<echo>${sScript}direkter Rueckgabewert abgeholt: ${returnControlString}</echo>-->
+						<ac:var name="myReturnControlString" value="${returnControlString}"/>						
+						<ac:if>
+							<equals arg1="${myReturnControl}" arg2="false" />
+							<ac:then>		
+									<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFilebyFile festgestellt - '${myReturnControlString}'" />				
+									<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+							</ac:then>
+							<ac:else>						
+							</ac:else>
+						</ac:if>
 					</ac:else>
 				</ac:if> 
 		</ac:then>
 	</ac:if>
+	
+	
+	</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+					
+			<ac:var name="myReturnControl" value="false" />
+			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+		</ac:catch>
+
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>		
+	
 			
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />			
+	<ac:var name="returnControlString" value="${myReturnControlString}" />			
 </target>
 <target name="-FGLDelLocal_DeleteFileSingle"> 
+	<fl:let>sScript::='-FGLDelLocal_DeleteFileSingle: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
 	<!-- Durch dieses gekapselte Target kann in antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
-		
+	<ac:var name="myReturnControl" value="true" unset="true"/>
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	
 	<!-- Uebernahme von Einzelwerten -->
 	<fl:let>myDir::='${sFiledir}'</fl:let><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
 	<fl:let>myFile::='${sFilename}'</fl:let>
 	
 	<!-- Uebernahme von Array Werten -->
 	<!--<arrayCopyJsZZZ arrayinput="${srcaTotal.filedir}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />-->
+
+	<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
 
 	<fl:when test="null('${myFile}')">
 		<echo>Uebergabeparameter ist Null (myFile)</echo>
@@ -4332,24 +4505,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<fl:fail message="Uebergabeparameter ist Leerwert (myDir)"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 	</fl:when>	
 	<!--<fl:echo>Uebergabeparameter sind (myDir = myFile):  ${myDir} = ${myFile}</fl:echo>-->
-					
-	<!-- TODO noch kaputt: IDEE: Normiere hier den möglichen Dateipfad nach Windows Style -->
-	<!-- Wie oben bei der Ermittlung der Projektdatei, die in der Batch definiert wurde.
-			Das Problem hier ist, das eine Property gefüllt wird und sich diese Property nie im Wert ändert -->
-			<!--<path id="pathTempLeft">
-					<pathelement location="${myLeftPart}"/>
-					</path>
-					<pathconvert targetos="windows" property="part.path.temp.left" refid="pathTempLeft">
-					</pathconvert>
-					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.left}</echo>
-							
-					<path id="pathTempRight">
-					<pathelement location="${myRightPart}"/>
-					</path>
-					<pathconvert targetos="windows" property="part.path.temp.right" refid="pathTempRight">
-					</pathconvert>
-					<echo>Normierter Pfad (Windows Style)= ${part.path.temp.right}</echo> -->
-											
+																
 	<!-- ### Lösche anhand des Verzeichnis- und Dateinamens -->
 	<!-- TODO Fange Fehler ab, wenn eine Datei / ein Verzeichnis nicht (mehr) vorhanden ist -->
 	<!-- TODO GOON noch kaputt: Den Fall abfangen, falls eine Datei nicht gelöscht werden kann, wg. Rechte, in anderem Programm geöffnet, etc. -->
@@ -4368,8 +4524,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- ein bestimmtest Verzeichnis ausschliessen wird wohl funktionieren --> <!-- <exclude name="**/A-dir/**/B-dir/**"/> -->
 	<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
-			
-		
+					
 	<!-- absolute Pfade verwenden: -->
 	<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
 	<delete includeEmptyDirs="true"> -->
@@ -4421,35 +4576,31 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<var name="op2" value="1"/>
 		<var name="op" value="-"/>
 		<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-		<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>
+		<!--<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>-->
 	
-		<!-- 20160215 noch kaputt VERSUCH HIER EINEN IN IMPLODE PROVOZIERTEN FEHLER ABZUFANGEN -->
-		<trycatch property="myError" reference="myErrorObject">
-		<try>
-    
 		<!-- Baue aus dem Array immer wieder neu den absoluten Verzeichnispfad, aber immer wieder um eine obere Indexposition weniger -->
 		<!-- Verwende dazu eine Schleife und inputindexhigh wird darin immer um 1 reduziert. -->
 		<!-- <ac:for param="i" end="1" begin="1"> --><!-- nettes Attribut: beginn -->
 		<!-- <ac:for param="icounter" end="${iubound}" keepgoing="true">	--><!-- keepgoing sorgt dafuer, dass die Schleife selbst nicht abgebrochen wird. Der Fehler würde anschliessend geworfen. -->
 		<ac:for param="icounter" end="${iubound}" >
 		<sequential>
-			<echo>${sScript}icounter=@{icounter}</echo> 
+			<!--<echo>${sScript}icounter=@{icounter}</echo>-->
 						
 			<var name="op1" value="${iubound}"/>
 			<var name="op2" value="@{icounter}"/>
 			<var name="op" value="-"/>
 			<math result="iIndexTemp" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-			<echo>${sScript}Errechnete Obergrenze des Arrays fuer diesen Lauf: ${iIndexTemp}</echo>
+			<!--<echo>${sScript}Errechnete Obergrenze des Arrays fuer diesen Lauf: ${iIndexTemp}</echo>-->
 			
 			<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub"/>
-			<echo>${sScript}Verzeichnis ${myReturnStringSub}</echo>
+			<!--<echo>${sScript}Verzeichnis ${myReturnStringSub}</echo>-->
 						
 			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
 			<fl:let>myReturnControl::="${returnControlSub}"</fl:let>
 
 			<!-- Root nicht versuchen zu löschen -->			
 		<isFileRootJsZZZ inputfilepath="${myReturnStringSub}" returnboolean="myReturnValue2" returncontrol="myReturnControl2" returncontrolstring="myReturnControlString2"/>
-		<echo message="myReturnValue2 = ${myReturnValue2}" />
+		<!--<echo message="myReturnValue2 = ${myReturnValue2}" />-->
 		<ac:if>
 			<and>
 				<equals arg1="true" arg2="${myReturnValue2}"/>
@@ -4485,31 +4636,46 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		</sequential>
 		</ac:for>		
 
-		</try>
-		<catch>
-			<echo>In &lt;catch&gt;.</echo>
-			<echo>Fehler abgefangen: ${myError}</echo>
-		</catch>
-
-		<finally>
-			<echo>In &lt;finally&gt;.</echo>
-		</finally>
-	</trycatch>
+		</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+			<ac:var name="myReturnControl" value="false"/>
+			<ac:var name="myReturnControlString" value="${baz}"/>						
+			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+		</ac:catch>
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>
 	
 	<!-- ############### -->
+	<!--<echo>${sScript} gibt zurueck: ${myReturnControlString}</echo>-->
 	<!-- Rueckgabebwerte -->
-	<ac:var name="returnControl" value="true" />
-	<ac:var name="returnControlString" value="alles o.k." />
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnControlString" value="'${myReturnControlString}'" />
 	<!--<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->	
 </target>
 <target name="-FGLDelLocal_DeleteFileByFile">
 	<fl:let>sScript::='-FGLDelLocal_DeleteFileByFile: '</fl:let>	
+	<fl:let>sTrace::=""</fl:let>
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	
 	<arrayCopyJsZZZ arrayinput="${saTotal.sFiledir}" arrayreturn="mysaTotal.sFiledir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.sFilename}" arrayreturn="mysaTotal.sFilename" sflagcontrol="" />
-	<echo>${sScript}Uebergebene Eingangs-Arrays:</echo>
-	<arrayDebugJsZZZ arrayinput="${mysaTotal.sFiledir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
-	<arrayDebugJsZZZ arrayinput="${mysaTotal.sFilename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<!--<echo>${sScript}Uebergebene Eingangs-Arrays:</echo>-->
+	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.sFiledir}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays -->	
+	<!--<arrayDebugJsZZZ arrayinput="${mysaTotal.sFilename}" ilevel="1"/>--><!-- Ausgabe des neuen Arrays -->	
 	
+	
+	<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+			
 	<!-- Prüfen: Alle Arrays sollen gleich lang sein.-->
 	<arrayElementCountJsZZZ arrayinput="${mysaTotal.sFiledir}" ireturn="mysaTotal.sFiledir.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->
 	<arrayElementCountJsZZZ arrayinput="${mysaTotal.sFilename}" ireturn="mysaTotal.sFilename.iSize"/><!-- Hier wird die scriptdef Methode arrayElementCountJsZZZ aufgerufen -->	
@@ -4535,7 +4701,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<var name="op2" value="1"/>
 	<var name="op" value="-"/>
 	<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-	<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>
+	<!--<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>-->
 	
 	<!-- Hole die Werte der aktuellen Arrayposition, das geht nur wenn iubound > icounter, darum muss man doch tatsächlich eine Fallunterscheidung einbauen, wenn param und end gleich sind -->
 	<ac:for param="icounter" end="${iubound}">			
@@ -4544,7 +4710,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<arrayGetJsZZZ arrayinput="${mysaTotal.sFiledir}" index="@{icounter}" arrayget="sFiledir" sflagcontrol="raw"/>	
 			<arrayGetJsZZZ arrayinput="${mysaTotal.sFilename}" index="@{icounter}" arrayget="sFilename" sflagcontrol=""/>	
 			<fl:let>mysFiledir::='${sFiledir}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-			<echo message="${sScript}@{icounter}ter:'mysFiledir' raw='${mysFiledir}'" />		
+			<!--<echo message="${sScript}@{icounter}ter:'mysFiledir' raw='${mysFiledir}'" />-->
 
 			<!-- Aufruf des Single-File Kopiervorgang -->			
 			<!-- Nur einmal escapen reicht nicht, intern es muss x-mal escaped werden, da bei der Umwandlung zu String immer ein escapender Backslash verloren geht.-->
@@ -4552,10 +4718,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<antcallback target="-stringEscapeBackslashZZZ" return="returnControl,returnTrace,returnString">					
 				<param name="stringInput" value="${mysFiledir}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->	
 				<param name="intNumber" value="1" />					
-			</antcallback>
-			
+			</antcallback>			
 			<fl:let>mysFiledirEscaped::='${returnString}'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-			<echo>${sScript}Backslash-escapeter Verzeichniseintrag: ${mysFiledirEscaped}</echo>
+			<!--<echo>${sScript}Backslash-escapeter Verzeichniseintrag: ${mysFiledirEscaped}</echo>-->
 			<fl:let>mysFilename::='${sFilename}'</fl:let>
 			
 			<antcallback target="-FGLDelLocal_DeleteFileSingle" return="returnControl,returnControlString">					
@@ -4563,15 +4728,44 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 				<param name="sFilename" value="${mysFilename}"/>						
 			</antcallback>	
 						
-			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
-			<fl:let>myReturnControl::="${returnControl}"</fl:let>
-			<fl:let>myReturnString::="${returnControlString}"</fl:let>
+			<!-- 20160222 TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->			
+			<ac:var name="myReturnControl" value="${returnControl}"/>
+			<!--<echo>${sScript}direkter Rueckgabewert abgeholt: ${returnControlString}</echo>-->
+			<ac:var name="myReturnControlString" value="${returnControlString}"/>			
+			<ac:if>
+				<equals arg1="${myReturnControl}" arg2="false" />
+				<ac:then>		
+						<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
+						<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+				</ac:then>
+				<ac:else>						
+				</ac:else>
+			</ac:if>
 		</sequential>
 		</ac:for>		
 
+		</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+			
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<ac:var name="myReturnControlString" value="'${baz}'"/>
+			<ac:var name="myReturnControl" value="false"/>
+			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+		</ac:catch>
+
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>		
+	
+	<!--<echo>${sScript} gibt zurueck: ${myReturnControlString}</echo>-->
 	<!-- Rueckgabewerte -->
-	<ac:var name="returnControl" value="true" />
-	<ac:var name="returnControlString" value="${sScript} Alles ok." />
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 </target>
 <!-- ### HILFSTARGETS ########################################################## -->
 <!-- ######## Hilfstargets ############################################################################--> 	
