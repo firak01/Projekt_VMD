@@ -332,8 +332,8 @@
 <!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <!--<target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandling, -myTestJAZUsedByJavaScript_FileEasyZZZ, -myTestJAZUsedByJavaScript_StringZZZ, ">-->
- <target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandling">
+ <!--<target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandling, -myTestJAZUsedByJavaScript_ErrorHandlingCascaded, -myTestJAZUsedByJavaScript_FileEasyZZZ, -myTestJAZUsedByJavaScript_StringZZZ, ">-->
+ <target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandlingCascaded">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -406,6 +406,172 @@
 		
 		
 	</target> 
+	
+	
+	<target name="-myTestJAZUsedByJavaScript_ErrorHandlingCascaded">
+	    <!-- Der Java/JAZ-Kernel Fehler tritt nun in einem Untertarget auf und soll bis nach 'oben' durchgereicht werden -->
+		<fl:let>sScript::='-myTestJAZUsedByJavaScript_ErrorHandlingCascaded: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<!-- Verwende für die von 'unten' nach 'oben' (also Richtung main-Methode) durchgereichten Variablen antcontrib mit unset="true". Verwende nicht flaka! -->
+		<ac:var name="myReturnControl" value="true"/> <!-- unset="true"/> -->
+		<ac:var name="myReturnControlString" value="alles o.k."/> <!-- unset="true" />-->
+		
+		<!--<fl:let>returnControlStringMain::='im Haupttarget alles ok. '</fl:let>-->
+		<ac:var name="returnControlStringMain" value="im Haupttarget alles o.k."/> <!-- unset="true" />-->
+		<echo>${sScript}Start</echo>
+
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+		
+		<!-- 1. Aufruf, sollte keinen Fehler werfen -->
+		<fl:let>mysFiledirEscaped::='c:\\temp'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+		<antcallback target="--myTestJAZUsedByJavaScript_SubtargetDummy" return="returnBoolean,returnControl,returnControlString">					
+				<param name="sFiledir" value="${mysFiledirEscaped}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->								
+			</antcallback>			
+			<ac:var name="myReturnControl" value="${returnControl}"/>
+			<ac:var name="myReturnControlString" value="${returnControlString}"/>			
+			<ac:if>
+				<equals arg1="${myReturnControl}" arg2="false" />
+				<ac:then>		 
+						<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
+						<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+				</ac:then>
+				<ac:else>						
+				</ac:else>
+			</ac:if>
+			<ac:if>
+				<equals arg1="${returnBoolean}" arg2="false" />
+				<ac:then>		
+						<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
+						<!--<fl:fail message="${sScript}${myReturnControlString}"/>--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+						<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} ist nicht Root." />
+				</ac:then>
+				<ac:else>	
+						<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} IST Root." />				
+				</ac:else>
+			</ac:if>
+			
+		<!-- 2. Aufruf mit Leerstring, sollte Fehler werfen! -->
+		<fl:let>mysFiledirEscaped::=''</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
+		<antcallback target="--myTestJAZUsedByJavaScript_SubtargetDummy" return="returnControl,returnControlString">					
+				<param name="sFiledir" value="${mysFiledirEscaped}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
+			</antcallback>	
+			<ac:var name="myReturnControl" value="${returnControl}"/>
+			<echo>${sScript}direkter Rueckgabewert abgeholt: ${returnControlString}</echo>
+			<ac:var name="myReturnControlString" value="${returnControlString}"/>			
+			<ac:if>
+				<equals arg1="${myReturnControl}" arg2="false" />
+				<ac:then>		
+						<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
+						<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+				</ac:then>
+				<ac:else>						
+				</ac:else>
+			</ac:if>
+			<ac:if>
+				<equals arg1="${returnBoolean}" arg2="false" />
+			<ac:then>		
+					<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
+					<!--<fl:fail message="${sScript}${myReturnControlString}"/>--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+					<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} ist nicht Root." />
+			</ac:then>
+			<ac:else>	
+					<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} IST Root." />				
+			</ac:else>
+		</ac:if>
+			
+			
+		
+		</ac:try>
+		<ac:catch>
+			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+			<ac:var name="myReturnControl" value="false"/>
+			<ac:var name="myReturnControlString" value="${baz}"/>						
+			<!--<echo>${sScript}CATCH - Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+			
+			<!-- Rueckgabe an das aufrufenden Target / Haupttarget -->
+			<!--<fl:let>returnControlStringMain::=${myReturnControlString}</fl:let>-->
+			<ac:var name="returnControlStringMain" value="${myReturnControlString}"/> <!-- unset="true" />-->
+		</ac:catch>
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>
+	
+	
+	<echo>${sScript}An aufrufendes Target/Haupttarget zurueckgeben: ${returnControlStringMain}</echo>
+			
+		
+	</target> 
+	
+	<target name="--myTestJAZUsedByJavaScript_SubtargetDummy">
+	    <!-- Der Java/JAZ-Kernel Fehler tritt nun in einem Untertarget auf und soll bis nach 'oben' durchgereicht werden -->
+		<fl:let>sScript::='--myTestJAZUsedByJavaScript_SubtargetDummy: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<!-- Verwende für die von 'unten' nach 'oben' (also Richtung main-Methode) durchgereichten Variablen antcontrib mit unset="true". Verwende nicht flaka! -->
+		<ac:var name="myReturnControl" value="true" unset="true"/>
+		<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+		<echo>${sScript}Start</echo>
+         
+		 <!-- Uebergabeparameter abholen -->
+		<fl:let>mysFiledir::='${sFiledir}'</fl:let><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
+	
+		
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+		
+		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
+		<ac:if>
+			<not>
+				<available classname="basic.zBasic.util.file.FileEasyZZZ" />        
+			</not>
+			<ac:then>
+				<fl:fail message="${sScript}FileEasyZZZ existiert nicht."/>
+			</ac:then>
+			<ac:else>
+				<echo message="${sScript}FileEasyZZZ vorhanden." />
+			 </ac:else>
+		 </ac:if>
+	 		
+		<!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
+		<tryout_jaz_errorHandlingJs inputfilepath="${mysFiledir}" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
+		
+		</ac:try>
+		<ac:catch>
+			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
+			<property name="baz" refid="myErrorObject" />
+			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
+			<ac:var name="myReturnControl" value="false"/>
+			<ac:var name="myReturnControlString" value="${baz}"/>						
+			<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>
+		</ac:catch>
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>
+		
+		<!--Rueckgabwerte an aufrufendes Target -->
+		<ac:var name="returnBoolean" value="${myReturnBoolean}"/>
+		<ac:var name="returnControl" value="${myReturnControl}"/>
+		<ac:var name="returnControlString" value="${myReturnControlString}"/>	
+	</target> 
+	
 	
 	<target name="-myTestJAZUsedByJavaScript_FileEasyZZZ">
 		<fl:let>sScript::='-myTestJAZUsedByJavaScript_FileEasyZZZ: '</fl:let>
