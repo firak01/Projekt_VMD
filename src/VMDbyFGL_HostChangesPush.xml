@@ -2884,22 +2884,20 @@
 		
 		
 		</ac:try>
-		<ac:catch>
+	<ac:catch>
+			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
 			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
-			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
-			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
 			<property name="baz" refid="myErrorObject" />
 			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
-					
-			<ac:var name="myReturnControl" value="false" />
-			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<ac:var name="myReturnControl" value="false"/>
+			<ac:var name="myReturnControlString" value="${baz}"/>						
 			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
 		</ac:catch>
-
 		<ac:finally>
 			<echo>In &lt;finally&gt;${sScript}.</echo>
 		</ac:finally>
-	</ac:trycatch>			
+	</ac:trycatch>
 		
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
@@ -4307,22 +4305,20 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	</ac:if><!-- Anzahl der Dateien pruefen -->
 
 		</ac:try>
-		<ac:catch>
+	<ac:catch>
+			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
 			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
-			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
-			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
 			<property name="baz" refid="myErrorObject" />
 			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
-					
-			<ac:var name="myReturnControl" value="false" />
-			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<ac:var name="myReturnControl" value="false"/>
+			<ac:var name="myReturnControlString" value="${baz}"/>						
 			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
 		</ac:catch>
-
 		<ac:finally>
 			<echo>In &lt;finally&gt;${sScript}.</echo>
 		</ac:finally>
-	</ac:trycatch>		
+	</ac:trycatch>
 		
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
@@ -4447,22 +4443,20 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	
 	</ac:try>
-		<ac:catch>
+	<ac:catch>
+			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
 			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
-			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
-			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
 			<property name="baz" refid="myErrorObject" />
 			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
-					
-			<ac:var name="myReturnControl" value="false" />
-			<ac:var name="myReturnControlString" value="'${baz}'"/>			
+			<ac:var name="myReturnControl" value="false"/>
+			<ac:var name="myReturnControlString" value="${baz}"/>						
 			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
 		</ac:catch>
-
 		<ac:finally>
 			<echo>In &lt;finally&gt;${sScript}.</echo>
 		</ac:finally>
-	</ac:trycatch>		
+	</ac:trycatch>
 	
 			
 	<!-- Rueckgabewerte -->
@@ -4639,9 +4633,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 
 		</ac:try>
 		<ac:catch>
+			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
 			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
 			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
-			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
 			<property name="baz" refid="myErrorObject" />
 			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
 			<ac:var name="myReturnControl" value="false"/>
@@ -4747,22 +4741,20 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		</ac:for>		
 
 		</ac:try>
-		<ac:catch>
+			<ac:catch>
+			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
 			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
-			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
 			<property name="baz" refid="myErrorObject" />
 			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
-			
-			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
-			<ac:var name="myReturnControlString" value="'${baz}'"/>
 			<ac:var name="myReturnControl" value="false"/>
+			<ac:var name="myReturnControlString" value="${baz}"/>						
 			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
 		</ac:catch>
-
 		<ac:finally>
 			<echo>In &lt;finally&gt;${sScript}.</echo>
 		</ac:finally>
-	</ac:trycatch>		
+	</ac:trycatch>
 	
 	<!--<echo>${sScript} gibt zurueck: ${myReturnControlString}</echo>-->
 	<!-- Rueckgabewerte -->
