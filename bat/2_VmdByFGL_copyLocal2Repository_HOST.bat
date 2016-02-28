@@ -78,6 +78,37 @@ ECHO VersionMajar.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%Vers
 ECHO VersionName: %VersionName%
 ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
 
+REM Ermittle auf Batch Ebene einen Timestamp, dieser dient zuerst zur Benennung der Log-Dateien, ist aber auch im Script auslesbar.
+@REM Set ups %date variable
+@REM First parses month, day, and year into mm , dd, yyyy formats and then combines to be MMDDYYYY
+
+REM WIN7, deutsch...
+REM ### Lokale Unterfunktion :trim, hier nur innerhalb der FOR Schleife nutzbar und nicht als LABEL für die gesamte batch
+REM echo . schaltet das ausgeschaltete Echo wieder für diese zeile ein. @ECHO off schaltet das echo aus...
+Echo Datum ---- Uhrzeit ist %DATE% ---- %TIME%
+SETLOCAL ENABLEEXTENSIONS
+
+REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)
+SETLOCAL ENABLEDELAYEDEXPANSION
+@echo off
+For /f "tokens=1-3 delims=/." %%a in ('date /t') do (
+    set myMM=%%b
+	call :trimRight %%a
+	set myDD=%varTrimmed%
+	REM call :trimLeft %%c
+	call :trimRight %%c
+	set myYYYY=%varTrimmed%		
+	REM set myYYYY=%%c
+	)
+For /f "tokens=1-3 delims=/:" %%a in ('time /t') do (set mytime=%%a%%b%%c)
+echo %myYYYY%_%myMM%_%myDD%_%myTime%
+set VMD_DATETIME=%myYYYY%%myMM%%myDD%_%myTime%
+ECHO VMD_DATETIME=%VMD_DATETIME%
+
+
+ECHO HOST ist %HOST%
+
+
 REM Eine Startdatei mit den Projekteinstellungen übergeben. 
 REM Merke: Der übergebenen Dateiname wird ggfs. durch die existenz eines Dateinamens project_ "Hostname des Rechners" _vmd.properties übersteuert.
 REM Merke: Die Pfadangaben sind mit Slash und nicht mit Backslash
@@ -96,13 +127,87 @@ REM %* gibt alle Parameter aus, mit denen diese Batch aufgerufen wurde. Diese we
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
 IF NOT "%1"=="" (
 		REM Fehler "missing value for property" wenn -D nix dahinterstehendes hat.
-		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%* > ..log\log.txt 2> ..\log\error.txt
+		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%* > ..\log\log.txt 2> ..\log\error.txt
 	) ELSE (
 		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties  > ..\log\log.txt 2> ..\log\error.txt
 	)
+REM Dokumentiere jeden Lauf
+REM COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\1fgl\repository\Projekt_VMD\log\log%VMD_DATETIME%.txt
+REM COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\1fgl\repository\Projekt_VMD\log\error%VMD_DATETIME%.txt
 
-
-echo Ende Copy Repository to Local HOST
-pause
 REM timeout /T 20 /nobreak
 REM nicht im Debuggen, sonst wieder einkommentieren, damit sich das Fenster schliesst: exit
+echo Ende Copy Repository to Local HOST
+pause
+
+REM Ohne diesen Labelaufruf werden die Unterlabels erneut aufgerufen...
+goto :eof
+
+:trimLeft
+	echo. %1
+	for /f "tokens=* delims= " %%a in ("%*") do set varTrimmed=%%a
+	echo."%varTrimmed%"
+:trimRight
+    REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)
+	SETLOCAL ENABLEDELAYEDEXPANSION
+	echo.%1
+	set str=%1
+	
+	REM Ein wenig Grundlagenexperimente, die funktionieren
+	REM echo.mit Tilde -3 ist ... der drittletzte Buchstabe von date "%date:~-3,1%"
+	REM echo.mit Tilde -3 sind ... die beiden (Achtung Logik) drittletzten Buchstabe von date "%date:~-3,2%"
+	
+	REM set myStr="a b c d ef"
+	REM echo.myStr am Anfang="%myStr%"
+	REM echo.mystring mit Tilde 0 ist alles !myStr:~0!
+	REM echo.mystring mit Tilde -2,1 ist ... der letzte Buchstabe "!myStr:~-2,1!"
+	REM echo.mystring mit Tilde -3,1 ist ... der vorletzte Buchstabe "!myStr:~-3,1!"
+	REM echo.mystring mit Tilde -3,2 ist ... der vorletzte und letzte Buchstabe "!myStr:~-3,2!"
+	
+	set myStr="a b c d ef "
+		
+	REM zur Schleife:
+	REM Die Variable darf nur aus einem Buchstaben bestehen! "%t" ist erlaubt, "%test" nicht! Bei der Verwendung mehrerer Befehle muss zwischen "DO" und der Klammer "(" ein Leerzeichen sein.
+	REM so würde eine Schleife rückwärts gezählt for /l %%x in (10,-1,1) do (
+	REM was bedeuted das /l? Es muss etwas listenmäßiges sein und ist wichtig.... Mit solchen Schleifen kann man Aktionen eine bestimmte Anzahl oft ausführen. Dazu muss man den Parameter /L angeben.
+	
+	REM Zum if - Befehl
+	REM Der Parameter /i unterbindet eine Differenzierung der Groß-/Kleinbuchstaben.
+	REM Bei der Verwendung mehrerer Befehle muss zwischen Bedingung und der Klammer "(" ein Leerzeichen sein.
+	
+	REM Zum set - Befehl
+	REM Der Parameter /a wird dazu verwendet rechenoperationen durchzuführen
+	REM zum Ausrufezeichen
+	REM Definiert eine Variable, zur Verzögerten Berechenung, d.h. erst zur Laufzeit berechnen. Siehe SETLOCAL ENABLEDELAYEDEXPANSION.
+	REM Dagegen wird mit % eine Variable wohl schon beim kompilieren berechnet.
+	
+	
+	for /l %%x in (2,1,11) do (
+	REM for %%x in (2,1,11) do ( wir nur einmal ausgeführt
+        echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
+		set /a itemp=11-%%x
+		echo.itemp=!itemp!
+		
+		set ctemp=!myStr:~-%%x,1!
+		REM Beachte hier die verzoegerte Berechnung zur Lauzeit durch Ausrufezeichen ....   echo.!ctemp!
+		
+		if "!ctemp!"==" " (
+			echo Leerstring gefunden.			
+			) else (
+			echo kein Leerstring
+			REM abbrechen...
+			goto :trimexit
+			)
+		echo.reduzierter String !myStr!		
+	)
+	:trimexit
+	echo.itemp am ende !itemp!
+	echo.myStr am ende="!myStr!:~-12,!itemp!"
+	
+	
+	
+	
+	
+	
+	
+:eof
