@@ -86,18 +86,18 @@ REM WIN7, deutsch...
 REM ### Lokale Unterfunktion :trim, hier nur innerhalb der FOR Schleife nutzbar und nicht als LABEL für die gesamte batch
 REM echo . schaltet das ausgeschaltete Echo wieder für diese zeile ein. @ECHO off schaltet das echo aus...
 Echo Datum ---- Uhrzeit ist %DATE% ---- %TIME%
-SETLOCAL ENABLEEXTENSIONS
 
 REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)
+SETLOCAL ENABLEEXTENSIONS
 SETLOCAL ENABLEDELAYEDEXPANSION
 @echo off
 For /f "tokens=1-3 delims=/." %%a in ('date /t') do (
     set myMM=%%b
 	call :trimRight %%a
-	set myDD=%varTrimmed%
+	set myDD=!returnStringTrim!
 	REM call :trimLeft %%c
 	call :trimRight %%c
-	set myYYYY=%varTrimmed%		
+	set myYYYY=!returnStringTrim!		
 	REM set myYYYY=%%c
 	)
 For /f "tokens=1-3 delims=/:" %%a in ('time /t') do (set mytime=%%a%%b%%c)
@@ -195,15 +195,23 @@ goto :eof
 			echo Leerstring gefunden.			
 			) else (
 			echo kein Leerstring
+			REM https://www.administrator.de/wissen/arbeite-batch-umgebungsvariablen-erstellung-umgang-erweiterungen-ver%C3%A4nderungen-117069.html
 			REM abbrechen...
+			REM PROBLEM: Wie rechnet man das zur Laufzeit aus... set myStrReduced="!myStr!:~-12,!itemp!"
+			REM set myStrReduced=!myStr!:~-12,!itemp!
+			REM set myStrReduced=!myStr:~-12,itemp!
+			set myStrReduced=!%myStr%:~-12,%itemp%!
+			REM set myStrReduced=!!myStr!:~-12,!itemp!!
+			
+			echo.reduzierter String !myStrReduced!	
+			echo.andere Syntax %myStr:~-12,4%
 			goto :trimexit
-			)
-		echo.reduzierter String !myStr!		
+			)		
 	)
 	:trimexit
 	echo.itemp am ende !itemp!
-	echo.myStr am ende="!myStr!:~-12,!itemp!"
-	
+	echo.myStr am ende="!myStrReduced!"
+	set returnStringTrim=!myStrReduced!
 	
 	
 	
@@ -211,3 +219,4 @@ goto :eof
 	
 	
 :eof
+
