@@ -95,15 +95,17 @@ For /f "tokens=1-3 delims=/." %%a in ('date /t') do (
     set myMM=%%b
 	call :trimRight %%a
 	set myDD=!returnStringTrim!
+	echo.zurueckgegebenerWert="!returnStringTrim!"
 	REM call :trimLeft %%c
 	call :trimRight %%c
+	echo.zurueckgegebenerWert="!returnStringTrim!"
 	set myYYYY=!returnStringTrim!		
 	REM set myYYYY=%%c
 	)
 For /f "tokens=1-3 delims=/:" %%a in ('time /t') do (set mytime=%%a%%b%%c)
-echo %myYYYY%_%myMM%_%myDD%_%myTime%
-set VMD_DATETIME=%myYYYY%%myMM%%myDD%_%myTime%
-ECHO VMD_DATETIME=%VMD_DATETIME%
+echo !myYYYY!_!myMM!_!myDD!_!myTime!
+set VMD_DATETIME=!myYYYY!!myMM!!myDD!_!myTime!
+ECHO VMD_DATETIME=!VMD_DATETIME!
 
 
 ECHO HOST ist %HOST%
@@ -148,6 +150,12 @@ goto :eof
 	for /f "tokens=* delims= " %%a in ("%*") do set varTrimmed=%%a
 	echo."%varTrimmed%"
 :trimRight
+	REM Originalcode
+	REM set str=15 Trailing Spaces to truncate               &rem
+	REM echo."%str%"
+	REM for /l %%a in (1,1,31) do if "!str:~-1!"==" " set str=!str:~0,-1!
+	REM echo."%str%"
+
     REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)
 	SETLOCAL ENABLEDELAYEDEXPANSION
 	echo.%1
@@ -185,7 +193,9 @@ goto :eof
 	for /l %%x in (2,1,11) do (
 	REM for %%x in (2,1,11) do ( wir nur einmal ausgeführt
         echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
-		set /a itemp=11-%%x
+		
+		REM Länge des Strings +2 Minus Zählvariable. Die Zählvariable startet bei 2!
+		set /a itemp=13-%%x
 		echo.itemp=!itemp!
 		
 		set ctemp=!myStr:~-%%x,1!
@@ -198,25 +208,58 @@ goto :eof
 			REM https://www.administrator.de/wissen/arbeite-batch-umgebungsvariablen-erstellung-umgang-erweiterungen-ver%C3%A4nderungen-117069.html
 			REM abbrechen...
 			REM PROBLEM: Wie rechnet man das zur Laufzeit aus... set myStrReduced="!myStr!:~-12,!itemp!"
+			REM Nicht funktionierendes:
 			REM set myStrReduced=!myStr!:~-12,!itemp!
 			REM set myStrReduced=!myStr:~-12,itemp!
-			set myStrReduced=!%myStr%:~-12,%itemp%!
+			REM set myStrReduced=!%myStr%:~-12,%itemp%!
 			REM set myStrReduced=!!myStr!:~-12,!itemp!!
+			REM funktioniert echo.andere Syntax %myStr:~-12,4%
+			REM funktioniert aber nicht nicht echo.kombinations-syntax %myStr:~-12,!itemp!%
 			
-			echo.reduzierter String !myStrReduced!	
-			echo.andere Syntax %myStr:~-12,4%
-			goto :trimexit
+			REM funktioniert 
+			echo.itemp=!itemp!
+			REM nein set myStrReduced=%!myStr!:~-12,!itemp!%
+			REM nein call set myStrReduced=%%!myStr!:~-12,9%
+			REM funktioniert prinzipiell 
+			call set myStrReduced=%%myStr:~-12,!itemp!%%
+			echo.reduzierter String "!myStrReduced!"
+			
+			
+			
+			
+			REM funktionierendes Beispiel
+			REM setlocal enabledelayedexpansion
+			REM set string=This is my string to work with.
+			REM echo.anderesBeispiel !string!
+			REM set find=my string
+			REM set replace=your replacement
+			REM call set string=%%string:!find!=!replace!%%
+			REM echo.anderesBeispiel !string!
+			
+			
+			REM funktionierendes Beispiel02:
+			REM setlocal enabledelayedexpansion
+			REM set string=This is my string to work with.
+			REM call set string=%%string:to work with.=%%
+			REM echo.anderesBeispiel02 !string!
+			
+			REM ohne goto:EOF   goto :trimexit			
+			set returnStringTrim=!myStrReduced!
+			GOTO:EOF
 			)		
 	)
+	GOTO:EOF
+	
 	:trimexit
 	echo.itemp am ende !itemp!
 	echo.myStr am ende="!myStrReduced!"
+	REM funktioniert nicht set returnStringTrim=!myStrReduced!
+	REM set returnStringTrim=var:returnStringTrim=!myStrReduced!	
+	
+	REM so kopiert man in eine andere Variable
+	REM funktioniert call set returnStringTrim=!myStrReduced!
 	set returnStringTrim=!myStrReduced!
+	echo.retunStringTrim="!returnStringTrim!"
+    GOTO:EOF
 	
-	
-	
-	
-	
-	
-:eof
 
