@@ -33,8 +33,8 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
 
 -init:
      [echo] Receiving timestamp:
-     [echo] Current Timestamp: 20160303_091252
-     [echo] Backup-Filenames: vmd20160303_091252.zip, misc20160303_091252.zip
+     [echo] Current Timestamp: 20160304_091132
+     [echo] Backup-Filenames: vmd20160304_091132.zip, misc20160304_091132.zip
 
 -FglRepository_Main:
 
@@ -73,9 +73,9 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] project.vmd.dirRepositoryArchive = "vmd"
      [echo] conf.dirRepositoryArchive = "vmd"
      [echo] myTargetDirectory = "C:/1fgl/repository/Projekt_VMDBackups"
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160303_091252.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160304_091132.zip
      [echo] b) VmdRepository Misc:
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160303_091252.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160304_091132.zip
   [fl:echo] FglRepositoryBackup erfolgreich. Fahre fort.
 
 -FglRepositoryCopyClient2archive:
