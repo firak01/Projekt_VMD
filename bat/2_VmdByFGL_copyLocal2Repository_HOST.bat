@@ -113,8 +113,30 @@ REM For /f "tokens=1-4 delims=/:." %%a in ('echo %time%') do (set "mytime=%%a%%b
 REM TODO GOON 20160304
 For /f "tokens=1-4 delims=/:." %%a in ('echo %time%') do (set "mytime=%%a%%b%%c")
 echo !myYYYY!_!myMM!_!myDD!_!myTime!
+
+REM In dem 'date /t' wird die Millisekundenausgabe mit Komma abgetrennt angezeigt. Bei dem 'echo %time%' ebenfalls.
+REM Intern und programmiertechnisch muss ich hier aber auf ein Leerzeichen abbprüfen, damit der String links davon gefunden wird.
+
+REM Wenn ein Leerzeichen in dem Übergabestring ist, wir das als Trenner der an die Funktion übergebenen Argumente angesehen
+REM Funktionierendes Beispiel
+REM set myTime=Das ist toll
+REM set myTime=%myTime: =_%
+REM call :StringLeftInclude !myTime! _
+REM set "myTime=!returnStringLeftInclude!"
+REM echo myTime links=!myTime!
+
+REM Aber wg des Leerzeichens im 'echo time' reicht schon folgendes. Grund: Wenn ein Leerzeichen in dem Übergabestring ist, wir das als Trenner der an die Funktion übergebenen Argumente angesehen
+call :StringLeftInclude !myTime!
+set "myTime=!returnStringLeftInclude!"
+echo myTime links=!myTime!
+
+call :trimRight !myTime!
+set "myTime=!returnStringTrim!"
+
+
+
 set "VMD_DATETIME=!myYYYY!!myMM!!myDD!_!myTime!"
-ECHO VMD_DATETIME=!VMD_DATETIME!
+ECHO VMD_DATETIME="!VMD_DATETIME!"
 
 ECHO HOST ist %HOST%
 
@@ -161,10 +183,36 @@ ENDLOCAL
 REM Ohne diesen Labelaufruf werden die Unterlabels erneut aufgerufen...
 goto:eof
 
+:StringLeftInclude
+   REM Originalcode:
+   REM set "find=* "
+   REM call set sTempDelete=%%myTime:!find!=%%
+   REM echo sTempDelete="!sTempDelete!"
+   REM call set myTime=%%myTime:!sTempDelete!=%%
+   REM echo myTime ohne Millisekunden="!myTime!"
+   
+   REM "Wird ein String mit Leerzeichen übergeben, so werden die Leerzeichen implizit als Trenner der Übergabeparameter interpretiert".
+   REM Daher sollte ein String vorher "encoded" werden.
+   echo.Start von StringLeftInclude mit String und Delimiter: "%1" und "%2"
+   set "myString=%1"
+   set "myFind=*%2"
+   call set sTempDelete=%%myString:!myFind!=%%
+   echo sTempDelete="!sTempDelete!"
+   if "!sTempDelete!"=="!myString!" (
+	    set "returnStringLeftInclude=!myString!"
+	) else (
+		call set myStrReduced=%%myString:!sTempDelete!=%%
+		echo Reduzierter String="!myStrReduced!"
+		set "returnStringLeftInclude=!myStrReduced!"		
+	)	
+   GOTO:EOF
+
 :trimLeft
-	echo. %1
-	for /f "tokens=* delims= " %%a in ("%*") do set varTrimmed=%%a
-	echo."%varTrimmed%"
+    REM Originalcode
+	REM echo. %1
+	REM for /f "tokens=* delims= " %%a in ("%*") do set varTrimmed=%%a
+	REM echo."%varTrimmed%"
+	
 :trimRight
 	REM Originalcode
 	REM set str=15 Trailing Spaces to truncate               &rem
@@ -205,6 +253,9 @@ goto:eof
 	REM TIP: Setze die Wertzuweisung hinter sem SET in Anführungszeichen, damit soll verhindert werden, dass unbeabsichtigte Leerzeichen am Ende der Zeiel in den Wert rutschen.
 	REM      Das ist bei mathematischen SET Rechenoperationen nicht notwendig
 	
+	REM Zum Goto:EOF Befehl
+	REM Das entspricht einem Return in einer normalen Script-/Programmiersprache.
+	
 	
 	REM TODO: Hole die Länge des zu trimmenden Strings
 	
@@ -224,9 +275,9 @@ goto:eof
 		if "!ctemp!"==" " (
 			echo Leerstring gefunden, Schleife fortsetzen.
 			) else (
-			echo kein Leerstring, Schleife abbrechen.
-			REM https://www.administrator.de/wissen/arbeite-batch-umgebungsvariablen-erstellung-umgang-erweiterungen-ver%C3%A4nderungen-117069.html
-			REM abbrechen...
+			REM echo kein Leerstring, Schleife abbrechen.
+			
+			REM https://www.administrator.de/wissen/arbeite-batch-umgebungsvariablen-erstellung-umgang-erweiterungen-ver%C3%A4nderungen-117069.html			
 			REM PROBLEM: Wie rechnet man das zur Laufzeit aus... set myStrReduced="!myStr!:~-12,!itemp!"
 			REM Nicht funktionierendes:
 			REM set myStrReduced=!myStr!:~-12,!itemp!
@@ -239,9 +290,9 @@ goto:eof
 			REM nein set myStrReduced=%!myStr!:~-12,!itemp!%
 			REM nein call set myStrReduced=%%!myStr!:~-12,9%			
 			call set "myStrReduced=%%myStr:~-12,!itemp!%%"
-			echo.reduzierter String "!myStrReduced!"
+			REM echo.reduzierter String "!myStrReduced!"
 							
-			REM Beispiele zur Lösungsfindung
+			REM Beispiele zur Lösungsfindung für die obige Berechnung
 			REM funktionierendes Beispiel01:
 			REM setlocal enabledelayedexpansion
 			REM set string=This is my string to work with.

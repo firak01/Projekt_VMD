@@ -7,7 +7,7 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] VMD aus Uebergabeparameter= C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties
      [echo] Wert fuer host= ${nothing}
      [echo] HOST aus Umgebungsvariable = ${env.host}
-     [echo] VMD_OS= Win81
+     [echo] VMD_OS= Win7
      [echo] Normierter Pfad (Windows Style)= C:\1fgl\repository\Projekt_VMD\bat\project_vmd.properties
   [fl:echo] groesse tempa per scriptdef Aufruf: 6
      [echo] Pfadbestandteilausgabe
@@ -20,52 +20,54 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] errechneter wert fuer Index des letzten Pfadteils: 5
      [echo] An letzter Stelle gefundener wert: project_vmd.properties
      [echo] Der Pfad ist: 'C:\1fgl\repository\Projekt_VMD\bat'
-     [echo] Pruefe Existenz lokaler Uebersteuerungs-Projektdatei: C:\1fgl\repository\Projekt_VMD\bat\project_HIS4528_vmd.properties
-     [echo] Lokale Projektdatei existiert: C:\1fgl\repository\Projekt_VMD\bat\project_HIS4528_vmd.properties
-     [echo] Verwende Projektdatei: C:\1fgl\repository\Projekt_VMD\bat\project_HIS4528_vmd.properties
-     [echo] Verwendet Projektkonfiguration: C:\1fgl\repository\Projekt_VMD\bat\project_HIS4528_vmd.properties
-     [echo] Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert: C:\1fgl\repository\Projekt_VMD\bat\project_HIS4528_vmd.properties
+     [echo] Pruefe Existenz lokaler Uebersteuerungs-Projektdatei: C:\1fgl\repository\Projekt_VMD\bat\project_UGAKI-PRV_vmd.properties
+     [echo] Lokale Projektdatei existiert: C:\1fgl\repository\Projekt_VMD\bat\project_UGAKI-PRV_vmd.properties
+     [echo] Verwende Projektdatei: C:\1fgl\repository\Projekt_VMD\bat\project_UGAKI-PRV_vmd.properties
+     [echo] Verwendet Projektkonfiguration: C:\1fgl\repository\Projekt_VMD\bat\project_UGAKI-PRV_vmd.properties
+     [echo] Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert: C:\1fgl\repository\Projekt_VMD\bat\project_UGAKI-PRV_vmd.properties
      [echo] test1 hat den Wert: einTestWert
-     [echo] project.vmd.dirRepositoryPath hat den Wert: C:/1fgl/repository/Projekt_VMD
+     [echo] project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}
      [echo] project.vmd.operation_mode hat den Wert: test
-     [echo] project.vmd.dirPathClientFgl hat den Wert: c:/1fgl/client
-     [echo] project.vmd.os hat den Wert: Win81
+     [echo] project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}
+     [echo] project.vmd.os hat den Wert: Win7
 
 -init:
      [echo] Receiving timestamp:
-     [echo] Current Timestamp: 20160304_091132
-     [echo] Backup-Filenames: vmd20160304_091132.zip, misc20160304_091132.zip
+     [echo] Current Timestamp: 20160306_085445
+     [echo] Backup-Filenames: vmd20160306_085445.zip, misc20160306_085445.zip
 
 -FglRepository_Main:
 
 -FglCheckProjectPropertiesRepository:
 
 -FglCheckProjectProperties:
-  [fl:echo] project.vmd.dirRepositoryPath hat den Wert: 'C:/1fgl/repository/Projekt_VMD'
-  [fl:echo] project.vmd.dirPathClientFgl hat den Wert: 'c:/1fgl/client'
-  [fl:echo] project.vmd.os hat den Wert: 'Win81'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard 'C:/1fgl/repository/Projekt_VMD'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard 'c:/1fgl/client'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.'
+  [fl:echo] project.vmd.os hat den Wert: 'Win7'
      [echo] myDirRepositoryPath hat den Wert: "C:/1fgl/repository/Projekt_VMD"
      [echo] myDirPathClientFgl hat den Wert: "c:/1fgl/client"
-     [echo] myOs hat den Wert: "Win81"
+     [echo] myOs hat den Wert: "Win7"
   [fl:echo] myGoon hat den Wert: true
-  [fl:echo] Hinweis: <#!!FGLUNDEFINED!!#>
+  [fl:echo] Hinweis: Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.
   [fl:echo] Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.
-     [echo] VMD_OS=Win81
+     [echo] VMD_OS=Win7
 
 -computeFilenameVMD:
 
 -isHostVMD:
-     [echo] VMD_OS= Win81
+     [echo] VMD_OS= Win7
 
 -computeFilenameHostVMD:
-     [echo] errechneter Dateiname = FGLWin81_HIS4528_Installationen.txt
-     [echo] Pruefe Existenz der Datei: c:/1fgl/client\FGLWin81_HIS4528_Installationen.txt
-     [echo] Client Verzeichnis Host-VMD-Datei existiert: c:/1fgl/client\FGLWin81_HIS4528_Installationen.txt
+     [echo] errechneter Dateiname = FGLWin7_UGAKI-PRV_Installationen.txt
+     [echo] Pruefe Existenz der Datei: c:/1fgl/client\FGLWin7_UGAKI-PRV_Installationen.txt
+     [echo] Client Verzeichnis Host-VMD-Datei existiert: c:/1fgl/client\FGLWin7_UGAKI-PRV_Installationen.txt
      [echo] Ergebnis'isHostVMD' = true
   [fl:echo] Hostrechner identifiziert.
 
 -computeFilenameHostVMD:
-     [echo] Errechneter wert der VMD Datei=FGLWin81_HIS4528_Installationen.txt
+     [echo] Errechneter wert der VMD Datei=FGLWin7_UGAKI-PRV_Installationen.txt
 
 -FglRepositoryBackup:
      [echo] Creating Backup: C:/1fgl/repository/Projekt_VMDBackups
@@ -73,9 +75,9 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] project.vmd.dirRepositoryArchive = "vmd"
      [echo] conf.dirRepositoryArchive = "vmd"
      [echo] myTargetDirectory = "C:/1fgl/repository/Projekt_VMDBackups"
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160304_091132.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160306_085445.zip
      [echo] b) VmdRepository Misc:
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160304_091132.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160306_085445.zip
   [fl:echo] FglRepositoryBackup erfolgreich. Fahre fort.
 
 -FglRepositoryCopyClient2archive:
@@ -89,16 +91,19 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
 -FglCheckProjectPropertiesVmd:
 
 -FglCheckProjectProperties:
-  [fl:echo] project.vmd.dirRepositoryPath hat den Wert: 'C:/1fgl/repository/Projekt_VMD'
-  [fl:echo] project.vmd.dirPathClientFgl hat den Wert: 'c:/1fgl/client'
-  [fl:echo] project.vmd.os hat den Wert: 'Win81'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard 'C:/1fgl/repository/Projekt_VMD'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard 'c:/1fgl/client'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.'
+  [fl:echo] project.vmd.os hat den Wert: 'Win7'
      [echo] myDirRepositoryPath hat den Wert: "C:/1fgl/repository/Projekt_VMD"
      [echo] myDirPathClientFgl hat den Wert: "c:/1fgl/client"
-     [echo] myOs hat den Wert: "Win81"
+     [echo] myOs hat den Wert: "Win7"
   [fl:echo] project.vmd.operation_mode hat den Wert: 'test'
-  [fl:echo] project.vmd.dirRepositoryBat hat den Wert: 'bat'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 2: 'Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard 'bat'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryBat%27%20verwende%20als%20Standard%20%27bat%27.'
   [fl:echo] myGoon hat den Wert: true
-  [fl:echo] Hinweis: <#!!FGLUNDEFINED!!#>
+  [fl:echo] Hinweis: Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryBat%27%20verwende%20als%20Standard%20%27bat%27.
   [fl:echo] Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.
   [fl:echo] testmodus
      [echo] Copy files general, by property file:
@@ -245,9 +250,9 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
   [fl:echo] -FglDelController_LineController: myArrayIsEmpty=false
   [fl:echo] -FglDelController_LineController: Ergebnis: true, haenge Array an.
   [fl:echo] -FglSchemaController_Controller: Ergebnis des Controllers fuer den DEL-FALL: ${returnControlString}
-[arrayDebugJsZZZ] typeof myarray = string
+[arrayDebugJsZZZ] typeof myarray = object
 [arrayDebugJsZZZ] kein Array uebergeben bekommen.
-[arrayDebugJsZZZ] kein Objekt
+[arrayDebugJsZZZ] Object uebergeben bekommen.
 [arrayDebugJsZZZ] #################################
 [arrayDebugJsZZZ] myArray ist jetzt leider ein String ='C%3A%5Ctemp%5CProjekt_VMD%5Ctestused02,C%3A%5Ctemp%5CProjekt_VMD%5Ctestused,C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C'
 [arrayDebugJsZZZ] splitte diesen String nach Komma.
@@ -262,9 +267,9 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
 [arrayDebugJsZZZ] zugriff ueber yy: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused'
 [arrayDebugJsZZZ] yy: '2'
 [arrayDebugJsZZZ] zugriff ueber yy: 'C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C'
-[arrayDebugJsZZZ] typeof myarray = string
+[arrayDebugJsZZZ] typeof myarray = object
 [arrayDebugJsZZZ] kein Array uebergeben bekommen.
-[arrayDebugJsZZZ] kein Objekt
+[arrayDebugJsZZZ] Object uebergeben bekommen.
 [arrayDebugJsZZZ] #################################
 [arrayDebugJsZZZ] myArray ist jetzt leider ein String ='**.**,**.**,file_copyBeispiel02renamed.txt'
 [arrayDebugJsZZZ] splitte diesen String nach Komma.
@@ -317,8 +322,8 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] -FGLDelLocal_DeleteFileSingle: Root noch nicht erreicht. Weitere Verarbeitung moeglich.
      [echo] -FGLDelLocal_DeleteFileSingle: Root noch nicht erreicht. Weitere Verarbeitung moeglich.
      [echo] -FGLDelLocal_DeleteFileSingle: Root erreicht. Keine weitere Verarbeitung.
-[isFileRootJsZZZ] ExceptionZZZ Fehler abgefangen (NASHORN)
-[isFileRootJsZZZ] err.getMessageLast()=DirectoryPath
+[isFileRootJsZZZ] ExceptionZZZ Fehler abgefangen (RHINO)
+[isFileRootJsZZZ] err.javaException.getMessageLast()=DirectoryPath
      [echo] -FGLDelLocal_DeleteFileSingle: Fehler geworfen: Error: DirectoryPath
      [echo] In <finally>-FGLDelLocal_DeleteFileSingle: .
      [echo] In <finally>-FGLDelLocal_DeleteFileByFile: .
@@ -340,4 +345,4 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
 compile:
 
 BUILD SUCCESSFUL
-Total time: 6 seconds
+Total time: 3 seconds
