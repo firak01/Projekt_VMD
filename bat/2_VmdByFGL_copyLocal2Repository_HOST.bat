@@ -2,6 +2,11 @@
 REM 1) KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
 REM 2) Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist (aus einem JDK). 
 
+REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)
+REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
+SETLOCAL ENABLEEXTENSIONS
+SETLOCAL ENABLEDELAYEDEXPANSION
+
 echo start Copy Repository to Local HOST
 echo uebergebener Parameter 1: %1
 echo uebergebener Parameter 2: %2
@@ -83,14 +88,7 @@ REM Ermittle auf Batch Ebene einen Timestamp, dieser dient zuerst zur Benennung 
 @REM First parses month, day, and year into mm , dd, yyyy formats and then combines to be MMDDYYYY
 
 REM WIN7, deutsch...
-REM ### Lokale Unterfunktion :trim, hier nur innerhalb der FOR Schleife nutzbar und nicht als LABEL für die gesamte batch
-REM echo . schaltet das ausgeschaltete Echo wieder für diese zeile ein. @ECHO off schaltet das echo aus...
 Echo Datum ---- Uhrzeit ist %DATE% ---- %TIME%
-
-REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)
-REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
-SETLOCAL ENABLEEXTENSIONS
-SETLOCAL ENABLEDELAYEDEXPANSION
 
 REM Setze Wertzuweisung hinter dem SET - Befehl in Anführungszeichen, um zu verhindern, dass Leerzeichen am Ende der Zeile in den Variablenwert "reinrutschen"
 @echo off
@@ -173,10 +171,6 @@ echo Ende Copy Repository to Local HOST
 pause
 
 REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
-REM So würden lokale Variablen global gemacht, theoretisch, nutze ich noch nicht.
-REM ENDLOCAL & set returnStringTrim=%myTest%
-REM ENDLOCAL & set returnStringTrim=!myTest!
-REM ENDLOCAL & set "returnStringTrim=!myStrReduced!"
 ENDLOCAL
 ENDLOCAL
 
@@ -213,60 +207,17 @@ goto:eof
 	REM for /f "tokens=* delims= " %%a in ("%*") do set varTrimmed=%%a
 	REM echo."%varTrimmed%"
 	
-:trimRight
-	REM Originalcode
-	REM set str=15 Trailing Spaces to truncate               &rem
-	REM echo."%str%"
-	REM for /l %%a in (1,1,31) do if "!str:~-1!"==" " set str=!str:~0,-1!
-	REM echo."%str%"
-
-    REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)	
+:trimRight	
 	echo.Start von trimRight mit: "%1"
 	set "myStr=%1"
 	
-	REM Einige Grundlagenexperimente zur Stringverarbeitung, die funktionieren
-	REM set myStr="a b c d ef "		
-	REM echo.myStr am Anfang="%myStr%"
-	REM echo.mit Tilde -3 ist ... der drittletzte Buchstabe von date "%date:~-3,1%"
-	REM echo.mit Tilde -3 sind ... die beiden (Achtung Logik) drittletzten Buchstabe von date "%date:~-3,2%"
-	
-	REM echo.mystring mit Tilde 0 ist alles !myStr:~0!
-	REM echo.mystring mit Tilde -2,1 ist ... der letzte Buchstabe "!myStr:~-2,1!"
-	REM echo.mystring mit Tilde -3,1 ist ... der vorletzte Buchstabe "!myStr:~-3,1!"
-	REM echo.mystring mit Tilde -3,2 ist ... der vorletzte und letzte Buchstabe "!myStr:~-3,2!"
-	
-	
-	REM zur Schleife:
-	REM Die Variable darf nur aus einem Buchstaben bestehen! "%t" ist erlaubt, "%test" nicht! Bei der Verwendung mehrerer Befehle muss zwischen "DO" und der Klammer "(" ein Leerzeichen sein.
-	REM so würde eine Schleife rückwärts gezählt for /l %%x in (10,-1,1) do (
-	REM was bedeuted das /l. Es muss etwas listenmäßiges sein und ist wichtig?.... Lösung: Mit solchen Schleifen kann man Aktionen eine bestimmte Anzahl oft ausführen. Dazu muss man den Parameter /L angeben.
-	
-	REM Zum if - Befehl
-	REM Der Parameter /i unterbindet eine Differenzierung der Groß-/Kleinbuchstaben.
-	REM Bei der Verwendung mehrerer Befehle muss zwischen Bedingung und der Klammer "(" ein Leerzeichen sein.
-	
-	REM Zum set - Befehl
-	REM Der Parameter /a wird dazu verwendet Rechenoperationen durchzuführen
-	REM zum Ausrufezeichen
-	REM Definiert eine Variable, zur Verzögerten Berechenung, d.h. erst zur Laufzeit berechnen. Siehe SETLOCAL ENABLEDELAYEDEXPANSION.
-	REM Dagegen wird mit % eine Variable wohl schon beim kompilieren berechnet.
-	REM TIP: Setze die Wertzuweisung hinter sem SET in Anführungszeichen, damit soll verhindert werden, dass unbeabsichtigte Leerzeichen am Ende der Zeiel in den Wert rutschen.
-	REM      Das ist bei mathematischen SET Rechenoperationen nicht notwendig
-	
-	REM Zum Goto:EOF Befehl
-	REM Das entspricht einem Return in einer normalen Script-/Programmiersprache.
-	
-	
 	REM TODO: Hole die Länge des zu trimmenden Strings
 	
-	for /l %%x in (2,1,11) do (
-	REM for %%x in (2,1,11) do ( würde wegen fehlendem /l nur einmal ausgeführt
+	for /l %%x in (1,1,31) do (		
         echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
 		
-		REM Länge des Strings +2 Minus Zählvariable. Die Zählvariable startet bei 2!
-		set /a itemp=13-%%x
-		
-		REM Beachte hier die verzoegerte Berechnung zur Laufzeit durch Ausrufezeichen ....   
+		REM "Länge des Strings +1" Minus Zählvariable. Die Zählvariable startet bei 1!
+		set /a itemp=32-%%x				
 		echo.itemp=!itemp!
 		
 		REM Beachte hier die verzoegerte Berechnung zur Laufzeit durch Ausrufezeichen ....   
@@ -275,39 +226,9 @@ goto:eof
 		if "!ctemp!"==" " (
 			echo Leerstring gefunden, Schleife fortsetzen.
 			) else (
-			REM echo kein Leerstring, Schleife abbrechen.
-			
-			REM https://www.administrator.de/wissen/arbeite-batch-umgebungsvariablen-erstellung-umgang-erweiterungen-ver%C3%A4nderungen-117069.html			
-			REM PROBLEM: Wie rechnet man das zur Laufzeit aus... set myStrReduced="!myStr!:~-12,!itemp!"
-			REM Nicht funktionierendes:
-			REM set myStrReduced=!myStr!:~-12,!itemp!
-			REM set myStrReduced=!myStr:~-12,itemp!
-			REM set myStrReduced=!%myStr%:~-12,%itemp%!
-			REM set myStrReduced=!!myStr!:~-12,!itemp!!
-			REM funktioniert echo.andere Syntax %myStr:~-12,4%
-			REM funktioniert aber nicht nicht echo.kombinations-syntax %myStr:~-12,!itemp!%
-			
-			REM nein set myStrReduced=%!myStr!:~-12,!itemp!%
-			REM nein call set myStrReduced=%%!myStr!:~-12,9%			
-			call set "myStrReduced=%%myStr:~-12,!itemp!%%"
-			REM echo.reduzierter String "!myStrReduced!"
-							
-			REM Beispiele zur Lösungsfindung für die obige Berechnung
-			REM funktionierendes Beispiel01:
-			REM setlocal enabledelayedexpansion
-			REM set string=This is my string to work with.
-			REM echo.anderesBeispiel !string!
-			REM set find=my string
-			REM set replace=your replacement
-			REM call set string=%%string:!find!=!replace!%%
-			REM echo.anderesBeispiel !string!
-						
-			REM funktionierendes Beispiel02:
-			REM setlocal enabledelayedexpansion
-			REM set string=This is my string to work with.
-			REM call set string=%%string:to work with.=%%
-			REM echo.anderesBeispiel02 !string!
-			
+			REM echo kein Leerstring, Schleife abbrechen.								
+			call set "myStrReduced=%%myStr:~-32,!itemp!%%"
+			REM echo.reduzierter String "!myStrReduced!"							
 			set "returnStringTrim=!myStrReduced!"			
 			GOTO:EOF
 			)		
