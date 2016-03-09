@@ -41,7 +41,8 @@ REM Zum set - Befehl, d.h. zu Variablen:
 	
 REM Zum Goto:EOF Befehl
 	REM Das entspricht einem Return in einer normalen Script-/Programmiersprache.
-	
+
+REM Funktionen zur Stringverarbeitung: http://www.dostips.com/DtTipsStringOperations.php	
 REM Einige Grundlagenexperimente zur Stringverarbeitung, die funktionieren
 	REM set myStr="a b c d ef "		
 	REM echo.myStr am Anfang="%myStr%"
@@ -103,21 +104,20 @@ echo.TESTS FUER TRIMRIGHT
 REM Originalcode, gedacht zum Ausführen ohne Aufruf einer Unterfunktion.
 echo.###################################################################
 echo.TEST: trimRight ... statischer Text, direktes ausfuehren, d.h. ohne Aufruf einer Unterfunktion.
-set str=15 Trailing Spaces to truncate               &rem
+set "str=15 Trailing Spaces to truncate               "
 echo."%str%"
 for /l %%a in (1,1,31) do if "!str:~-1!"==" " set str=!str:~0,-1!
 echo."%str%"
 echo. 
 echo.###################################################################
 echo.TEST: trimRight ... statischer Text, mit Aufruf einer Unterfunktion.
-REM Leerzeichen werden als Trenner für weitere Argumente an die Funktion gewertet, darum durch Unterstrich ersetzen
 
-REM set str=15 Trailing Spaces to truncate               &rem
+REM Leerzeichen werden als Trenner für weitere Argumente an die Funktion gewertet, darum durch Unterstrich ersetzen
+set "str=15 Trailing Spaces to truncate               "
 REM ersetze Leerzeichen durch Unterstriche
 set str=%str: =##FGLBLANK##%
 echo."%str%"
 
-REM set str=15_Trailing_Spaces_to_truncate               &rem
 call :trimRight %str%
 set "str=!returnStringTrim!"	
 echo."%str%"
@@ -209,6 +209,28 @@ ENDLOCAL
 REM Ohne diesen Labelaufruf werden die Unterlabels erneut aufgerufen...
 GOTO:EOF
 
+
+:StringLength
+REM  string len -- returns the length of a string
+::              -- string [in]  - variable name containing the string being measured for length
+::              -- len    [out] - variable to be used to return the string length
+
+(   SETLOCAL ENABLEDELAYEDEXPANSION
+    set "str=A!%~1!"&rem keep the A up front to ensure we get the length and not the upper bound. It also avoids trouble in case of empty string
+    set "len=0"
+    for /L %%A in (12,-1,0) do (
+        set /a "len|=1<<%%A"
+        for %%B in (!len!) do if "!str:~%%B,1!"=="" set /a "len&=~1<<%%A"
+    )
+	echo.in StringLength len="!len!"
+)
+( ENDLOCAL & REM RETURN VALUES
+    IF "%~2" NEQ "" SET /a %~2=%len%
+	echo.in StringLength len="%len%"
+	SET returnStringLength=!len!
+)
+GOTO:EOF
+
 :StringLeftInclude
    REM Originalcode:
    REM set "find=* "
@@ -272,11 +294,16 @@ GOTO:EOF
 	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
 	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
 	set myStr=%myStr:##FGLBLANK##= %
-	REM echo.myStr in trimRight="!myStr!"
+	REM 
+	echo.myStr in trimRight="!myStr!"
 	
 	REM TODO: Hole die Länge des zu trimmenden Strings
-	set myStrLength=128
+	call :StringLength
+	echo.Länge '!len!'
+	set myStrLength=45
 	set /a myStrLengthNegative=-1*!myStrLength!	
+	REM 
+	echo.MyStringLengthNegative="!myStrLengthNegative!"
 	for /l %%x in (1,1,!myStrLength!) do (		
         REM echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
 		
@@ -285,14 +312,20 @@ GOTO:EOF
 		REM echo.itemp=!itemp!
 		
 		REM Beachte hier die verzoegerte Berechnung zur Laufzeit durch Ausrufezeichen ....   
-		set ctemp=!myStr:~-%%x,1!
-		REM echo.!ctemp!
+		set "ctemp=!myStr:~-%%x,1!"
 		if "!ctemp!"==" " (
-			REM echo Leerstring gefunden, Schleife fortsetzen.
+			REM 
+			echo.Leerstring gefunden, Schleife fortsetzen.
 			) else (
-			REM echo kein Leerstring, Schleife abbrechen.								
+			REM 
+			echo.Kein Leerstring, Schleife abbrechen.								
+			REM 
+			echo.Zählvariable itemp=!itemp!
+			REM 
+			echo.Gefundenes Zeichen "!ctemp!"
 			call set "myStrReduced=%%myStr:~!myStrLengthNegative!,!itemp!%%"
-			REM echo.reduzierter String "!myStrReduced!"
+			REM 
+			echo.reduzierter String "!myStrReduced!"
 			set "returnStringTrim=!myStrReduced!"
 			GOTO:EOF
 			)		
