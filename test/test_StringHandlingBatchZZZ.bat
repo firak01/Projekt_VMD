@@ -1,4 +1,5 @@
 @echo off
+CLS
 REM @ECHO off schaltet das echo aus... . KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
 REM echo. schaltet das echo für diese eine Zeile wieder ein.
 
@@ -10,10 +11,10 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 
 REM ###################################################################
 REM Allgemeine Hinweise für die Batch Programmierung
-REM 
-	REM In Anführungszeichen z.B. !theVariable!
-	REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)	
-
+REM zum Kommentieren
+     REM Normale Kommentar mit REM
+	 REM Schneller zu tippen sind aber zwei Doppelpunkte am Anfang ::
+	
 REM zur Schleife:
 	REM Die Variable darf nur aus einem Buchstaben bestehen! "%t" ist erlaubt, "%test" nicht! Bei der Verwendung mehrerer Befehle muss zwischen "DO" und der Klammer "(" ein Leerzeichen sein.
 	REM so würde eine Schleife rückwärts gezählt for /l %%x in (10,-1,1) do (
@@ -29,9 +30,10 @@ REM Zum set - Befehl, d.h. zu Variablen:
 	REM Der Parameter /a 
 		REM wird dazu verwendet Rechenoperationen durchzuführen
 		
-	REM zum Ausrufezeichen
+	REM zum Ausrufezeichen z.B. !theVariable!
 		REM Definiert eine Variable, zur Verzögerten Berechenung, d.h. erst zur Laufzeit berechnen. Siehe SETLOCAL ENABLEDELAYEDEXPANSION.
-		
+	    REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)	
+
 	REM Dagegen wird mit % 
 		REM eine Variable wohl schon beim kompilieren berechnet.
 		
@@ -98,20 +100,45 @@ REM Wenn ein Leerzeichen in dem Übergabestring ist, wir das als Trenner der an d
 	REM set "myTime=!returnStringLeftInclude!"
 	REM echo myTime links=!myTime!
 
-REM ###################################################################
-echo.TESTS FUER TRIMRIGHT
+echo. 
+echo.###################################################################	
+echo.TESTS: Zur Ermittlung der Stringlaenge
+echo.###################################################################
+echo.TESTS FUER STRINGLENGTHZZZ
+set "myStr=36haractersForLength mit Leerzeichen"
+set  returnStringLengthZZZ=-1
 
-REM Originalcode, gedacht zum Ausführen ohne Aufruf einer Unterfunktion.
+REM Anders als im Original aus dem Web, habe ich die Reihenfolge der Argumente vertauscht.
+call :StringLengthZZZ myStr returnStringLengthZZZ 
+echo.Ergebnis="%returnStringLengthZZZ%"
+
+echo.	
+echo.###################################################################
+echo.TESTS FUER STRINGLENGTH
+set "myStr=36haractersForLength mit Leerzeichen"
+set  returnStringLength=-1
+
+REM Anders als im Original aus dem Web, habe ich die Reihenfolge der Argumente vertauscht.
+call :StringLength returnStringLength myStr
+echo.Ergebnis="%returnStringLength%"
+
+
+
+echo.	
+echo.###################################################################
+echo.TESTS FUER TRIMRIGHT
 echo.###################################################################
 echo.TEST: trimRight ... statischer Text, direktes ausfuehren, d.h. ohne Aufruf einer Unterfunktion.
 set "str=15 Trailing Spaces to truncate               "
+REM Originalcode, gedacht zum Ausführen ohne Aufruf einer Unterfunktion.
 echo."%str%"
 for /l %%a in (1,1,31) do if "!str:~-1!"==" " set str=!str:~0,-1!
 echo."%str%"
+
+
 echo. 
 echo.###################################################################
 echo.TEST: trimRight ... statischer Text, mit Aufruf einer Unterfunktion.
-
 REM Leerzeichen werden als Trenner für weitere Argumente an die Funktion gewertet, darum durch Unterstrich ersetzen
 set "str=15 Trailing Spaces to truncate               "
 REM ersetze Leerzeichen durch Unterstriche
@@ -209,26 +236,57 @@ ENDLOCAL
 REM Ohne diesen Labelaufruf werden die Unterlabels erneut aufgerufen...
 GOTO:EOF
 
-
+REM ##################    UNTERFUNKTIONEN #################################################
 :StringLength
-REM  string len -- returns the length of a string
+REM  returns the length of a string
+::              -- returnStringLength    [out] - variable to be used to return the string length
+::              -- string [in]  - variable name containing the string being measured for length
+
+
+(   
+    SETLOCAL
+	echo.in StringLength s="%1"
+	set "s=!%~2!#"	
+	echo.in StringLength02 s="!s!"
+    set "returnStringLength=0"
+    for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
+       if "!s:~%%P,1!" NEQ "" ( 
+            set /a "returnStringLength+=%%P"
+            set "s=!s:~%%P!"
+        )
+    )
+)
+( 
+  ENDLOCAL & REM RETURN VALUES
+  echo.%returnStringLength%
+  set "%~1=%returnStringLength%"
+  exit /b
+)
+
+:StringLengthZZZ
+REM  returns the length of a string (Reihenfolge der Argumente vertauscht gegenüber :StringLength)
 ::              -- string [in]  - variable name containing the string being measured for length
 ::              -- len    [out] - variable to be used to return the string length
-
-(   SETLOCAL ENABLEDELAYEDEXPANSION
-    set "str=A!%~1!"&rem keep the A up front to ensure we get the length and not the upper bound. It also avoids trouble in case of empty string
-    set "len=0"
-    for /L %%A in (12,-1,0) do (
-        set /a "len|=1<<%%A"
-        for %%B in (!len!) do if "!str:~%%B,1!"=="" set /a "len&=~1<<%%A"
+(   
+    SETLOCAL
+	echo.in StringLength r="%2"
+	echo.in StringLength s="%1"
+	set "s=!%~1!#"	
+	echo.in StringLength02 s="!s!"
+    set "returnStringLengthZZZ=0"
+    for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
+       if "!s:~%%P,1!" NEQ "" ( 
+           set /a "returnStringLengthZZZ+=%%P"
+           set "s=!s:~%%P!"
+      )
     )
-	echo.in StringLength len="!len!"
 )
-( ENDLOCAL & REM RETURN VALUES
-    IF "%~2" NEQ "" SET /a %~2=%len%
-	echo.in StringLength len="%len%"
-	SET returnStringLength=!len!
-)
+( 
+  ENDLOCAL & REM RETURN VALUES
+  echo.%returnStringLengthZZZ%
+  set "%~2=%returnStringLengthZZZ%"
+  exit /b
+  )
 GOTO:EOF
 
 :StringLeftInclude
@@ -298,7 +356,7 @@ GOTO:EOF
 	echo.myStr in trimRight="!myStr!"
 	
 	REM TODO: Hole die Länge des zu trimmenden Strings
-	call :StringLength
+	call :StringLength !myStr!
 	echo.Länge '!len!'
 	set myStrLength=45
 	set /a myStrLengthNegative=-1*!myStrLength!	
