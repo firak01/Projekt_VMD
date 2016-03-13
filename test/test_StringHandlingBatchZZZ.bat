@@ -115,7 +115,7 @@ echo.Ergebnis="%returnStringLengthZZZ%"
 echo.	
 echo.###################################################################
 echo.TESTS FUER STRINGLENGTH
-set "myStr=36haractersForLength mit Leerzeichen"
+set "myStr=27ForLength mit Leerzeichen"
 set  returnStringLength=-1
 
 REM Anders als im Original aus dem Web, habe ich die Reihenfolge der Argumente vertauscht.
@@ -126,10 +126,10 @@ echo.Ergebnis="%returnStringLength%"
 
 echo.	
 echo.###################################################################
-echo.TESTS FUER TRIMRIGHT
+echo.TESTS FUER STRINGTRIMRIGHT
 echo.###################################################################
-echo.TEST: trimRight ... statischer Text, direktes ausfuehren, d.h. ohne Aufruf einer Unterfunktion.
-set "str=15 Trailing Spaces to truncate               "
+echo.TEST: StringTrimRight ... statischer Text, direktes ausfuehren, d.h. ohne Aufruf einer Unterfunktion.
+set "str=15a Trailing Spaces to truncate.  Lenght 58               "
 REM Originalcode, gedacht zum Ausführen ohne Aufruf einer Unterfunktion.
 echo."%str%"
 for /l %%a in (1,1,31) do if "!str:~-1!"==" " set str=!str:~0,-1!
@@ -138,19 +138,21 @@ echo."%str%"
 
 echo. 
 echo.###################################################################
-echo.TEST: trimRight ... statischer Text, mit Aufruf einer Unterfunktion.
+echo.TEST: StringTrimRight ... statischer Text, mit Aufruf einer Unterfunktion.
 REM Leerzeichen werden als Trenner für weitere Argumente an die Funktion gewertet, darum durch Unterstrich ersetzen
-set "str=15 Trailing Spaces to truncate               "
+set "str=15b Trailing Spaces to truncate.  Lenght 58               "
 REM ersetze Leerzeichen durch Unterstriche
 set str=%str: =##FGLBLANK##%
 echo."%str%"
 
-call :trimRight %str%
-set "str=!returnStringTrim!"	
-echo."%str%"
+set "returnStringTrimRight="
+call :StringTrimRight %str% returnStringTrimRight
+echo.Ergebnis von StringTrimRight "!returnStringTrimRight!"
+set "str=!returnStringTrimRight!"	
+echo.Ergebnis von StringTrimRight uebertragen "!str!"
 echo. 
 echo.###################################################################
-echo.TEST: trimRight ... dynamischer Text (hier Datum), mit Aufruf einer Unterfunktion.
+echo.TEST: StringTrimRight ... dynamischer Text (hier Datum), mit Aufruf einer Unterfunktion.
 
 REM Ermittle auf Batch Ebene einen Timestamp, dieser dient zuerst zur Benennung der Log-Dateien, ist aber auch im Script auslesbar.
 @REM Set ups %date variable
@@ -164,11 +166,11 @@ REM WIN7, deutsch...
 For /f "tokens=1-3 delims=/." %%a in ('date /t') do (
     set "myMM=%%b"
 	
-	call :trimRight %%a
-	set "myDD=!returnStringTrim!"
+	call :StringTrimRight %%a returnStringTrimRight
+	set "myDD=!returnStringTrimRight!"
 	
-	call :trimRight %%c	
-	set "myYYYY=!returnStringTrim!"	
+	call :StringTrimRight %%c	returnStringTrimRight
+	set "myYYYY=!returnStringTrimRight!"	
 	)
 
 echo !myYYYY!_!myMM!_!myDD!	
@@ -217,8 +219,8 @@ call :StringLeftInclude !myTime! ##FGLBLANK##
 set "myTime=!returnStringLeftInclude!"
 echo.myTime links=!myTime!
 
-call :trimRight !myTime!
-set "myTime=!returnStringTrim!"
+call :StringTrimRight !myTime!
+set "myTime=!returnStringTrimRight!"
 
 
 
@@ -245,9 +247,18 @@ REM  returns the length of a string
 
 (   
     SETLOCAL
-	echo.in StringLength s="%1"
-	set "s=!%~2!#"	
+	echo.in StringLength r="%1"
+	echo.in StringLength s="%2"	
+	REM warum geht das nicht set "s=!%~2!#"	
+	set "s=%2#"	
 	echo.in StringLength02 s="!s!"
+	
+	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set s=!s:##FGLBLANK##= !
+	echo.in StringLength03 s nach Ersetzung="!s!"
+	
     set "returnStringLength=0"
     for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
        if "!s:~%%P,1!" NEQ "" ( 
@@ -269,10 +280,18 @@ REM  returns the length of a string (Reihenfolge der Argumente vertauscht gegenü
 ::              -- len    [out] - variable to be used to return the string length
 (   
     SETLOCAL
-	echo.in StringLength r="%2"
-	echo.in StringLength s="%1"
+	echo.in StringLengthZZZ r="%2"
+	echo.in StringLengthZZZ s="%1"
+	
 	set "s=!%~1!#"	
 	echo.in StringLength02 s="!s!"
+	
+	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set s=!s:##FGLBLANK##= !
+	echo.in StringLength03 s nach Ersetzung="!s!"
+	
     set "returnStringLengthZZZ=0"
     for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
        if "!s:~%%P,1!" NEQ "" ( 
@@ -345,23 +364,35 @@ GOTO:EOF
 	)
    GOTO:EOF
 
-:trimRight
-	REM echo.Start von trimRight mit: "%1"
+:StringTrimRight
+(   
+    SETLOCAL
+	REM 
+	echo.Start von StringTrimRight mit: "%1"
 	set "myStr=%1"
+	set "returnStringTrimRight=%2"
+	echo.myStr in StringTrimRight=!myStr!
+	
+	REM Der Rückgabewert, falls kein Leerstring am Ende wegzutrimmen ist
+	set "myStrReduced=!myStr!"
+	set "returnStringTrimRight=!myStr!"
+	
+	REM Hole die Länge des zu trimmenden Strings VOR DER ERSETZUNG
+	set  returnStringLength=-1
+	call :StringLength returnStringLength !myStr! 
+	echo.Länge '!returnStringLength!'
+	set "myStrLength=!returnStringLength!"
 	
 	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
 	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
-	set myStr=%myStr:##FGLBLANK##= %
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set myStr=!myStr:##FGLBLANK##= !
 	REM 
-	echo.myStr in trimRight="!myStr!"
-	
-	REM TODO: Hole die Länge des zu trimmenden Strings
-	call :StringLength !myStr!
-	echo.Länge '!len!'
-	set myStrLength=45
+	echo.myStr nach Ersetzung in StringTrimRight="!myStr!"
+		
 	set /a myStrLengthNegative=-1*!myStrLength!	
 	REM 
-	echo.MyStringLengthNegative="!myStrLengthNegative!"
+	echo.myStringLengthNegative="!myStrLengthNegative!"
 	for /l %%x in (1,1,!myStrLength!) do (		
         REM echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
 		
@@ -372,21 +403,30 @@ GOTO:EOF
 		REM Beachte hier die verzoegerte Berechnung zur Laufzeit durch Ausrufezeichen ....   
 		set "ctemp=!myStr:~-%%x,1!"
 		if "!ctemp!"==" " (
-			REM 
-			echo.Leerstring gefunden, Schleife fortsetzen.
+			REM echo.Leerstring gefunden, Schleife fortsetzen.
 			) else (
-			REM 
-			echo.Kein Leerstring, Schleife abbrechen.								
-			REM 
-			echo.Zählvariable itemp=!itemp!
-			REM 
-			echo.Gefundenes Zeichen "!ctemp!"
-			call set "myStrReduced=%%myStr:~!myStrLengthNegative!,!itemp!%%"
-			REM 
-			echo.reduzierter String "!myStrReduced!"
-			set "returnStringTrim=!myStrReduced!"
-			GOTO:EOF
-			)		
+			REM echo.Kein Leerstring, Schleife abbrechen.								
+			REM echo.Zählvariable itemp=!itemp!
+			REM echo.Gefundenes Zeichen "!ctemp!"
+			call set "myStrReducedTemp=%%myStr:~!myStrLengthNegative!,!itemp!%%"
+			REM echo.reduzierter String Temp = "!myStrReducedTemp!"
+			set "myStrReduced=!myStrReducedTemp!!ctemp!"
+			REM echo.reduzierter String Temp = "!myStrReducedTemp!"
+			
+			set "returnStringTrimRight=!myStrReduced!"
+			echo.in StringTrimRight Ergebnis= "!returnStringTrimRight!"	
+			GOTO :StringTrimRightEnd
+			)
+	)		
+)
+(	
+:StringTrimRightEnd	
+	( 
+    ENDLOCAL & REM RETURN VALUES
+	::echo.%returnStringTrimRight%
+	set "%~2=%returnStringTrimRight%"
+	exit /b
 	)
-	set "returnStringTrim="			
-	GOTO:EOF
+)
+
+	
