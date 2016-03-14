@@ -185,11 +185,13 @@ REM ersetze Leerzeichen durch Unterstriche
 REM Wenn ein Leerzeichen in dem Übergabestring ist, wir das als Trenner der an die Funktion übergebenen Argumente angesehen
 set myText=%myText: =##FGLBLANK##%
 echo.myText=!myText!
-set "myFind=##FGLBLANK##"
+::set "myFind=##FGLBLANK##"
+set "myFind=ist"
 
 REM Aber wg des Leerzeichens im 'echo time' reicht schon folgendes. Grund: Wenn ein Leerzeichen in dem Übergabestring ist, wir das als Trenner der an die Funktion übergebenen Argumente angesehen
 REM call :StringLeftInclude !myTime! 
-call :StringLeftInclude !myText! !myFind!
+set "returnStringLeftInclude="
+call :StringLeftInclude !myText! !myFind! returnStringLeftInclude
 set "myText=!returnStringLeftInclude!"
 echo.myText links="!myText!"
 echo.
@@ -215,11 +217,13 @@ REM Intern und programmiertechnisch muss ich hier aber auf ein Leerzeichen abbpr
 
 REM Aber wg des Leerzeichens im 'echo time' reicht schon folgendes. Grund: Wenn ein Leerzeichen in dem Übergabestring ist, wir das als Trenner der an die Funktion übergebenen Argumente angesehen
 REM call :StringLeftInclude !myTime! 
-call :StringLeftInclude !myTime! ##FGLBLANK##
-set "myTime=!returnStringLeftInclude!"
+set "returnStringLeftInclude="
+call :StringLeftInclude !myTime! ##FGLBLANK## returnStringLeftInclude
+set "myTime=!returnStringLeftInclude!" 
 echo.myTime links=!myTime!
 
-call :StringTrimRight !myTime!
+set "returnStringTrimRight="
+call :StringTrimRight !myTime! returnStringTrimRight
 set "myTime=!returnStringTrimRight!"
 
 
@@ -273,6 +277,7 @@ REM  returns the length of a string
   set "%~1=%returnStringLength%"
   exit /b
 )
+GOTO:EOF
 
 :StringLengthZZZ
 REM  returns the length of a string (Reihenfolge der Argumente vertauscht gegenüber :StringLength)
@@ -309,6 +314,9 @@ REM  returns the length of a string (Reihenfolge der Argumente vertauscht gegenü
 GOTO:EOF
 
 :StringLeftInclude
+(   
+    SETLOCAL
+	
    REM Originalcode:
    REM set "find=* "
    REM call set sTempDelete=%%myTime:!find!=%%
@@ -322,8 +330,10 @@ GOTO:EOF
    set "myString=%1"
    REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
    REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
-   set myString=%myString:##FGLBLANK##= %
-   REM echo.myString in StringLeftInclude="!myString!"
+   REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+   set myString=!myString:##FGLBLANK##= !
+   REM 
+   echo.myString in StringLeftInclude="!myString!"
 	
    set "myFind=%2"
    echo.1. myFind in StringLeftInclude="!myFind!"
@@ -331,18 +341,22 @@ GOTO:EOF
    REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
    REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
    if "!myFind!"=="" (
-		set myFind=##FGLBLANK##
-	) else (		
-		set myFind=%myFind:##FGLBLANK##= %
-	)
-	echo.2. myFind in StringLeftInclude="!myFind!"
+		set "myFind=##FGLBLANK##"
+	) 
+	
+	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set myFind=!myFind:##FGLBLANK##= !
+	echo.2a. myFind in StringLeftInclude="!myFind!"
+    
    
-   set "myFind=*!myFind!"
    REM original set "myFind=*%2"
+    set "myFind=*!myFind!"
    echo.3. myFind in StringLeftInclude="!myFind!"
 	
    call set sTempDelete=%%myString:!myFind!=%%
-   echo sTempDelete="!sTempDelete!"
+   echo 3b. sTempDelete="!sTempDelete!"
    if "!sTempDelete!"=="!myString!" (
 	    set "returnStringLeftInclude=!myString!"
 	) else (
@@ -356,13 +370,22 @@ GOTO:EOF
    call set sTempDelete=%%myString:!myFind!=%%
    echo sTempDelete="!sTempDelete!"
    if "!sTempDelete!"=="!myString!" (
-	    set "returnStringLeftInclude=!myString!"
+		set myStrReduced=!myString: =##FGLBLANK##!
 	) else (
 		call set myStrReduced=%%myString:!sTempDelete!=%%
 		echo Reduzierter String="!myStrReduced!"
-		set "returnStringLeftInclude=!myStrReduced!"
+		set myStrReduced=!myStrReduced: =##FGLBLANK##!
 	)
-   GOTO:EOF
+	set "returnStringLeftInclude=!myStrReduced!"
+)
+   ( 
+  ENDLOCAL & REM RETURN VALUES
+  echo.%returnStringLeftInclude%
+  set "%~3=%returnStringLeftInclude%"
+  exit /b
+  )
+GOTO:EOF
+   
 
 :StringTrimRight
 (   
@@ -428,5 +451,6 @@ GOTO:EOF
 	exit /b
 	)
 )
+GOTO:EOF
 
 	

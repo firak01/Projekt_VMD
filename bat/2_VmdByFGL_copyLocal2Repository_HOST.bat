@@ -1,4 +1,5 @@
 @echo off
+CLS
 REM 1) KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
 REM 2) Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist (aus einem JDK). 
 
@@ -83,6 +84,7 @@ ECHO VersionMajar.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%Vers
 ECHO VersionName: %VersionName%
 ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
 
+REM #################################################################################
 REM Ermittle auf Batch Ebene einen Timestamp, dieser dient zuerst zur Benennung der Log-Dateien, ist aber auch im Script auslesbar.
 @REM Set ups %date variable
 @REM First parses month, day, and year into mm , dd, yyyy formats and then combines to be MMDDYYYY
@@ -95,12 +97,14 @@ REM Setze Wertzuweisung hinter dem SET - Befehl in Anführungszeichen, um zu verh
 For /f "tokens=1-3 delims=/." %%a in ('date /t') do (
     set "myMM=%%b"
 	
-	call :trimRight %%a
-	set "myDD=!returnStringTrim!"
+	set "returnStringTrimRight="
+	call :StringTrimRight %%a returnStringTrimRight
+	set "myDD=!returnStringTrimRight!"
 	
 	REM call :trimLeft %%c
-	call :trimRight %%c	
-	set "myYYYY=!returnStringTrim!"	
+	set "returnStringTrimRight="
+	call :StringTrimRight %%c returnStringTrimRight
+	set "myYYYY=!returnStringTrimRight!"	
 	)
 
 REM Bei aktivierter Befehlserweiterung wird mit /t verhindert, dass die Eingabe einer neuen Zeit (oder ENTER DRUECKEN) erfolgt.
@@ -124,19 +128,29 @@ REM set "myTime=!returnStringLeftInclude!"
 REM echo myTime links=!myTime!
 
 REM Aber wg des Leerzeichens im 'echo time' reicht schon folgendes. Grund: Wenn ein Leerzeichen in dem Übergabestring ist, wir das als Trenner der an die Funktion übergebenen Argumente angesehen
-call :StringLeftInclude !myTime!
+set "returnStringLeftInclude="
+call :StringLeftInclude !myTime! returnStringLeftInclude
 set "myTime=!returnStringLeftInclude!"
 echo myTime links=!myTime!
 
-call :trimRight !myTime!
-set "myTime=!returnStringTrim!"
+set "returnStringTrimRight="
+call :StringTrimRight !myTime! returnStringTrimRight
+set "myTime=!returnStringTrimRight!"
 
 
 
 set "VMD_DATETIME=!myYYYY!!myMM!!myDD!_!myTime!"
 ECHO VMD_DATETIME="!VMD_DATETIME!"
 
+REM ###################################################################
+REM DEN HOST RECHNERNAMEN AN DIE LOG DATEIEN ANHAENGEN, dieser wurde schon per aufrufender Batch gesetzt. 
+::Das ist ein anderer als der computername und ist auf dem Hostrechner selbst leer, d.h. es gibt ihn nur für einen VMWare client
 ECHO HOST ist %HOST%
+IF NOT "%HOST%"=="" (
+	set "VMD_HOST=%HOST%_"
+   ) ELSE (
+    set "VMD_HOST="
+   )
 
 
 REM Eine Startdatei mit den Projekteinstellungen übergeben. 
@@ -162,8 +176,8 @@ IF NOT "%1"=="" (
 		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties  > ..\log\log.txt 2> ..\log\error.txt
 	)
 REM Dokumentiere jeden Lauf
-REM COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\1fgl\repository\Projekt_VMD\log\log%VMD_DATETIME%.txt
-REM COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\1fgl\repository\Projekt_VMD\log\error%VMD_DATETIME%.txt
+COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\1fgl\repository\Projekt_VMD\log\log%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
+COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\1fgl\repository\Projekt_VMD\log\error%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
 
 REM timeout /T 20 /nobreak
 REM nicht im Debuggen, sonst wieder einkommentieren, damit sich das Fenster schliesst: exit
@@ -177,7 +191,79 @@ ENDLOCAL
 REM Ohne diesen Labelaufruf werden die Unterlabels erneut aufgerufen...
 goto:eof
 
+REM ##################    UNTERFUNKTIONEN #################################################
+:StringLength
+REM  returns the length of a string
+::              -- returnStringLength    [out] - variable to be used to return the string length
+::              -- string [in]  - variable name containing the string being measured for length
+(   
+    SETLOCAL
+	echo.in StringLength r="%1"
+	echo.in StringLength s="%2"	
+	REM warum geht das nicht set "s=!%~2!#"	
+	set "s=%2#"	
+	echo.in StringLength02 s="!s!"
+	
+	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set s=!s:##FGLBLANK##= !
+	echo.in StringLength03 s nach Ersetzung="!s!"
+	
+    set "returnStringLength=0"
+    for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
+       if "!s:~%%P,1!" NEQ "" ( 
+            set /a "returnStringLength+=%%P"
+            set "s=!s:~%%P!"
+        )
+    )
+)
+( 
+  ENDLOCAL & REM RETURN VALUES
+  echo.%returnStringLength%
+  set "%~1=%returnStringLength%"
+  exit /b
+)
+GOTO:EOF
+
+:StringLengthZZZ
+REM  returns the length of a string (Reihenfolge der Argumente vertauscht gegenüber :StringLength)
+::              -- string [in]  - variable name containing the string being measured for length
+::              -- len    [out] - variable to be used to return the string length
+(   
+    SETLOCAL
+	echo.in StringLengthZZZ r="%2"
+	echo.in StringLengthZZZ s="%1"
+	
+	set "s=!%~1!#"	
+	echo.in StringLength02 s="!s!"
+	
+	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set s=!s:##FGLBLANK##= !
+	echo.in StringLength03 s nach Ersetzung="!s!"
+	
+    set "returnStringLengthZZZ=0"
+    for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
+       if "!s:~%%P,1!" NEQ "" ( 
+           set /a "returnStringLengthZZZ+=%%P"
+           set "s=!s:~%%P!"
+      )
+    )
+)
+( 
+  ENDLOCAL & REM RETURN VALUES
+  echo.%returnStringLengthZZZ%
+  set "%~2=%returnStringLengthZZZ%"
+  exit /b
+  )
+GOTO:EOF
+
 :StringLeftInclude
+(   
+    SETLOCAL
+	
    REM Originalcode:
    REM set "find=* "
    REM call set sTempDelete=%%myTime:!find!=%%
@@ -189,9 +275,35 @@ goto:eof
    REM Daher sollte ein String vorher "encoded" werden.
    echo.Start von StringLeftInclude mit String und Delimiter: "%1" und "%2"
    set "myString=%1"
-   set "myFind=*%2"
+   REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+   REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+   REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+   set myString=!myString:##FGLBLANK##= !
+   REM 
+   echo.myString in StringLeftInclude="!myString!"
+	
+   set "myFind=%2"
+   echo.1. myFind in StringLeftInclude="!myFind!"
+   
+   REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+   REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+   if "!myFind!"=="" (
+		set "myFind=##FGLBLANK##"
+	) 
+	
+	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set myFind=!myFind:##FGLBLANK##= !
+	echo.2a. myFind in StringLeftInclude="!myFind!"
+    
+   
+   REM original set "myFind=*%2"
+    set "myFind=*!myFind!"
+   echo.3. myFind in StringLeftInclude="!myFind!"
+	
    call set sTempDelete=%%myString:!myFind!=%%
-   echo sTempDelete="!sTempDelete!"
+   echo 3b. sTempDelete="!sTempDelete!"
    if "!sTempDelete!"=="!myString!" (
 	    set "returnStringLeftInclude=!myString!"
 	) else (
@@ -199,40 +311,91 @@ goto:eof
 		echo Reduzierter String="!myStrReduced!"
 		set "returnStringLeftInclude=!myStrReduced!"		
 	)	
-   GOTO:EOF
+   REM set "myFind=*!myFind!"
+   echo.4. myFind in StringLeftInclude="!myFind!"
+   
+   call set sTempDelete=%%myString:!myFind!=%%
+   echo sTempDelete="!sTempDelete!"
+   if "!sTempDelete!"=="!myString!" (
+		set myStrReduced=!myString: =##FGLBLANK##!
+	) else (
+		call set myStrReduced=%%myString:!sTempDelete!=%%
+		echo Reduzierter String="!myStrReduced!"
+		set myStrReduced=!myStrReduced: =##FGLBLANK##!
+	)
+	set "returnStringLeftInclude=!myStrReduced!"
+)
+   ( 
+  ENDLOCAL & REM RETURN VALUES
+  echo.%returnStringLeftInclude%
+  set "%~3=%returnStringLeftInclude%"
+  exit /b
+  )
+GOTO:EOF
+   
 
-:trimLeft
-    REM Originalcode
-	REM echo. %1
-	REM for /f "tokens=* delims= " %%a in ("%*") do set varTrimmed=%%a
-	REM echo."%varTrimmed%"
-	
-:trimRight	
-	echo.Start von trimRight mit: "%1"
+:StringTrimRight
+(   
+    SETLOCAL
+	REM 
+	echo.Start von StringTrimRight mit: "%1"
 	set "myStr=%1"
+	set "returnStringTrimRight=%2"
+	echo.myStr in StringTrimRight=!myStr!
 	
-	REM TODO: Hole die Länge des zu trimmenden Strings
+	REM Der Rückgabewert, falls kein Leerstring am Ende wegzutrimmen ist
+	set "myStrReduced=!myStr!"
+	set "returnStringTrimRight=!myStr!"
 	
-	for /l %%x in (1,1,31) do (		
-        echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
+	REM Hole die Länge des zu trimmenden Strings VOR DER ERSETZUNG
+	set  returnStringLength=-1
+	call :StringLength returnStringLength !myStr! 
+	echo.Länge '!returnStringLength!'
+	set "myStrLength=!returnStringLength!"
+	
+	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
+	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
+	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
+	set myStr=!myStr:##FGLBLANK##= !
+	REM 
+	echo.myStr nach Ersetzung in StringTrimRight="!myStr!"
+		
+	set /a myStrLengthNegative=-1*!myStrLength!	
+	REM 
+	echo.myStringLengthNegative="!myStrLengthNegative!"
+	for /l %%x in (1,1,!myStrLength!) do (		
+        REM echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
 		
 		REM "Länge des Strings +1" Minus Zählvariable. Die Zählvariable startet bei 1!
-		set /a itemp=32-%%x				
-		echo.itemp=!itemp!
+		set /a itemp=!myStrLength!-%%x				
+		REM echo.itemp=!itemp!
 		
 		REM Beachte hier die verzoegerte Berechnung zur Laufzeit durch Ausrufezeichen ....   
-		set ctemp=!myStr:~-%%x,1!
-		echo.!ctemp!
+		set "ctemp=!myStr:~-%%x,1!"
 		if "!ctemp!"==" " (
-			echo Leerstring gefunden, Schleife fortsetzen.
+			REM echo.Leerstring gefunden, Schleife fortsetzen.
 			) else (
-			REM echo kein Leerstring, Schleife abbrechen.								
-			call set "myStrReduced=%%myStr:~-32,!itemp!%%"
-			REM echo.reduzierter String "!myStrReduced!"							
-			set "returnStringTrim=!myStrReduced!"			
-			GOTO:EOF
-			)		
+			REM echo.Kein Leerstring, Schleife abbrechen.								
+			REM echo.Zählvariable itemp=!itemp!
+			REM echo.Gefundenes Zeichen "!ctemp!"
+			call set "myStrReducedTemp=%%myStr:~!myStrLengthNegative!,!itemp!%%"
+			REM echo.reduzierter String Temp = "!myStrReducedTemp!"
+			set "myStrReduced=!myStrReducedTemp!!ctemp!"
+			REM echo.reduzierter String Temp = "!myStrReducedTemp!"
+			
+			set "returnStringTrimRight=!myStrReduced!"
+			echo.in StringTrimRight Ergebnis= "!returnStringTrimRight!"	
+			GOTO :StringTrimRightEnd
+			)
+	)		
+)
+(	
+:StringTrimRightEnd	
+	( 
+    ENDLOCAL & REM RETURN VALUES
+	::echo.%returnStringTrimRight%
+	set "%~2=%returnStringTrimRight%"
+	exit /b
 	)
-	set "returnStringTrim="			
-	GOTO:EOF
-	
+)
+GOTO:EOF
