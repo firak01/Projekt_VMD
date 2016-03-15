@@ -112,8 +112,22 @@ REM Das gibt nur Stunden und Minuten aus For /f "tokens=1-4 delims=/:" %%a in ('
 REM Das gibt zwar auch Sekunden aus, aber die Stundenzahl ist nicht zweistellig und die Millisekunden will ich nicht 
 REM For /f "tokens=1-4 delims=/:." %%a in ('echo %time%') do (set "mytime=%%a%%b%%c")
 
-REM TODO GOON 20160304
-For /f "tokens=1-4 delims=/:." %%a in ('echo %time%') do (set "mytime=%%a%%b%%c")
+REM TODO GOON 20160304, VOR der STUNDENAUSGABE EINE FUEHRENDE 0.
+For /f "tokens=1-4 delims=/:." %%a in ('echo %time%') do (
+
+	set "myHour=%%a"
+	set "myHour=0!myHour!"	
+	set "returnStringRight="
+	REM ersetze Leerzeichen durch Ausdruck
+	set "myHour=!myHour: =##FGLBLANK##!"
+	echo.Stunde="!myHour!"
+	call :StringRight !myHour! 2 returnStringRight
+	REM Leerzeichen wieder einsetzen
+	set "returnStringRight=!returnStringRight:##FGLBLANK##= !"
+	set "myHour=!returnStringRight!"
+	
+	set "mytime=!myHour!%%b%%c"
+	)
 echo !myYYYY!_!myMM!_!myDD!_!myTime!
 
 REM In dem 'date /t' wird die Millisekundenausgabe mit Komma abgetrennt angezeigt. Bei dem 'echo %time%' ebenfalls.
@@ -333,7 +347,38 @@ GOTO:EOF
   )
 GOTO:EOF
    
+:StringRight
+(
+	SETLOCAL
+	REM 
+	echo.Start von StringRight mit "String" und "Anzahl Zeichen": "%1" und "%2"
+	set "myStr=%1"
+	set "myNumber=%2"
+	set "returnStringTrimRight=%3"
+		
+	REM Die ##FGLBLANK## Zeichen wieder gegen Leerzeichen eintauschen
+	set myStr=!myStr:##FGLBLANK##= !
+	echo.myStr in StringTrimRight="!myStr!"
+	
+	Set /a myNumberNegative=-1*!myNumber!
+	call set "myStrReducedTemp=%%myStr:~!myNumberNegative!%%"
+	
+	set myStrReducedTemp=!myStrReducedTemp: =##FGLBLANK##!
+	SET "returnStringRight=!myStrReducedTemp!"
+	GOTO :StringRightEnd
+)
+(
+:StringRightEnd
+	( 
+    ENDLOCAL & REM RETURN VALUES
+	::echo.%returnStringTrimRight%
+	set "%~3=%returnStringRight%"
+	exit /b
+	)
+)
+GOTO:EOF
 
+   
 :StringTrimRight
 (   
     SETLOCAL

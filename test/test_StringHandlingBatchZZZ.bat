@@ -37,8 +37,8 @@ REM Zum set - Befehl, d.h. zu Variablen:
 	REM Dagegen wird mit % 
 		REM eine Variable wohl schon beim kompilieren berechnet.
 		
-	REM TIP: 
-		REM Setze die Wertzuweisung hinter sem SET in Anführungszeichen, damit soll verhindert werden, dass unbeabsichtigte Leerzeichen am Ende der Zeiel in den Wert rutschen.
+	REM TIP: SET in Anführungszeichen
+		REM Setze die Wertzuweisung hinter dem SET in Anführungszeichen, damit soll verhindert werden, dass unbeabsichtigte Leerzeichen am Ende der Zeiel in den Wert rutschen.
 		REM Das ist bei mathematischen SET Rechenoperationen nicht notwendig
 	
 REM Zum Goto:EOF Befehl
@@ -123,6 +123,29 @@ call :StringLength returnStringLength myStr
 echo.Ergebnis="%returnStringLength%"
 
 
+echo.	
+echo.###################################################################
+echo.TESTS FUER STRINGRIGHT
+echo.###################################################################
+echo.TEST: StringRight ... statischer Text, direktes ausfuehren, d.h. ohne Aufruf einer Unterfunktion.
+set "str=Zum Abschneiden 9 Zeichen"
+REM Originalcode, gedacht zum Ausführen ohne Aufruf einer Unterfunktion.
+echo."%str%"
+set str=%str:~-9%
+echo."%str%"
+
+echo. 
+echo.###################################################################
+echo.TEST: StringRight ... statischer Text, mit Aufruf einer Unterfunktion.
+set "str=Zum Abschneiden 9 Zeichen"
+
+set "returnStringRight="
+REM ersetze Leerzeichen durch Ausdruck
+set "str=%str: =##FGLBLANK##%"
+call :StringRight %str% 9 returnStringRight
+REM Leerzeichen wieder einsetzen
+set "returnStringRight=!returnStringRight:##FGLBLANK##= !"
+echo.Ergebnis StringRight="!returnStringRight!"
 
 echo.	
 echo.###################################################################
@@ -385,7 +408,43 @@ GOTO:EOF
   exit /b
   )
 GOTO:EOF
-   
+
+REM Beispiel für "Zeichen von rechts abschneiden"
+REM set str=politic
+REM echo.%str%
+REM set str=%str:~-4%
+REM echo.%str%
+:StringRight
+(
+	SETLOCAL
+	REM 
+	echo.Start von StringRight mit "String" und "Anzahl Zeichen": "%1" und "%2"
+	set "myStr=%1"
+	set "myNumber=%2"
+	set "returnStringTrimRight=%3"
+		
+	REM Die ##FGLBLANK## Zeichen wieder gegen Leerzeichen eintauschen
+	set myStr=!myStr:##FGLBLANK##= !
+	echo.myStr in StringTrimRight="!myStr!"
+	
+	Set /a myNumberNegative=-1*!myNumber!
+	call set "myStrReducedTemp=%%myStr:~!myNumberNegative!%%"
+	
+	set myStrReducedTemp=!myStrReducedTemp: =##FGLBLANK##!
+	SET "returnStringRight=!myStrReducedTemp!"
+	GOTO :StringRightEnd
+)
+(
+:StringRightEnd	
+	( 
+    ENDLOCAL & REM RETURN VALUES
+	::echo.%returnStringTrimRight%
+	set "%~3=%returnStringRight%"
+	exit /b
+	)
+)
+GOTO:EOF	
+	
 
 :StringTrimRight
 (   
