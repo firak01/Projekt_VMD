@@ -40,13 +40,19 @@
 		<attribute name="arrayinput" />
 		<attribute name="valueinput" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
 		<attribute name="arrayreturn" />
+		<attribute name="returncontrol" />
+		<attribute name="returncontrolstring" />
 		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
 		<![CDATA[
 			var myArray = attributes.get("arrayinput");		 
 			var myValue = attributes.get("valueinput");
 			var myFlagControl = attributes.get("sflagcontrol");
 			var myArrayReturn = new Array();
-								
+			var myReturnControl = true;
+			var myReturnControlString = "Alles o.k.";
+			
+			
+			try{			
 			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
 			var icount=-1;
 			var iuboundfilled=-1;
@@ -94,8 +100,19 @@
 			
 			//TODO An dieser Stelle bei der Erweiterung arrays anzuhängen: Prüfen, ob das ein Einzelwert oder ein Array ist.
 			myArrayReturn[icountGlobal]=textEncoded;
-																						
+		
+		
+		    }catch(err) {
+				bErg = false; //sicher ist sicher....
+				myReturnControl = false;
+				myReturnControlString = handleError(err);
+			}
+									
+			//##### RUECKGABE						
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			//project.setProperty(attributes.get("returnboolean"), bErg);
+			project.setProperty(attributes.get("returncontrol"), myReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);
 			
 			
 		//TODO: In den JSZ Kernel bringen
@@ -109,6 +126,52 @@
 		 return encodedHtml;
 		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
 	   }
+	   
+	   function handleError(err){
+				//document.getElementById("demo").innerHTML = err.message;
+				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
+				//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
+					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+						print("ExceptionZZZ Fehler abgefangen (NASHORN)");
+						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
+						myReturnControlString = "Error: " + err.getMessageLast();
+					}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
+						print("ExceptionZZZ Fehler abgefangen (RHINO)");
+						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+						myReturnControlString = "Error: " + err.javaException.getMessageLast();
+					}else{
+					   //weitere, unbestimmte Fehler abfangen
+					   print("Unbestimmten Fehler abfangen.");
+					   var version = java.lang.System.getProperty("java.version");
+					   print("JavaVersion: " + version);
+					   print("typeof err: "+typeof(err));					   
+						if(version.substring(0,3)=="1.8"){
+							print ("Javascript Engine: 'Nashorn'");
+							print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+							myReturnControlString = "Error: " + err.message;												
+						}else{
+							print ("Javascript Engine: 'Rhino'");
+							print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
+							if(err.constructor.name=='JavaException'){
+								print("Error.name=" + err.name);
+								print("Error=" + err);
+								print("Error.getCause=" + err.getCause); //Ergebnis: undefined
+								//print("Error.getCause()=" + err.getCause());
+								print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
+								//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
+								//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
+								//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
+								print("err.javaException.getMessage()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+								myReturnControlString = "Error: " + err.javaException.getMessage();
+							}else{
+								print("normaler Fehler.  Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+							    myReturnControlString = "Error: " + err.message;
+							}									
+						}
+					}					
+					return myReturnControlString;
+			}//End function handleError
+	   
 		]]>
 	</scriptdef>
 	
@@ -2151,7 +2214,15 @@
 		</ac:then>
 		<ac:else><!-- TODO GOON: Default nur verwenden, wenn project.useDefault konfiguriert ist -->
 			<fl:let>myDirRepositoryPath ::= "C:/1fgl/repository/Projekt_VMD"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard '${myDirRepositoryPath}'." arrayreturn="myaError" sflagcontrol="" />			
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard '${myDirRepositoryPath}'." arrayreturn="myaError"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />			
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 		</ac:else>
 	</ac:if>
 	<ac:if>
@@ -2168,7 +2239,15 @@
 		</ac:then>
 		<ac:else>
 			<fl:let>myDirPathClientFgl ::= "c:/1fgl/client"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard '${myDirPathClientFgl}'." arrayreturn="myaError" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard '${myDirPathClientFgl}'." arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 		</ac:else>
 	</ac:if>
 	<ac:if>
@@ -2185,7 +2264,15 @@
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.os'" arrayreturn="myaError" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.os'" arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 		</ac:else>
 	</ac:if>
 	
@@ -2416,7 +2503,15 @@
 		</ac:then>
 		<ac:else>			
 			<fl:let>myOperation_mode ::= "prod"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.operation_mode' verwende als Standard '${myOperation_mode}'." arrayreturn="myaError" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.operation_mode' verwende als Standard '${myOperation_mode}'." arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 		</ac:else>
 	</ac:if>
 	
@@ -2434,7 +2529,15 @@
 		</ac:then>
 		<ac:else>					
 			<fl:let>myDirRepositoryBat ::= "bat"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard '${myDirRepositoryBat}'." arrayreturn="myaError" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard '${myDirRepositoryBat}'." arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 		</ac:else>
 	</ac:if>
 	
@@ -2717,7 +2820,15 @@
 			<fl:let>myReturnControl.SchemaChanged::=false</fl:let>
 										
 			<!-- Hänge an bestehendes Array an -->
-			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
@@ -2730,7 +2841,15 @@
 			
 			<!-- Mache neues Array. Hänge an neues Array an -->			
 			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.UnSchema"/>
-			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
@@ -3158,8 +3277,24 @@
 			<fl:when test="${myisdirectoryPart} == true">
 					<!-- A) Teil - Verzeichnis-Fall: -->
 					<echo>${sScript}Teil: Ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.</echo>
-					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
-					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="**.**" arrayreturn="mysaTotal.filename" sflagcontrol="" />								
+					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+					<ac:if>
+						<equals arg1="false" arg2="${myReturnControl}"/>
+						<ac:then>							
+							<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+							<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+						</ac:then>		
+					</ac:if>					
+					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="**.**" arrayreturn="mysaTotal.filename" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />								
+					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+					<ac:if>
+						<equals arg1="false" arg2="${myReturnControl}"/>
+						<ac:then>							
+							<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+							<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+						</ac:then>		
+					</ac:if>
 					<fl:let>myReturnControl::=true</fl:let>
 					<fl:let>myReturnString::='${sScript}Alles o.k.'</fl:let>
 			</fl:when>
@@ -3170,13 +3305,28 @@
 					<!-- Ermittle aus dem Pfad den Verzeichnis und den Dateiteil -->
 					<getFilenameFromPathJsZZZ pathstring="${mySinglePart}" returnfilename="myFilename" returncontrol="mytempReturnControl" returnacontrolstring="myaReturnControl" sflagcontrol="" />
 					<echo>${sScript}Der Dateiname ist: '${myFilename}'</echo>
-					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="${myFilename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
-
+					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="${myFilename}" arrayreturn="mysaTotal.filename" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+					<ac:if>
+						<equals arg1="false" arg2="${myReturnControl}"/>
+						<ac:then>							
+							<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+							<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+						</ac:then>		
+					</ac:if>
 					<fl:let>myDirectoryPath::=''</fl:let>
 					<stringLeftBackStringZZZ text="${mySinglePart}" matchstring="${myFilename}" returnstring="myDirectoryPath" />
 					<echo>${sScript}Der Pfad ist: '${myDirectoryPath}'</echo>					
-					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />								
-															
+					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />								
+					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+					<ac:if>
+						<equals arg1="false" arg2="${myReturnControl}"/>
+						<ac:then>							
+							<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+							<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+						</ac:then>		
+					</ac:if>
+			
 					<fl:let>myReturnControl::=${mytempReturnControl}</fl:let>									
 					<fl:choose>
 						<fl:when test="${myReturnControl}==true">
@@ -4211,11 +4361,27 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- 4. Packe die Werte in ein Array -->
 	<arrayInitJsZZZ isize="0" arrayreturn="fileadir"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt. -->
-	<arrayAppendJsZZZ arrayinput="${fileadir}" valueinput="${myPath}" arrayreturn="myFileadir" sflagcontrol="" />
+	<arrayAppendJsZZZ arrayinput="${fileadir}" valueinput="${myPath}" arrayreturn="myFileadir" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	
+	<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+	<ac:if>
+		<equals arg1="false" arg2="${myReturnControl}"/>
+		<ac:then>							
+			<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+			<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+		</ac:then>		
+	</ac:if>
 	<!-- <arrayDebugJsZZZ arrayinput="${myFileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 	<arrayInitJsZZZ isize="0" arrayreturn="fileaname"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
-	<arrayAppendJsZZZ arrayinput="${fileaname}" valueinput="${xtractedvalue}" arrayreturn="myFileaname" sflagcontrol="" />
+	<arrayAppendJsZZZ arrayinput="${fileaname}" valueinput="${xtractedvalue}" arrayreturn="myFileaname" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+	<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+	<ac:if>
+		<equals arg1="false" arg2="${myReturnControl}"/>
+		<ac:then>							
+			<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+			<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+		</ac:then>		
+	</ac:if>
 	<!-- <arrayDebugJsZZZ arrayinput="${myFileaname}" ilevel="1"/ --><!-- Ausgabe des neuen Arrays -->	
 	
 		
@@ -4244,7 +4410,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:for param="icounter" end="${iSize}">
 		<sequential>
 			<arrayInitJsZZZ isize="0" arrayreturn="myAFiledir"/> <!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
-			<arrayAppendJsZZZ arrayinput="${myAFiledir}" valueinput="${myPart}" arrayreturn="myArrayNew" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myAFiledir}" valueinput="${myPart}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myAFiledir" sflagcontrol="" />
 		</sequential>
 	</ac:for>

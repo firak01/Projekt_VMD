@@ -33,8 +33,8 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
 
 -init:
      [echo] Receiving timestamp:
-     [echo] Current Timestamp: 20160315_063035
-     [echo] Backup-Filenames: vmd20160315_063035.zip, misc20160315_063035.zip
+     [echo] Current Timestamp: 20160316_075311
+     [echo] Backup-Filenames: vmd20160316_075311.zip, misc20160316_075311.zip
 
 -FglRepository_Main:
 
@@ -43,8 +43,10 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
 -FglCheckProjectProperties:
 [arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard 'C:/1fgl/repository/Projekt_VMD'.'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
 [arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard 'c:/1fgl/client'.'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
   [fl:echo] project.vmd.os hat den Wert: 'Win7'
      [echo] myDirRepositoryPath hat den Wert: "C:/1fgl/repository/Projekt_VMD"
      [echo] myDirPathClientFgl hat den Wert: "c:/1fgl/client"
@@ -75,9 +77,9 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] project.vmd.dirRepositoryArchive = "vmd"
      [echo] conf.dirRepositoryArchive = "vmd"
      [echo] myTargetDirectory = "C:/1fgl/repository/Projekt_VMDBackups"
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160315_063035.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160316_075311.zip
      [echo] b) VmdRepository Misc:
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160315_063035.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160316_075311.zip
   [fl:echo] FglRepositoryBackup erfolgreich. Fahre fort.
 
 -FglRepositoryCopyClient2archive:
@@ -93,8 +95,10 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
 -FglCheckProjectProperties:
 [arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard 'C:/1fgl/repository/Projekt_VMD'.'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
 [arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard 'c:/1fgl/client'.'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
   [fl:echo] project.vmd.os hat den Wert: 'Win7'
      [echo] myDirRepositoryPath hat den Wert: "C:/1fgl/repository/Projekt_VMD"
      [echo] myDirPathClientFgl hat den Wert: "c:/1fgl/client"
@@ -102,6 +106,7 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
   [fl:echo] project.vmd.operation_mode hat den Wert: 'test'
 [arrayAppendJsZZZ] Wert encoded anhängen an position 2: 'Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard 'bat'.'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryBat%27%20verwende%20als%20Standard%20%27bat%27.'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
   [fl:echo] myGoon hat den Wert: true
   [fl:echo] Hinweis: Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryBat%27%20verwende%20als%20Standard%20%27bat%27.
   [fl:echo] Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.
@@ -140,6 +145,7 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] Keine Schemaaenderung
 [arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'C:\temp\Projekt_VMD\testused02'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused02'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
      [echo] Noch hat kein Schemawechsel stattgefunden.
   [fl:echo] Leerzeile, wird übersprungen...
   [fl:echo] Leerzeile, wird übersprungen...
@@ -151,6 +157,7 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] Keine Schemaaenderung
 [arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'C:\temp\Projekt_VMD\testused'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
      [echo] Noch hat kein Schemawechsel stattgefunden.
   [fl:echo] Leerzeile, wird übersprungen...
   [fl:echo] zu verarbeitende Zeile:'del://C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt'
@@ -160,6 +167,7 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] Keine Schemaaenderung
 [arrayAppendJsZZZ] Wert encoded anhängen an position 2: 'C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5Cfile_copyBeispiel02renamed.txt'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
      [echo] Noch hat kein Schemawechsel stattgefunden.
   [fl:echo] Leerzeile, wird übersprungen...
   [fl:echo] Leerzeile, wird übersprungen...
@@ -208,8 +216,10 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] -FglDelLocal_AnalyseSingle: Teil: Ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.
 [arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'C:\temp\Projekt_VMD\testused'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
 [arrayAppendJsZZZ] Wert encoded anhängen an position 0: '**.**'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: '**.**'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
   [fl:echo] -FglDelController_LineController: Ergebnis von -FGLDelLocal_AnalyseMatrix bzw. -FglDelLocal_AnalyseSingle=true
   [fl:echo] -FglDelController_LineController: returna.filedir=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused
   [fl:echo] -FglDelController_LineController: returna.filename=**.**
@@ -236,9 +246,11 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] -FglDelLocal_AnalyseSingle: Der Dateiname ist: 'file_copyBeispiel02renamed.txt'
 [arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'file_copyBeispiel02renamed.txt'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'file_copyBeispiel02renamed.txt'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
      [echo] -FglDelLocal_AnalyseSingle: Der Pfad ist: 'C:\1fgl\repository\Projekt_VMD\testused02\'
 [arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'C:\1fgl\repository\Projekt_VMD\testused02\'
 [arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C'
+     [echo] myReturnControl | myReturnConstrolString | myReturnValue = true | Alles o.k. | ${myReturnValue}
   [fl:echo] -FglDelController_LineController: Ergebnis von -FGLDelLocal_AnalyseMatrix bzw. -FglDelLocal_AnalyseSingle=true
   [fl:echo] -FglDelController_LineController: returna.filedir=C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C
   [fl:echo] -FglDelController_LineController: returna.filename=file_copyBeispiel02renamed.txt
@@ -316,19 +328,19 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] -FGLDelLocal_DeleteFileSingle: Fehler geworfen: Error: DirectoryPath
      [echo] In <finally>-FGLDelLocal_DeleteFileSingle: .
      [echo] In <finally>-FGLDelLocal_DeleteFileByFile: .
-  [fl:echo] -FGLDelLocal_Delete: Fehler in -FGLDelLocal_DeleteFilebyFile festgestellt - '-FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4703: The following error occurred while executing this line:
-  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4735: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4580: The following error occurred while executing this line:
-  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4627: Error: DirectoryPath''
+  [fl:echo] -FGLDelLocal_Delete: Fehler in -FGLDelLocal_DeleteFilebyFile festgestellt - '-FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4877: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4909: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4754: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4801: Error: DirectoryPath''
      [echo] In <finally>-FGLDelLocal_Delete: .
      [echo] In <finally>-FGLDelLocal_Main: .
-  [fl:echo] -FglSchemaController_Controller: Ergebnis des Loeschens: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4434: -FGLDelLocal_Delete: -FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4703: The following error occurred while executing this line:
-  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4735: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4580: The following error occurred while executing this line:
-  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4627: Error: DirectoryPath'
+  [fl:echo] -FglSchemaController_Controller: Ergebnis des Loeschens: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4608: -FGLDelLocal_Delete: -FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4877: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4909: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4754: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4801: Error: DirectoryPath'
      [echo] In <finally>-FglSchemaController_Controller: .
      [echo] In <finally>-FglFileControlController_Main: .
-  [fl:echo] Ergebnis des FileControll Controllers: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4434: -FGLDelLocal_Delete: -FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4703: The following error occurred while executing this line:
-  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4735: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4580: The following error occurred while executing this line:
-  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4627: Error: DirectoryPath'
+  [fl:echo] Ergebnis des FileControll Controllers: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4608: -FGLDelLocal_Delete: -FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4877: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4909: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4754: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4801: Error: DirectoryPath'
      [echo] In <finally>-FglVmd_Main: .
 
 compile:

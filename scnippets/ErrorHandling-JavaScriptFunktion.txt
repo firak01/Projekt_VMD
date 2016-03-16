@@ -1,0 +1,16 @@
+<!-- Code Snippet für die ANT - Scripte: Fehler aus JavaScript-Funktion entgegennehmen -->
+
+
+returncontrol="myReturnControl" returnControlString="myReturnControlString" 
+
+
+
+
+<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString} " />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
