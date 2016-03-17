@@ -98,9 +98,27 @@
      <attribute name="returnboolean" />
 	 <attribute name="returncontrol" />
 	 <attribute name="returncontrolstring" />
-     <![CDATA[
+     <![CDATA[						
+		tryout_jaz_errorHandling();			
+		function tryout_jaz_errorHandling(){
+		try{
+			var myError = new Error();
+		}catch(anErr){
+			print("Im Catch");
+		}
+			print("line:"+ myError.lineNumber);
+			print("file:"+ myError.fileName);			
+			print("stack: " +myError.stack);
+			if(undefined!=myError.stack){
+					var caller_line = myError.stack.split("\n")[1];  // Index 0=Error, 1=Name der aktuellen Funktion.
+					print(caller_line);
+					var index = caller_line.indexOf("at ");
+					var clean = caller_line.slice(index+2, caller_line.length);
+					print("TESTE caller_line" + clean );
+			    }	
+			
+			print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);			
 			enableJava();
-		   
 			//Allgemein für Import Statements gilt:
 			//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
 			//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
@@ -176,7 +194,9 @@
 			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);			
 			//	project.setProperty(attributes.get("filenames"), arrayFilenames);
 			//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
-		
+			}//end function tryout...
+			
+			
 		
 			//Todo: Diese Funktion in den JSZ Kernel packen
 			function enableJava(){
@@ -202,19 +222,24 @@
 			}//End function enableJava
 			
 			function handleError(err){
+				print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);
 			
-				//TEST: Versuche aus dem Error-Objekt weitere Infos zu holen
+				//TEST: Versuche aus dem uebergebenen Error-Objekt weitere Infos zu holen
 				print("TESTETESTETETSTETETSETTESETTETSTE");
+				print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);
+			
 				print(err);
 				print("Fehlerobjekt Zeilennummer: " + err.lineNumber);
 				print("Fehlerobjekt Dateiname: " + err.fileName);
-				print("Fehelrobjekt Stacktrace: " + err.stack);
-				var caller_line = err.stack.split("\n")[0];
-				print(caller_line);
-				//var index = caller_line.indexOf("at ");
-				//var clean = caller_line.slice(index+2, caller_line.length);
-				//print("TESTE caller_line" + clean );
-				print("TEST: "  + (new Error).lineNumber);
+				print("Fehlerobjekt Stacktrace: " + err.stack);
+				if(undefined!=err.stack){
+					var caller_line = err.stack.split("\n")[0];
+					print(caller_line);
+					//var index = caller_line.indexOf("at ");
+					//var clean = caller_line.slice(index+2, caller_line.length);
+					//print("TESTE caller_line" + clean );
+			    }	
+			
 				
 			
 			
