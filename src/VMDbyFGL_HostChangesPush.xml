@@ -697,92 +697,103 @@
 
     <attribute name="returnstring" /> 
 	<attribute name="returncontrol" /> 
+	<attribute name="returncontrolstring" /> 
 	
     <![CDATA[
 		arrayStringImplodeZZZ();
 		function arrayStringImplodeZZZ(){
-		//normalerweise verwendet man join, wie in dem Beispiel:
-		//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
-		//var myarray = str_to_split.split(",");
-		//var output=myarray.join("");
-		//
-		//Aber hier soll nur ein bestimmter Bereich von... bis... gejoint werden. 
-		//Sinnvoll um vom Array vorne oder hinten etwas abzuschneiden.
-	    
-		var myArrayString = attributes.get("inputarraystring");		
-		var myDelimiter = attributes.get("inputdelimiter");
-		var myiIndexLow = attributes.get("inputindexlow");
-		var myiIndexHigh = attributes.get("inputindexhigh");
-		//print("myiIndexLow=" + myiIndexLow);
-		//print("myiIndexHigh=" + myiIndexHigh);
-		
-		
-		var myStringReturn = "";
-		var bReturnControl = true;
-		
-		if(myArrayString===undefined){
-			//print("myString = undefined");
-			bReturnControl = false;
-		}else if(myArrayString===null){
-			//print("myString = null");			
-			bReturnControl = false;
-		}else{
-			if(myDelimiter===undefined){
-				//print("myDelimiter = 'undefined'");
-				myStringReturn=myArrayString.join("");
-				bReturnControl = false;
-			}else if(myDelimiter===''){
-				//print("myDelimiter = 'leer'");
-				myStringReturn=myArrayString.join("");
-				bReturnControl = false;
-			}else{	
-				//print("myDelimiter = " + myDelimiter);
+			//normalerweise verwendet man join, wie in dem Beispiel:
+			//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
+			//var myarray = str_to_split.split(",");
+			//var output=myarray.join("");
+			//
+			//Aber hier soll nur ein bestimmter Bereich von... bis... gejoint werden. 
+			//Sinnvoll um vom Array vorne oder hinten etwas abzuschneiden.
 			
-				if(myiIndexLow===undefined){
-					myiIndexLow=0;
-				}else if(myiIndexLow==null){
-					myiIndexLow=0;
-				}else if(myiIndexLow<=-1){
-					myiIndexLow=0;
-				}
+			var myArrayString = attributes.get("inputarraystring");		
+			var myDelimiter = attributes.get("inputdelimiter");
+			var myiIndexLow = attributes.get("inputindexlow");
+			var myiIndexHigh = attributes.get("inputindexhigh");
+			//print("myiIndexLow=" + myiIndexLow);
+			//print("myiIndexHigh=" + myiIndexHigh);
+			
+			
+			var myStringReturn = "";
+			var myReturnControl = true;
+			var myReturnControlString = "";
+			
+			try{
+			if(myArrayString===undefined){
+				//print("myString = undefined");
+				myReturnControl = false;
+			}else if(myArrayString===null){
+				//print("myString = null");			
+				myReturnControl = false;
+			}else{
+				if(myDelimiter===undefined){
+					//print("myDelimiter = 'undefined'");
+					myStringReturn=myArrayString.join("");
+					myReturnControl = false;
+				}else if(myDelimiter===''){
+					//print("myDelimiter = 'leer'");
+					myStringReturn=myArrayString.join("");
+					myReturnControl = false;
+				}else{	
+					//print("myDelimiter = " + myDelimiter);
 				
-				//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
-				var objectArray = myArrayString.split(',');  
-										
-				//Hole die Anzahl der Einträge im Array, ggfs. für einen ungueltigen oberen Wert
-				myiIndexMax = objectArray.length-1;
-				//print("myiIndexMax="+myiIndexMax);
-				if(myiIndexHigh===undefined){
-					myiIndexHigh=myiIndexMax;
-				}else if(myiIndexLow==null){
-					myiIndexHigh=myiIndexMax;
-				}else if(myiIndexHigh>myiIndexMax){
-					myiIndexHigh=myiIndexMax;
-				}else if(myiIndexHigh<=-1){
-					myiIndexHigh=myiIndexMax;
-				}
-				
-				//Falsch: damit geht man Buchstabe für Buchstabe vor: 
-				//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
-				//	print("myArrayString[i]="+myArrayString[i]);
-				//	myStringReturn+=myArrayString[i];
-				//	print("myStringReturn="+myStringReturn);
-				//}						 		
-				var iIndexCount=-1;
-				for(x in objectArray){
-					iIndexCount++;
-					//print("objectArray[x]="+objectArray[x]);
-					if(iIndexCount>=myiIndexLow){  //noch kaputt: Fehler durch >= provizieren . Richtig muss es nur >  heissen.
-						if(iIndexCount >= myiIndexHigh) break;
-						if(myStringReturn!="") myStringReturn+=myDelimiter;
-						myStringReturn+=objectArray[x];					
-						//print("myStringReturn="+myStringReturn);
+					if(myiIndexLow===undefined){
+						myiIndexLow=0;
+					}else if(myiIndexLow==null){
+						myiIndexLow=0;
+					}else if(myiIndexLow<=-1){
+						myiIndexLow=0;
 					}
-				}								
+					
+					//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
+					var objectArray = myArrayString.split(',');  
+											
+					//Hole die Anzahl der Einträge im Array, ggfs. für einen ungueltigen oberen Wert
+					myiIndexMax = objectArray.length-1;
+					//print("myiIndexMax="+myiIndexMax);
+					if(myiIndexHigh===undefined){
+						myiIndexHigh=myiIndexMax;
+					}else if(myiIndexLow==null){
+						myiIndexHigh=myiIndexMax;
+					}else if(myiIndexHigh>myiIndexMax){
+						myiIndexHigh=myiIndexMax;
+					}else if(myiIndexHigh<=-1){
+						myiIndexHigh=myiIndexMax;
+					}
+					
+					//Falsch: damit geht man Buchstabe für Buchstabe vor: 
+					//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
+					//	print("myArrayString[i]="+myArrayString[i]);
+					//	myStringReturn+=myArrayString[i];
+					//	print("myStringReturn="+myStringReturn);
+					//}						 		
+					var iIndexCount=-1;
+					for(x in objectArray){
+						iIndexCount++;
+						//print("objectArray[x]="+objectArray[x]);
+						if(iIndexCount>=myiIndexLow){  //noch kaputt: Fehler durch >= provizieren . Richtig muss es nur >  heissen.
+							if(iIndexCount >= myiIndexHigh) break;
+							if(myStringReturn!="") myStringReturn+=myDelimiter;
+							myStringReturn+=objectArray[x];					
+							//print("myStringReturn="+myStringReturn);
+						}
+					}								
+				}
 			}
-		}				 
-		project.setProperty(attributes.get("returnstring"), myStringReturn);
-		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+
+			}catch(err) {
+					myReturnControl = false;
+					myReturnControlString = handleError(err);
+				}
+
+			
+			project.setProperty(attributes.get("returnstring"), myStringReturn);
+			project.setProperty(attributes.get("returncontrol"), myReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);
 		}//End function arrayStringImplodeZZZ		
 				
         function handleError(err){		
@@ -799,7 +810,7 @@
 			if(undefined!=err.stack){									
 				caller_line = err.stack.split("\n")[0];
 			}							
-			myReturnControlString = "Error: '" + err.javaException.getMessageLast() + "' " + caller_line;
+			myReturnControlString = "Error: aaaaaaa'" + err.javaException.getMessageLast() + "' " + caller_line;
 		}else{			
 			//print("################################");
 			print("Unbestimmten Fehler abfangen.");
@@ -823,7 +834,7 @@
 			}
 		}					
 		return myReturnControlString;
-	}//End function handleError				
+		}//End function handleError				
 				
      ]]>
 	</scriptdef>	
@@ -1161,6 +1172,8 @@
 	 <attribute name="returncontrol" />
 	 <attribute name="returncontrolstring" />
      <![CDATA[
+	 isFileRootZZZ();
+	 function isFileRootZZZ(){
 		   enableJava();
 		   
 		   //Allgemein für Import Statements gilt:
@@ -1203,7 +1216,7 @@
 			project.setProperty(attributes.get("returnboolean"), bErg);
 			project.setProperty(attributes.get("returncontrol"), myReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);			
-
+	}//End function isFileRootZZZ
 				
 			//Todo: Diese Funktion in den JSZ Kernel packen
 			function enableJava(){
@@ -1228,50 +1241,45 @@
 				}
 			}//End function enableJava
 			
-			function handleError(err){
-				//document.getElementById("demo").innerHTML = err.message;
-				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
-				//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
-					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
-						print("ExceptionZZZ Fehler abgefangen (NASHORN)");
-						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
-						myReturnControlString = "Error: " + err.getMessageLast();
-					}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
-						print("ExceptionZZZ Fehler abgefangen (RHINO)");
-						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-						myReturnControlString = "Error: " + err.javaException.getMessageLast();
-					}else{
-					   //weitere, unbestimmte Fehler abfangen
-					   print("Unbestimmten Fehler abfangen.");
-					   var version = java.lang.System.getProperty("java.version");
-					   print("JavaVersion: " + version);
-					   print("typeof err: "+typeof(err));					   
-						if(version.substring(0,3)=="1.8"){
-							print ("Javascript Engine: 'Nashorn'");
-							print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
-							myReturnControlString = "Error: " + err.message;												
-						}else{
-							print ("Javascript Engine: 'Rhino'");
-							print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
-							if(err.constructor.name=='JavaException'){
-								print("Error.name=" + err.name);
-								print("Error=" + err);
-								print("Error.getCause=" + err.getCause); //Ergebnis: undefined
-								//print("Error.getCause()=" + err.getCause());
-								print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
-								//print("Error.message(): " + err.message());//Ergebnis: Es wird ein Fehler geworfen 'is not a function, it is "string"
-								//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
-								//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
-								print("err.javaException.getMessage()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-								myReturnControlString = "Error: " + err.javaException.getMessage();
-							}else{
-								print("normaler Fehler.  Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
-							    myReturnControlString = "Error: " + err.message;
-							}									
-						}
-					}	
-				return myReturnControlString;					
-			}//End function handleError
+			 function handleError(err){		
+		//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
+		//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
+		if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+			//print("################################");
+			print("ExceptionZZZ Fehler abgefangen (NASHORN)");			
+			myReturnControlString = "Error: " + err.getMessageLast();
+		}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
+			//print("################################");
+			print("ExceptionZZZ Fehler abgefangen (RHINO)");						
+			var caller_line="Kein Stacktrace vorhanden.";
+			if(undefined!=err.stack){									
+				caller_line = err.stack.split("\n")[0];
+			}							
+			myReturnControlString = "Error: '" + err.javaException.getMessageLast() + "' " + caller_line;
+		}else{			
+			//print("################################");
+			print("Unbestimmten Fehler abfangen.");
+			var version = java.lang.System.getProperty("java.version");
+			print("JavaVersion: " + version);
+			print("typeof err: "+typeof(err));					   
+			if(version.substring(0,3)=="1.8"){
+				print ("Javascript Engine: 'Nashorn'");				
+				myReturnControlString = "Error: " + err.message;//Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+			}else{
+				print("################################");
+				print ("Javascript Engine: 'Rhino'");
+				print("err.contructor.name="+err.constructor.name);				
+				if(err.constructor.name=='JavaException'){					
+					print("Error=" + err);
+					myReturnControlString = "Error: " + err.javaException.getMessage();
+				}else{
+					print("normaler Fehler.  Error=" + err); //In Rhino wird der Fehler nicht direkt zurückgegeben.
+				    myReturnControlString = "Error: " + err.message;
+				}									
+			}
+		}					
+		return myReturnControlString;
+		}//End function handleError		
 	      ]]>
   </scriptdef>
 	
@@ -4804,8 +4812,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<math result="iIndexTemp" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
 			<!--<echo>${sScript}Errechnete Obergrenze des Arrays fuer diesen Lauf: ${iIndexTemp}</echo>-->
 			
-			<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub"/>
+			<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub" returncontrolstring="myReturnControlSubString"/>
 			<!--<echo>${sScript}Verzeichnis ${myReturnStringSub}</echo>-->
+			<echo>${sScript}arrayStringImplode=${myReturnControlSubString}</echo>
 						
 			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
 			<fl:let>myReturnControl::="${returnControlSub}"</fl:let>
