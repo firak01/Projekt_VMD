@@ -3,6 +3,15 @@
 --- Wichtig: Niemals Firefox updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
 ######################################################################
 
+20151207: Einbau von 16GB Arbeitspeicher
+
+20151205: Fehlermeldung in VMClient bei Netzwerkzugriff auf Verzeichnisse des Host: "Für diesen Befehl ist nicht genügend Serverspeicher verfügbar."
+          Behebung durch Registry HKEY_LOCAL_MACHINE\ System\ CurrentControlSet \Services \LanmanServer \Parameters
+          Neuer Schlüssel DWORD IRPStackSize mit Wert Dezimal 50
+
+	HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\LargeSystemCache, dort setzen Sie den Wert bitte auf 1
+	HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\Size hier tragen Sie als Wert bitte 3 ein
+ 
 20151101: Installation Treiber für USB 3.0 Controller
 
 20150620: Notepad++ mit plugins: compare, explorer, xmltools

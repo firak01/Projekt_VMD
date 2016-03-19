@@ -101,29 +101,60 @@
      <![CDATA[						
 		tryout_jaz_errorHandling();			
 		function tryout_jaz_errorHandling(){
-		try{
-			var myError = new Error();
+		var myError = new Error();
+		try{			
+			throw myError;
 		}catch(anErr){
-			print("Im Catch");
-		}
-			print("line:"+ myError.lineNumber);
-			print("file:"+ myError.fileName);			
-			print("stack: " +myError.stack);
-			if(undefined!=myError.stack){
-					var caller_line = myError.stack.split("\n")[1];  // Index 0=Error, 1=Name der aktuellen Funktion.
-					print(caller_line);
-					var index = caller_line.indexOf("at ");
-					var clean = caller_line.slice(index+2, caller_line.length);
-					print("TESTE caller_line" + clean );
-			    }	
+			print("#####");
+			print("Im Catch, error erfolgreich abgefangen.");
 			
-			print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);			
+			//Java 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.		
+			print("line:"+ anErr.lineNumber);
+			print("file:"+ anErr.fileName);			
+			print("stack: " +anErr.stack);
+			if(undefined!=anErr.stack){
+				var caller_line = anErr.stack.split("\n")[1];  // Index 0=Error, 1=Name der aktuellen Funktion.
+				print("caller line=" + caller_line);
+				var index = caller_line.indexOf("at ");
+				var clean = caller_line.slice(index+2, caller_line.length);
+				print("TESTE caller_line" + clean );
+			}	
+		}
+		
+		print("#####");
+		print("1. Error objekt ausserhalb des catch....");
+		
+		//Java 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.
+		print("line:"+ myError.lineNumber);
+		print("file:"+ myError.fileName);			
+		print("stack: " +myError.stack);
+		if(undefined!=myError.stack){
+				var caller_line = myError.stack.split("\n")[1];  // Index 0=Error, 1=Name der aktuellen Funktion.
+				print("caller line=" + caller_line);
+				var index = caller_line.indexOf("at ");
+				var clean = caller_line.slice(index+2, caller_line.length);
+				print("TESTE caller_line" + clean );
+			}	
+			
+			
+			print("#####");
+			print("2 Error objekt ausserhalb des catch....");
+			//Funktioniert nicht mit Java7 (RHINO)
+			print("TEST, neues ErrorObjekt erzeugen und direkt die Zeilennummer ausgeben: "  + (new Error).lineNumber);		
+			
+			
+			//Fehler rhinoException gibt es nicht bei normalen JavaScript Fehlern... auch nicht mit Java7 (RHINO)
+			//print("TEST, neues ErrorObjekt erzeugen und direkt die Zeilennummer ausgeben: "  + (new Error).rhinoException.lineNumber);		
+
+
+			print("#####");
+			print("Error objekt im Zusammenspiel mit JAVA");
 			enableJava();
 			//Allgemein für Import Statements gilt:
 			//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
 			//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
 	 
-			// import statements, funktionieren beide
+			//import statements, funktionieren beide
 			//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
 			//importPackage(basic.zBasic.util.datatype.string);
 			importClass(Packages.basic.zBasic.ExceptionZZZ);
@@ -222,19 +253,26 @@
 			}//End function enableJava
 			
 			function handleError(err){
-				print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);
-			
+				
 				//TEST: Versuche aus dem uebergebenen Error-Objekt weitere Infos zu holen
-				print("TESTETESTETETSTETETSETTESETTETSTE");
-				print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);
-			
-				print(err);
+				print("##### in handle Error");
+				
+				//Java 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.
+				print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);			
+				
+				print("##### in handle Error für den Java-Fehler");				
+				print("Error Objekt: " + err);
 				print("Fehlerobjekt Zeilennummer: " + err.lineNumber);
 				print("Fehlerobjekt Dateiname: " + err.fileName);
-				print("Fehlerobjekt Stacktrace: " + err.stack);
+				
+				
+				var caller_line="Kein Stacktrace vorhanden.";
 				if(undefined!=err.stack){
-					var caller_line = err.stack.split("\n")[0];
-					print(caller_line);
+					//print("Fehlerobjekt Stacktrace: " + err.stack);
+					caller_line = err.stack.split("\n")[0];
+					//print("caller line=" + caller_line);
+					
+					//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
 					//var index = caller_line.indexOf("at ");
 					//var clean = caller_line.slice(index+2, caller_line.length);
 					//print("TESTE caller_line" + clean );
@@ -247,15 +285,30 @@
 				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
 				//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
 					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+						print("################################");
 						print("ExceptionZZZ Fehler abgefangen (NASHORN)");
 						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
 						myReturnControlString = "Error: " + err.getMessageLast();
 					}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
+						print("################################");
 						print("ExceptionZZZ Fehler abgefangen (RHINO)");
 						print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
-						myReturnControlString = "Error: " + err.javaException.getMessageLast();
+						
+						var caller_line="Kein Stacktrace vorhanden.";
+						if(undefined!=err.stack){		
+							//print("err.stack="+err.stack);
+						
+							caller_line = err.stack.split("\n")[0];
+							
+							//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
+							//var index = caller_line.indexOf("at ").trim();
+							//var clean = caller_line.slice(index+2, caller_line.length);
+							//print("TESTE caller_line" + clean );
+						}							
+						myReturnControlString = "Error: '" + err.javaException.getMessageLast() + "' " + caller_line;
 					}else{
 					   //weitere, unbestimmte Fehler abfangen
+					   print("################################");
 					   print("Unbestimmten Fehler abfangen.");
 					   var version = java.lang.System.getProperty("java.version");
 					   print("JavaVersion: " + version);
@@ -265,6 +318,7 @@
 							print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
 							myReturnControlString = "Error: " + err.message;												
 						}else{
+							print("################################");
 							print ("Javascript Engine: 'Rhino'");
 							print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
 							if(err.constructor.name=='JavaException'){
@@ -277,6 +331,7 @@
 								//print("Error: " + err.getMessageLast());//Ergebnis: Es wird ein Fehler geworfen 'cannot find function getMessageLast in object JavaException
 								//print("Error: " + err.getMessageLast);//Ergebnis: dito, kein Unterschied zu getMessageLast()
 								print("err.javaException.getMessage()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
+								print("err.rhinoExcption.stack="+err.rhinoExcption.stack);
 								myReturnControlString = "Error: " + err.javaException.getMessage();
 							}else{
 								print("normaler Fehler.  Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.

@@ -699,6 +699,8 @@
 	<attribute name="returncontrol" /> 
 	
     <![CDATA[
+		arrayStringImplodeZZZ();
+		function arrayStringImplodeZZZ(){
 		//normalerweise verwendet man join, wie in dem Beispiel:
 		//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
 		//var myarray = str_to_split.split(",");
@@ -781,6 +783,47 @@
 		}				 
 		project.setProperty(attributes.get("returnstring"), myStringReturn);
 		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+		}//End function arrayStringImplodeZZZ		
+				
+        function handleError(err){		
+		//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
+		//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
+		if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+			//print("################################");
+			print("ExceptionZZZ Fehler abgefangen (NASHORN)");			
+			myReturnControlString = "Error: " + err.getMessageLast();
+		}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
+			//print("################################");
+			print("ExceptionZZZ Fehler abgefangen (RHINO)");						
+			var caller_line="Kein Stacktrace vorhanden.";
+			if(undefined!=err.stack){									
+				caller_line = err.stack.split("\n")[0];
+			}							
+			myReturnControlString = "Error: '" + err.javaException.getMessageLast() + "' " + caller_line;
+		}else{			
+			//print("################################");
+			print("Unbestimmten Fehler abfangen.");
+			var version = java.lang.System.getProperty("java.version");
+			print("JavaVersion: " + version);
+			print("typeof err: "+typeof(err));					   
+			if(version.substring(0,3)=="1.8"){
+				print ("Javascript Engine: 'Nashorn'");				
+				myReturnControlString = "Error: " + err.message;//Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+			}else{
+				print("################################");
+				print ("Javascript Engine: 'Rhino'");
+				print("err.contructor.name="+err.constructor.name);				
+				if(err.constructor.name=='JavaException'){					
+					print("Error=" + err);
+					myReturnControlString = "Error: " + err.javaException.getMessage();
+				}else{
+					print("normaler Fehler.  Error=" + err); //In Rhino wird der Fehler nicht direkt zurückgegeben.
+				    myReturnControlString = "Error: " + err.message;
+				}									
+			}
+		}					
+		return myReturnControlString;
+	}//End function handleError				
 				
      ]]>
 	</scriptdef>	
