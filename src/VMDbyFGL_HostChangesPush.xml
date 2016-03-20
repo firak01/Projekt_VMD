@@ -2098,10 +2098,38 @@
 			</loadproperties> 	 
 			<echo>test1 hat den Wert: ${test1}</echo>
 	
-			<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 				
-			<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>	
+			<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 							
 			<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
 			<echo>project.vmd.os hat den Wert: ${project.vmd.os}</echo>
+						
+						
+			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+					   dies passiert hier durch flaka´s install-property handler task -->
+				<fl:install-property-handler />  	
+				<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+					
+			<!-- Gib den operation_mode als Umgebungsvariable zurück.
+                 Dadurch steht diese information direkt der Batch zur Verfügung.
+                 Ziel: Die Erzeugung von Protokolldateien steuern. -->
+				 <echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>
+				<!-- damit provoziert man einen Fehler im Ant Script und setzt errorlevel im Batch anders -->
+				<!-- <exec>
+				<env key="VMD_OPERATION_MODE" value="${project.vmd.operation_mode}"/>				
+				</exec> -->
+				
+				<exec executable="cmd" failonerror="true">
+				<env key="VMD_OPERATION_MODE" value="${project.vmd.operation_mode}"/>
+				<arg value="/C"/>
+				<arg value="echo Wert '%VMD_OPERATION_MODE%' wurde gesetzt als Umgebungsvariable fuer VMD_OPERATION_MODE"/>
+				</exec>
+				
+				
+				
+				<exec executable="setx.exe">
+					<arg line="VMD_OPERATION_MODE test"/>
+					<arg line="/m"/>
+				</exec>
+				<echo>VMD_OPERATION_MODE='${env.VMD_OPERATION_MODE}'</echo>
 			
 			<!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
 			<!-- TODO : Prüfe die Controldatei auf Validität. -->

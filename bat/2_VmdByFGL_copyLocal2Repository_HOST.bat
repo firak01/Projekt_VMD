@@ -176,6 +176,8 @@ REM Das nur unter Windows DOS Box aufrufen, unter Eclipse werden die Pfade nicht
 SET TRYOUT_ANT="Das ist ein Test"
 SET VMD="C:/1fgl/repository/Projekt_VMD"
 
+
+
 REM Variante B) Sowohl für Eclipse (Run Konfiguration) als auch Batch. 
 REM MERKE: Wenn die Batch auch aus Eclipse heraus gestartet werden soll, braucht man wohl ANT_HOME usw. als Umgebungsvariable. 
 REM Mit -D wird eine Parameter übergeben. Ohne -D wird davon ausgegangen, dass dies der Targetname in dem AntScript ist, der gestartet werden soll.
@@ -183,24 +185,46 @@ REM                                                          Z.B. call ant -buil
 REM                                                          Hier soll das Target blabla ausgeführt werden. Ohne solch eine Targetangabe wird gestartet was unter <project ... default="..." > angegeben ist.
 REM %* gibt alle Parameter aus, mit denen diese Batch aufgerufen wurde. Diese werden an Ant weitergegeben.
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
+SET "VMD_OPERATION_MODE=muss_ueberschrieben_werden_aus_'project_RECHNERNAME_vmd.properties'"
 IF NOT "%1"=="" (
 		REM Fehler "missing value for property" wenn -D nix dahinterstehendes hat.
 		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%* > ..\log\log.txt 2> ..\log\error.txt
 	) ELSE (
 		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties  > ..\log\log.txt 2> ..\log\error.txt
 	)
-REM Dokumentiere jeden Lauf
-COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\1fgl\repository\Projekt_VMD\log\log%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
-COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\1fgl\repository\Projekt_VMD\log\error%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
+	
+REM Beobachtung... Bei einem Fehler im Ant-Script wird sowohl errorlevel 0 als auch errorlevel 1 gesetzt
+if errorlevel 0 (
+	echo.errorlevel 0
+) else (
+	echo.errorlevel ist nicht 0
+)	
+REM Beobachtung... Errorlevel 1 wird bei einem Fehler im ant-Script gesetzt.
+if errorlevel 1 (
+	echo.errorlevel 1
+) else (
+	echo.errorlevel ist nicht 1
+)
+	
+REM Dokumentiere jeden Lauf, ausser im Testfall. Kopiere dazu das Log in eine Datei mit dem aktuellen Timestamp.
+:: Diese Umgebungsvariable wird im Ant-Script gesetzt. Dieser Wert wird in der project_RECHNERNAME_vmd.properties Datei gesetzt
+:: und im Ant-Script ausgelesen.
+echo.ausgabe %VMD_OPERATION_MODE%
+IF NOT "%VMD_OPERATION_MODE%"=="test" (
+	COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\1fgl\repository\Projekt_VMD\log\log%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
+	COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\1fgl\repository\Projekt_VMD\log\error%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
+) ELSE (
+	echo.Testmodus. Protokolliere den Lauf nicht.
+)
+
+REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
+ENDLOCAL
+ENDLOCAL
 
 REM timeout /T 20 /nobreak
 REM nicht im Debuggen, sonst wieder einkommentieren, damit sich das Fenster schliesst: exit
 echo Ende Copy Repository to Local HOST
 pause
-
-REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
-ENDLOCAL
-ENDLOCAL
 
 REM Ohne diesen Labelaufruf werden die Unterlabels erneut aufgerufen...
 goto:eof
