@@ -1,168 +1,42 @@
 @echo off
 CLS
-REM 1) KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
-REM 2) Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist (aus einem JDK). 
+REM @ECHO off schaltet das echo aus... . KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
+REM echo. schaltet das echo für diese eine Zeile wieder ein.
 
 REM Zur verzögerten Übersetzung von Variablen. Bewirkt, dass die Variable nicht zur Kompilierzeit sondern erst zur Laufzeit übersetzt wird (setzt die Verwendung von SETLOCAL zur Aktivierung von verzögerter Übersetzung voraus)
 REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
 SETLOCAL ENABLEEXTENSIONS
 SETLOCAL ENABLEDELAYEDEXPANSION
 
-echo start Copy Repository to Local HOST
-echo uebergebener Parameter 1: %1
-echo uebergebener Parameter 2: %2
-echo alle Parameter: %*
-
-REM Ermittle auf Batch Ebene das verwendete Betriebssystem, um es als Parameter über eine Umgebungsvariable an das ANT Script zu uebergeben.
-FOR /F "tokens=2 delims=[]" %%a IN ('VER') DO FOR /F "tokens=2" %%b IN ("%%a") DO SET VersionNumber=%%b
-
-FOR /F "tokens=1 delims=." %%a IN ("%VersionNumber%") DO SET VersionMajor=%%a
-FOR /F "tokens=2 delims=." %%a IN ("%VersionNumber%") DO SET VersionMinor=%%a
-FOR /F "tokens=3 delims=." %%a IN ("%VersionNumber%") DO SET VersionBuild=%%a
-
-IF %VersionMajor%==6 (
-		 IF %VersionMinor%==4 (
-		 		 SET VersionName=Windows 10
-				 SET VMD_OS=Win10
-		 ) ELSE (
-		 IF %VersionMinor%==3 (
-		 		 SET VersionName=Windows 8.1
-				 SET VMD_OS=Win81
-		 ) ELSE (
-		 IF %VersionMinor%==2 (
-		 		 SET VersionName=Windows 8
-				 SET VMD_OS=Win8
-		 ) ELSE (
-		 IF %VersionMinor%==1 (
-		 		 SET VersionName=Windows 7
-				 SET VMD_OS=Win7
-		 ) ELSE (
-		 IF %VersionMinor%==0 (
-		 		 SET VersionName=Windows Vista
-				 SET VMD_OS=WinVi
-		 )))))
-) ELSE (
-IF %VersionMajor%==5 (
-		 IF %VersionMinor%==2 (
-		 		 SET VersionName=Windows Server 2003
-				 SET VMD_OS=W2003
-		 ) ELSE (
-		 IF %VersionMinor%==1 (
-		 		 SET VersionName=Windows XP
-				 SET VMD_OS=WinXP
-		 ) ELSE (
-		 IF %VersionMinor%==0 (
-		 		 SET VersionName=Windows 2000
-				 SET VMD_OS=Win2k
-		 )))
-) ELSE (
-IF %VersionMajor%==4 ( ECHO 4
-		 IF %VersionMinor%==90 (
-		 		 SET VersionName=Windows ME
-				 SET VMD_OS=WinME
-		 ) ELSE (
-		 IF %VersionMinor%==10 (
-		 		 SET VersionName=Windows 98
-				 SET VMD_OS=W98
-		 ) ELSE (
-		 IF %VersionBuild%==1381 (
-		 		 SET VersionName=Windows NT 4.0
-				 SET VMD_OS=WinNT
-		 ) ELSE (
-		 IF %VersionMinor%==00 (
-		 		 SET VersionName=Windows 95
-				 SET VMD_OS=W95
-		 ))))
-) ELSE (
-IF %VersionMajor%==3 (
-		 SET VersionName=Windows 3.1
-		 SET VMD_OS=Win31
-))))
-
-ECHO Versionsnummer: %VersionNumber%
-ECHO VersionMajor.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%VersionBuild%
-ECHO VersionName: %VersionName%
-ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
-
-REM #################################################################################
-REM Ermittle auf Batch Ebene einen Timestamp, dieser dient zuerst zur Benennung der Log-Dateien, ist aber auch im Script auslesbar.
-set "returnDateTimestampCurrentZZZ="
-call :DateTimestampCurrentZZZ returnDateTimestampCurrentZZZ
-set "VMD_DATETIME=!returnDateTimestampCurrentZZZ!"
-ECHO VMD_DATETIME="!VMD_DATETIME!"
 
 REM ###################################################################
-REM DEN HOST RECHNERNAMEN AN DIE LOG DATEIEN ANHAENGEN, dieser wurde schon per aufrufender Batch gesetzt. 
-::Das ist ein anderer als der computername und ist auf dem Hostrechner selbst leer, d.h. es gibt ihn nur für einen VMWare client
-ECHO HOST ist %HOST%
-IF NOT "%HOST%"=="" (
-	set "VMD_HOST=%HOST%_"
-   ) ELSE (
-    set "VMD_HOST="
-   )
+REM Allgemeine Hinweise für die Batch Programmierung s. unter Snippets "HinweiseBatchProgrammierung.txt"
 
+echo. 
+echo.###################################################################	
+echo.TESTS: Zur Ermittlung des aktuellen Timestamps
+echo.###################################################################
+echo.TESTS FUER DateTimestampCurrentZZZ
+set  "returnDateTimestampCurrentZZZ="
 
-REM Eine Startdatei mit den Projekteinstellungen übergeben. 
-REM Merke: Der übergebenen Dateiname wird ggfs. durch die existenz eines Dateinamens project_ "Hostname des Rechners" _vmd.properties übersteuert.
-REM Merke: Die Pfadangaben sind mit Slash und nicht mit Backslash
+REM Anders als im Original aus dem Web, habe ich die Reihenfolge der Argumente vertauscht.
+call :DateTimestampCurrentZZZ returnDateTimestampCurrentZZZ 
+echo.Ergebnis="%returnDateTimestampCurrentZZZ%"
 
-REM Varinte A) Für Batch Alternative Möglichkeit über Umgebungsvariablen Parameter zu übergeben.
-REM Das nur unter Windows DOS Box aufrufen, unter Eclipse werden die Pfade nicht gefunden.
-SET TRYOUT_ANT="Das ist ein Test"
-SET VMD="C:/1fgl/repository/Projekt_VMD"
+echo.
+echo.###################################################################
 
-
-
-REM Variante B) Sowohl für Eclipse (Run Konfiguration) als auch Batch. 
-REM MERKE: Wenn die Batch auch aus Eclipse heraus gestartet werden soll, braucht man wohl ANT_HOME usw. als Umgebungsvariable. 
-REM Mit -D wird eine Parameter übergeben. Ohne -D wird davon ausgegangen, dass dies der Targetname in dem AntScript ist, der gestartet werden soll.
-REM                                                          Z.B. call ant -buildfile test.xml -Dparam1 -Dparam2 blabla
-REM                                                          Hier soll das Target blabla ausgeführt werden. Ohne solch eine Targetangabe wird gestartet was unter <project ... default="..." > angegeben ist.
-REM %* gibt alle Parameter aus, mit denen diese Batch aufgerufen wurde. Diese werden an Ant weitergegeben.
-REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
-SET "VMD_OPERATION_MODE=muss_ueberschrieben_werden_aus_'project_RECHNERNAME_vmd.properties'"
-IF NOT "%1"=="" (
-		REM Fehler "missing value for property" wenn -D nix dahinterstehendes hat.
-		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%* > ..\log\log.txt 2> ..\log\error.txt
-	) ELSE (
-		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties  > ..\log\log.txt 2> ..\log\error.txt
-	)
-	
-REM Beobachtung... Bei einem Fehler im Ant-Script wird sowohl errorlevel 0 als auch errorlevel 1 gesetzt
-if errorlevel 0 (
-	echo.errorlevel 0
-) else (
-	echo.errorlevel ist nicht 0
-)	
-REM Beobachtung... Errorlevel 1 wird bei einem Fehler im ant-Script gesetzt.
-if errorlevel 1 (
-	echo.errorlevel 1
-) else (
-	echo.errorlevel ist nicht 1
-)
-	
-REM Dokumentiere jeden Lauf, ausser im Testfall. Kopiere dazu das Log in eine Datei mit dem aktuellen Timestamp.
-:: Diese Umgebungsvariable wird im Ant-Script gesetzt. Dieser Wert wird in der project_RECHNERNAME_vmd.properties Datei gesetzt
-:: und im Ant-Script ausgelesen.
-echo.ausgabe %VMD_OPERATION_MODE%
-IF NOT "%VMD_OPERATION_MODE%"=="test" (
-	COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\1fgl\repository\Projekt_VMD\log\log%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
-	COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\1fgl\repository\Projekt_VMD\log\error%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
-) ELSE (
-	echo.Testmodus. Protokolliere den Lauf nicht.
-)
 
 REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
+REM So würden lokale Variablen global gemacht, theoretisch, nutze ich noch nicht.
+REM ENDLOCAL & set returnStringTrim=%myTest%
+REM ENDLOCAL & set returnStringTrim=!myTest!
+REM ENDLOCAL & set "returnStringTrim=!myStrReduced!"
 ENDLOCAL
 ENDLOCAL
-
-REM timeout /T 20 /nobreak
-REM nicht im Debuggen, sonst wieder einkommentieren, damit sich das Fenster schliesst: exit
-echo Ende Copy Repository to Local HOST
-pause
 
 REM Ohne diesen Labelaufruf werden die Unterlabels erneut aufgerufen...
-goto:eof
+GOTO:EOF
 
 REM ##################    UNTERFUNKTIONEN #################################################
 :StringLength
@@ -172,16 +46,14 @@ REM  returns the length of a string
 (   
     SETLOCAL
 	REM echo.in StringLength r="%1"
-	REM echo.in StringLength s="%2"	
+	::echo.in StringLength s="%2"	
 	REM warum geht das nicht set "s=!%~2!#"	
-	set "s=%2#"	
-	REM echo.in StringLength02 s="!s!"
+	set "s=%2#"
 	
 	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
 	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
 	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
 	set s=!s:##FGLBLANK##= !
-	REM echo.in StringLength03 s nach Ersetzung="!s!"
 	
     set "returnStringLength=0"
     for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
@@ -206,16 +78,13 @@ REM  returns the length of a string (Reihenfolge der Argumente vertauscht gegenü
 (   
     SETLOCAL
 	REM echo.in StringLengthZZZ r="%2"
-	REM echo.in StringLengthZZZ s="%1"
 	
-	set "s=!%~1!#"	
-	REM echo.in StringLength02 s="!s!"
+	set "s=!%~1!#"
 	
 	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
 	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
 	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
 	set s=!s:##FGLBLANK##= !
-	REM echo.in StringLength03 s nach Ersetzung="!s!"
 	
     set "returnStringLengthZZZ=0"
     for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
@@ -246,7 +115,6 @@ GOTO:EOF
    
    REM "Wird ein String mit Leerzeichen übergeben, so werden die Leerzeichen implizit als Trenner der Übergabeparameter interpretiert".
    REM Daher sollte ein String vorher "encoded" werden.
-   REM echo.Start von StringLeftInclude mit String und Delimiter: "%1" und "%2"
    set "myString=%1"
    REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
    REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
@@ -255,7 +123,6 @@ GOTO:EOF
    REM echo.myString in StringLeftInclude="!myString!"
 	
    set "myFind=%2"
-   REM echo.1. myFind in StringLeftInclude="!myFind!"
    
    REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
    REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
@@ -267,44 +134,42 @@ GOTO:EOF
 	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
 	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
 	set myFind=!myFind:##FGLBLANK##= !
-	REM echo.2a. myFind in StringLeftInclude="!myFind!"
     
    
    REM original set "myFind=*%2"
-   set "myFind=*!myFind!"
-   REM echo.3. myFind in StringLeftInclude="!myFind!"
+    set "myFind=*!myFind!"
 	
    call set sTempDelete=%%myString:!myFind!=%%
-   REM echo 3b. sTempDelete="!sTempDelete!"
    if "!sTempDelete!"=="!myString!" (
 	    set "returnStringLeftInclude=!myString!"
 	) else (
 		call set myStrReduced=%%myString:!sTempDelete!=%%
-		REM echo Reduzierter String="!myStrReduced!"
-		set "returnStringLeftInclude=!myStrReduced!"		
+		echo Reduzierter String="!myStrReduced!"
+		set "returnStringLeftInclude=!myStrReduced!"
 	)	
    REM set "myFind=*!myFind!"
-   REM echo.4. myFind in StringLeftInclude="!myFind!"
    
    call set sTempDelete=%%myString:!myFind!=%%
-   REM echo sTempDelete="!sTempDelete!"
    if "!sTempDelete!"=="!myString!" (
 		set myStrReduced=!myString: =##FGLBLANK##!
 	) else (
 		call set myStrReduced=%%myString:!sTempDelete!=%%
-		REM echo Reduzierter String="!myStrReduced!"
 		set myStrReduced=!myStrReduced: =##FGLBLANK##!
 	)
 	set "returnStringLeftInclude=!myStrReduced!"
 )
    ( 
   ENDLOCAL & REM RETURN VALUES
-  ::echo.%returnStringLeftInclude%
   set "%~3=%returnStringLeftInclude%"
   exit /b
   )
 GOTO:EOF
-   
+
+REM Beispiel für "Zeichen von rechts abschneiden"
+REM set str=politic
+REM echo.%str%
+REM set str=%str:~-4%
+REM echo.%str%
 :StringRight
 (
 	SETLOCAL
@@ -315,7 +180,6 @@ GOTO:EOF
 		
 	REM Die ##FGLBLANK## Zeichen wieder gegen Leerzeichen eintauschen
 	set myStr=!myStr:##FGLBLANK##= !
-	REM echo.myStr in StringTrimRight="!myStr!"
 	
 	Set /a myNumberNegative=-1*!myNumber!
 	call set "myStrReducedTemp=%%myStr:~!myNumberNegative!%%"
@@ -325,24 +189,21 @@ GOTO:EOF
 	GOTO :StringRightEnd
 )
 (
-:StringRightEnd
-	( 
+:StringRightEnd	
+	(
     ENDLOCAL & REM RETURN VALUES
-	::echo.%returnStringTrimRight%
 	set "%~3=%returnStringRight%"
 	exit /b
 	)
 )
 GOTO:EOF
 
-   
 :StringTrimRight
 (   
     SETLOCAL
 	REM echo.Start von StringTrimRight mit: "%1"
 	set "myStr=%1"
 	set "returnStringTrimRight=%2"
-	REM echo.myStr in StringTrimRight=!myStr!
 	
 	REM Der Rückgabewert, falls kein Leerstring am Ende wegzutrimmen ist
 	set "myStrReduced=!myStr!"
@@ -350,23 +211,19 @@ GOTO:EOF
 	
 	REM Hole die Länge des zu trimmenden Strings VOR DER ERSETZUNG
 	set  returnStringLength=-1
-	call :StringLength returnStringLength !myStr! 
-	REM echo.Länge '!returnStringLength!'
+	call :StringLength returnStringLength !myStr!
 	set "myStrLength=!returnStringLength!"
 	
 	REM Leerzeichen in einem String werden als Argumenttrenner für diesen Funktionsaufruf angesehen.
 	REM Darum müssen die Leerzeichen vorher durch einen String ersetzt werden und an dieser Stelle erfolgt die Rückübersetzung.
 	REM Greift nicht auf die lokale Variable zu set myStr=%myStr:##FGLBLANK##= %
 	set myStr=!myStr:##FGLBLANK##= !
-	REM echo.myStr nach Ersetzung in StringTrimRight="!myStr!"
-		
 	set /a myStrLengthNegative=-1*!myStrLength!	
-	REM echo.myStringLengthNegative="!myStrLengthNegative!"
-	for /l %%x in (1,1,!myStrLength!) do (		
+	for /l %%x in (1,1,!myStrLength!) do (
         REM echo.letzte Buchstaben bei %%x : !myStr:~-%%x,1!		
 		
 		REM "Länge des Strings +1" Minus Zählvariable. Die Zählvariable startet bei 1!
-		set /a itemp=!myStrLength!-%%x				
+		set /a itemp=!myStrLength!-%%x
 		REM echo.itemp=!itemp!
 		
 		REM Beachte hier die verzoegerte Berechnung zur Laufzeit durch Ausrufezeichen ....   
@@ -383,7 +240,6 @@ GOTO:EOF
 			REM echo.reduzierter String Temp = "!myStrReducedTemp!"
 			
 			set "returnStringTrimRight=!myStrReduced!"
-			REM echo.in StringTrimRight Ergebnis= "!returnStringTrimRight!"	
 			GOTO :StringTrimRightEnd
 			)
 	)		
@@ -392,10 +248,10 @@ GOTO:EOF
 :StringTrimRightEnd	
 	( 
     ENDLOCAL & REM RETURN VALUES
-	::echo.%returnStringTrimRight%
 	set "%~2=%returnStringTrimRight%"
 	exit /b
 	)
+)
 
 :DateTimestampCurrentZZZ
 (
@@ -488,5 +344,7 @@ GOTO:EOF
 	set "%~1=%returnDateTimestampCurrentZZZ%"
 	exit /b
 )
+
 GOTO:EOF
-GOTO:EOF
+
+	
