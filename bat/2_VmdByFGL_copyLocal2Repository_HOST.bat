@@ -14,74 +14,9 @@ echo uebergebener Parameter 2: %2
 echo alle Parameter: %*
 
 REM Ermittle auf Batch Ebene das verwendete Betriebssystem, um es als Parameter über eine Umgebungsvariable an das ANT Script zu uebergeben.
-FOR /F "tokens=2 delims=[]" %%a IN ('VER') DO FOR /F "tokens=2" %%b IN ("%%a") DO SET VersionNumber=%%b
-
-FOR /F "tokens=1 delims=." %%a IN ("%VersionNumber%") DO SET VersionMajor=%%a
-FOR /F "tokens=2 delims=." %%a IN ("%VersionNumber%") DO SET VersionMinor=%%a
-FOR /F "tokens=3 delims=." %%a IN ("%VersionNumber%") DO SET VersionBuild=%%a
-
-IF %VersionMajor%==6 (
-		 IF %VersionMinor%==4 (
-		 		 SET VersionName=Windows 10
-				 SET VMD_OS=Win10
-		 ) ELSE (
-		 IF %VersionMinor%==3 (
-		 		 SET VersionName=Windows 8.1
-				 SET VMD_OS=Win81
-		 ) ELSE (
-		 IF %VersionMinor%==2 (
-		 		 SET VersionName=Windows 8
-				 SET VMD_OS=Win8
-		 ) ELSE (
-		 IF %VersionMinor%==1 (
-		 		 SET VersionName=Windows 7
-				 SET VMD_OS=Win7
-		 ) ELSE (
-		 IF %VersionMinor%==0 (
-		 		 SET VersionName=Windows Vista
-				 SET VMD_OS=WinVi
-		 )))))
-) ELSE (
-IF %VersionMajor%==5 (
-		 IF %VersionMinor%==2 (
-		 		 SET VersionName=Windows Server 2003
-				 SET VMD_OS=W2003
-		 ) ELSE (
-		 IF %VersionMinor%==1 (
-		 		 SET VersionName=Windows XP
-				 SET VMD_OS=WinXP
-		 ) ELSE (
-		 IF %VersionMinor%==0 (
-		 		 SET VersionName=Windows 2000
-				 SET VMD_OS=Win2k
-		 )))
-) ELSE (
-IF %VersionMajor%==4 ( ECHO 4
-		 IF %VersionMinor%==90 (
-		 		 SET VersionName=Windows ME
-				 SET VMD_OS=WinME
-		 ) ELSE (
-		 IF %VersionMinor%==10 (
-		 		 SET VersionName=Windows 98
-				 SET VMD_OS=W98
-		 ) ELSE (
-		 IF %VersionBuild%==1381 (
-		 		 SET VersionName=Windows NT 4.0
-				 SET VMD_OS=WinNT
-		 ) ELSE (
-		 IF %VersionMinor%==00 (
-		 		 SET VersionName=Windows 95
-				 SET VMD_OS=W95
-		 ))))
-) ELSE (
-IF %VersionMajor%==3 (
-		 SET VersionName=Windows 3.1
-		 SET VMD_OS=Win31
-))))
-
-ECHO Versionsnummer: %VersionNumber%
-ECHO VersionMajor.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%VersionBuild%
-ECHO VersionName: %VersionName%
+SET "returnMachineLocalOs="
+call :MachineLocalOsZZZ returnMachineLocalOs
+set "VMD_OS=!returnMachineLocalOs!"
 ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
 
 REM #################################################################################
@@ -479,7 +414,7 @@ GOTO:EOF
 	
 	REM  ###################################################################
 	set "returnDateTimestampCurrentZZZ=!myDateTimestamp!"
-	echo.in DateTimestampCurrent Ergebnis= "!returnDateTimestampCurrentZZZ!"
+	REM echo.in DateTimestampCurrent Ergebnis= "!returnDateTimestampCurrentZZZ!"
 	GOTO :DateTimestampCurrentZZZEnd
 )
 :DateTimestampCurrentZZZEnd
@@ -488,5 +423,107 @@ GOTO:EOF
 	set "%~1=%returnDateTimestampCurrentZZZ%"
 	exit /b
 )
-GOTO:EOF
+
+
+:MachineLocalOsZZZ
+REM  returns the the Name of the used OS. The name is shortened to be used in a filename.
+::              -- returnMachineLocalOsZZZ    [in / out] - variable to be used to return the Name of the used OS. 
+
+SETLOCAL	
+set "returnMachineLocalOs=%1"
+	
+REM ##########################################################################
+	
+REM Ermittle auf Batch Ebene das verwendete Betriebssystem, um es als Parameter über eine Umgebungsvariable an das ANT Script zu uebergeben.
+FOR /F "tokens=2 delims=[]" %%a IN ('VER') DO FOR /F "tokens=2" %%b IN ("%%a") DO SET VersionNumber=%%b
+
+FOR /F "tokens=1 delims=." %%a IN ("%VersionNumber%") DO SET VersionMajor=%%a
+FOR /F "tokens=2 delims=." %%a IN ("%VersionNumber%") DO SET VersionMinor=%%a
+FOR /F "tokens=3 delims=." %%a IN ("%VersionNumber%") DO SET VersionBuild=%%a
+
+IF %VersionMajor%==6 (
+	REM echo.6
+	IF %VersionMinor%==4 (
+		 SET VersionName=Windows 10
+		 SET returnMachineLocalOs=Win10
+	) ELSE (
+		IF %VersionMinor%==3 (
+			SET VersionName=Windows 8.1
+			SET returnMachineLocalOs=Win81
+		) ELSE (
+			IF %VersionMinor%==2 (
+				SET VersionName=Windows 8
+				SET returnMachineLocalOs=Win8
+			) ELSE (
+				IF %VersionMinor%==1 (
+					SET VersionName=Windows 7
+					SET returnMachineLocalOs=Win7
+				) ELSE (
+					IF %VersionMinor%==0 (
+						SET VersionName=Windows Vista
+						SET returnMachineLocalOs=WinVi
+					)
+				)
+			)
+		)
+	)
+) ELSE (
+	IF %VersionMajor%==5 (
+		IF %VersionMinor%==2 (
+			SET VersionName=Windows Server 2003
+			SET returnMachineLocalOs=W2003
+		) ELSE (
+			IF %VersionMinor%==1 (
+				SET VersionName=Windows XP
+				SET returnMachineLocalOs=WinXP
+			) ELSE (
+				IF %VersionMinor%==0 (
+					SET VersionName=Windows 2000
+					SET returnMachineLocalOs=Win2k
+				)
+			)
+		)
+	) ELSE (
+		IF %VersionMajor%==4 ( 				
+			IF %VersionMinor%==90 (
+				SET VersionName=Windows ME
+				SET returnMachineLocalOs=WinME
+			 ) ELSE (
+				IF %VersionMinor%==10 (
+					SET VersionName=Windows 98
+					SET returnMachineLocalOs=W98
+				) ELSE (
+					IF %VersionBuild%==1381 (
+						SET VersionName=Windows NT 4.0
+						SET returnMachineLocalOs=WinNT
+					 ) ELSE (
+						IF %VersionMinor%==00 (
+							SET VersionName=Windows 95
+							SET returnMachineLocalOs=W95
+						 )
+					)
+				)
+			)
+		) ELSE (
+			IF %VersionMajor%==3 (
+				SET VersionName=Windows 3.1
+				SET returnMachineLocalOs=Win31
+			)
+		)
+	)
+)
+
+REM ECHO Versionsnummer: %VersionNumber%
+::ECHO VersionMajor.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%VersionBuild%
+::ECHO VersionName: %VersionName%
+::ECHO VMD_OS Kuerzel (errechnet): %returnMachineLocalOs%
+
+GOTO :MachineLocalOsZZZEnd
+:MachineLocalOsZZZEnd
+(
+  ENDLOCAL & REM RETURN VALUES
+  ::echo.%returnMachineLocalOs%
+  set "%~1=%returnMachineLocalOs%"
+  exit /b
+)
 GOTO:EOF
