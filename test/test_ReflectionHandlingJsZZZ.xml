@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>  
+<project name="test_ReflectionHandlingJsZZZ"   default="compile" basedir=".."
+	xmlns:fl="antlib:it.haefelinger.flaka" 
+	xmlns:ac="antlib://net/sf/antcontrib"><!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
+
+	<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
+	<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" /> -->
+ 
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+<!-- ######## Scriptdefs ############################################################################--> 
+<!-- ############################################################-->
+	 <scriptdef name="tryout_reflectMethodCurrentNameJs" language="javascript">		 
+		 <attribute name="returnstring" />
+		 <attribute name="returncontrol" />
+		 <attribute name="returncontrolstring" />
+		<!-- Hiermit testet man das Reflection Handling.
+             Es wird ein Error Objekt erzeugt und daraus der Name der aktuellen Methode geholt.
+			 Dies ist z.B. wichtig um genauere Log-Ausgaben zu erzeugen und den Code generisch zu halten -->
+				
+		<![CDATA[
+			tryout_reflectMethodCurrentName();
+			function tryout_reflectMethodCurrentName(){
+				var sReturn="Kein Methodenname errechnet.";
+			
+				sReturn = reflectMethodCurrentName(new Error())
+				
+				project.setProperty(attributes.get("returnstring"), sReturn);
+				project.setProperty(attributes.get("returncontrol"), true);
+				project.setProperty(attributes.get("returncontrolstring"), "Alles o.k.");				
+			}
+			
+			function reflectMethodCurrentName(myError){
+				var sReturn="Kein Stacktrace vorhanden.";
+				if('undefined'!=myError && null!=myError){					
+					if(undefined!=myError.stack){		
+						//Java 8, NASHORN funktioniert.
+						//print(myError.stack);
+						var caller_line = myError.stack.split("\n")[1];
+						
+						//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
+						//var index = caller_line.indexOf("at ").trim();
+						//var clean = caller_line.slice(index+2, caller_line.length);
+						//print("TESTE caller_line" + clean );
+						
+						sReturn = caller_line;
+					} else {
+						sReturn="reflectMethodCurrentName: Kein Stack im Error Objekt vorhanden."
+					}												
+					return(sReturn);
+				}else{
+					return("reflectMethodCurrentName: Kein Error Objekt uebergeben.");
+				}
+			}//End function reflectMethodCurrentName				
+			
+		]]>
+	</scriptdef>
+
+	   
+       
+     
+<!-- ################################################################################# -->
+	<!-- Die einzelnen Tests im depends hinzufügen -->
+  <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
+             Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
+ <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
+ <!-- TODO Test für stringUnencodeJsZZZ und stringEncodeJsZZZ -->
+ <target name="compile" depends="-myTestReflectMethodCurentNameJs">
+    <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
+	<!-- WIRD NICHT BENÖTIGT -->
+	
+    <!-- Compile the java code from ${src} into ${build} -->
+	<!-- example how to create a directory -->
+    <!-- <mkdir dir="${build}"/>
+	-->
+    
+	<!-- Example how to use a java compile task to compile files from a source file directory (containing .java files) to a build file directory (containig .class files) -->
+	<!-- <javac debug="yes" srcdir="${src}" destdir="${build}">
+    	<classpath refid="project.classpath"/>
+    </javac>
+	-->
+  </target>
+  
+  <target name="-myTestReflectMethodCurentNameJs">
+		<echo>myTestReflectMethodCurentNameJs: </echo>
+		
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<tryout_reflectMethodCurrentNameJs returnstring="myReturnString" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" />
+		<echo message="Ermittelter Methodenname = ${myReturnString}" />
+		<echo message="############################" />
+				
+	</target> 
+ </project>

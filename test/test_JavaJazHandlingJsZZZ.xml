@@ -199,9 +199,23 @@
 			//}				
 				
 			}catch(err) {
+				print("Fehler gefangen.");
+				
 				bErg = false; //sicher ist sicher....
 				myReturnControl = false;
-				myReturnControlString = handleError(err);
+				var myErrorString = handleError(err);
+				print("geholter Fehlerstring: " + myErrorString);
+				
+				//Funktioniert unter Java 8. Funktioniert es auch unter Java 7?
+				//var myErr = new Error();
+				//var myStackString = myErr.stack;
+				//print("künstlicher STACK: " + myStackString);
+								
+				//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+				var myFunctionCurrentName=reflectMethodCurrentName(new Error());
+				print("gefundener Funktionsname: " + myFunctionCurrentName);
+				
+				myReturnControlString=myFunctionCurrentName + " " + myErrorString;				
 			}
 			
 			// create and use a Task via Ant API
@@ -268,6 +282,7 @@
 				
 				var caller_line="Kein Stacktrace vorhanden.";
 				if(undefined!=err.stack){
+				    //RUECKGABE MOEGLICH BEI RHINO
 					//print("Fehlerobjekt Stacktrace: " + err.stack);
 					caller_line = err.stack.split("\n")[0];
 					//print("caller line=" + caller_line);
@@ -276,7 +291,15 @@
 					//var index = caller_line.indexOf("at ");
 					//var clean = caller_line.slice(index+2, caller_line.length);
 					//print("TESTE caller_line" + clean );
-			    }	
+			    }else{
+					//Bei NASHORN WIRD NIX ZURUECKGELIEFERT
+					//probiere hier: NashornException.getScriptStackString(e.getCause());
+					print("kein stack vorhanden für " + typeof(err));
+					
+				}				
+				
+				
+				
 			
 				
 			
@@ -288,7 +311,23 @@
 						print("################################");
 						print("ExceptionZZZ Fehler abgefangen (NASHORN)");
 						print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
-						myReturnControlString = "Error: " + err.getMessageLast();
+						
+						var caller_line="Kein Stacktrace vorhanden.";
+						if(undefined!=err.stack){		
+							//print("err.stack="+err.stack);
+						
+							caller_line = err.stack.split("\n")[0];
+							
+							//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
+							//var index = caller_line.indexOf("at ").trim();
+							//var clean = caller_line.slice(index+2, caller_line.length);
+							//print("TESTE caller_line" + clean );
+						} else {
+							print("Definitiv kein Stack vorhanden");
+						}
+						
+						
+						myReturnControlString = "Error: '" + err.getMessageLast()  + "' " + caller_line;;
 					}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
 						print("################################");
 						print("ExceptionZZZ Fehler abgefangen (RHINO)");
@@ -304,6 +343,8 @@
 							//var index = caller_line.indexOf("at ").trim();
 							//var clean = caller_line.slice(index+2, caller_line.length);
 							//print("TESTE caller_line" + clean );
+						} else {
+							print("Definitiv kein Stack vorhanden");
 						}							
 						myReturnControlString = "Error: '" + err.javaException.getMessageLast() + "' " + caller_line;
 					}else{
@@ -341,6 +382,30 @@
 					}					
 					return myReturnControlString;
 			}//End function handleError
+			
+			
+			function reflectMethodCurrentName(myError){
+				var sReturn="Kein Stacktrace vorhanden.";
+				if('undefined'!=myError && null!=myError){					
+					if(undefined!=myError.stack){		
+						//Java 8, NASHORN funktioniert.
+						//print(myError.stack);
+						var caller_line = myError.stack.split("\n")[1];
+						
+						//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
+						//var index = caller_line.indexOf("at ").trim();
+						//var clean = caller_line.slice(index+2, caller_line.length);
+						//print("TESTE caller_line" + clean );
+						
+						sReturn = caller_line;
+					} else {
+						sReturn="reflectMethodCurrentName: Kein Stack im Error Objekt vorhanden."
+					}												
+					return(sReturn);
+				}else{
+					return("reflectMethodCurrentName: Kein Error Objekt uebergeben.");
+				}
+			}//End function reflectMethodCurrentName				
 	      ]]>
   </scriptdef>
   
