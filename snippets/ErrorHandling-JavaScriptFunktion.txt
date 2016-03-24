@@ -1,9 +1,10 @@
 <!-- Code Snippet für die ANT - Scripte: Fehler aus JavaScript-Funktion entgegennehmen -->
 
-
-returncontrol="myReturnControl" returnControlString="myReturnControlString" 
-
-
+<!-- Aufruf der ScriptDef-Funktion mit den zusätzlichen Parametern: returncontrol und returncontrolstring -->
+returncontrol="myReturnControl" returncontrolstring="myReturnControlString" 
+<fl:let>sScript::='-DER ANT SCRIPT NAME IMMER MIT DOPPELPUNKT ENDEND:'</fl:let>
+<ac:var name="myReturnControl" value="false" unset="true"/>
+<ac:var name="myReturnControlString" value="Fehler" unset="true"/>	
 
 
 <echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString} " />
@@ -14,3 +15,11 @@ returncontrol="myReturnControl" returnControlString="myReturnControlString"
 					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
 				</ac:then>		
 			</ac:if>
+			
+			
+			
+//wichtig in der JavaScript Funktion dann die Steuerungsvariablen übernehmen und nicht etwas neu setzen. Wg. Call by Reference.
+//var bReturnControl=true;
+//var sReturnControl="Alles o.k.";
+	var bReturnControl=project.getProperty(attributes.get("returncontrol"));
+	var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));

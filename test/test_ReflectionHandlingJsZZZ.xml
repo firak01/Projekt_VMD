@@ -26,41 +26,101 @@
              Es wird ein Error Objekt erzeugt und daraus der Name der aktuellen Methode geholt.
 			 Dies ist z.B. wichtig um genauere Log-Ausgaben zu erzeugen und den Code generisch zu halten -->
 				
-		<![CDATA[
+		<![CDATA[		
 			tryout_reflectMethodCurrentName();
 			function tryout_reflectMethodCurrentName(){
-				var sReturn="Kein Methodenname errechnet.";
-			
-				sReturn = reflectMethodCurrentName(new Error())
+				var sReturn="";
 				
-				project.setProperty(attributes.get("returnstring"), sReturn);
-				project.setProperty(attributes.get("returncontrol"), true);
-				project.setProperty(attributes.get("returncontrolstring"), "Alles o.k.");				
+				//var bReturnControl=true;
+				//var sReturnControl="Alles o.k.";
+				var bReturnControl=project.getProperty(attributes.get("returncontrol"));
+				var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
+				try{
+					var objError = new Error();
+					sReturn = reflectMethodCurrent_Name(objError, bReturnControl, sReturnControl);
+					if(!bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + sReturnControl);				
+				}catch(err){	
+					print(err);
+					try{
+						sReturnControl=err;				
+						bReturnControl=false;
+					}catch(e){
+						print(e);
+						sReturnControl="Error im Errorhandling";				
+						bReturnControl=false;
+					}
+				}
+				project.setProperty(attributes.get("returnstring"),sReturn);
+				project.setProperty(attributes.get("returncontrol"),bReturnControl);
+				project.setProperty(attributes.get("returncontrolstring"),sReturnControl);				
 			}
 			
-			function reflectMethodCurrentName(myError){
-				var sReturn="Kein Stacktrace vorhanden.";
-				if('undefined'!=myError && null!=myError){					
-					if(undefined!=myError.stack){		
-						//Java 8, NASHORN funktioniert.
-						//print(myError.stack);
-						var caller_line = myError.stack.split("\n")[1];
+			function reflectMethodCurrent_Name(myError, bReturnControl, sReturnControl){
+				var sScript="reflectMethodCurrentName:";
+				var sReturn="";				
+				try{					
+					if('undefined'!=myError && null!=myError){					
+						var sLine=reflectMethodCurrent_StackLine(myError, bReturnControl, sReturnControl);
+						if(!bReturnControl)	throw new Error(sReturnControl);
 						
-						//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
-						//var index = caller_line.indexOf("at ").trim();
-						//var clean = caller_line.slice(index+2, caller_line.length);
-						//print("TESTE caller_line" + clean );
+						var sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, bReturnControl, sReturnControl);
+						if(!bReturnControl)	throw new Error(sReturnControl);
 						
-						sReturn = caller_line;
-					} else {
-						sReturn="reflectMethodCurrentName: Kein Stack im Error Objekt vorhanden."
-					}												
-					return(sReturn);
-				}else{
-					return("reflectMethodCurrentName: Kein Error Objekt uebergeben.");
+						bReturnControl=true;
+						sReturnControl=sScript+"Alles o.k.";
+						sReturn=sMethod;
+					}else{
+						sReturnControl=sScript+"Kein Error Objekt uebergeben.";
+						bReturnControl=false;
+					}	
+				}catch(err){
+					print(err);
+					sReturnControl = sScript+"Kein Methodenname berechenbar." + err;
+					bReturnControl = false;
 				}
+				return sReturn;
 			}//End function reflectMethodCurrentName				
 			
+			function reflectMethodCurrent_StackLine(myError, bReturnControl, sReturnControl){
+					var sScript="reflectMethodCurrent_StackLine:";
+					var sReturn="";
+					var sReturnControl="Kein Stacktrace vorhanden.";
+					var bReturnControl=false;
+					try{
+						if('undefined'!=myError && null!=myError){					
+							if(undefined!=myError.stack){		
+							//Java 8, NASHORN funktioniert.
+							//print(myError.stack);
+							var caller_line = myError.stack.split("\n")[1];
+							
+							//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
+							//var index = caller_line.indexOf("at ").trim();
+							//var clean = caller_line.slice(index+2, caller_line.length);
+							//print("TESTE caller_line" + clean );
+							
+							sReturn = caller_line;
+						} else {
+							sReturnControl="reflectMethodCurrentStackLine: Kein Stack im Error Objekt vorhanden."
+							bReturnControl=false;
+						}				
+						}else{
+							sReturnControl="reflectMethodCurrentStackLine: Kein Error Objekt uebergeben.";
+							bReturnControl=false;
+						}
+						bReturnControl=true
+						sReturnControl=sScript+"Alles o.k."
+					
+					}catch(err){
+						print(err);
+						sReturnControl = sScript+"Kein Methodenname berechenbar." + err;
+						bReturnControl = false;
+					}
+					return sReturn;
+				}//End function reflectMethodCurrent_StackLine
+				
+				//function reflectMethodCurrent_StackMethodFromLine(myError, bReturnControl, sReturnControl){
+				
+				//}//End function reflectMethodCurrent_StackMethodFromLine
 		]]>
 	</scriptdef>
 
@@ -90,10 +150,21 @@
   </target>
   
   <target name="-myTestReflectMethodCurentNameJs">
-		<echo>myTestReflectMethodCurentNameJs: </echo>
+		<fl:let>sScript::='-myTestReflectMethodCurentNameJs: '</fl:let>
+		<echo>${sScript}Start</echo>
+		<ac:var name="myReturnControl" value="false" unset="true"/>
+		<ac:var name="myReturnControlString" value="Fehler" unset="true"/>	
 		
-		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<!-- Hier wird die scriptdef Methode aufgerufen -->		
 		<tryout_reflectMethodCurrentNameJs returnstring="myReturnString" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" />
+		<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString} " />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<echo message="Ermittelter Methodenname = ${myReturnString}" />
 		<echo message="############################" />
 				
