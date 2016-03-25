@@ -27,61 +27,67 @@
 			 Dies ist z.B. wichtig um genauere Log-Ausgaben zu erzeugen und den Code generisch zu halten -->
 				
 		<![CDATA[		
-			tryout_reflectMethodCurrentName();
-			function tryout_reflectMethodCurrentName(){
-				var sReturn="";
-				
-				//var bReturnControl=true;
-				//var sReturnControl="Alles o.k.";
-				var bReturnControl=project.getProperty(attributes.get("returncontrol"));
-				var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
+		    var bReturnControl=project.getProperty(attributes.get("returncontrol"));
+			var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
+			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var objControl=new Object();
+			objControl.sReturnControl=sReturnControl;
+			objControl.bReturnControl=bReturnControl;
+			var sReturn=tryout_reflectMethodCurrentName(objControl);			
+			project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);
+			
+			
+			function tryout_reflectMethodCurrentName(objControl){
+				print("Start (jetzt ohne sScript zu definieren. Dies soll ja errechnet werden.");
+				var sReturn="";				
 				try{
 					var objError = new Error();
-					sReturn = reflectMethodCurrent_Name(objError, bReturnControl, sReturnControl);
-					if(!bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + sReturnControl);				
+					sReturn = reflectMethodCurrent_Name(objError, objControl);					
+					if(!objControl.bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + objControl.sReturnControl);
 				}catch(err){	
 					print(err);
 					try{
-						sReturnControl=err;				
-						bReturnControl=false;
-					}catch(e){
+						objControl.sReturnControl=err;				
+						objControl.bReturnControl=false;
+					} catch(e){
 						print(e);
-						sReturnControl="Error im Errorhandling";				
-						bReturnControl=false;
+						objControl.sReturnControl="Error im Errorhandling";				
+						objControl.bReturnControl=false;
 					}
 				}
-				project.setProperty(attributes.get("returnstring"),sReturn);
-				project.setProperty(attributes.get("returncontrol"),bReturnControl);
-				project.setProperty(attributes.get("returncontrolstring"),sReturnControl);				
+				return sReturn;
 			}
 			
-			function reflectMethodCurrent_Name(myError, bReturnControl, sReturnControl){
-				var sScript="reflectMethodCurrentName:";
+			function reflectMethodCurrent_Name(myError, objControl){
+				var sScript="reflectMethodCurrentName:";				
 				var sReturn="";				
 				try{					
 					if('undefined'!=myError && null!=myError){					
-						var sLine=reflectMethodCurrent_StackLine(myError, bReturnControl, sReturnControl);
-						if(!bReturnControl)	throw new Error(sReturnControl);
+						var sLine=reflectMethodCurrent_StackLine(myError, objControl);
+						if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
+
+						var sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, objControl);
+						if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
 						
-						var sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, bReturnControl, sReturnControl);
-						if(!bReturnControl)	throw new Error(sReturnControl);
-						
-						bReturnControl=true;
-						sReturnControl=sScript+"Alles o.k.";
+						objControl.bReturnControl=true;
+						objControl.sReturnControl=sScript+"Alles o.k.";
 						sReturn=sMethod;
 					}else{
-						sReturnControl=sScript+"Kein Error Objekt uebergeben.";
-						bReturnControl=false;
+						objControl.sReturnControl=sScript+"Kein Error Objekt uebergeben.";
+						objControl.bReturnControl=false;
 					}	
 				}catch(err){
-					print(err);
-					sReturnControl = sScript+"Kein Methodenname berechenbar." + err;
-					bReturnControl = false;
+					print(err);					
+					objControl.sReturnControl=sScript+"Kein Methodenname berechenbar. "+ err;					
+					objControl.bReturnControl=false;					
 				}
 				return sReturn;
 			}//End function reflectMethodCurrentName				
 			
-			function reflectMethodCurrent_StackLine(myError, bReturnControl, sReturnControl){
+
+function reflectMethodCurrent_StackLine(myError, objControl){
 					var sScript="reflectMethodCurrent_StackLine:";
 					var sReturn="";
 					var sReturnControl="Kein Stacktrace vorhanden.";
@@ -100,14 +106,14 @@
 							
 							sReturn = caller_line;
 						} else {
-							sReturnControl="reflectMethodCurrentStackLine: Kein Stack im Error Objekt vorhanden."
+							sReturnControl="reflectMethodCurrent_StackLine: Kein Stack im Error Objekt vorhanden.";
 							bReturnControl=false;
 						}				
 						}else{
-							sReturnControl="reflectMethodCurrentStackLine: Kein Error Objekt uebergeben.";
+							sReturnControl="reflectMethodCurrent_StackLine: Kein Error Objekt uebergeben.";
 							bReturnControl=false;
 						}
-						bReturnControl=true
+						bReturnControl=true;
 						sReturnControl=sScript+"Alles o.k."
 					
 					}catch(err){
@@ -115,12 +121,16 @@
 						sReturnControl = sScript+"Kein Methodenname berechenbar." + err;
 						bReturnControl = false;
 					}
+					objControl.sReturnControl=sReturnControl;					
+					objControl.bReturnControl=bReturnControl;
 					return sReturn;
 				}//End function reflectMethodCurrent_StackLine
 				
-				//function reflectMethodCurrent_StackMethodFromLine(myError, bReturnControl, sReturnControl){
 				
-				//}//End function reflectMethodCurrent_StackMethodFromLine
+				function reflectMethodCurrent_StackMethodFromLine(myError, bReturnControl, sReturnControl){
+				
+				}//End function reflectMethodCurrent_StackMethodFromLine
+			
 		]]>
 	</scriptdef>
 
@@ -152,8 +162,11 @@
   <target name="-myTestReflectMethodCurentNameJs">
 		<fl:let>sScript::='-myTestReflectMethodCurentNameJs: '</fl:let>
 		<echo>${sScript}Start</echo>
-		<ac:var name="myReturnControl" value="false" unset="true"/>
-		<ac:var name="myReturnControlString" value="Fehler" unset="true"/>	
+		<!--<ac:var name="myReturnControl" value="false" unset="true"/>-->
+		<!--<ac:var name="myReturnControlString" value="Fehler" unset="true"/>-->
+		<fl:let>myReturnControl::=false</fl:let>
+		<fl:let>myReturnControlString::="Fehler"</fl:let>
+		<echo message="1. myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString} " />
 		
 		<!-- Hier wird die scriptdef Methode aufgerufen -->		
 		<tryout_reflectMethodCurrentNameJs returnstring="myReturnString" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" />
