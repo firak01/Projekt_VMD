@@ -29,6 +29,8 @@
 		<![CDATA[		
 		    var bReturnControl=project.getProperty(attributes.get("returncontrol"));
 			var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
+			enableJava();
+			
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
 			var objControl=new Object();
 			objControl.sReturnControl=sReturnControl;
@@ -37,14 +39,31 @@
 			project.setProperty(attributes.get("returnstring"),sReturn);
 			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);
-			
-			
+						
 			function tryout_reflectMethodCurrentName(objControl){
 				print("Start (jetzt ohne sScript zu definieren. Dies soll ja errechnet werden.");
 				var sReturn="";				
 				try{
-					var objError = new Error();
-					sReturn = reflectMethodCurrent_Name(objError, objControl);					
+					//Das bekommt keinen Stacktrace Java 7. 
+					//var objError = new Error();	
+
+					//dito.. in Java7
+					//var objError = errorTraced();
+					//var caller_line = objError.stack.split("\n")[1];
+					
+					//dito.. in Java7
+					//var stack_trace=stackTrace();
+					//var caller_line = stack_trace.split("\n")[1];
+				
+					//Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
+					//var stack_trace=createStackTrace();
+					//var caller_line = stack_trace[0];
+					//print("yyyyyyyyyy" + caller_line);
+					
+					//Java7: Weil es kein Error objekt mit Stactrace gibt, kann man es sich sparen 
+					//sReturn = reflectMethodCurrent_Name(objError, objControl);					
+					
+					sReturn=reflectMethodCurrentV7_Name(objControl);					
 					if(!objControl.bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + objControl.sReturnControl);
 				}catch(err){	
 					print(err);
@@ -61,9 +80,11 @@
 			}
 			
 			function reflectMethodCurrent_Name(myError, objControl){
-				var sScript="reflectMethodCurrentName:";				
+				var sScript="reflectMethodCurrentName: ";				
 				var sReturn="";				
-				try{					
+				try{			
+					//TODO GOON: Hier eine Java-Versionsweiche einbauen.....
+				
 					if('undefined'!=myError && null!=myError){					
 						var sLine=reflectMethodCurrent_StackLine(myError, objControl);
 						if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
@@ -84,38 +105,106 @@
 					objControl.bReturnControl=false;					
 				}
 				return sReturn;
+			}//End function reflectMethodCurrentName		
+
+			function reflectMethodCurrentV8_Name(myError, objControl){
+			
+			}//End function reflectMethodCurrentV8_Name
+
+			function reflectMethodCurrentV7_Name(objControl){
+				var sScript="reflectMethodCurrentV7_Name: ";				
+				var sReturn="";				
+				try{					
+					//Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
+					var stack_trace=createStackTrace();
+					var caller_line = stack_trace[0];
+
+					var sMethod=reflectMethodCurrentV7_FunctionFromStackLine(caller_line, objControl);
+					if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
+						
+					objControl.bReturnControl=true;
+					objControl.sReturnControl=sScript+"Alles o.k.";
+					sReturn=sMethod;	
+				}catch(err){
+					print(err);					
+					objControl.sReturnControl=sScript+"Kein Methodenname berechenbar. "+ err;					
+					objControl.bReturnControl=false;					
+				}
+				return sReturn;
 			}//End function reflectMethodCurrentName				
 			
-
-function reflectMethodCurrent_StackLine(myError, objControl){
-					var sScript="reflectMethodCurrent_StackLine:";
+				
+				//#####################################################################
+				//### Den Funktionsnamen von einer Fehlerzeile bekommen
+				//#####################################################################
+				function reflectMethodCurrent_StackMethodFromLine(sStackLine, objControl){
+					var sScript="reflectMethodCurrent_StackMethodFromLine: ";
+					var sReturn = sStackLine;					
+					var sReturnControl="Alles o.k.";
+					var bReturnControl=true;
+					try {
+					
+					
+					}catch(err){
+						print(err);
+						sReturnControl = sScript+"Kein Methodenname berechenbar." + err;
+						bReturnControl = false;
+					}
+					objControl.sReturnControl=sReturnControl;					
+					objControl.bReturnControl=bReturnControl;
+					return sReturn;
+				}//End function reflectMethodCurrent_StackMethodFromLine
+				
+				function reflectMethodCurrentV7_FunctionFromStackLine(sStackLine, objControl){
+					var sScript="reflectMethodCurrentV7_FunctionFromStackLine: ";
+					var sReturn = sStackLine;					
+					var sReturnControl="Alles o.k.";
+					var bReturnControl=true;
+					try {
+					
+					
+					}catch(err){
+						print(err);
+						sReturnControl = sScript+"Kein Methodenname berechenbar." + err;
+						bReturnControl = false;
+					}
+					objControl.sReturnControl=sReturnControl;					
+					objControl.bReturnControl=bReturnControl;
+					return sReturn;
+				}//End function reflectMethodCurrentV7_FunctionFromStackLine
+				
+				
+				//##################################################################
+				//### Tryouts den Stacktrace vom Error objekt zu bekommen
+				//##################################################################
+				//Funktioniert in Java7 nicht, da kein Stacktrace im error-objekt vorhanden ist.
+				function reflectMethodCurrent_StackLine(myError, objControl){
+					var sScript="reflectMethodCurrent_StackLine: ";
 					var sReturn="";
-					var sReturnControl="Kein Stacktrace vorhanden.";
-					var bReturnControl=false;
+					var sReturnControl="Alles o.k.";
+					var bReturnControl=true;
+					print(sScript+" xxxxxxxxxxxxxxx "+myError);
 					try{
 						if('undefined'!=myError && null!=myError){					
 							if(undefined!=myError.stack){		
-							//Java 8, NASHORN funktioniert.
-							//print(myError.stack);
-							var caller_line = myError.stack.split("\n")[1];
-							
-							//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
-							//var index = caller_line.indexOf("at ").trim();
-							//var clean = caller_line.slice(index+2, caller_line.length);
-							//print("TESTE caller_line" + clean );
-							
-							sReturn = caller_line;
-						} else {
-							sReturnControl="reflectMethodCurrent_StackLine: Kein Stack im Error Objekt vorhanden.";
-							bReturnControl=false;
-						}				
+								//Java 8, NASHORN funktioniert.
+								//print(myError.stack);
+								var caller_line = myError.stack.split("\n")[1];
+								
+								//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
+								//var index = caller_line.indexOf("at ").trim();
+								//var clean = caller_line.slice(index+2, caller_line.length);
+								//print("TESTE caller_line" + clean );
+								
+								sReturn = caller_line;
+							} else {
+								sReturnControl=sScript+"Kein Stack im Error Objekt vorhanden.";
+								bReturnControl=false;
+							}				
 						}else{
-							sReturnControl="reflectMethodCurrent_StackLine: Kein Error Objekt uebergeben.";
+							sReturnControl=sScript+"Kein Error Objekt uebergeben.";
 							bReturnControl=false;
-						}
-						bReturnControl=true;
-						sReturnControl=sScript+"Alles o.k."
-					
+						}					
 					}catch(err){
 						print(err);
 						sReturnControl = sScript+"Kein Methodenname berechenbar." + err;
@@ -127,9 +216,121 @@ function reflectMethodCurrent_StackLine(myError, objControl){
 				}//End function reflectMethodCurrent_StackLine
 				
 				
-				function reflectMethodCurrent_StackMethodFromLine(myError, bReturnControl, sReturnControl){
+				//produziert in Java7 KEINEN Stacktrace
+				function errorTraced() {
+				  try {
+					var err = new Error("test01");
+					throw err;
+				  } catch (err) {
+					print("ddddd " + err);
+					//print(err.rhinoException.printStackTrace());
+					print(err.stack);
+					return err;
+				  }
+				}
 				
-				}//End function reflectMethodCurrent_StackMethodFromLine
+				//produziert in Java7 KEINEN Stacktrace
+				function stackTrace() {
+				  try {
+					var err = new Error("test02");
+					throw err;
+				  } catch (err) {
+					print("eeee " + err);
+					//print(err.rhinoException.printStackTrace());
+					print(err.stack);
+					return err.stack;
+				  }
+				}
+				
+				//produziert in Java7 einen Stacktrace
+				function createStackTrace() {
+				  var callstack = [];
+				  var isCallstackPopulated = false;
+				  try {
+					i.dont.exist+=0; //doesn't exist- that's the point
+				  } catch(e) {
+					if (e.stack) { //Firefox
+						//print("ffox");
+						//print(e.stack);
+					  var lines = e.stack.split('\n');
+					  for (var i=0, len=lines.length; i<=len-1; i++) {
+						//print(i + ": '" + lines[i].trim() +"'");
+						//klappt hier nicht....  if (lines[i].trim().match(/^\s*[A-Za-z0-9\-_\$]+\(/)) {
+						if (lines[i].trim()!=''){
+						  //print("line used");
+						  callstack.push(lines[i]);
+						}else		 {
+						  //print("empty line NOT used");  				
+						}
+					  }
+					  
+					  //Remove call to printStackTrace()
+					  callstack.shift();
+					  isCallstackPopulated = true;
+					}
+					else if (window.opera && e.message) { //Opera
+						print("opera  untested");
+					  var lines = e.message.split('\n');
+					  for (var i=0, len=lines.length; i<len; i++) {
+						if (lines[i].match(/^\s*[A-Za-z0-9\-_\$]+\(/)) {
+						  var entry = lines[i];
+						  //Append next line also since it has the file info
+						  if (lines[i+1]) {
+							entry += ' at ' + lines[i+1];
+							i++;
+						  }
+						  callstack.push(entry);
+						}
+					  }
+					  //Remove call to printStackTrace()
+					  callstack.shift();
+					  isCallstackPopulated = true;
+					}
+				  }
+				  if (!isCallstackPopulated) { //IE and Safari
+					print("ie untested");
+					var currentFunction = arguments.callee.caller;
+					while (currentFunction) {
+					  var fn = currentFunction.toString();
+					  var fname = fn.substring(fn.indexOf("function") + 8, fn.indexOf('')) || 'anonymous';
+					  callstack.push(fname);
+					  currentFunction = currentFunction.caller;
+					}
+				  }
+				  //output(callstack);
+				  return callstack;
+			}
+
+			function output(arr) {
+			  //Optput however you want
+			  //alert(arr.join('\n\n'));
+			  //print("aaaaaaa " + arr);
+			  print(arr.join('\n\n'));
+			}
+
+
+
+				
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				var version = java.lang.System.getProperty("java.version");
+				print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+				
 			
 		]]>
 	</scriptdef>
