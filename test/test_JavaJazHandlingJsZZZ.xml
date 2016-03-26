@@ -98,151 +98,101 @@
      <attribute name="returnboolean" />
 	 <attribute name="returncontrol" />
 	 <attribute name="returncontrolstring" />
-     <![CDATA[						
-		tryout_jaz_errorHandling();			
-		function tryout_jaz_errorHandling(){
-		var myError = new Error();
-		try{			
-			throw myError;
-		}catch(anErr){
-			print("#####");
-			print("Im Catch, error erfolgreich abgefangen.");
+     <![CDATA[			
+			var bReturnControl=project.getProperty(attributes.get("returncontrol"));
+			var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
 			
-			//Java 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.		
-			print("line:"+ anErr.lineNumber);
-			print("file:"+ anErr.fileName);			
-			print("stack: " +anErr.stack);
-			if(undefined!=anErr.stack){
-				var caller_line = anErr.stack.split("\n")[1];  // Index 0=Error, 1=Name der aktuellen Funktion.
-				print("caller line=" + caller_line);
-				var index = caller_line.indexOf("at ");
-				var clean = caller_line.slice(index+2, caller_line.length);
-				print("TESTE caller_line" + clean );
-			}	
-		}
-		
-		print("#####");
-		print("1. Error objekt ausserhalb des catch....");
-		
-		//Java 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.
-		print("line:"+ myError.lineNumber);
-		print("file:"+ myError.fileName);			
-		print("stack: " +myError.stack);
-		if(undefined!=myError.stack){
-				var caller_line = myError.stack.split("\n")[1];  // Index 0=Error, 1=Name der aktuellen Funktion.
-				print("caller line=" + caller_line);
-				var index = caller_line.indexOf("at ");
-				var clean = caller_line.slice(index+2, caller_line.length);
-				print("TESTE caller_line" + clean );
-			}	
+			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var objControl=new Object();
+			objControl.sReturnControl=sReturnControl;
+			objControl.bReturnControl=bReturnControl;
+			var sReturn=tryout_jaz_errorHandling(objControl);			
+			project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);
+						
 			
-			
-			print("#####");
-			print("2 Error objekt ausserhalb des catch....");
-			//Funktioniert nicht mit Java7 (RHINO)
-			print("TEST, neues ErrorObjekt erzeugen und direkt die Zeilennummer ausgeben: "  + (new Error).lineNumber);		
-			
-			
-			//Fehler rhinoException gibt es nicht bei normalen JavaScript Fehlern... auch nicht mit Java7 (RHINO)
-			//print("TEST, neues ErrorObjekt erzeugen und direkt die Zeilennummer ausgeben: "  + (new Error).rhinoException.lineNumber);		
-
-
-			print("#####");
-			print("Error objekt im Zusammenspiel mit JAVA");
-			enableJava();
-			//Allgemein für Import Statements gilt:
-			//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
-			//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
-	 
-			//import statements, funktionieren beide
-			//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
-			//importPackage(basic.zBasic.util.datatype.string);
-			importClass(Packages.basic.zBasic.ExceptionZZZ);
-			importPackage(Packages.basic.zBasic.util.file);
-	 			
-			//#############
-			//#### EINGABE ######	 
-			var myFilepath = attributes.get("inputfilepath");
-			print("myFilepath="+myFilepath);
-			
-			var bErg = false;
-			var myReturnControl = true;
-			var myReturnControlString = "Alles o.k.";
-			
-			//#### ERROR HANDLING #######
-			try{
-			
-			//#### Java, etc.
-			bErg = FileEasyZZZ.isRoot(myFilepath);
-			print("bErg="+bErg);
-			
-			
-			//var serg = StringZZZ.toCamelCase(myFilepath,"_");
-			//println("serg="+serg);
-			
-			// create and use a Task via Ant API
-			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
-			//echo = self.getProject().createTask("echo");
-			//echo.setMessage("Ergebnis + ": " + serg);
-			//echo.perform();
-         
-		    //Doku:
-			//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
-			//Da dies in einer einzelnen Funktion gekapselt werden soll, machen wir einen catch und darin if - Abfragen.
-			//}catch (err if err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO, 
-			//		myReturnControlString = "Error: " + err.javaException.getMessageLast();
-			//.................................................	
-			//}catch (err if err.instanceof ExceptionZZZ) {  // So geht das nur mit NASHORN, 
-			//    myReturnControlString = "Error: " + err.getMessageLast();
-			//}catch(err){
-			// ................................................
-			//}				
-				
-			}catch(err) {
-				print("Fehler gefangen.");
-				
-				bErg = false; //sicher ist sicher....
-				myReturnControl = false;
-				var myErrorString = handleError(err);
-				print("geholter Fehlerstring: " + myErrorString);
-				
-				//Funktioniert unter Java 8. Funktioniert es auch unter Java 7?
-				//var myErr = new Error();
-				//var myStackString = myErr.stack;
-				//print("künstlicher STACK: " + myStackString);
+			function tryout_jaz_errorHandling(objControl){
+				print("Start (jetzt ohne sScript zu definieren. Dies soll ja errechnet werden.");
 								
-				//Wende Funktion an, zur Ermittlung der aktuellen Funktion
-				var myFunctionCurrentName=reflectMethodCurrentName(new Error());
-				print("gefundener Funktionsname: " + myFunctionCurrentName);
-				
-				myReturnControlString=myFunctionCurrentName + " " + myErrorString;				
-			}
+				var myError = new Error();
+				try{			
+					throw myError;
+				}catch(anErr){
+					//Funktioniert nicht mit Java7 (RHINO)
+					print("TEST, neues ErrorObjekt erzeugen und direkt die Zeilennummer ausgeben: "  + (new Error).lineNumber);		
+				}
+		
+		
+		
+				print("#######################");
+				print("Error objekt im Zusammenspiel mit JAVA");
+				enableJava();
+		
+				//Allgemein für Import Statements gilt:
+				//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
+				//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
+ 
+				//import statements, funktionieren beide
+				//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
+				//importPackage(basic.zBasic.util.datatype.string);
+				importClass(Packages.basic.zBasic.ExceptionZZZ);
+				importPackage(Packages.basic.zBasic.util.file);
 			
-			// create and use a Task via Ant API
-			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
-			//echo = self.getProject().createTask("echo");
-			//echo.setMessage("Ergebnis + ": " + serg);
-			//echo.perform();
+				//#############
+				//#### EINGABE ######	 
+				var myFilepath = attributes.get("inputfilepath");
+				print("myFilepath="+myFilepath);
+		
+				var bErg = false;
+				var myReturnControl = true;
+				var myReturnControlString = "Alles o.k.";
+			
+				//#### ERROR HANDLING #######
+				try{
+			
+					//#### Java, etc.
+					bErg = FileEasyZZZ.isRoot(myFilepath);
+					print("bErg="+bErg);
+			
          
-			 //Beispiel für die Array-Rueckgabe 
-			//	var arrayFilenames=new Array();
-			//	var arrayFilelengths=new Array();
-			
-			//	arrayFilenames.push('Woa'); 
-			//	arrayFilenames.push('Wob'); 
-			//	arrayFilelengths.push(1234); 
-			
-			
-			//#### RÜCKGABE #####
-			project.setProperty(attributes.get("returnboolean"), bErg);
-			project.setProperty(attributes.get("returncontrol"), myReturnControl);
-			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);			
-			//	project.setProperty(attributes.get("filenames"), arrayFilenames);
-			//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
+					//Doku:
+					//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
+					//Da dies in einer einzelnen Funktion gekapselt werden soll, machen wir einen catch und darin if - Abfragen.
+					//}catch (err if err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO, 
+					//		myReturnControlString = "Error: " + err.javaException.getMessageLast();
+					//.................................................	
+					//}catch (err if err.instanceof ExceptionZZZ) {  // So geht das nur mit NASHORN, 
+					//    myReturnControlString = "Error: " + err.getMessageLast();
+					//}catch(err){
+					// ................................................
+					//}				
+				
+				}catch(err) {
+					print("Fehler gefangen: " + err);
+					try{				
+						bErg = false; //sicher ist sicher....
+						myReturnControl = false;
+					
+						//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+						var objControl=new Object();										
+						var myErrorString = handleError(err,objControl);
+						if(!objControl.bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + objControl.sReturnControl);
+				
+						print("geholter Fehlerstring: " + myErrorString);					
+						myReturnControlString=myFunctionCurrentName + " " + myErrorString;				
+					}catch(e){
+						print(e);					
+						objControl.sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;					
+						objControl.bReturnControl=false;					
+					}
+				}
 			}//end function tryout...
 			
 			
-		
+	//#############################################
+    //### Hilfsfunktion
+	//#############################################	
 			//Todo: Diese Funktion in den JSZ Kernel packen
 			function enableJava(){
 			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
@@ -266,10 +216,15 @@
 				}
 			}//End function enableJava
 			
-			function handleError(err){
+			function handleError(err,objControl){
 				
 				//TEST: Versuche aus dem uebergebenen Error-Objekt weitere Infos zu holen
 				print("##### in handle Error");
+				var myFunctionCurrentName=reflectMethodCurrent_Name(err, objControl);
+				if(!objControl.bReturnControl) throw new Error("Fehler beim Ermittlen des Funktionnamens im ErrorHandling: " + objControl.sReturnControl);					
+				print("gefundener Funktionsname: " + myFunctionCurrentName);
+					
+				//TODO GOON TODO GOON 
 				
 				//Java 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.
 				print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);			
@@ -384,28 +339,184 @@
 			}//End function handleError
 			
 			
-			function reflectMethodCurrentName(myError){
-				var sReturn="Kein Stacktrace vorhanden.";
-				if('undefined'!=myError && null!=myError){					
-					if(undefined!=myError.stack){		
-						//Java 8, NASHORN funktioniert.
-						//print(myError.stack);
-						var caller_line = myError.stack.split("\n")[1];
+			//###############################################################
+			//### REFLECTION 
+			//###############################################################
+			function reflectMethodCurrent_Name(myError, objControl){
+				var sScript="reflectMethodCurrentName: ";				
+				var sReturn="";				
+				try{			
+					//Merke Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
+					if('undefined'!=myError && null!=myError){					
+						var sLine=reflectMethodCurrent_StackLine(myError, objControl);
+						if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
+
+						var sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, objControl);
+						if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
 						
-						//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
-						//var index = caller_line.indexOf("at ").trim();
-						//var clean = caller_line.slice(index+2, caller_line.length);
-						//print("TESTE caller_line" + clean );
+						objControl.bReturnControl=true;
+						objControl.sReturnControl=sScript+"Alles o.k.";
+						sReturn=sMethod;
+					}else{						
+						//Java V7 liegt wahrscheinlich vor
+						var sLine=reflectMethodCurrent_StackLine(null, objControl);
+						if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
 						
-						sReturn = caller_line;
-					} else {
-						sReturn="reflectMethodCurrentName: Kein Stack im Error Objekt vorhanden."
-					}												
-					return(sReturn);
-				}else{
-					return("reflectMethodCurrentName: Kein Error Objekt uebergeben.");
+						var sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, objControl);
+						if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
+
+						objControl.bReturnControl=true;
+						objControl.sReturnControl=sScript+"Alles o.k.";
+						sReturn=sMethod;
+					}	
+				}catch(err){
+					print(err);					
+					objControl.sReturnControl=sScript+"Kein Methodenname berechenbar. "+ err;					
+					objControl.bReturnControl=false;					
 				}
-			}//End function reflectMethodCurrentName				
+				return sReturn;
+			}//End function reflectMethodCurrentName		
+					
+			function reflectMethodCurrent_StackLine(myError, objControl){
+				var sScript="reflectMethodCurrent_StackLine: ";
+				var sReturn="";
+				var sReturnControl="Alles o.k.";
+				var bReturnControl=true;
+				try{
+					if('undefined'!=myError && null!=myError){					
+						if(undefined!=myError.stack){		
+							//Java 8, NASHORN funktioniert.
+							//print(myError.stack);
+							var sCallerLine = myError.stack.split("\n")[1];						
+							sReturn=sCallerLine;
+						} else {
+							//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
+							var saStacktrace=createStackTrace();
+							var sCallerLine = saStacktrace[2]; //Da ich den Stacktrace später als in der Java8 VErsion erzeuge, muss der Index um 1 höher sein.							
+							sReturn=sCallerLine;
+						}				
+					}else{
+						//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
+						var saStacktrace=createStackTrace();
+						var sCallerLine = saStacktrace[2]; //Da ich den Stacktrace später als in der Java8 VErsion erzeuge, muss der Index um 1 höher sein.						
+						sReturn=sCallerLine;
+					}					
+				}catch(err){
+					print(err);
+					sReturnControl = sScript+"Keine Stacktrace-Zeile berechenbar." + err;
+					bReturnControl = false;
+				}
+				objControl.sReturnControl=sReturnControl;					
+				objControl.bReturnControl=bReturnControl;
+				return sReturn;
+			}//End function reflectMethodCurrent_StackLine
+			
+			//#########################################
+			//### Hilfsfunktion zur Generierung eines Stacktraces. Als Workaround für Java7. 
+			//#########################################			
+			function createStackTrace() {
+			  var callstack = [];
+			  var isCallstackPopulated = false;
+			  try {
+				i.dont.exist+=0; //doesn't exist- that's the point
+			  } catch(e) {
+				if (e.stack) { //Firefox
+					//print("ffox");
+					//print(e.stack);
+				  var lines = e.stack.split('\n');
+				  for (var i=0, len=lines.length; i<=len-1; i++) {
+					//print(i + ": '" + lines[i].trim() +"'");
+					//klappt hier nicht....  if (lines[i].trim().match(/^\s*[A-Za-z0-9\-_\$]+\(/)) {
+					if (lines[i].trim()!=''){
+					  //print("line used");
+					  callstack.push(lines[i]);
+					}else		 {
+					  //print("empty line NOT used");  				
+					}
+				  }
+				  
+				  //Remove call to printStackTrace()
+				  callstack.shift();
+				  isCallstackPopulated = true;
+				}
+				else if (window.opera && e.message) { //Opera
+					print("opera  untested");
+				  var lines = e.message.split('\n');
+				  for (var i=0, len=lines.length; i<len; i++) {
+					if (lines[i].match(/^\s*[A-Za-z0-9\-_\$]+\(/)) {
+					  var entry = lines[i];
+					  //Append next line also since it has the file info
+					  if (lines[i+1]) {
+						entry += ' at ' + lines[i+1];
+						i++;
+					  }
+					  callstack.push(entry);
+					}
+				  }
+				  //Remove call to printStackTrace()
+				  callstack.shift();
+				  isCallstackPopulated = true;
+				}
+			  }
+			  if (!isCallstackPopulated) { //IE and Safari
+				print("ie untested");
+				var currentFunction = arguments.callee.caller;
+				while (currentFunction) {
+				  var fn = currentFunction.toString();
+				  var fname = fn.substring(fn.indexOf("function") + 8, fn.indexOf('')) || 'anonymous';
+				  callstack.push(fname);
+				  currentFunction = currentFunction.caller;
+				}
+			  }
+			  //output(callstack);
+			  return callstack;
+		}
+
+		function output(arr) {
+		  //Optput however you want
+		  //alert(arr.join('\n\n'));
+		  //print("aaaaaaa " + arr);
+		  print(arr.join('\n\n'));
+		}
+		
+		
+
+		//#####################################################################
+		//### Den Funktionsnamen von einer Fehlerzeile bekommen
+		//#####################################################################
+		function reflectMethodCurrent_StackMethodFromLine(sStackLine, objControl){
+			var sScript="reflectMethodCurrent_StackMethodFromLine: ";
+			var sReturn = sStackLine;					
+			var sReturnControl="Alles o.k.";
+			var bReturnControl=true;
+			try {
+				if(undefined==sStackLine || null==sStackLine) throw new Error("Parameter Stacktrace-Zeile fehlt.");
+			
+					//TODO: Einzelne Informationen zerlegen, um die Ausgabe schöner zu machen.
+					//var index = caller_line.indexOf("at ").trim();
+					//var clean = caller_line.slice(index+2, caller_line.length);
+					//print("TESTE caller_line" + clean );
+					
+					var index = sStackLine.indexOf(" (");
+					var clean = sStackLine.slice(index+2, sStackLine.length);
+					
+					var index2 = clean.indexOf(")");							
+					if(index2>=1){
+						var clean2 = clean.substring(0,index2);
+					}else{
+						var clean2 = clean;
+					}							
+					sReturn=clean2;			
+			}catch(err){
+				print(err);
+				sReturnControl = sScript+"Kein Methodenname aus Stacktrace-Zeile berechenbar." + err;
+				bReturnControl = false;
+			}
+			objControl.sReturnControl=sReturnControl;					
+			objControl.bReturnControl=bReturnControl;
+			return sReturn;
+		}//End function reflectMethodCurrent_StackMethodFromLine
+						
 	      ]]>
   </scriptdef>
   
@@ -617,32 +728,31 @@
 		<fl:let>mysFiledirEscaped::=''</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
 		<antcallback target="--myTestJAZUsedByJavaScript_SubtargetDummy" return="returnControl,returnControlString">					
 				<param name="sFiledir" value="${mysFiledirEscaped}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
-			</antcallback>	
-			<ac:var name="myReturnControl" value="${returnControl}"/>
-			<echo>${sScript}direkter Rueckgabewert abgeholt: ${returnControlString}</echo>
-			<ac:var name="myReturnControlString" value="${returnControlString}"/>			
-			<ac:if>
-				<equals arg1="${myReturnControl}" arg2="false" />
-				<ac:then>		
-						<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
-						<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
-				</ac:then>
-				<ac:else>						
-				</ac:else>
-			</ac:if>
-			<ac:if>
-				<equals arg1="${returnBoolean}" arg2="false" />
-			<ac:then>		
-					<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
-					<!--<fl:fail message="${sScript}${myReturnControlString}"/>--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-					<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} ist nicht Root." />
-			</ac:then>
-			<ac:else>	
-					<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} IST Root." />				
-			</ac:else>
+		</antcallback>	
+		<ac:var name="myReturnControl" value="${returnControl}"/>
+		<echo>${sScript}direkter Rueckgabewert abgeholt: ${returnControlString}</echo>
+		<ac:var name="myReturnControlString" value="${returnControlString}"/>			
+		<ac:if>
+			<equals arg1="${myReturnControl}" arg2="false" />
+		<ac:then>		
+				<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
+				<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
+		</ac:then>
+		<ac:else>						
+		</ac:else>
+		
 		</ac:if>
-			
-			
+		<ac:if>
+			<equals arg1="${returnBoolean}" arg2="false" />
+		<ac:then>		
+				<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
+				<!--<fl:fail message="${sScript}${myReturnControlString}"/>--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+				<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} ist nicht Root." />
+		</ac:then>
+		<ac:else>	
+				<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} IST Root." />				
+		</ac:else>
+		</ac:if>
 		
 		</ac:try>
 		<ac:catch>
