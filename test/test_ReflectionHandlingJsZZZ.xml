@@ -17,6 +17,47 @@
 	</taskdef>
 	
 <!-- ######## Scriptdefs ############################################################################--> 
+<!-- ########################### -->
+ <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
+ <scriptdef name="tryout_errorHandlingJs" language="javascript">
+     <attribute name="inputfilepath" />
+     <attribute name="returnstring" />
+	 <attribute name="returncontrol" />
+	 <attribute name="returncontrolstring" />
+     <![CDATA[			
+			//Einfaches TryOut, wie man einen Fehler aus JavaScript zurückgeben kann.
+			//Dabei wird in Java7 generell kein Stacking Objekt erzeugt und die Infos (z.B. die Zeilennummer) sind nicht so direkt abrufbar.
+			var bReturnControl=project.getProperty(attributes.get("returncontrol"));
+			var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
+			
+			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var objControl=new Object();
+			objControl.sReturnControl=sReturnControl;
+			objControl.bReturnControl=bReturnControl;
+						
+			var sReturn=tryout_errorHandling(objControl);		
+			
+			project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);	
+
+			function tryout_errorHandling(objControl){
+				print("Start (jetzt ohne sScript zu definieren. Dies soll ja errechnet werden).");
+				var sReturn="TEST sReturn";				
+				var myError = new Error("Mein Testfehler aus JS");
+				try{			
+					throw myError;
+				}catch(anErr){
+					//Funktioniert nicht mit Java7 (RHINO) gibt dort 0 zurück.
+					print("TEST, neues ErrorObjekt erzeugen und direkt die Zeilennummer ausgeben: "  + (new Error).lineNumber);	
+					objControl.bReturnControl=false;
+					objControl.sReturnControl=anErr;
+				}
+				return sReturn;
+		    }			
+	      ]]>
+  </scriptdef>				
+
 <!-- ############################################################-->
 	 <scriptdef name="tryout_reflectMethodCurrentNameJs" language="javascript">		 
 		 <attribute name="returnstring" />
@@ -78,6 +119,9 @@
 				return sReturn;
 			}
 			
+			//###############################################################
+			//### REFLECTION 
+			//###############################################################
 			function reflectMethodCurrent_Name(myError, objControl){
 				var sScript="reflectMethodCurrentName: ";				
 				var sReturn="";				
@@ -295,7 +339,8 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
  <!-- TODO Test für stringUnencodeJsZZZ und stringEncodeJsZZZ -->
- <target name="compile" depends="-myTestReflectMethodCurentNameJs">
+ <!--<target name="compile" depends="-myTryoutJavaScript_ErrorHandling, -myTestReflectMethodCurentNameJs">-->
+ <target name="compile" depends="-myTryoutJavaScript_ErrorHandling">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -310,6 +355,39 @@
     </javac>
 	-->
   </target>
+  
+  <target name="-myTryoutJavaScript_ErrorHandling">
+		<fl:let>sScript::='-myTryoutJavaScript_ErrorHandling: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<echo>${sScript}Start</echo>
+
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+		
+		 <!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
+		<tryout_errorHandlingJs inputfilepath="c:\\temp" returnstring="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
+		
+		</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+		</trycatch>		
+	</target>
+  
   
   <target name="-myTestReflectMethodCurentNameJs">
 		<fl:let>sScript::='-myTestReflectMethodCurentNameJs: '</fl:let>
