@@ -27,32 +27,46 @@
      <![CDATA[			
 			//Einfaches TryOut, wie man einen Fehler aus JavaScript zurückgeben kann.
 			//Dabei wird in Java7 generell kein Stacking Objekt erzeugt und die Infos (z.B. die Zeilennummer) sind nicht so direkt abrufbar.
-			var bReturnControl=project.getProperty(attributes.get("returncontrol"));
-			var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
+			var sInputFilepath=attributes.get("inputfilepath");
+			print("Startparameter: "+sInputFilepath);
+			var bReturnControl=attributes.get("returncontrol");
+			var sReturnControl=attributes.get("returncontrolstring");
 			
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
 			var objControl=new Object();
 			objControl.sReturnControl=sReturnControl;
 			objControl.bReturnControl=bReturnControl;
 						
-			var sReturn=tryout_errorHandling(objControl);		
+			var sReturn=tryout_errorHandling(sInputFilepath,objControl);		
 			
 			project.setProperty(attributes.get("returnstring"),sReturn);
 			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);	
 
-			function tryout_errorHandling(objControl){
+			function tryout_errorHandling(sInputFilepath,objControl){
 				print("Start (jetzt ohne sScript zu definieren. Dies soll ja errechnet werden).");
-				var sReturn="TEST sReturn";				
-				var myError = new Error("Mein Testfehler aus JS");
+				sInputfilePath=attributes.get("inputfilepath");
+				print("Startparameter: "+sInputFilepath);				
+				var sReturn="TEST sReturn";		
+				var bReturnControl=false;
+				var sReturnControl="Fehler.";		
 				try{			
-					throw myError;
+					if(sInputFilepath==''){
+						var myError = new Error("Mein Testfehler aus JS");
+						throw myError;
+					}else{
+						sReturn = "Test gefuellter Eingabeparameter.";
+						bReturnControl=true;
+						sReturnControl="Alles o.k.";
+					}
 				}catch(anErr){
 					//Funktioniert nicht mit Java7 (RHINO) gibt dort 0 zurück.
 					print("TEST, neues ErrorObjekt erzeugen und direkt die Zeilennummer ausgeben: "  + (new Error).lineNumber);	
-					objControl.bReturnControl=false;
-					objControl.sReturnControl=anErr;
+					bReturnControl=false;
+					sReturnControl=anErr;					
 				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
 				return sReturn;
 		    }			
 	      ]]>
@@ -366,7 +380,9 @@
 		<try>
 		
 		 <!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
-		<tryout_errorHandlingJs inputfilepath="c:\\temp" returnstring="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		 <fl:let>myInputFilepath::="Test01-keinBackslash"</fl:let>
+		 <echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
+		<tryout_errorHandlingJs inputfilepath="${myInputFilepath}" returnstring="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
 		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
 		<ac:if>
 			<equals arg1="false" arg2="${myReturnControl}"/>
@@ -376,6 +392,18 @@
 			</ac:then>		
 		</ac:if>
 		
+		 <!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
+		  <fl:let>myInputFilepath::=""</fl:let>
+		  <echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
+		<tryout_errorHandlingJs inputfilepath="${myInputFilepath}" returnstring="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		</try>
 		<catch>
 			<echo>In &lt;catch&gt;.</echo>

@@ -98,7 +98,7 @@
      <attribute name="returnboolean" />
 	 <attribute name="returncontrol" />
 	 <attribute name="returncontrolstring" />
-     <![CDATA[			
+     <![CDATA[				        
 			var bReturnControl=project.getProperty(attributes.get("returncontrol"));
 			var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
 			
@@ -106,13 +106,18 @@
 			var objControl=new Object();
 			objControl.sReturnControl=sReturnControl;
 			objControl.bReturnControl=bReturnControl;			
-			var sReturn=tryout_jaz_errorHandling(objControl);			
-			project.setProperty(attributes.get("returnstring"),sReturn);
+			var bReturn=tryout_jaz_errorHandling(objControl);			
+			project.setProperty(attributes.get("returnboolean"),bReturn);
 			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);	
 		
 			function tryout_jaz_errorHandling(objControl){
-		
+				print("#######################");
+				var sScript=reflectMethodCurrent_Name(null, objControl);
+				if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
+				sScript=sScript+": ";
+				print(sScript+"START");
+			
 				print("#######################");
 				print("Error objekt im Zusammenspiel mit JAVA");
 				enableJava();
@@ -132,17 +137,19 @@
 				var myFilepath = attributes.get("inputfilepath");
 				print("myFilepath="+myFilepath);
 		
-				var bErg = false;
-				var myReturnControl = true;
-				var myReturnControlString = "Alles o.k.";
+				var bReturn = false;
+				var myReturnControl = false;
+				var myReturnControlString = sScript+"Fehler.";
 			
 				//#### ERROR HANDLING #######
 				try{
 			
 					//#### Java, etc.
-					bErg = FileEasyZZZ.isRoot(myFilepath);
+					var bErg = FileEasyZZZ.isRoot(myFilepath);
 					print("bErg="+bErg);
-			
+					bReturn=bErg;
+					myReturnControl = true;
+					myReturnControlString = "Alles o.k.";
          
 					//Doku:
 					//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
@@ -160,21 +167,26 @@
 					print("Fehler gefangen: " + err);
 					try{				
 						bErg = false; //sicher ist sicher....
+						bReturn=bErg;
 						myReturnControl = false;
+						myReturnControlString=sScript+"Fehler.";
 					
 						//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 						var objControl=new Object();										
 						var myErrorString = handleError(err,objControl);
-						if(!objControl.bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + objControl.sReturnControl);
-				
-						print("geholter Fehlerstring: " + myErrorString);					
+						if(!objControl.bReturnControl) throw new Error(sScript + objControl.sReturnControl);				
+						print("geholter Fehlerstring: " + myErrorString);	
+						
 						myReturnControlString=myFunctionCurrentName + " " + myErrorString;				
 					}catch(e){
 						print(e);					
-						objControl.sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;					
-						objControl.bReturnControl=false;					
+						myReturnControl=false;
+						myReturnControlString=sScript+"Fehler im ErrorHandling. "+ e;
 					}
 				}
+				objControl.sReturnControl=myReturnControlString;
+				objControl.bReturnControl=myReturnControl;	
+				return bReturn;
 			}//end function tryout...
 			
 			
@@ -204,6 +216,14 @@
 				}
 			}//End function enableJava
 			
+			
+				
+				
+				
+			
+			//#############################################
+			//### ERROROHANDLING
+			//#############################################		
 			function handleError(err,objControl){
 				
 				//TEST: Versuche aus dem uebergebenen Error-Objekt weitere Infos zu holen
@@ -239,15 +259,9 @@
 					//probiere hier: NashornException.getScriptStackString(e.getCause());
 					print("kein stack vorhanden für " + typeof(err));
 					
-				}				
-				
-				
-				
-			
-				
-			
-			
-				//document.getElementById("demo").innerHTML = err.message;
+				}	
+
+//document.getElementById("demo").innerHTML = err.message;
 				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
 				//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
 					if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
@@ -324,10 +338,12 @@
 						}
 					}					
 					return myReturnControlString;
-			}//End function handleError
+			}//End function handleError	
+			
+				
 			
 			
-			//###############################################################
+		//###############################################################
 			//### REFLECTION 
 			//###############################################################
 			function reflectMethodCurrent_Name(myError, objControl){
@@ -632,7 +648,9 @@
 		 </ac:if>
 		 
 		 <!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
-		<tryout_jaz_errorHandlingV8Js inputfilepath="c:\\temp" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		  <fl:let>myInputFilepath::="c:\\temp"</fl:let>
+		 <echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
+		<tryout_jaz_errorHandlingJs inputfilepath="${myInputFilepath}" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
 		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
 		<ac:if>
 			<equals arg1="false" arg2="${myReturnControl}"/>
@@ -644,7 +662,9 @@
 		 
 	 		
 		<!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
-		<tryout_jaz_errorHandlingJs inputfilepath="c:\\temp" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<fl:let>myInputFilepath::="c:\\temp"</fl:let>
+		<echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
+		<tryout_jaz_errorHandlingJs inputfilepath="${myInputFilepath}" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
 		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
 		<ac:if>
 			<equals arg1="false" arg2="${myReturnControl}"/>
@@ -655,13 +675,15 @@
 		</ac:if>
 		
 		
-		<tryout_jaz_errorHandlingJs inputfilepath="" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
-		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		 <fl:let>myInputFilepath::=""</fl:let>
+		<echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
+		<tryout_jaz_errorHandlingJs inputfilepath="${myInputFilepath}" returnboolean="myReturnValue03" returncontrol="myReturnControl03" returnControlString="myReturnControlString03"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl03} | ${myReturnControlString03} | ${myReturnValue03}" />
 		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
+			<equals arg1="false" arg2="${myReturnControl03}"/>
 			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sicherstellen, das jetzt nicht alles komplett aufhört -->				
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString03}</echo>	
+				<fail message="${myReturnControlString03}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sicherstellen, das jetzt nicht alles komplett aufhört -->				
 			</ac:then>		
 		</ac:if>
 		
