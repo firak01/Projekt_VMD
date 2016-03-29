@@ -99,22 +99,21 @@
 	 <attribute name="returncontrol" />
 	 <attribute name="returncontrolstring" />
      <![CDATA[				        
-			var bReturnControl=project.getProperty(attributes.get("returncontrol"));
-			var sReturnControl=project.getProperty(attributes.get("returncontrolstring"));
-			
+			var myFilepath = attributes.get("inputfilepath");
+		
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
-			var objControl=new Object();
-			objControl.sReturnControl=sReturnControl;
-			objControl.bReturnControl=bReturnControl;			
-			var bReturn=tryout_jaz_errorHandling(objControl);			
+			var objControl=new Object();		
+			var bReturn=tryout_jaz_errorHandling(myFilepath,objControl);	
 			project.setProperty(attributes.get("returnboolean"),bReturn);
 			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);	
 		
-			function tryout_jaz_errorHandling(objControl){
+			function tryout_jaz_errorHandling(myFilepath,objControl){
+			try{
 				print("#######################");
-				var sScript=reflectMethodCurrent_Name(null, objControl);
-				if(!objControl.bReturnControl)	throw new Error(objControl.sReturnControl);
+				var objControlCaller=new Object();
+				var sScript=reflectMethodCurrent_Name(null, objControlCaller);
+				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 				sScript=sScript+": ";
 				print(sScript+"START");
 			
@@ -134,16 +133,14 @@
 			
 				//#############
 				//#### EINGABE ######	 
-				var myFilepath = attributes.get("inputfilepath");
+				var myFilepath="";
 				print("myFilepath="+myFilepath);
 		
 				var bReturn = false;
-				var myReturnControl = false;
-				var myReturnControlString = sScript+"Fehler.";
+				var myReturnControl = false; //Zumindest Fehler zurückgegen, wenn der Programmablauf (z.B. im Errorhandling) nicht so ist wie erwartet.
+				var myReturnControlString = sScript+"Fehler."; 
 			
-				//#### ERROR HANDLING #######
-				try{
-			
+				
 					//#### Java, etc.
 					var bErg = FileEasyZZZ.isRoot(myFilepath);
 					print("bErg="+bErg);
@@ -164,6 +161,7 @@
 					//}				
 				
 				}catch(err) {
+					//#### ERROR HANDLING #######
 					print("Fehler gefangen: " + err);
 					try{				
 						bErg = false; //sicher ist sicher....
@@ -172,19 +170,20 @@
 						myReturnControlString=sScript+"Fehler.";
 					
 						//Wende Funktion an, zur Ermittlung der aktuellen Funktion
-						var objControl=new Object();										
-						var myErrorString = handleError(err,objControl);
-						if(!objControl.bReturnControl) throw new Error(sScript + objControl.sReturnControl);				
-						print("geholter Fehlerstring: " + myErrorString);	
-						
-						myReturnControlString=myFunctionCurrentName + " " + myErrorString;				
+						var objControlErrh=new Object();//wichtig: Neues Error Objekt.										
+						var myErrorString = handleError(err,objControlErrh);
+						if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+						myReturnControl = false;
+						myReturnControlString=sScript + myErrorString;				
 					}catch(e){
 						print(e);					
 						myReturnControl=false;
 						myReturnControlString=sScript+"Fehler im ErrorHandling. "+ e;
 					}
 				}
+				print("zuruegegebener controlstring in JS-Unter-Funktion:" + myReturnControlString);
 				objControl.sReturnControl=myReturnControlString;
+				print("zuruegegebener controlstring in JS-Unter-Funktion 02:" + objControl.sReturnControl);
 				objControl.bReturnControl=myReturnControl;	
 				return bReturn;
 			}//end function tryout...
@@ -655,7 +654,7 @@
 		<ac:if>
 			<equals arg1="false" arg2="${myReturnControl}"/>
 			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString2}</echo>	
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
 				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
 			</ac:then>		
 		</ac:if>
