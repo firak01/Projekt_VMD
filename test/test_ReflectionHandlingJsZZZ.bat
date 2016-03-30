@@ -1,4 +1,5 @@
 @echo off
+CLS
 REM KONVERTIERE DIESE DATEI ZU ANSI, NUR DANN WIRD '@echo off' als Befehl erkannt.
 
 REM Verwendet wird ant. Voraussetzung ist also das Java Ant - Tool installiert ist.
