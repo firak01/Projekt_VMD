@@ -118,7 +118,7 @@
 				print(sScript+"START");
 			
 				print("#######################");
-				print("Error objekt im Zusammenspiel mit JAVA");
+				print(sScript+"Error objekt im Zusammenspiel mit JAVA");
 				enableJava();
 		
 				//Allgemein für Import Statements gilt:
@@ -137,16 +137,16 @@
 				print("myFilepath="+myFilepath);
 		
 				var bReturn = false;
-				var myReturnControl = false; //Zumindest Fehler zurückgegen, wenn der Programmablauf (z.B. im Errorhandling) nicht so ist wie erwartet.
-				var myReturnControlString = sScript+"Fehler."; 
+				var bReturnControl = false; //Zumindest Fehler zurückgegen, wenn der Programmablauf (z.B. im Errorhandling) nicht so ist wie erwartet.
+				var sReturnControl = sScript+"Fehler."; 
 			
 				
 					//#### Java, etc.
 					var bErg = FileEasyZZZ.isRoot(myFilepath);
 					print("bErg="+bErg);
 					bReturn=bErg;
-					myReturnControl = true;
-					myReturnControlString = "Alles o.k.";
+					bReturnControl = true;
+					sReturnControl = "Alles o.k.";
          
 					//Doku:
 					//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
@@ -168,18 +168,18 @@
 						var objControlErrh=new Object();//wichtig: Neues Error Objekt.										
 						var myErrorString = handleError(err,objControlErrh);
 						if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-						myReturnControl = false;
-						myReturnControlString=sScript + myErrorString;				
+						bReturnControl = false;
+						sReturnControl=sScript + myErrorString;				
 					}catch(e){
 						print(e);					
-						myReturnControl=false;
-						myReturnControlString=sScript+"Fehler im ErrorHandling. "+ e;
+						bReturnControl=false;
+						sReturnControlString=sScript+"Fehler im ErrorHandling. "+ e;
 					}
 				}
-				print("zuruegegebener controlstring in JS-Unter-Funktion:" + myReturnControlString);
-				objControl.sReturnControl=myReturnControlString;
+				print("zuruegegebener controlstring in JS-Unter-Funktion:" + sReturnControl);
+				objControl.sReturnControl=sReturnControl;
 				print("zuruegegebener controlstring in JS-Unter-Funktion 02:" + objControl.sReturnControl);
-				objControl.bReturnControl=myReturnControl;	
+				objControl.bReturnControl=bReturnControl;	
 				return bReturn;
 			}//end function tryout...
 						
@@ -197,7 +197,8 @@
 					
 				//TODO GOON TODO GOON 
 				
-				//Java 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.
+				//JAVA 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.
+				//JAVA 8 (Nashorn), hier wird die Zeilenummer ausgegeben.
 				print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);			
 				
 				print("##### in handle Error für den Java-Fehler");				
@@ -316,26 +317,15 @@
 				var sReturnControl="Fehler";
 				var objControlCaller = new Object();
 				try{	
-                    var sMethod="";				
-					//Merke Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
-					if('undefined'!=myError && null!=myError){	                        				
-						var sLine=reflectMethodCurrent_StackLine(myError, objControlCaller);
-						if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-						print(sScript+"8: sLine="+sLine);
-													
-						sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, objControlCaller);
-						if(!objControlCaller.bReturnControl)	throw new Error(objControlCaller.sReturnControl);												
-						print(sScript+"8: sMethod="+sMethod);
-					}else{						
-						//Java V7 liegt wahrscheinlich vor
-						var sLine=reflectMethodCurrent_StackLine(null, objControlCaller);
-						if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-						print(sScript+"7: sLine="+sLine);
-													
-						sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, objControlCaller);
-						if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);						
-						print(sScript+"7: sMethod="+sMethod);
-					}	
+                    var sMethod="";							
+					
+					var sLine=reflectMethodCurrent_StackLine(myError, objControlCaller);
+					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+					print(sScript +"sLine="+sLine);
+												
+					sMethod=reflectMethodCurrent_StackMethodFromLine(sLine, objControlCaller);
+					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);												
+					
 					sReturn=sMethod;
 					bReturnControl=true;
 					sReturnControl=sScript+"Alles o.k.";								
@@ -357,25 +347,69 @@
 				var sReturn="";
 				var bReturnControl=false;
 				var sReturnControl=sScript+"Fehler";
+				
+				var objControlCaller = new Object();
 				try{
 				    var sCallerLine="";
-					if('undefined'!=myError && null!=myError){					
-						if(undefined!=myError.stack){		
-							//Java 8, NASHORN funktioniert.
-							//print(sScript + "Error Stack=" + myError.stack);
-							sCallerLine = myError.stack.split("\n")[1];						
-						} else {
+					
+					var bIsJava7=isJava7(objControlCaller);
+					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+					
+					//Merke Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
+					//ACHTUNG: Wir Suchen als Funktion das VORLETZTE Element in dem Array
+					if(bIsJava7){		
+						print(sScript+"7: Ausfuehrung unter Java7");					
+						if('undefined'!=myError && null!=myError){					
+							if(undefined!=myError.stack){		
+								print(sScript+"7: Stack im Error Objekt vorhanden");
+								var saStacktrace = myError.stack.split("\n");						
+								var iUbound = saStacktrace.length;
+								sCallerLine = saStacktrace[(iUbound-2)];//-1 wg. Index
+							} else {
+								//Normal in Java7, da kein Stacktrace im error-objekt vorhanden ist.
+								print(sScript+"7: KEIN Stack im Error Objekt vorhanden");
+								var saStacktrace=createStackTrace();
+								//print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
+								
+								var iUbound = saStacktrace.length;
+								sCallerLine = saStacktrace[(iUbound-2)];//-1 wg. Index
+								//sCallerLine = saStacktrace[3]; //Da ich den Stacktrace später als in der Version mit Stacktrace erzeuge, muss der Index um 1 höher sein.							
+							}				
+						}else{
+							print(sScript+"7: KEIN Error Objekt vorhanden");
+							var saStacktrace=createStackTrace();
+							var iUbound = saStacktrace.length;
+							sCallerLine = saStacktrace[(iUbound-2)];//-1 wg. Index
+							//sCallerLine = saStacktrace[4]; //Da ich den Stacktrace später als in der Version mit Stacktrace erzeuge, muss der Index um 1 höher sein.																		
+						}					
+					}else{
+						print(sScript+"8: Ausfuehrung unter Java8");
+						if('undefined'!=myError && null!=myError){					
+							if(undefined!=myError.stack){		
+								//Java 8, NASHORN funktioniert.
+								print(sScript + "8: Error Stack=" + myError.stack);
+								var saStacktrace = myError.stack.split("\n");						
+								var iUbound = saStacktrace.length;
+								sCallerLine = saStacktrace[(iUbound-2)];//-1 wg. Index			
+							} else {
+								//Ungewöhnlich in Java 8 - wenn kein error-objekt vorhanden ist, vermutlich wurde kein Error Objekt übergeben.
+								print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");
+															
+								var saStacktrace=createStackTrace();
+								print(sScript + "8: Erstellter StackTrace=" + saStacktrace);												
+								var iUbound = saStacktrace.length;
+								sCallerLine = saStacktrace[(iUbound-2)];//-1 wg. Index
+								//sCallerLine = saStacktrace[4]; //Da ich den Stacktrace später als in der Version mit Stacktrace erzeuge, muss der Index um 1 höher sein.							
+							}				
+						}else{
 							//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
 							var saStacktrace=createStackTrace();
-							//print(sScript + "Error StackTrace=" + saStacktrace);
-							sCallerLine = saStacktrace[2]; //Da ich den Stacktrace später als in der Java8 VErsion erzeuge, muss der Index um 1 höher sein.							
-						}				
-					}else{
-						//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
-						var saStacktrace=createStackTrace();
-						sCallerLine = saStacktrace[2]; //Da ich den Stacktrace später als in der Java8 VErsion erzeuge, muss der Index um 1 höher sein.																		
-					}	
-					//print(sScript+"CallerLine="+sCallerLine);
+							var iUbound = saStacktrace.length;
+							sCallerLine = saStacktrace[(iUbound-2)];//-1 wg. Index
+							//sCallerLine = saStacktrace[4]; //Da ich den Stacktrace später als in der Version mit Stacktrace erzeuge, muss der Index um 1 höher sein.																		
+						}
+					}
+					print(sScript+"CallerLine="+sCallerLine);
 					sReturn=sCallerLine;
 					bReturnControl=true;
 					sReturnControl=sScript + "Alles o.k.";
