@@ -176,7 +176,7 @@
 					var objControlCaller = new Object();
 					var sLine=reflectMethodCurrent_StackLine(myError, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-					print(sScript +"sLine="+sLine);
+					//print(sScript +"sLine="+sLine);
 												
 					var sMethod=reflectMethod_StackMethodFromLine(sLine, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);												
@@ -207,7 +207,7 @@
 				    var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
-					print(sScript+"CallerLine="+sCallerLine);
+					//print(sScript+"CallerLine="+sCallerLine);
 					sReturn=sCallerLine;
 					bReturnControl=true;
 					sReturnControl=sScript + "Alles o.k.";
@@ -223,7 +223,7 @@
 			}//End function reflectMethodCurrent_StackLine
 			
 			
-			
+			//#################################################################
 			function reflectMethodCalling_Name(myError, objControl){
 				var sScript="reflectMethodCalling_Name: ";				
 				var sReturn="";
@@ -235,7 +235,7 @@
 					
 					var sLine=reflectMethodCalling_StackLine(myError, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-					print(sScript +"sLine="+sLine);
+					//print(sScript +"sMethodCallingLine="+sLine);
 												
 					sMethod=reflectMethod_StackMethodFromLine(sLine, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);												
@@ -255,6 +255,7 @@
 				return sReturn;
 			}//End function reflectMethodCurrentName		
 			
+			//#################################################################
 			function reflectMethodCalling_StackLine(myError, objControl){
 				var sScript="reflectMethodCalling_StackLine: ";
 				var sReturn="";
@@ -265,7 +266,7 @@
 				    var sCallerLine=reflectMethod_StackLine(myError,4, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
-					print(sScript+"CallerLine="+sCallerLine);
+					//print(sScript+"CallerLine="+sCallerLine);
 					sReturn=sCallerLine;
 					bReturnControl=true;
 					sReturnControl=sScript + "Alles o.k.";
@@ -295,7 +296,7 @@
 					
 					if(iIndex=='undefined' || iIndex==null){
 						iIndex=3;//-1 wg. Index an sich, -1 weil es eine Unterfunktion entweder von ....current oder ...calling ist, -2 wg. der Tatsache, dass man DIESE Funktion nicht haben will, sondern die aufrufende.
-					}
+					}					
 				
 					var objControlCaller = new Object();
 					var bIsJava7=isJava7(objControlCaller);
@@ -309,26 +310,34 @@
 							if(undefined!=myError.stack){		
 								print(sScript+"7: Stack im Error Objekt vorhanden");
 								var saStacktrace = myError.stack.split("\n");						
-								print(sScript + "7: Vorhandener StackTrace=" + saStacktrace);
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								//print(sScript + "7: Vorhandener StackTrace=" + saStacktrace);
+								var iuBound=saStacktrace.length-1;
+								//print(sScript + "7: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}
 								sCallerLine = saStacktrace[(iIndex)];
 							} else {
 								//Normal in Java7, da kein Stacktrace im error-objekt vorhanden ist.
 								print(sScript+"7: KEIN Stack im Error Objekt vorhanden");
 								var saStacktrace=createStackTrace();
-								print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
-								
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								//print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
+								var iuBound=saStacktrace.length-1;
+								//print(sScript + "7: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}
 								sCallerLine = saStacktrace[(iIndex)];
 							}				
 						}else{
 							print(sScript+"7: KEIN Error Objekt vorhanden");
 							var saStacktrace=createStackTrace();
-							print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
-							//var iUbound = saStacktrace.length;
-							//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+							//print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
+							var iuBound=saStacktrace.length-1;
+							//print(sScript + "7: iuBound="+iuBound);
+							if(iIndex>iuBound){
+								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+							}
 							sCallerLine = saStacktrace[(iIndex)];
 						}					
 					}else{
@@ -336,27 +345,37 @@
 						if('undefined'!=myError && null!=myError){					
 							if(undefined!=myError.stack){		
 								//Java 8, NASHORN funktioniert.
-								print(sScript + "8: Error Stack=" + myError.stack);
-								var saStacktrace = myError.stack.split("\n");						
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								print(sScript + "8: Error Stack vorhanden");
+								//print(sScript + "8: Error Stack=" + myError.stack);
+								var saStacktrace = myError.stack.split("\n");
+								//print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
+								var iuBound=saStacktrace.length-1;
+								//print(sScript + "8: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}								
 								sCallerLine = saStacktrace[(iIndex)];
 							} else {
 								//Ungewöhnlich in Java 8 - wenn kein error-objekt vorhanden ist, vermutlich wurde kein Error Objekt übergeben.
-								print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");
-															
+								print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
 								var saStacktrace=createStackTrace();
-								print(sScript + "8: Erstellter StackTrace=" + saStacktrace);												
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								//print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
+								var iuBound=saStacktrace.length-1;									
+								//print(sScript + "8: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}									
 								sCallerLine = saStacktrace[(iIndex)];
 							}				
 						}else{
 							//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
 							var saStacktrace=createStackTrace();
-							print(sScript + "7 oder X: Erstellter StackTrace=" + saStacktrace);
-							//var iUbound = saStacktrace.length;
-							//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+							//print(sScript + "7 oder X: Erstellter StackTrace=" + saStacktrace);	
+							var iuBound=saStacktrace.length-1;
+							//print(sScript + "8: iuBound="+iuBound);
+							if(iIndex>iuBound){
+								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+							}								
 							sCallerLine = saStacktrace[(iIndex)];
 						}
 					}
@@ -660,7 +679,7 @@
 					var objControlCaller = new Object();
 					var sLine=reflectMethodCurrent_StackLine(myError, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-					print(sScript +"sLine="+sLine);
+					//print(sScript +"sLine="+sLine);
 												
 					var sMethod=reflectMethod_StackMethodFromLine(sLine, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);												
@@ -691,7 +710,7 @@
 				    var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
-					print(sScript+"CallerLine="+sCallerLine);
+					//print(sScript+"CallerLine="+sCallerLine);
 					sReturn=sCallerLine;
 					bReturnControl=true;
 					sReturnControl=sScript + "Alles o.k.";
@@ -707,7 +726,7 @@
 			}//End function reflectMethodCurrent_StackLine
 			
 			
-			
+			//#################################################################
 			function reflectMethodCalling_Name(myError, objControl){
 				var sScript="reflectMethodCalling_Name: ";				
 				var sReturn="";
@@ -719,7 +738,7 @@
 					
 					var sLine=reflectMethodCalling_StackLine(myError, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-					print(sScript +"sLine="+sLine);
+					//print(sScript +"sMethodCallingLine="+sLine);
 												
 					sMethod=reflectMethod_StackMethodFromLine(sLine, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);												
@@ -739,6 +758,7 @@
 				return sReturn;
 			}//End function reflectMethodCurrentName		
 			
+			//#################################################################
 			function reflectMethodCalling_StackLine(myError, objControl){
 				var sScript="reflectMethodCalling_StackLine: ";
 				var sReturn="";
@@ -749,7 +769,7 @@
 				    var sCallerLine=reflectMethod_StackLine(myError,4, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
-					print(sScript+"CallerLine="+sCallerLine);
+					//print(sScript+"CallerLine="+sCallerLine);
 					sReturn=sCallerLine;
 					bReturnControl=true;
 					sReturnControl=sScript + "Alles o.k.";
@@ -779,7 +799,7 @@
 					
 					if(iIndex=='undefined' || iIndex==null){
 						iIndex=3;//-1 wg. Index an sich, -1 weil es eine Unterfunktion entweder von ....current oder ...calling ist, -2 wg. der Tatsache, dass man DIESE Funktion nicht haben will, sondern die aufrufende.
-					}
+					}					
 				
 					var objControlCaller = new Object();
 					var bIsJava7=isJava7(objControlCaller);
@@ -793,26 +813,34 @@
 							if(undefined!=myError.stack){		
 								print(sScript+"7: Stack im Error Objekt vorhanden");
 								var saStacktrace = myError.stack.split("\n");						
-								print(sScript + "7: Vorhandener StackTrace=" + saStacktrace);
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								//print(sScript + "7: Vorhandener StackTrace=" + saStacktrace);
+								var iuBound=saStacktrace.length-1;
+								//print(sScript + "7: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}
 								sCallerLine = saStacktrace[(iIndex)];
 							} else {
 								//Normal in Java7, da kein Stacktrace im error-objekt vorhanden ist.
 								print(sScript+"7: KEIN Stack im Error Objekt vorhanden");
 								var saStacktrace=createStackTrace();
-								print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
-								
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								//print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
+								var iuBound=saStacktrace.length-1;
+								//print(sScript + "7: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}
 								sCallerLine = saStacktrace[(iIndex)];
 							}				
 						}else{
 							print(sScript+"7: KEIN Error Objekt vorhanden");
 							var saStacktrace=createStackTrace();
-							print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
-							//var iUbound = saStacktrace.length;
-							//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+							//print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
+							var iuBound=saStacktrace.length-1;
+							//print(sScript + "7: iuBound="+iuBound);
+							if(iIndex>iuBound){
+								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+							}
 							sCallerLine = saStacktrace[(iIndex)];
 						}					
 					}else{
@@ -820,27 +848,37 @@
 						if('undefined'!=myError && null!=myError){					
 							if(undefined!=myError.stack){		
 								//Java 8, NASHORN funktioniert.
-								print(sScript + "8: Error Stack=" + myError.stack);
-								var saStacktrace = myError.stack.split("\n");						
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								print(sScript + "8: Error Stack vorhanden");
+								//print(sScript + "8: Error Stack=" + myError.stack);
+								var saStacktrace = myError.stack.split("\n");
+								//print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
+								var iuBound=saStacktrace.length-1;
+								//print(sScript + "8: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}								
 								sCallerLine = saStacktrace[(iIndex)];
 							} else {
 								//Ungewöhnlich in Java 8 - wenn kein error-objekt vorhanden ist, vermutlich wurde kein Error Objekt übergeben.
-								print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");
-															
+								print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
 								var saStacktrace=createStackTrace();
-								print(sScript + "8: Erstellter StackTrace=" + saStacktrace);												
-								//var iUbound = saStacktrace.length;
-								//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+								//print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
+								var iuBound=saStacktrace.length-1;									
+								//print(sScript + "8: iuBound="+iuBound);
+								if(iIndex>iuBound){
+									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+								}									
 								sCallerLine = saStacktrace[(iIndex)];
 							}				
 						}else{
 							//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
 							var saStacktrace=createStackTrace();
-							print(sScript + "7 oder X: Erstellter StackTrace=" + saStacktrace);
-							//var iUbound = saStacktrace.length;
-							//sCallerLine = saStacktrace[(iUbound-iIndexOffset)];
+							//print(sScript + "7 oder X: Erstellter StackTrace=" + saStacktrace);	
+							var iuBound=saStacktrace.length-1;
+							//print(sScript + "8: iuBound="+iuBound);
+							if(iIndex>iuBound){
+								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
+							}								
 							sCallerLine = saStacktrace[(iIndex)];
 						}
 					}
@@ -1083,7 +1121,7 @@
  <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
  <!-- TODO Test für stringUnencodeJsZZZ und stringEncodeJsZZZ -->
  <!--<target name="compile" depends="-myTryoutJavaScript_ErrorHandling, -myTestReflectMethodCurrentNameJs,myTestReflectMethodCallingNameJs">-->
- <target name="compile" depends="-myTestReflectMethodCurrentNameJs">
+ <target name="compile" depends="-myTestReflectMethodCallingNameJs">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
