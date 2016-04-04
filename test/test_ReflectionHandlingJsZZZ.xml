@@ -295,6 +295,7 @@
 				    var sCallerLine="";
 					
 					if(iIndex=='undefined' || iIndex==null){
+						print(sScript+"Index null ==> auf 3 gesetzt.");
 						iIndex=3;//-1 wg. Index an sich, -1 weil es eine Unterfunktion entweder von ....current oder ...calling ist, -2 wg. der Tatsache, dass man DIESE Funktion nicht haben will, sondern die aufrufende.
 					}					
 				
@@ -368,12 +369,13 @@
 								sCallerLine = saStacktrace[(iIndex)];
 							}				
 						}else{
-							//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
+							//Vermutlich Java8 und kein error-objekt übergeben.
 							var saStacktrace=createStackTrace();
-							//print(sScript + "7 oder X: Erstellter StackTrace=" + saStacktrace);	
+							print(sScript + "8 ohne Error Objekt: Erstellter StackTrace=" + saStacktrace);	
 							var iuBound=saStacktrace.length-1;
-							//print(sScript + "8: iuBound="+iuBound);
+							print(sScript + "8: iuBound="+iuBound + "; iIndex="+iIndex +".");
 							if(iIndex>iuBound){
+								print(sScript+"Index größer iUbound ==> iUbound-2 gesetzt. ("+iIndex+" --- "+(iUbound-2)+").");
 								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 							}								
 							sCallerLine = saStacktrace[(iIndex)];
@@ -453,8 +455,17 @@
 	//### Hilfsfunktion zur Generierung eines Stacktraces. Als Workaround für Java7. 
 	//#########################################			
 	function createStackTrace() {
+	  var sScript="createStackTrace: ";
 	  var callstack = [];
 	  var isCallstackPopulated = false;
+	  try{
+		var objControlCaller=new Object();
+		var bJava7=isJava7(objControlCaller);					
+		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+		
+if(bJava7){		
+	 
+	  //+++ Java7 Fall
 	  try {
 		i.dont.exist+=0; //doesn't exist- that's the point
 	  } catch(e) {
@@ -506,6 +517,26 @@
 		  currentFunction = currentFunction.caller;
 		}
 	  }
+	  //+++ ENDE Java7 Fall
+	  //+++ START Java8 Fall
+	  }else{
+		try {
+			var objError = new Error();
+			callstack=objError.stack;
+		} catch(e) {
+		
+		}
+	  
+	  
+	  }
+	  }catch(err){
+			//#### SIMPLES ERROR HANDLING #######
+			print(err);					
+			bReturnControl=false;
+			sReturnControl=sScript+"Fehler. "+ err;					
+		}
+		//+++ ENDE Java8 Fall
+	  
 	  //output(callstack);
 	  return callstack;
 	}
