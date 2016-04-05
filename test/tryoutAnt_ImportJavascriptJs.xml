@@ -461,7 +461,9 @@
 							if(iIndex>iuBound){
 								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 							}								
-							sCallerLine = saStacktrace[(iIndex)];
+							var iIndexToBeUsed=iIndex;
+							print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+							sCallerLine = saStacktrace[(iIndexToBeUsed)];
 						}
 					}
 					print(sScript+"CallerLine="+sCallerLine);
