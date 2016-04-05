@@ -277,7 +277,9 @@
 				var sReturnControl=sScript+"Fehler";				
 				try{
 					var objControlCaller = new Object();
-				    var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
+				    //Java7 funktioniert? var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
+					//Java8 Fall, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren mehr? 
+					var sCallerLine=reflectMethod_StackLine(myError, 5, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
 					//print(sScript+"CallerLine="+sCallerLine);
@@ -336,7 +338,9 @@
 				var sReturnControl=sScript+"Fehler";
 				try{
 					var objControlCaller = new Object();
-				    var sCallerLine=reflectMethod_StackLine(myError,4, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
+				    //Java7: funktioniert? var sCallerLine=reflectMethod_StackLine(myError,4, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
+					//Java8 Fall, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren mehr? 
+					var sCallerLine=reflectMethod_StackLine(myError,6, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
 					//print(sScript+"CallerLine="+sCallerLine);
@@ -421,31 +425,39 @@
 								print(sScript + "8: Error Stack vorhanden");
 								//print(sScript + "8: Error Stack=" + myError.stack);
 								var saStacktrace = myError.stack.split("\n");
-								//print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
+								print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
 								var iuBound=saStacktrace.length-1;
-								//print(sScript + "8: iuBound="+iuBound);
+								print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 								if(iIndex>iuBound){
 									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
-								}								
-								sCallerLine = saStacktrace[(iIndex)];
+								}			
+								var iIndexToBeUsed=1;
+								print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+								sCallerLine = saStacktrace[(iIndexToBeUsed)];
 							} else {
 								//Ungewöhnlich in Java 8 - wenn kein error-objekt vorhanden ist, vermutlich wurde kein Error Objekt übergeben.
 								print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
-								var saStacktrace=createStackTrace();
-								//print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
+								var stack=createStackTrace();
+								var saStacktrace = stack.split("\n");
+								print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
 								var iuBound=saStacktrace.length-1;									
-								//print(sScript + "8: iuBound="+iuBound);
+								print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 								if(iIndex>iuBound){
 									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 								}									
-								sCallerLine = saStacktrace[(iIndex)];
+								var iIndexToBeUsed=iIndex+1;
+								print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+								sCallerLine = saStacktrace[(iIndexToBeUsed)];
 							}				
 						}else{
 							//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
-							var saStacktrace=createStackTrace();
-							//print(sScript + "7 oder X: Erstellter StackTrace=" + saStacktrace);	
+							print(sScript + "8 ohne ErrorObjekt");
+							
+							var stack=createStackTrace();
+							var saStacktrace = stack.split("\n");
+							print(sScript + "8 ohne ErrorObjekt=" + saStacktrace);	
 							var iuBound=saStacktrace.length-1;
-							//print(sScript + "8: iuBound="+iuBound);
+							print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 							if(iIndex>iuBound){
 								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 							}								
@@ -526,8 +538,17 @@
 	//### Hilfsfunktion zur Generierung eines Stacktraces. Als Workaround für Java7. 
 	//#########################################			
 	function createStackTrace() {
+	  var sScript="createStackTrace: ";
 	  var callstack = [];
 	  var isCallstackPopulated = false;
+	  try{
+		var objControlCaller=new Object();
+		var bJava7=isJava7(objControlCaller);					
+		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+		
+if(bJava7){		
+	   print(sScript+"Java7 Fall");
+	  //+++ Java7 Fall
 	  try {
 		i.dont.exist+=0; //doesn't exist- that's the point
 	  } catch(e) {
@@ -579,15 +600,36 @@
 		  currentFunction = currentFunction.caller;
 		}
 	  }
-	  //output(callstack);
+	  //+++ ENDE Java7 Fall
+	  //+++ START Java8 Fall
+	  }else{
+		print(sScript+"Java8 Fall");
+		try {
+			var objError = new Error();
+			callstack=objError.stack;
+		} catch(e) {
+		
+		}
+	  
+	  
+	  }
+	  }catch(err){
+			//#### SIMPLES ERROR HANDLING #######
+			print(err);					
+			bReturnControl=false;
+			sReturnControl=sScript+"Fehler. "+ err;					
+		}
+		//+++ ENDE Java8 Fall
+	  
+	  output(sScript, callstack);
 	  return callstack;
 	}
 
-	function output(arr) {
+	function output(sScript, arr) {
 	  //Optput however you want
 	  //alert(arr.join('\n\n'));
-	  //print("aaaaaaa " + arr);
-	  print(arr.join('\n\n'));
+	  print(sScript +"arr="+ arr);
+	  //print(arr.join('\n\n'));
 	}			
 			
 			
