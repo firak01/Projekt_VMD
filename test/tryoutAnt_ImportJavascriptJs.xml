@@ -16,111 +16,35 @@
 
  <!-- ########################### -->
  <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
- <scriptdef name="tryout_jaz_string_camelcase" language="javascript">
-     <attribute name="filename_search" />
-     <attribute name="filenames" />
-	 <attribute name="filelengths" />
-	 <attribute name="tryout" />
-     <![CDATA[
-		   enableJava();
-		   
-		   //Allgemein für Import Statements gilt:
-		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
-		   //                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
-	 
-		   // import statements, funktionieren beide
-			//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
-			//importPackage(basic.zBasic.util.datatype.string);
-			importPackage(Packages.basic.zBasic.util.datatype.string);
-	 
-			var test = java.lang.System.getProperty("java.class.path");
-			println("classpath="+test);
-			
-			
-			//#############
-			 //#### EINGABE ######	 
-			var file2search = attributes.get("filename_search");
-			print("file2search="+file2search);
-			
-			//#### Java, etc.
-			var serg = StringZZZ.toCamelCase(file2search,"_");
-			//var serg = "test ohne java";
-			print("serg="+serg);
-			
-			// create and use a Task via Ant API
-			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
-			//echo = self.getProject().createTask("echo");
-			//echo.setMessage("Ergebnis + ": " + serg);
-			//echo.perform();
-         
-			  
-		//	var arrayFilenames=new Array();
-		//	var arrayFilelengths=new Array();
-			
-		//	arrayFilenames.push('Woa'); 
-		//	arrayFilenames.push('Wob'); 
-		//	arrayFilelengths.push(1234); 
-			
-			
-			//#### RÜCKGABE #####
-		//	project.setProperty(attributes.get("tryout"), "Text zurueckgeben: " + serg);  
-		//	project.setProperty(attributes.get("filenames"), arrayFilenames);
-		//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
-		
-		
-		
-		//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//print("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
-			}
-	      ]]>
-  </scriptdef>
-  				
- <!-- ########################### -->
- <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
- <scriptdef name="tryout_jaz_errorHandlingJs" language="javascript">
-     <attribute name="inputfilepath" />
+ <scriptdef name="tryout_import_javaScriptJs" language="javascript">
+     <attribute name="inputtestvalue" />
      <attribute name="returnboolean" />
 	 <attribute name="returncontrol" />
 	 <attribute name="returncontrolstring" />
      <![CDATA[				        
-			var myFilepath = attributes.get("inputfilepath");
+			var myTestvalue = attributes.get("inputtestvalue");
 		
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
 			var objControl=new Object();		
-			var bReturn=tryout_jaz_errorHandling(myFilepath,objControl);	
+			var bReturn=tryout_import_javascript(myTestvalue,objControl);	
 			project.setProperty(attributes.get("returnboolean"),bReturn);
 			project.setProperty(attributes.get("returncontrol"),objControl.bReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"),objControl.sReturnControl);	
 		
-			function tryout_jaz_errorHandling(myFilepath,objControl){
-			try{
-				print("#######################");
+			function tryout_import_javascript(myTestvalue,objControl){
+			try{											
+				//#######################
+				//#### FUNKTIONSRUMPF ######	 
 				var objControlCaller=new Object();
 				var sScript=reflectMethodCurrent_Name(null, objControlCaller);
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 				sScript=sScript+": ";
 				print(sScript+"START");
-			
-				print("#######################");
 				print(sScript+"Error objekt im Zusammenspiel mit JAVA");
+				
 				enableJava();
 		
+				//Weil im ErrorHandler ExceptionZZZ auftaucht, muss vorher diese Java Klasse importiert werden!
 				//Allgemein für Import Statements gilt:
 				//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
 				//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
@@ -130,23 +54,31 @@
 				//importPackage(basic.zBasic.util.datatype.string);
 				importClass(Packages.basic.zBasic.ExceptionZZZ);
 				importPackage(Packages.basic.zBasic.util.file);
-			
-				//#############
-				//#### EINGABE ######	 				
-				var myFilepath="";  ////NOCH KAPUTT 20160402: Damit wird der Fehler erzwungen
-				print("myFilepath="+myFilepath);
+				
+				//########################
+				//#### EINGABEPARAMETER ######	 				
+				//var myTestvalue="";  ////NOCH KAPUTT 20160402: Damit wird der Fehler erzwungen
+				print("myTestvalue="+myTestvalue);
 		
 				var bReturn = false;
 				var bReturnControl = false; //Zumindest Fehler zurückgegen, wenn der Programmablauf (z.B. im Errorhandling) nicht so ist wie erwartet.
 				var sReturnControl = sScript+"Fehler."; 
-			
 				
-					//#### Java, etc.
-					var bErg = FileEasyZZZ.isRoot(myFilepath);
-					print("bErg="+bErg);
-					bReturn=bErg;
-					bReturnControl = true;
-					sReturnControl = "Alles o.k.";
+				//#####################
+				//#### VERARBEITUNG ######	 
+
+				//#### Java, etc.
+				var bErg=false;
+				//bErg = FileEasyZZZ.isRoot(myTestvalue);
+							
+				eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
+				bErg = tryoutFunctionForImport(myTestvalue);	
+				print("bErg="+bErg);
+				
+				print("#######################");
+				bReturn=bErg;
+				bReturnControl = true;
+				sReturnControl = "Alles o.k.";
          
 					//Doku:
 					//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
@@ -158,7 +90,8 @@
 					//    myReturnControlString = "Error: " + err.getMessageLast();
 					//}catch(err){
 					// ................................................
-					//}				
+					//}	
+				
 				
 				}catch(err) {
 					//#### ERROR HANDLING #######
@@ -176,7 +109,7 @@
 						sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
 					}
 				}
-				print("zuruegegebener controlstring aus JAZ-Fehler:" + sReturnControl);
+				print("zuruegegebener controlstring:" + sReturnControl);
 				objControl.sReturnControl=sReturnControl;				
 				objControl.bReturnControl=bReturnControl;	
 				return bReturn;
@@ -303,9 +236,6 @@
 				objControl.bReturnControl=bReturnControl;	
 				return sReturn;
 		}//End function handleError	
-			
-				
-			
 			
 			//###############################################################
 			//### REFLECTION 
@@ -717,94 +647,14 @@
 			}//End function enableJava
 						
 	      ]]>
-  </scriptdef>
-  
-  <!-- ########################### -->
- <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
- <scriptdef name="tryout_jaz_fileeasy_isRoot" language="javascript">
-     <attribute name="inputfilepath" />
-     <attribute name="returnboolean" />
-     <![CDATA[
-		   enableJava();
-		   
-		   //Allgemein für Import Statements gilt:
-		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
-		   //                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
-	 
-		   // import statements, funktionieren beide
-			//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
-			//importPackage(basic.zBasic.util.datatype.string);
-			importPackage(Packages.basic.zBasic.util.file);
-	 
-			var test = java.lang.System.getProperty("java.class.path");
-			print("classpath="+test);
-			
-			
-			//#############
-			 //#### EINGABE ######	 
-			var myFilepath = attributes.get("inputfilepath");
-			print("myFilepath="+myFilepath);
-			
-			//#### Java, etc.
-			var bErg = FileEasyZZZ.isRoot(myFilepath);
-			print("bErg="+bErg);
-			
-			
-			//var serg = StringZZZ.toCamelCase(file2search,"_");
-			//var serg = "test ohne java";
-			//println("serg="+serg);
-			
-			// create and use a Task via Ant API
-			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
-			//echo = self.getProject().createTask("echo");
-			//echo.setMessage("Ergebnis + ": " + serg);
-			//echo.perform();
-         
-			  
-		//	var arrayFilenames=new Array();
-		//	var arrayFilelengths=new Array();
-			
-		//	arrayFilenames.push('Woa'); 
-		//	arrayFilenames.push('Wob'); 
-		//	arrayFilelengths.push(1234); 
-			
-			
-			//#### RÜCKGABE #####
-			project.setProperty(attributes.get("returnboolean"), bErg);  
-		//	project.setProperty(attributes.get("filenames"), arrayFilenames);
-		//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
-		
-		
-		
-		//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//println("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
-			}
-	      ]]>
-  </scriptdef>
-         
+  </scriptdef>        
   
 <!-- ################################################################################# -->
 <!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <!--<target name="compile" depends=" -myTestJAZUsedByJavaScript_ErrorHandling, -myTestJAZUsedByJavaScript_ErrorHandlingCascaded, -myTestJAZUsedByJavaScript_FileEasyZZZ, -myTestJAZUsedByJavaScript_StringZZZ, ">-->
- <target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandling">
+ <!--<target name="compile" depends=" -myTryoutImport_JavaScript,">-->
+ <target name="compile" depends="-myTryoutImport_JavaScript">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -820,32 +670,19 @@
 	-->
   </target>
 
-	<target name="-myTestJAZUsedByJavaScript_ErrorHandling">
-		<fl:let>sScript::='-myTestJAZUsedByJavaScript_ErrorHandling: '</fl:let>
+	<target name="-myTryoutImport_JavaScript">
+		<fl:let>sScript::='-myTryoutImport_JavaScript: '</fl:let>
 		<fl:let>sTrace::=""</fl:let>
 		<echo>${sScript}Start</echo>
 
 		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
 		<trycatch property="myError" reference="myErrorObject">
 		<try>
-		
-		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
-		<ac:if>
-			<not>
-				<available classname="basic.zBasic.util.file.FileEasyZZZ" />        
-			</not>
-			<ac:then>
-				<fl:fail message="FileEasyZZZ existiert nicht."/>
-			</ac:then>
-			<ac:else>
-				<echo message="FileEasyZZZ vorhanden." />
-			 </ac:else>
-		 </ac:if>
-		 
+			 
 		 <!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
-		  <fl:let>myInputFilepath::="c:\\temp"</fl:let>
-		 <echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
-		<tryout_jaz_errorHandlingJs inputfilepath="${myInputFilepath}" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		  <fl:let>myInputTestvalue::="Ein Testwert Mit Leerzeichen"</fl:let>
+		 <echo>${sScript}myInputTestvalue='${myInputTestvalue}'</echo>
+		<tryout_import_javaScriptJs inputtestvalue="${myInputTestvalue}" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
 		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
 		<ac:if>
 			<equals arg1="false" arg2="${myReturnControl}"/>
@@ -855,33 +692,6 @@
 			</ac:then>		
 		</ac:if>
 		 
-	 		
-		<!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
-		<fl:let>myInputFilepath::="c:\\temp"</fl:let>
-		<echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
-		<tryout_jaz_errorHandlingJs inputfilepath="${myInputFilepath}" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
-		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString2}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
-		
-		
-		 <fl:let>myInputFilepath::=""</fl:let>
-		<echo>${sScript}myInputFilepath='${myInputFilepath}'</echo>
-		<tryout_jaz_errorHandlingJs inputfilepath="${myInputFilepath}" returnboolean="myReturnValue03" returncontrol="myReturnControl03" returnControlString="myReturnControlString03"/>
-		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl03} | ${myReturnControlString03} | ${myReturnValue03}" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl03}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString03}</echo>	
-				<fail message="${myReturnControlString03}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sicherstellen, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
-		
 		</try>
 		<catch>
 			<echo>In &lt;catch&gt;.</echo>
@@ -893,238 +703,6 @@
 		</finally>
 	</trycatch>
 		
-		
-	</target> 
-	
-	
-	<target name="-myTestJAZUsedByJavaScript_ErrorHandlingCascaded">
-	    <!-- Der Java/JAZ-Kernel Fehler tritt nun in einem Untertarget auf und soll bis nach 'oben' durchgereicht werden -->
-		<fl:let>sScript::='-myTestJAZUsedByJavaScript_ErrorHandlingCascaded: '</fl:let>
-		<fl:let>sTrace::=""</fl:let>
-		<!-- Verwende für die von 'unten' nach 'oben' (also Richtung main-Methode) durchgereichten Variablen antcontrib mit unset="true". Verwende nicht flaka! -->
-		<ac:var name="myReturnControl" value="true"/> <!-- unset="true"/> -->
-		<ac:var name="myReturnControlString" value="alles o.k."/> <!-- unset="true" />-->
-		
-		<!--<fl:let>returnControlStringMain::='im Haupttarget alles ok. '</fl:let>-->
-		<ac:var name="returnControlStringMain" value="im Haupttarget alles o.k."/> <!-- unset="true" />-->
-		<echo>${sScript}Start</echo>
-
-		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
-		<ac:trycatch property="myError" reference="myErrorObject">
-		<ac:try>
-		
-		<!-- 1. Aufruf, sollte keinen Fehler werfen -->
-		<fl:let>mysFiledirEscaped::='c:\\temp'</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-		<antcallback target="--myTestJAZUsedByJavaScript_SubtargetDummy" return="returnBoolean,returnControl,returnControlString">					
-				<param name="sFiledir" value="${mysFiledirEscaped}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->								
-			</antcallback>			
-			<ac:var name="myReturnControl" value="${returnControl}"/>
-			<ac:var name="myReturnControlString" value="${returnControlString}"/>			
-			<ac:if>
-				<equals arg1="${myReturnControl}" arg2="false" />
-				<ac:then>		 
-						<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
-						<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
-				</ac:then>
-				<ac:else>						
-				</ac:else>
-			</ac:if>
-			<ac:if>
-				<equals arg1="${returnBoolean}" arg2="false" />
-				<ac:then>		
-						<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
-						<!--<fl:fail message="${sScript}${myReturnControlString}"/>--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-						<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} ist nicht Root." />
-				</ac:then>
-				<ac:else>	
-						<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} IST Root." />				
-				</ac:else>
-			</ac:if>
-			
-		<!-- 2. Aufruf mit Leerstring, sollte Fehler werfen! -->
-		<fl:let>mysFiledirEscaped::=''</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben, aber: Es wird einmal die Backslashverdoppelung wieder entfernt. -->							
-		<antcallback target="--myTestJAZUsedByJavaScript_SubtargetDummy" return="returnControl,returnControlString">					
-				<param name="sFiledir" value="${mysFiledirEscaped}" /><!--wichtig: In der aufgerufenen Methode den Wert per Hochkommata abholen. Dadurch wird der Wert 'byValue' uebergeben, aber es wird einmal die Backslashverdoppelung wieder entfernt. -->												
-		</antcallback>	
-		<ac:var name="myReturnControl" value="${returnControl}"/>
-		<echo>${sScript}direkter Rueckgabewert abgeholt: ${returnControlString}</echo>
-		<ac:var name="myReturnControlString" value="${returnControlString}"/>			
-		<ac:if>
-			<equals arg1="${myReturnControl}" arg2="false" />
-		<ac:then>		
-				<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
-				<fl:fail message="${sScript}${myReturnControlString}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->									
-		</ac:then>
-		<ac:else>						
-		</ac:else>
-		
-		</ac:if>
-		<ac:if>
-			<equals arg1="${returnBoolean}" arg2="false" />
-		<ac:then>		
-				<!--<fl:echo message="${sScript}Fehler in -FGLDelLocal_DeleteFileSingle festgestellt - ${myReturnControlString}" />-->
-				<!--<fl:fail message="${sScript}${myReturnControlString}"/>--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-				<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} ist nicht Root." />
-		</ac:then>
-		<ac:else>	
-				<fl:echo message="${sScript}Verzeichnis ${mysFiledirEscaped} IST Root." />				
-		</ac:else>
-		</ac:if>
-		
-		</ac:try>
-		<ac:catch>
-			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
-			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
-			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
-			<property name="baz" refid="myErrorObject" />
-			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
-			<ac:var name="myReturnControl" value="false"/>
-			<ac:var name="myReturnControlString" value="${baz}"/>						
-			<!--<echo>${sScript}CATCH - Fehler zurueckgeben: ${myReturnControlString}</echo>-->
-			
-			<!-- Rueckgabe an das aufrufenden Target / Haupttarget -->
-			<!--<fl:let>returnControlStringMain::=${myReturnControlString}</fl:let>-->
-			<ac:var name="returnControlStringMain" value="${myReturnControlString}"/> <!-- unset="true" />-->
-		</ac:catch>
-		<ac:finally>
-			<echo>In &lt;finally&gt;${sScript}.</echo>
-		</ac:finally>
-	</ac:trycatch>
-	
-	
-	<echo>${sScript}An aufrufendes Target/Haupttarget zurueckgeben: ${returnControlStringMain}</echo>
-			
-		
-	</target> 
-	
-	<target name="--myTestJAZUsedByJavaScript_SubtargetDummy">
-	    <!-- Der Java/JAZ-Kernel Fehler tritt nun in einem Untertarget auf und soll bis nach 'oben' durchgereicht werden -->
-		<fl:let>sScript::='--myTestJAZUsedByJavaScript_SubtargetDummy: '</fl:let>
-		<fl:let>sTrace::=""</fl:let>
-		<!-- Verwende für die von 'unten' nach 'oben' (also Richtung main-Methode) durchgereichten Variablen antcontrib mit unset="true". Verwende nicht flaka! -->
-		<ac:var name="myReturnControl" value="true" unset="true"/>
-		<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
-		<echo>${sScript}Start</echo>
-         
-		 <!-- Uebergabeparameter abholen -->
-		<fl:let>mysFiledir::='${sFiledir}'</fl:let><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
-	
-		
-		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
-		<ac:trycatch property="myError" reference="myErrorObject">
-		<ac:try>
-		
-		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
-		<ac:if>
-			<not>
-				<available classname="basic.zBasic.util.file.FileEasyZZZ" />        
-			</not>
-			<ac:then>
-				<fl:fail message="${sScript}FileEasyZZZ existiert nicht."/>
-			</ac:then>
-			<ac:else>
-				<echo message="${sScript}FileEasyZZZ vorhanden." />
-			 </ac:else>
-		 </ac:if>
-	 		
-		<!-- Hier wird die scriptdef Methode aufgerufen. Ein Leerstring führt zu einem Fehler (ExceptionZZZ) in der intern aufgerufenen JAZ-Kernel Klasse. -->
-		<tryout_jaz_errorHandlingJs inputfilepath="${mysFiledir}" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
-		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
-		
-		</ac:try>
-		<ac:catch>
-			<!-- PROBLEM myError wird nicht zurückgegeben. --> 
-			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
-			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->					
-			<property name="baz" refid="myErrorObject" />
-			<!--<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>-->
-			<ac:var name="myReturnControl" value="false"/>
-			<ac:var name="myReturnControlString" value="${baz}"/>						
-			<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>
-		</ac:catch>
-		<ac:finally>
-			<echo>In &lt;finally&gt;${sScript}.</echo>
-		</ac:finally>
-	</ac:trycatch>
-		
-		<!--Rueckgabwerte an aufrufendes Target -->
-		<ac:var name="returnBoolean" value="${myReturnBoolean}"/>
-		<ac:var name="returnControl" value="${myReturnControl}"/>
-		<ac:var name="returnControlString" value="${myReturnControlString}"/>	
-	</target> 
-	
-	
-	<target name="-myTestJAZUsedByJavaScript_FileEasyZZZ">
-		<fl:let>sScript::='-myTestJAZUsedByJavaScript_FileEasyZZZ: '</fl:let>
-		<fl:let>sTrace::=""</fl:let>
-		<echo>${sScript}Start</echo>
-
-		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
-		<ac:if>
-		<not>
-			<available classname="basic.zBasic.util.file.FileEasyZZZ" />        
-		</not>
-	  <ac:then>
-		<fl:fail message="FileEasyZZZ existiert nicht."/>
-	   </ac:then>
-	   <ac:else>
-	   <echo message="FileEasyZZZ vorhanden." />
-	   </ac:else>
-	 </ac:if>
-	 
-		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<tryout_jaz_fileeasy_isRoot inputfilepath="c:\\" returnboolean="myReturnValue"/>
-		<echo message="myReturnValue = ${myReturnValue}" />
-		
-		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<tryout_jaz_fileeasy_isRoot inputfilepath="c:\\temp" returnboolean="myReturnValue"/>
-		<echo message="myReturnValue = ${myReturnValue}" />
-		
-		<!-- Verwende antcontrib für eine Schleife über die Arrays --><!-- do something with @{myelement} -->
-<!-- 		<for list="${myfilenames}" param="myelement">
-			<sequential>				
-				<echo>myelement= @{myelement}</echo>
-			</sequential>
-		</for> -->
-		
-	</target> 
-	
-	<target name="-myTestJAZUsedByJavaScript_StringZZZ">
-		<echo>myTestJavaUsedByJavaScript: </echo>
-		<property name="fs.dir" value="../testused"/>
-		<property name="fs.includes" value="**/*.txt"/>
-		<property name="fs.excludes" value="**/*.tmp"/>
-
-		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
-		<ac:if>
-		<not>
-			<available classname="basic.zBasic.util.datatype.string.StringZZZ" />        
-		</not>
-	  <ac:then>
-		<fl:fail message="StringZZZ existiert nicht."/>
-	   </ac:then>
-	   <ac:else>
-	   <echo message="StringZZZ vorhanden." />
-	   </ac:else>
-	 </ac:if>
-	 
-		<!-- Hier wird die scriptdef Methode tryout_java_file_length aufgerufen -->
-		<tryout_jaz_string_camelcase filename_search="Das_ist_ein_camelcase_test" filenames="myfilenames" filelengths="myfilelengths" tryout="mytryout_string"/>
-		<echo message="mytryout_string = ${mytryout_string}" />
-		
-		<!-- Verwende antcontrib für eine Schleife über die Arrays --><!-- do something with @{myelement} -->
-<!-- 		<for list="${myfilenames}" param="myelement">
-			<sequential>				
-				<echo>myelement= @{myelement}</echo>
-			</sequential>
-		</for> -->
 		
 	</target> 
  </project>
