@@ -193,8 +193,10 @@
 				try{
 					var objControlCaller=new Object();
 					var sScript=reflectMethodCurrent_Name(null, objControlCaller);
+					if(!objControlCaller.bReturnControl) throw new Error("Fehler beim Ermittlen des aktuellen Funktionnamens im ErrorHandling: " + objControlCaller.sReturnControl);
 					sScript = sScript + ": ";
-					print("##### in " + sScript + " ############################");
+					print("################################");
+					print("##### in " + sScript + " #######");
 				
 					//TEST: Versuche aus dem uebergebenen Error-Objekt weitere Infos zu holen
 					//PROBLEM: Bei einem geworfenen Java Fehler wird hier kein korrekter Stacktrace und damit auch kein Funktionsname gefunden.
@@ -202,13 +204,10 @@
 					var myFunctionCallingName=reflectMethodCalling_Name(null,objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error("Fehler beim Ermittlen des aufrufenden Funktionnamens im ErrorHandling: " + objControlCaller.sReturnControl);					
 					print("gefundener aufrufender Funktionsname: " + myFunctionCallingName);
-					
-					var myFunctionCurrentName = reflectMethodCurrent_Name(null, objControlCaller);
-					if(!objControlCaller.bReturnControl) throw new Error("Fehler beim Ermittlen des aktuellen Funktionnamens im ErrorHandling: " + objControlCaller.sReturnControl);					
-					print("gefundener aktueller Funktionsname: " + myFunctionCurrentName);
-					
+										
 					var myFunctionErrorFoundName="";
 					if(err!='undefined' && err!=null){
+					    print(sScript+"Error Objekt vorhanden");
 						var myFunctionErrorName=reflectMethodCurrent_Name(err, objControlCaller);
 						if(!objControlCaller.bReturnControl) throw new Error("Fehler beim Ermittlen des letzten Funktionnamens im ErrorHandling: " + objControlCaller.sReturnControl);					
 						print("gefundener error Funktionsname: " + myFunctionErrorName);
@@ -216,33 +215,28 @@
 					}else {
 						myFunctionErrorFoundName = myFunctionCallingName;
 					}
-					
-					
-				//TODO GOON TODO GOON NOCH KAPUT 20160402
-				
+									
 				//JAVA 7 (Rhino), hier wird nichts ausgegeben, schade.	Stack ist undefined.
-				//JAVA 8 (Nashorn), hier wird die Zeilenummer ausgegeben.
-				//print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);			
+				//JAVA 8 (Nashorn), hier wird die Zeilenummer ausgegeben, nur nicht bei ExceptionZZZ Fehlern.
+				//        generell funktioniert es aber unter JAVA 8 (Nashorn): print("TEST, neues ErrorObjekt erzeugen und die Zeilennummer ausgeben: "  + (new Error).lineNumber);			
 				
-				print("##### in handle Error fuer den Java-Fehler");				
-				print("Error Objekt: " + err);
-				print("Fehlerobjekt Zeilennummer: " + err.lineNumber);
-				print("Fehlerobjekt Dateiname: " + err.fileName);
-																
-				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
-				//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
-				if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
-					print("################################");
-					print("ExceptionZZZ Fehler abgefangen (NASHORN, Java 8)");
+				print("#############################################################");
+				print("##### in handle Error fuer den Java oder sonstigen Fehler ###");				
+				print("Error Objekt: " + err);//Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+				
+				//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. 
+				//      Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
+				//      In JAVA 8 (Nashorn) steht das Objekt direkter zur Verfügung.
+				if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.					
+					print("ExceptionZZZ Fehler abgefangen (NASHORN, Java 8), Zeilennummer steht nicht zur Verfügung");
 					print("err.getMessageLast()="+ err.getMessageLast());  //DIE LÖSUNG MIT NASHORN !!!!
 					print("err.getFunctionLast()="+ err.getFunctionLast());  //DIE LÖSUNG MIT NASHORN !!!!
 							
 					sReturn = myFunctionErrorFoundName + ": ExceptionZZZ: '" + err.getFunctionLast() + " - " + err.getMessageLast() + "'.";
 					sReturnControl="Alles o.k."; //Das Errorhandling an sich ist o.k.
 					bReturnControl=true;
-				}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
-					print("################################");
-					print("ExceptionZZZ Fehler abgefangen (RHINO, Java 7)");
+				}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!					
+					print("ExceptionZZZ Fehler abgefangen (RHINO, Java 7), Zeilennummer steht nicht zur Verfügung");
 					print("err.javaException.getMessageLast()="+ err.javaException.getMessageLast());  //DIE LÖSUNG MIT RHINO !!!!
 					print("err.javaException.getFunctionLast()="+ err.javaException.getFunctionLast());  //DIE LÖSUNG MIT NASHORN !!!!
 							
@@ -251,27 +245,16 @@
 					bReturnControl=true;
 										
 				}else{
-				   //weitere, unbestimmte Fehler abfangen
-				   print("################################");
+				   //weitere, unbestimmte Fehler abfangen					   
 				   print("Unbestimmten Fehler abfangen.");
-				   var version = java.lang.System.getProperty("java.version");
-				   print("JavaVersion: " + version);
-				   print("typeof err: "+typeof(err));					   
-					if(version.substring(0,3)=="1.8"){
-						print ("Javascript Engine: 'Nashorn'");
-						print("Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
-						
-						sReturn = myFunctionErrorFoundName + ": " + typeof(err) + ": '" + err.message + "'.";												
-						sReturnControl="Alles o.k."; //Das Errorhandling an sich ist o.k.
-						bReturnControl=true;
-					
-					}else{
-						print("################################");
+
+					var bIsJava7=isJava7(objControlCaller);
+					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);				
+					if(bIsJava7){
 						print ("Javascript Engine: 'Rhino'");
 						print("err.contructor.name="+err.constructor.name);	//In Rhino wird der Fehler nicht direkt zurückgegeben.			
 						if(err.constructor.name=='JavaException'){
-							print("Error.name=" + err.name);
-							print("Error=" + err);
+							print("Error.name=" + err.name);							
 							print("Error.getCause=" + err.getCause); //Ergebnis: undefined
 							//print("Error.getCause()=" + err.getCause());
 							print("Error.message: " + err.message);//Ergebnis der Ausgabe: basic.zBasic.ExceptionZZZ: null;
@@ -285,11 +268,19 @@
 							sReturnControl="Alles o.k.";
 							bReturnControl=true;
 						}else{
-							print("normaler Fehler.  Error=" + err); //Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+							print("normaler Fehler.");
 							sReturn = myFunctionErrorFoundName + ": Error: " + err.message;
 							sReturnControl="Alles o.k."; //Das Errorhandling an sich ist o.k.
 							bReturnControl=true;
-						}									
+						}			
+					}else{
+						print ("Javascript Engine: 'Nashorn'");						
+						print("Fehlerobjekt Zeilennummer: " + err.lineNumber);
+						print("Fehlerobjekt Dateiname: " + err.fileName);
+				
+						sReturn = myFunctionErrorFoundName + ": " + typeof(err) + ": '" + err.message + "'.";												
+						sReturnControl="Alles o.k."; //Das Errorhandling an sich ist o.k.
+						bReturnControl=true;						
 					}
 				}		
 
@@ -303,7 +294,6 @@
 				objControl.bReturnControl=bReturnControl;	
 				return sReturn;
 		}//End function handleError	
-			
 				
 			
 			
@@ -347,7 +337,9 @@
 				var sReturnControl=sScript+"Fehler";				
 				try{
 					var objControlCaller = new Object();
-				    var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
+				    //Java7 funktioniert? var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
+					//Java8 Fall, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren mehr? 
+					var sCallerLine=reflectMethod_StackLine(myError, 5, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
 					//print(sScript+"CallerLine="+sCallerLine);
@@ -406,7 +398,9 @@
 				var sReturnControl=sScript+"Fehler";
 				try{
 					var objControlCaller = new Object();
-				    var sCallerLine=reflectMethod_StackLine(myError,4, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
+				    //Java7: funktioniert? var sCallerLine=reflectMethod_StackLine(myError,4, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
+					//Java8 Fall, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren mehr? 
+					var sCallerLine=reflectMethod_StackLine(myError,6, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
 					//print(sScript+"CallerLine="+sCallerLine);
@@ -491,35 +485,45 @@
 								print(sScript + "8: Error Stack vorhanden");
 								//print(sScript + "8: Error Stack=" + myError.stack);
 								var saStacktrace = myError.stack.split("\n");
-								//print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
+								print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
 								var iuBound=saStacktrace.length-1;
-								//print(sScript + "8: iuBound="+iuBound);
+								print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 								if(iIndex>iuBound){
 									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
-								}								
-								sCallerLine = saStacktrace[(iIndex)];
+								}			
+								var iIndexToBeUsed=1;
+								print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+								sCallerLine = saStacktrace[(iIndexToBeUsed)];
 							} else {
 								//Ungewöhnlich in Java 8 - wenn kein error-objekt vorhanden ist, vermutlich wurde kein Error Objekt übergeben.
 								print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
-								var saStacktrace=createStackTrace();
-								//print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
+								var stack=createStackTrace();
+								var saStacktrace = stack.split("\n");
+								print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
 								var iuBound=saStacktrace.length-1;									
-								//print(sScript + "8: iuBound="+iuBound);
+								print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 								if(iIndex>iuBound){
 									iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 								}									
-								sCallerLine = saStacktrace[(iIndex)];
+								var iIndexToBeUsed=iIndex+1;
+								print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+								sCallerLine = saStacktrace[(iIndexToBeUsed)];
 							}				
 						}else{
 							//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
-							var saStacktrace=createStackTrace();
-							//print(sScript + "7 oder X: Erstellter StackTrace=" + saStacktrace);	
+							print(sScript + "8 ohne ErrorObjekt");
+							
+							var stack=createStackTrace();
+							var saStacktrace = stack.split("\n");
+							print(sScript + "8 ohne ErrorObjekt=" + saStacktrace);	
 							var iuBound=saStacktrace.length-1;
-							//print(sScript + "8: iuBound="+iuBound);
+							print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 							if(iIndex>iuBound){
 								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 							}								
-							sCallerLine = saStacktrace[(iIndex)];
+							var iIndexToBeUsed=iIndex;
+							print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+							sCallerLine = saStacktrace[(iIndexToBeUsed)];
 						}
 					}
 					print(sScript+"CallerLine="+sCallerLine);
@@ -596,8 +600,17 @@
 	//### Hilfsfunktion zur Generierung eines Stacktraces. Als Workaround für Java7. 
 	//#########################################			
 	function createStackTrace() {
+	  var sScript="createStackTrace: ";
 	  var callstack = [];
 	  var isCallstackPopulated = false;
+	  try{
+		var objControlCaller=new Object();
+		var bJava7=isJava7(objControlCaller);					
+		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+		
+if(bJava7){		
+	   print(sScript+"Java7 Fall");
+	  //+++ Java7 Fall
 	  try {
 		i.dont.exist+=0; //doesn't exist- that's the point
 	  } catch(e) {
@@ -649,15 +662,36 @@
 		  currentFunction = currentFunction.caller;
 		}
 	  }
-	  //output(callstack);
+	  //+++ ENDE Java7 Fall
+	  //+++ START Java8 Fall
+	  }else{
+		print(sScript+"Java8 Fall");
+		try {
+			var objError = new Error();
+			callstack=objError.stack;
+		} catch(e) {
+		
+		}
+	  
+	  
+	  }
+	  }catch(err){
+			//#### SIMPLES ERROR HANDLING #######
+			print(err);					
+			bReturnControl=false;
+			sReturnControl=sScript+"Fehler. "+ err;					
+		}
+		//+++ ENDE Java8 Fall
+	  
+	  output(sScript, callstack);
 	  return callstack;
 	}
 
-	function output(arr) {
+	function output(sScript, arr) {
 	  //Optput however you want
 	  //alert(arr.join('\n\n'));
-	  //print("aaaaaaa " + arr);
-	  print(arr.join('\n\n'));
+	  print(sScript +"arr="+ arr);
+	  //print(arr.join('\n\n'));
 	}			
 			
 			
