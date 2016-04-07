@@ -270,11 +270,15 @@
 				var sReturnControl=sScript+"Fehler";				
 				try{
 					var objControlCaller = new Object();
-				    //Java7 funktioniert? var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
-					//Java8 Fall, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren mehr? 
-					var sCallerLine=reflectMethod_StackLine(myError, 5, objControlCaller);
+				    //Java7 funktioniert -	var sCallerLine=reflectMethod_StackLine(myError, 3, objControlCaller);
+					//Java8 Fall, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren Indexpositionen mehr!
+					//                                                                 var sCallerLine=reflectMethod_StackLine(myError, 5, objControlCaller);					
+					var iIndex = getStackLineIndexCurrent(objControlCaller);					
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-										
+					
+					var sCallerLine=reflectMethod_StackLine(myError, iIndex, objControlCaller);
+					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+					
 					//print(sScript+"CallerLine="+sCallerLine);
 					sReturn=sCallerLine;
 					bReturnControl=true;
@@ -289,6 +293,38 @@
 				objControl.sReturnControl=sReturnControl;
 				return sReturn;
 			}//End function reflectMethodCurrent_StackLine
+			
+			function getStackLineIndexCurrent(objControl){
+				var sScript="getStackLineIndex: ";
+				var iReturn=-1;
+				var bReturnControl=false;
+				var sReturnControl=sScript+"Fehler";				
+				try{
+					var objControlCaller = new Object();
+				   var bIsJava7 = isJava7(objControlCaller);
+					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+					
+					//Die Indexposition ist verschieden, sowohl wg. eines anders aussehenden Stacktraces als auch wg. mehr aufgerufener Funktionen, diesen auszuwerten.
+					if(bIsJava7){
+						iIndex=3;
+					}else{
+						iIndex=5;
+					}
+					print(sScript+"iIndex="+iIndex);
+					iReturn=iIndex;
+					bReturnControl=true;
+					sReturnControl=sScript + "Alles o.k.";
+				}catch(err){
+					//#### SIMPLES ERROR HANDLING #######
+					//print(err);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return iReturn;
+			
+			}
 			
 			
 			//#################################################################
@@ -332,8 +368,15 @@
 				try{
 					var objControlCaller = new Object();
 				    //Java7: funktioniert? var sCallerLine=reflectMethod_StackLine(myError,4, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
-					//Java8 Fall, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren mehr? 
-					var sCallerLine=reflectMethod_StackLine(myError,6, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
+					//Java8 Fall funktioniert, ohne übergebenen Error Objekt. Dann muss nämlich der Stack erst errechnet werden: funktioniert mit zwei weiteren mehr? 
+					//                                                                                   var sCallerLine=reflectMethod_StackLine(myError,6,objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
+					
+					var iIndex = getStackLineIndexCurrent(objControlCaller);					
+					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+					
+					var iIndexCalling = iIndex + 1;
+					
+					var sCallerLine=reflectMethod_StackLine(myError,iIndexCalling, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
 					if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 										
 					//print(sScript+"CallerLine="+sCallerLine);
@@ -628,6 +671,7 @@ if(bJava7){
 	}			
 			
 			
+			
 	//#############################################
     //### Hilfsfunktion JAVA
 	//#############################################	
@@ -682,6 +726,37 @@ if(bJava7){
 					print("Verwende Standard JavaScript Engine dieser Java Vesion.");
 				}
 			}//End function enableJava
+			
+								
+				//##################################################################
+				//### Tryouts den Stacktrace vom Error objekt zu bekommen
+				//##################################################################
+
+				//produziert in Java7 KEINEN Stacktrace
+				function errorTraced() {
+				  try {
+					var err = new Error("test01");
+					throw err;
+				  } catch (err) {
+					print("ddddd " + err);
+					//print(err.rhinoException.printStackTrace());
+					print(err.stack);
+					return err;
+				  }
+				}
+				
+				//produziert in Java7 KEINEN Stacktrace
+				function stackTrace() {
+				  try {
+					var err = new Error("test02");
+					throw err;
+				  } catch (err) {
+					print("eeee " + err);
+					//print(err.rhinoException.printStackTrace());
+					print(err.stack);
+					return err.stack;
+				  }
+				}
 						
 	      ]]>
   </scriptdef>        
