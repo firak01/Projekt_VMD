@@ -41,20 +41,7 @@
 				sScript=sScript+": ";
 				print(sScript+"START");
 				print(sScript+"Error objekt im Zusammenspiel mit JAVA");
-				
-				enableJava();
-		
-				//Weil im ErrorHandler ExceptionZZZ auftaucht, muss vorher diese Java Klasse importiert werden!
-				//Allgemein für Import Statements gilt:
-				//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
-				//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
- 
-				//import statements, funktionieren beide
-				//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
-				//importPackage(basic.zBasic.util.datatype.string);
-				importClass(Packages.basic.zBasic.ExceptionZZZ);
-				importPackage(Packages.basic.zBasic.util.file);
-				
+								
 				//########################
 				//#### EINGABEPARAMETER ######	 				
 				//var myTestvalue="";  ////NOCH KAPUTT 20160402: Damit wird der Fehler erzwungen
@@ -66,13 +53,10 @@
 				
 				//#####################
 				//#### VERARBEITUNG ######	 
-
-				//#### Java, etc.
-				var bErg=false;
-				//bErg = FileEasyZZZ.isRoot(myTestvalue);
-							
+				
+				//#### JavaScript importiern ###########
 				eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
-				bErg = tryoutAnt_ImportJavascript(myTestvalue);	
+				var bErg = tryoutAnt_ImportJavascript(myTestvalue);	
 				print("bErg="+bErg);
 				
 				print("#######################");

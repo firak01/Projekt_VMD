@@ -6,8 +6,9 @@ function tryoutAnt_ImportJavascript(myValue){
 	
 	print("emfangener Parameter: " + myValue);
 	
-	
 	print("################################");
 	print("### ENDE: externes JavaScript ###");
 	print("################+++++###########");
+	
+	return true;
 }
