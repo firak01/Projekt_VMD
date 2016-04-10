@@ -10,7 +10,7 @@
 				var objControlCaller = new Object();
 				var sLine=reflectMethodCurrent_StackLine(myError, objControlCaller);
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-				print(sScript +"sLine="+sLine);
+				//print(sScript +"sLine="+sLine);
 											
 				var sMethod=reflectMethod_StackMethodFromLine(sLine, objControlCaller);
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);												
@@ -25,7 +25,6 @@
 				sReturnControl=sScript+"Fehler. "+ err;					
 			}
 			//print(sScript+"sReturn="+sReturn);
-			if(objControl==undefined) { print("xxxxxxxxxxx"); } else { print("zzzzzzzzzzzz") };
 			objControl.bReturnControl=bReturnControl;
 			objControl.sReturnControl=sReturnControl;
 			return sReturn;
@@ -48,7 +47,7 @@
 				var sCallerLine=reflectMethod_StackLine(myError, iIndex, objControlCaller);
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 				
-				print(sScript+"CallerLine="+sCallerLine);
+				//print(sScript+"CallerLine="+sCallerLine);
 				sReturn=sCallerLine;
 				bReturnControl=true;
 				sReturnControl=sScript + "Alles o.k.";
@@ -79,7 +78,7 @@
 				}else{
 					iIndex=5;
 				}
-				print(sScript+"iIndex="+iIndex);
+				//print(sScript+"iIndex="+iIndex);
 				iReturn=iIndex;
 				bReturnControl=true;
 				sReturnControl=sScript + "Alles o.k.";
@@ -107,7 +106,7 @@
 				
 				var sLine=reflectMethodCalling_StackLine(myError, objControlCaller);
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-				print(sScript +"sMethodCallingLine="+sLine);
+				//print(sScript +"sMethodCallingLine="+sLine);
 											
 				sMethod=reflectMethod_StackMethodFromLine(sLine, objControlCaller);
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);												
@@ -121,8 +120,7 @@
 				bReturnControl=false;
 				sReturnControl=sScript+"Fehler. "+ err;					
 			}
-			//print(sScript+"sReturn="+sReturn);
-			if(objControl==undefined) { print("x4x4x4x4x4x4x4x4x4x4x4"); } else { print("z4z4z4z4z4z4z4z4z4z4z4z4") };
+			//print(sScript+"sReturn="+sReturn);			
 			objControl.bReturnControl=bReturnControl;
 			objControl.sReturnControl=sReturnControl;
 			return sReturn;
@@ -131,7 +129,7 @@
 		//#################################################################
 		function reflectMethodCalling_StackLine(myError, objControl){
 			var sScript="reflectMethodCalling_StackLine: ";
-			print(sScript+"START");
+			//print(sScript+"START");
 			var sReturn="";
 			var bReturnControl=false;
 			var sReturnControl=sScript+"Fehler";
@@ -149,7 +147,7 @@
 				var sCallerLine=reflectMethod_StackLine(myError,iIndexCalling, objControlCaller); //iIndex um einen mehr als bei ...MethodCurrent...
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 									
-				print(sScript+"CallerLine="+sCallerLine);
+				//print(sScript+"CallerLine="+sCallerLine);
 				sReturn=sCallerLine;
 				bReturnControl=true;
 				sReturnControl=sScript + "Alles o.k.";
@@ -159,7 +157,6 @@
 				bReturnControl=false;
 				sReturnControl=sScript+"Fehler. "+ err;					
 			}
-			if(objControl==undefined) { print("x5x5x5x5x5x5x5x5x5x5x5"); } else { print("z5z5z5z5z5z5z5z5z5z5z5z5") };
 			objControl.bReturnControl=bReturnControl;
 			objControl.sReturnControl=sReturnControl;
 			return sReturn;
@@ -189,7 +186,7 @@
 				//Merke Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
 				//ACHTUNG: Wir Suchen als Funktion das VORLETZTE Element in dem Array
 				if(bIsJava7){		
-					print(sScript+"7: Ausfuehrung unter Java7");					
+					//print(sScript+"7: Ausfuehrung unter Java7");					
 					if('undefined'!=myError && null!=myError){					
 						if(undefined!=myError.stack){		
 							print(sScript+"7: Stack im Error Objekt vorhanden");
@@ -214,7 +211,7 @@
 							sCallerLine = saStacktrace[(iIndex)];
 						}				
 					}else{
-						print(sScript+"7: KEIN Error Objekt vorhanden");
+						//print(sScript+"7: KEIN Error Objekt vorhanden");
 						var saStacktrace=createStackTrace();
 						//print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
 						var iuBound=saStacktrace.length-1;
@@ -225,55 +222,55 @@
 						sCallerLine = saStacktrace[(iIndex)];
 					}					
 				}else{
-					print(sScript+"8: Ausfuehrung unter Java8");
+					//print(sScript+"8: Ausfuehrung unter Java8");
 					if('undefined'!=myError && null!=myError){					
 						if(undefined!=myError.stack){		
 							//Java 8, NASHORN funktioniert.
-							print(sScript + "8: Error Stack vorhanden");
+							//print(sScript + "8: Error Stack vorhanden");
 							//print(sScript + "8: Error Stack=" + myError.stack);
 							var saStacktrace = myError.stack.split("\n");
-							print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
+							//print(sScript + "8: Gefundener StackTrace=" + saStacktrace);
 							var iuBound=saStacktrace.length-1;
-							print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
+							//print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 							if(iIndex>iuBound){
 								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 							}			
 							var iIndexToBeUsed=1;
-							print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+							//print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
 							sCallerLine = saStacktrace[(iIndexToBeUsed)];
 						} else {
 							//Ungewöhnlich in Java 8 - wenn kein error-objekt vorhanden ist, vermutlich wurde kein Error Objekt übergeben.
-							print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
+							//print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
 							var stack=createStackTrace();
 							var saStacktrace = stack.split("\n");
-							print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
+							//print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
 							var iuBound=saStacktrace.length-1;									
-							print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
+							//print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 							if(iIndex>iuBound){
 								iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 							}									
 							var iIndexToBeUsed=iIndex+1;
-							print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+							//print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
 							sCallerLine = saStacktrace[(iIndexToBeUsed)];
 						}				
 					}else{
 						//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
-						print(sScript + "8 ohne ErrorObjekt");
+						//print(sScript + "8 ohne ErrorObjekt");
 						
 						var stack=createStackTrace();
 						var saStacktrace = stack.split("\n");
-						print(sScript + "8 ohne ErrorObjekt=" + saStacktrace);	
+						//print(sScript + "8 ohne ErrorObjekt=" + saStacktrace);	
 						var iuBound=saStacktrace.length-1;
-						print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
+						//print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 						if(iIndex>iuBound){
 							iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 						}								
 						var iIndexToBeUsed=iIndex;
-						print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
+						//print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
 						sCallerLine = saStacktrace[(iIndexToBeUsed)];
 					}
 				}
-				print(sScript+"CallerLine="+sCallerLine);
+				//print(sScript+"CallerLine="+sCallerLine);
 				sReturn=sCallerLine;
 				bReturnControl=true;
 				sReturnControl=sScript + "Alles o.k.";
@@ -336,11 +333,10 @@ function reflectMethod_StackMethodFromLine(sStackLine, objControl){
 		print(err);					
 		bReturnControl=false;
 		sReturnControl=sScript+"Fehler. "+ err;					
-	}
-	if(objControl==undefined) { print("x2x2x2x2x2x2x2x2x2x2x2"); } else { print("z2z2z2z2z2z2z2z2z2z2z2z2") };
+	}	
 	objControl.bReturnControl=bReturnControl;
 	objControl.sReturnControl=sReturnControl;								
-	print(sScript+"sReturn="+sReturn);
+	//print(sScript+"sReturn="+sReturn);
 	return sReturn;
 }//End function reflectMethod_StackMethodFromLine
 		
@@ -357,7 +353,7 @@ function createStackTrace() {
 	if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 	
 if(bJava7){		
-   print(sScript+"Java7 Fall");
+  // print(sScript+"Java7 Fall");
   //+++ Java7 Fall
   try {
 	i.dont.exist+=0; //doesn't exist- that's the point
@@ -431,7 +427,7 @@ if(bJava7){
 	}
 	//+++ ENDE Java8 Fall
   
-  output(sScript, callstack);
+  //output(sScript, callstack);
   return callstack;
 }
 
@@ -452,7 +448,7 @@ function output(sScript, arr) {
 			var sReturnControl=sScript+"Fehler";
 			try {			
 				var version = java.lang.System.getProperty("java.version");
-				print("Java Version:" + version);
+				//print("Java Version:" + version);
 				
 				if(version.substring(0,3)=="1.7"){
 					bJava7found=true;
@@ -483,7 +479,7 @@ function output(sScript, arr) {
 			
 				//zu Testzwecken:
 				var version = java.lang.System.getProperty("java.version");
-				print("Java Version:" + version);
+				//print("Java Version:" + version);
 				
 				//var test = java.lang.System.getProperty("java.class.path");
 				//println("classpath="+test);
@@ -491,9 +487,9 @@ function output(sScript, arr) {
 				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
 				try{
 					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-					print("Verwende das alte Rhino unter Java 8");
+					//print("Verwende das alte Rhino unter Java 8");
 				}catch(e){
-					print("Verwende Standard JavaScript Engine dieser Java Vesion.");
+					//print("Verwende Standard JavaScript Engine dieser Java Vesion.");
 				}
 			}//End function enableJava
 			
