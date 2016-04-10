@@ -56,8 +56,23 @@
 				
 				//#### JavaScript importiern ###########
 				eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
-				var bErg = tryoutAnt_ImportJavascript(myTestvalue);	
+				var bErg = tryoutAnt_ImportJavascriptV02(myTestvalue);	
 				print("bErg="+bErg);
+				
+				var bErg = tryoutAnt_ImportJavascriptV01(myTestvalue);	
+				print("bErg="+bErg);
+				
+				//FAZIT: Es stehen alle Funktionen zur Verfügung, aber nur auf dieser Ebene.
+				
+				
+				//TEST: Stehen die Funktionen auch auf anderen Ebenen zur Verfügung?
+				//A) Auf der Ebenen erneut die js-Bibliothek einlesen
+				bErg = sub01_witheval(myTestvalue+" EBENE2a");
+				
+				//B) Auf der Ebenen NICHT erneut die js-Bibliothek einlesen
+				bErg = sub01_noeval(myTestvalue+" EBENE2b");
+				
+				
 				
 				print("#######################");
 				bReturn=bErg;
@@ -98,6 +113,156 @@
 				objControl.bReturnControl=bReturnControl;	
 				return bReturn;
 			}//end function tryout...
+			
+			function sub01_noeval(sTest){
+				try{											
+				//#######################
+				//#### FUNKTIONSRUMPF ######	 
+				var objControlCaller=new Object();
+				var sScript=reflectMethodCurrent_Name(null, objControlCaller);
+				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+				sScript=sScript+": ";
+				print(sScript+"START");
+				print(sScript+"Error objekt im Zusammenspiel mit JAVA UND Unterfunktion");
+								
+				//########################
+				//#### EINGABEPARAMETER ######	 				
+				var myTestvalue=sTest;  ////NOCH KAPUTT 20160402: Damit wird der Fehler erzwungen
+				print("myTestvalue="+myTestvalue);
+		
+				var bReturn = false;
+				var bReturnControl = false; //Zumindest Fehler zurückgegen, wenn der Programmablauf (z.B. im Errorhandling) nicht so ist wie erwartet.
+				var sReturnControl = sScript+"Fehler."; 
+				
+				//#####################
+				//#### VERARBEITUNG ######	 
+				
+				//#### JavaScript NICHT importieren, versuch, ob das Importieren in der aufrufenden Funktion reicht ###########
+				//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
+				var bErg = tryoutAnt_ImportJavascriptV02(myTestvalue);	
+				print("bErg="+bErg);
+				
+				var bErg = tryoutAnt_ImportJavascriptV01(myTestvalue);	
+				print("bErg="+bErg);
+				
+				//FAZIT: Es stehen ohne eval keine Funktionen zur Verfügung, auf dieser Ebene.
+				
+				
+				
+				print("#######################");
+				bReturn=bErg;
+				bReturnControl = true;
+				sReturnControl = "Alles o.k.";
+         
+					//Doku:
+					//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
+					//Da dies in einer einzelnen Funktion gekapselt werden soll, machen wir einen catch und darin if - Abfragen.
+					//}catch (err if err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO, 
+					//		myReturnControlString = "Error: " + err.javaException.getMessageLast();
+					//.................................................	
+					//}catch (err if err.instanceof ExceptionZZZ) {  // So geht das nur mit NASHORN, 
+					//    myReturnControlString = "Error: " + err.getMessageLast();
+					//}catch(err){
+					// ................................................
+					//}	
+				
+				
+				}catch(err) {
+					//#### ERROR HANDLING #######
+					print("Fehler gefangen: " + err);
+					try{																
+						//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+						var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+						var myErrorString = handleError(err,objControlErrh);
+						if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+						bReturnControl = false;
+						sReturnControl= myErrorString;				
+					}catch(e){
+						print(e);					
+						bReturnControl=false;
+						sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					}
+				}
+				print("zuruegegebener controlstring:" + sReturnControl);
+				objControl.sReturnControl=sReturnControl;				
+				objControl.bReturnControl=bReturnControl;	
+				return bReturn;
+			}
+			
+			function sub01_witheval(sTest){
+				try{											
+				//#######################
+				//#### FUNKTIONSRUMPF ######	 
+				var objControlCaller=new Object();
+				var sScript=reflectMethodCurrent_Name(null, objControlCaller);
+				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+				sScript=sScript+": ";
+				print(sScript+"START");
+				print(sScript+"Error objekt im Zusammenspiel mit JAVA UND Unterfunktion");
+								
+				//########################
+				//#### EINGABEPARAMETER ######	 				
+				var myTestvalue=sTest;  ////NOCH KAPUTT 20160402: Damit wird der Fehler erzwungen
+				print("myTestvalue="+myTestvalue);
+		
+				var bReturn = false;
+				var bReturnControl = false; //Zumindest Fehler zurückgegen, wenn der Programmablauf (z.B. im Errorhandling) nicht so ist wie erwartet.
+				var sReturnControl = sScript+"Fehler."; 
+				
+				//#####################
+				//#### VERARBEITUNG ######	 
+				
+				//#### JavaScript importieren, da das Importieren in der aufrufenden Funktion NICHT reicht ###########
+				eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
+				var bErg = tryoutAnt_ImportJavascriptV02(myTestvalue);	
+				print("bErg="+bErg);
+				
+				var bErg = tryoutAnt_ImportJavascriptV01(myTestvalue);	
+				print("bErg="+bErg);
+				
+				//FAZIT: Es stehen alle Funktionen zur Verfügung, aber nur nach Eval auf dieser Ebene.
+				
+				
+				
+				print("#######################");
+				bReturn=bErg;
+				bReturnControl = true;
+				sReturnControl = "Alles o.k.";
+         
+					//Doku:
+					//Von der Reihenfolge der catches wäre notwendig: Erst die genau definierten Fehler abfangen, dann die allgemeinen.
+					//Da dies in einer einzelnen Funktion gekapselt werden soll, machen wir einen catch und darin if - Abfragen.
+					//}catch (err if err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO, 
+					//		myReturnControlString = "Error: " + err.javaException.getMessageLast();
+					//.................................................	
+					//}catch (err if err.instanceof ExceptionZZZ) {  // So geht das nur mit NASHORN, 
+					//    myReturnControlString = "Error: " + err.getMessageLast();
+					//}catch(err){
+					// ................................................
+					//}	
+				
+				
+				}catch(err) {
+					//#### ERROR HANDLING #######
+					print("Fehler gefangen: " + err);
+					try{																
+						//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+						var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+						var myErrorString = handleError(err,objControlErrh);
+						if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+						bReturnControl = false;
+						sReturnControl= myErrorString;				
+					}catch(e){
+						print(e);					
+						bReturnControl=false;
+						sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					}
+				}
+				print("zuruegegebener controlstring:" + sReturnControl);
+				objControl.sReturnControl=sReturnControl;				
+				objControl.bReturnControl=bReturnControl;	
+				return bReturn;
+			}
 						
 			
 			//#############################################
@@ -108,6 +273,9 @@
 				var sReturnControl="Fehler im handleError";
 				var bReturnControl=false;
 				try{
+				    //Wichtig: Importiere ExceptionZZZ
+					importClass(Packages.basic.zBasic.ExceptionZZZ);
+					
 					var objControlCaller=new Object();
 					var sScript=reflectMethodCurrent_Name(null, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error("Fehler beim Ermittlen des aktuellen Funktionnamens im ErrorHandling: " + objControlCaller.sReturnControl);

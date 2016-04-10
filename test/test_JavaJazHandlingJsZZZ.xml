@@ -127,8 +127,7 @@
  
 				//import statements, funktionieren beide
 				//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
-				//importPackage(basic.zBasic.util.datatype.string);
-				importClass(Packages.basic.zBasic.ExceptionZZZ);
+				//importPackage(basic.zBasic.util.datatype.string);				
 				importPackage(Packages.basic.zBasic.util.file);
 			
 				//#############
@@ -191,6 +190,9 @@
 				var sReturnControl="Fehler im handleError";
 				var bReturnControl=false;
 				try{
+					//Wichtig: Importierere ExceptionZZZ
+					importClass(Packages.basic.zBasic.ExceptionZZZ);
+				
 					var objControlCaller=new Object();
 					var sScript=reflectMethodCurrent_Name(null, objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error("Fehler beim Ermittlen des aktuellen Funktionnamens im ErrorHandling: " + objControlCaller.sReturnControl);

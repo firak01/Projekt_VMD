@@ -104,6 +104,10 @@
 				bReturn=false;
 				sReturn="";
 			}else{
+				//auch das eval ausfürhern auf oberer ebenen bringt nix
+				//bReturn = enableKernelAntJs(objKernelLibs, objControlCaller);
+				//if(!objControlCaller.bReturnControl) throw new Error("tryout_reflectMethodCallingName: " + objControlCaller.sReturnControl);
+				
 				sReturn=tryout_reflectMethodCallingName(objKernelLibs, objControlCaller);
 				if(!objControlCaller.bReturnControl){									
 					bReturn=false;
@@ -128,30 +132,30 @@
 				var sReturnControl="Fehler";						
 				try{					
 					objKernelLibs[0] = new Object();
-					objKernelLibs[0]["Alias"] = "ReflectCode";
-					objKernelLibs[0]["Directory"] = "jsscriptdef";
-					objKernelLibs[0]["File"] = "ZAnt.basic.zBasic.ReflectCodeZZZ.js";
+					objKernelLibs[0]["ALIAS"] = "ReflectCode";
+					objKernelLibs[0]["DIRECTORY"] = "jsscriptdef";
+					objKernelLibs[0]["FILE"] = "ZAnt.basic.zBasic.ReflectCodeZZZ.js";
 
 					objKernelLibs[1] = new Object();
-					objKernelLibs[1]["Alias"] = "HandleError";
-					objKernelLibs[1]["Directory"] = "jsscriptdef"; 
-					objKernelLibs[1]["File"] = "ZAnt.basic.zBasic.HandleErrorZZZ.js";
+					objKernelLibs[1]["ALIAS"] = "HandleError";
+					objKernelLibs[1]["DIRECTORY"] = "jsscriptdef"; 
+					objKernelLibs[1]["FILE"] = "ZAnt.basic.zBasic.HandleErrorZZZ.js";
 
 					//REM Das Original aus dem Tryout.
 					//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
 					for (var i = 0; i < objKernelLibs.length; i++) { 									
-						//print("Lies Kernel Ant Js Bibliothek ein: '" + objKernelLibs[i]["Alias"]+"'"); 
-						for (var objEigenschaft in objKernelLibs[i]) {
-							print("Eigenschaft: '" + objEigenschaft + " = " + objKernelLibs[i][objEigenschaft] + "'"); 							
-						}	
+						//print("Lies Kernel Ant Js Bibliothek ein: '" + objKernelLibs[i]["ALIAS"]+"'"); 
+						//for (var objEigenschaft in objKernelLibs[i]) {
+						//	print("Eigenschaft: '" + objEigenschaft + " = " + objKernelLibs[i][objEigenschaft] + "'"); 							
+						//}	
+						
 						//Merke: basedir im Ant-Projekt ist auf ".." gesetzt.
-						//print("'../" + objKernelLibs[i]["Directory"] + "/" + objKernelLibs[i]["File"] +"'");					
-						objKernelLibs[i]["Code"] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( "../"+objKernelLibs[i]["Directory"] + "/" + objKernelLibs[i]["File"]));
-						//objKernelLibs[i]["CodeExecuted"] = eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( "../"+objKernelLibs[i]["Directory"] + "/" + objKernelLibs[i]["File"]) ) +'') ;
+						//print("'../" + objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"] +"'");																
+						objKernelLibs[i]["LOADINGSTRING"] = "org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(\"../"+objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"]+"\"))";
+						//print("objKernelLibs[i][LOADINGSTRING] = " + objKernelLibs[i]["LOADINGSTRING"]);
+						objKernelLibs[i]["LOADER"] = eval(objKernelLibs[i]["LOADINGSTRING"]); //Der LOADER kann dann mit eval('' + eval(objKernelLibs[i]["LOADER"])) ausgeführt werden
+						//Das ist dann etwas zuviel und funktioniert nicht... objKernelLibs[i]["CODEEXECUTED"] = eval('' + eval(objKernelLibs[i]["LOADER"])) ;						
 					}
-					
-					
-					
 					bReturnControl=true;
 					sReturnControl=sScript+"Alles o.k."
 					bReturn=true;
@@ -185,9 +189,43 @@
 							print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
 							for (var i = 0; i < objKernelLibs.length; i++) { 	
 								print("Lib: " + objKernelLibs[i]["Alias"]);					
-								var erg=eval('' + objKernelLibs[i]["Code"] +'');
-								objKernelLibs[i]["CodeExecuted"]=erg;
-								print("Lib loading result: " + erg);
+								print("Loader: " + objKernelLibs[i]["Loader"]);
+								//var erg=eval('' + objKernelLibs[i]["Loader"] +'');
+								
+								//Beispiel aus dem Tryout:
+								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
+														
+								
+								var erg="eval NICHT an erg zurueckgeben.";
+								//var erg=eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
+								//var erg=eval('' + objKernelLibs[i]["Loader"]);
+								//var erg=eval(objKernelLibs[i]["Loader"]);
+								//var erg=eval('+objKernelLibs[i]["Loader"]+'); //unexspected end of file
+								//var erg=eval(''+'+objKernelLibs[i]["Loader"]+'); //unexspected end of file
+								
+								
+								//var erg=eval('' + objKernelLibs[i]["CODE"] +''); //Ergibt, das es String sei....
+								
+								
+								//erg=eval('' + objKernelLibs[i]["Loader"]);
+								//erg=
+								
+								//erg=eval('+objKernelLibs[i]["Loader"]+');//unexspected end of file
+								
+								//ALSO: Wenn der Loader nicht funktioniert hier den Pfad nachbauen.
+								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../objKernelLibs[i]["Directory"]/objKernelLibs[i]["File"]')));//Syntax für Dateinamen ist falsch
+								
+								var spath = "../" + objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"];
+								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader('" + spath + "')));//file not found exception spath!!
+								
+								//Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
+								//org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(spath)); //So wird die datei gefunden
+								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(spath)) ); //So werden die Funktionen aus der gefundene Datei bereitgestellt
+								eval('' + eval(objKernelLibs[i]["LOADER"])); //funktioniert
+								//eval(objKernelLibs[i]["CODEEXECUTED"]);   //funktioniert NICHT, ist dann ein bissl zuviel
+								
+								//mal sehn, ob die letze funktion des externen Scripts zur Verfügung steht.
+								errorTraced();
 							}
 						}
 					}					
@@ -196,9 +234,9 @@
 					errorTraced();
 					print("### errorTraced ausgeführt");
 					print("#######################");
-					//mal sehn, ob die reflectMethodCurret_Name funktion des externen Scripts zur Verfügung steht.
+					//mal sehn, ob die reflectMethodCurrent_Name funktion des externen Scripts zur Verfügung steht.
 					var objControlCaller = new Object();
-					var stemp = reflectMethodCurrent_Name(null, objControlCaller)();
+					var stemp = reflectMethodCurrent_Name(null, objControlCaller);
 					
 					//TODO GOON NOCH KAPUTT
 					
@@ -226,11 +264,20 @@
 				var sReturnControl="Fehler";	
 				
 				try{
-					var objControlCaller=new Object();		
-					enableKernelAntJs(objKernelLibs, objControlCaller);
-					if(!objControlCaller.bReturnControl) throw new Error("tryout_reflectMethodCallingName: " + objControlCaller.sReturnControl);
+					var objControlCaller=new Object();	
+					//TODO GOON: NOCH KAPUTT
+					//Diese enableKernelFunktion in eine neue test_ImportKernelAntJs.xml packen, ansonsten ist es nicht sinnvoll einzusetzen.
+					//enableKernelAntJs(objKernelLibs, objControlCaller);
+					//if(!objControlCaller.bReturnControl) throw new Error("tryout_reflectMethodCallingName: " + objControlCaller.sReturnControl);
 											
-					//mal sehn, ob die letze funktion des externen Scripts zur Verfügung steht.
+					//HIER DAS EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG
+					//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["Alias"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						eval('' + eval(objKernelLibs[i]["LOADER"])); //Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
+					}													
+					print("### versuche errorTraced HIER auszuführen");
 					errorTraced();
 					print("### errorTraced ausgeführt");
 											
@@ -262,9 +309,17 @@
 				var sReturnControl="Fehler";
 				try{
 					var objControlCaller=new Object();
-					enableKernelAntJs(objKernelLibs, objControlCaller);
-					if(!objControlCaller.bReturnControl) throw new Error("tryout_Sub01_Calling: " + objControlCaller.sReturnControl);
-										
+					//enableKernelAntJs(objKernelLibs, objControlCaller);
+					//if(!objControlCaller.bReturnControl) throw new Error("tryout_Sub01_Calling: " + objControlCaller.sReturnControl);
+					
+                    //HIER DAS EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG
+					//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["Alias"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						eval('' + eval(objKernelLibs[i]["LOADER"])); //Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
+					}		
+					
 					var sScript = reflectMethodCurrent_Name(null, objControlCaller);					
 					if(!objControlCaller.bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + objControlCaller.sReturnControl);
 					sScript=sScript+": ";
