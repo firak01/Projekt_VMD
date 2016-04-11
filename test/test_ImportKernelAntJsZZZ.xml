@@ -40,14 +40,16 @@
 			var sReturnControl="Fehler";
 				
 			//Die benoetigten Kernel-Funktionen laden
-			var objKernelLibs = new Array();
+			//var objKernelLibs = new Array();
 			var objControlCaller=new Object();
-			var bReturn = enableKernelAntJs(objKernelLibs, objControlCaller);
+			//var bReturn = enableKernelAntJs(objKernelLibs, objControlCaller);
+			var bReturn = enableKernelAntJs(objControlCaller);
 			if(!objControlCaller.bReturnControl){								
 				bReturn=false;
 				sReturn="";
 			}else{				
-				sReturn=tryout_importKernelAntJs(objKernelLibs, objControlCaller);
+				//sReturn=tryout_importKernelAntJs(objKernelLibs, objControlCaller);
+				sReturn=tryout_importKernelAntJs(objControlCaller);
 				if(!objControlCaller.bReturnControl){									
 					bReturn=false;
 					sReturn="";
@@ -61,11 +63,13 @@
 			project.setProperty(attributes.get("returncontrol"),bReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
 						
-			function enableKernelAntJs(objKernelLibs, objControl){
+			//function enableKernelAntJs(objKernelLibs, objControl){
+			function enableKernelAntJs(objControl){
 				var sScript = "enableKernelAntJs: ";
 				
 			    //Erstelle eine Array der grundlegenden JavaScript-Kernel Funktionen.
 				//und lies dieses Array ein.
+				var objKernelLibs = new Array();
 				var bReturn=false; 
 				var bReturnControl=false;
 				var sReturnControl="Fehler";						
@@ -94,7 +98,9 @@
 						//print("objKernelLibs[i][LOADINGSTRING] = " + objKernelLibs[i]["LOADINGSTRING"]);
 						objKernelLibs[i]["LOADER"] = eval(objKernelLibs[i]["LOADINGSTRING"]); //Der LOADER kann dann mit eval('' + eval(objKernelLibs[i]["LOADER"])) ausgeführt werden
 						//Das ist dann etwas zuviel und funktioniert nicht... objKernelLibs[i]["CODEEXECUTED"] = eval('' + eval(objKernelLibs[i]["LOADER"])) ;						
+						//Das ist dann etwas zuviel und funktioniert nicht... objKernelLibs[i]["CODEEXECUTED"] = eval(objKernelLibs[i]["LOADER"]) ;
 					}
+					objControl["KERNELLIBS"]=objKernelLibs;
 					bReturnControl=true;
 					sReturnControl=sScript+"Alles o.k."
 					bReturn=true;
@@ -109,7 +115,8 @@
 				return bReturn;
 			}
 			
-			function loadKernelAntJs(objKernelLibs, objControl){
+			//function loadKernelAntJs(objKernelLibs, objControl){
+			function loadKernelAntJs(objControl){
 				var sScript = "loadKernelAntJs: ";
 				
 			    //Erstelle eine Array der grundlegenden JavaScript-Kernel Funktionen.
@@ -119,13 +126,15 @@
 				var sReturnControl="Fehler";						
 				try{	
 					print("#######################");
-					if(objKernelLibs==undefined || objKernelLibs==null){
+					if(objControl["KERNELLIBS"]==undefined || objControl["KERNELLIBS"]==null){
+					//if objKernelLibs==undefined || objKernelLibs==null){
 						print("Keine Kernel Ant Js Libs uebergeben zum Laden");
 					} else {
+						var objKernelLibs = objControl["KERNELLIBS"];
 						if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
-							print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+							print(sScript+"Keine Kernel Ant Js Libs vorhanden zum Laden");
 						} else {
-							print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+							print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
 							for (var i = 0; i < objKernelLibs.length; i++) { 	
 								print("Lib: " + objKernelLibs[i]["Alias"]);					
 								print("Loader: " + objKernelLibs[i]["Loader"]);
@@ -143,8 +152,14 @@
 								//Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
 								//org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(spath)); //So wird die datei gefunden
 								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(spath)) ); //So werden die Funktionen aus der gefundene Datei bereitgestellt
-								eval('' + eval(objKernelLibs[i]["LOADER"])); //funktioniert
+								//funktioniert:eval('' + eval(objKernelLibs[i]["LOADER"])); //funktioniert
 								//eval(objKernelLibs[i]["CODEEXECUTED"]);   //funktioniert NICHT, ist dann ein bissl zuviel
+								
+								//funktioniert: 
+								eval(objKernelLibs[i]["LOADER"]); //funktioniert, so wird der Code eingebunden.
+								
+								//objKernelLibs[i]["CODEEXECUTED"] = eval(objKernelLibs[i]["LOADER"]); //funktioniert
+								//funktioniert nicht: eval(objKernelLibs[i]["CODEEXECUTED"]); //functioniert nicht, ist ein bissl zuviel.
 								
 								//mal sehn, ob die letze funktion des externen Scripts zur Verfügung steht.
 								errorTraced();
@@ -182,7 +197,8 @@
 			}
 			
 						
-			function tryout_importKernelAntJs(objKernelLibs, objControl){	 
+			//function tryout_importKernelAntJs(objKernelLibs, objControl){	 
+			function tryout_importKernelAntJs(objControl){	 
 				var sScript = "tryout_importKernelAntJs: ";
 				var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
 				var bReturnControl=false;
@@ -190,15 +206,28 @@
 				
 				try{
 					var objControlCaller=new Object();						
-					loadKernelAntJs(objKernelLibs, objControlCaller); //Obwohl man hierin das Laden der JS-Funktionen durchführt, stehen die Funktionen hier nicht zur Verfügung.
+					//loadKernelAntJs(objKernelLibs, objControlCaller); //Obwohl man hierin das Laden der JS-Funktionen durchführt, stehen die Funktionen hier nicht zur Verfügung.
+					loadKernelAntJs(objControlCaller); //Obwohl man hierin das Laden der JS-Funktionen durchführt, stehen die Funktionen hier nicht zur Verfügung.
 					if(!objControlCaller.bReturnControl) throw new Error("tryout_reflectMethodCallingName: " + objControlCaller.sReturnControl);
 											
 					//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG
-					//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
-					for (var i = 0; i < objKernelLibs.length; i++) { 	
-						//print("Lib: " + objKernelLibs[i]["Alias"]);					
-						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
-						eval('' + eval(objKernelLibs[i]["LOADER"])); //Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
+					if(objControlCaller["KERNELLIBS"]==undefined || objControlCaller["KERNELLIBS"]==null){
+						print("Keine Kernel Ant Js Libs zum Laden vorhanden.");
+					} else {						
+						var objKernelLibs = objControlCaller["KERNELLIBS"];						
+						if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+							print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+						} else {
+							print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+							for (var i = 0; i < objKernelLibs.length; i++) { 	
+								//print("Lib: " + objKernelLibs[i]["Alias"]);					
+								//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+								//funktioniert: eval('' + eval(objKernelLibs[i]["LOADER"])); //Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
+								//funktioniert: 
+								eval(objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+								//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+							}
+						}
 					}
 					print("#######################");					
 					print("### versuche errorTraced HIER auszuführen");
@@ -220,7 +249,8 @@
 					sReturnControl=sScript+"Fehler";		
 					print("Name der aktuellen Funktion: "+sScript);
 					
-					sReturn = tryout_Sub01_Calling(objKernelLibs, objControlCaller);
+					//sReturn = tryout_Sub01_Calling(objKernelLibs, objControlCaller);
+					sReturn = tryout_Sub01_Calling(objControlCaller);
 					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
 					
 					sReturnControl="Alles o.k."
@@ -236,20 +266,28 @@
 				return sReturn;
 			}
 			
-			function tryout_Sub01_Calling(objKernelLibs, objControl){
+			//function tryout_Sub01_Calling(objKernelLibs, objControl){
+			function tryout_Sub01_Calling(objControl){
 				var sReturn="nix"; //Ziel: Den Namen der aufrufenden funktin (also nicht dier dieser tryout_Sub01 Funktion) auf Ant-Script Ebene zu erhalten.
 				var bReturnControl=false;
 				var sReturnControl="Fehler";
 				try{
 					var objControlCaller=new Object();
 					
-                    //HIER DAS EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG
-					//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
-					for (var i = 0; i < objKernelLibs.length; i++) { 	
-						//print("Lib: " + objKernelLibs[i]["Alias"]);					
-						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
-						eval('' + eval(objKernelLibs[i]["LOADER"])); //Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
-					}		
+					//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG
+					if(objControl["KERNELLIBS"]==undefined || objControl["KERNELLIBS"]==null){
+						print("Keine Kernel Ant Js Libs zum Laden vorhanden.");
+					} else { 						
+						var objKernelLibs = objControl["KERNELLIBS"];
+						if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+							print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+						} else {
+							print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+							for (var i = 0; i < objKernelLibs.length; i++) { 	
+								eval(objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.							
+							}
+						}
+					}
 					
 					var sScript = reflectMethodCurrent_Name(null, objControlCaller);					
 					if(!objControlCaller.bReturnControl) throw new Error("tryout_reflectMethodCurrentName: " + objControlCaller.sReturnControl);
