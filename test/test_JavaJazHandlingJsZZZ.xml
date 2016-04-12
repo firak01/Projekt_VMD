@@ -17,77 +17,153 @@
  <!-- ########################### -->
  <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
  <scriptdef name="tryout_jaz_string_camelcase" language="javascript">
-     <attribute name="filename_search" />
-     <attribute name="filenames" />
-	 <attribute name="filelengths" />
-	 <attribute name="tryout" />
+     <attribute name="inputstring" />
+	 <attribute name="returnstring" />
+	 <attribute name="returncontrol" />
+	 <attribute name="returncontrolstring" />
      <![CDATA[
-		   enableJava();
-		   
-		   //Allgemein für Import Statements gilt:
-		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
-		   //                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
-	 
-		   // import statements, funktionieren beide
-			//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
-			//importPackage(basic.zBasic.util.datatype.string);
-			importPackage(Packages.basic.zBasic.util.datatype.string);
-	 
-			var test = java.lang.System.getProperty("java.class.path");
-			println("classpath="+test);
+				var myString = attributes.get("inputstring");
 			
-			
-			//#############
-			 //#### EINGABE ######	 
-			var file2search = attributes.get("filename_search");
-			print("file2search="+file2search);
-			
-			//#### Java, etc.
-			var serg = StringZZZ.toCamelCase(file2search,"_");
-			//var serg = "test ohne java";
-			print("serg="+serg);
-			
-			// create and use a Task via Ant API
-			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
-			//echo = self.getProject().createTask("echo");
-			//echo.setMessage("Ergebnis + ": " + serg);
-			//echo.perform();
-         
-			  
-		//	var arrayFilenames=new Array();
-		//	var arrayFilelengths=new Array();
-			
-		//	arrayFilenames.push('Woa'); 
-		//	arrayFilenames.push('Wob'); 
-		//	arrayFilelengths.push(1234); 
-			
-			
-			//#### RÜCKGABE #####
-		//	project.setProperty(attributes.get("tryout"), "Text zurueckgeben: " + serg);  
-		//	project.setProperty(attributes.get("filenames"), arrayFilenames);
-		//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
+			var sReturn=""; 
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
 		
-		
-		
-		//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//print("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+			//Die benoetigten Kernel-Funktionen laden
+			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var objKernelLibs = new Array();
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs, "", objControlCaller);
+			if(!objControlCaller.bReturnControl){								
+				bReturn=false;
+				sReturn="";
+			}else{										
+				sReturn=tryout_jaz_stringCamelcase(objKernelLibs,myString, objControlCaller);		
+				if(!objControlCaller.bReturnControl){									
+					bReturn=false;
+					sReturn="";
+				}else{					
+				}
+			}	
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+			//project.setProperty(attributes.get("returnboolean"),bReturn);
+			project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
 				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k."
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					//print("Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
 			}
+			
+		//#################################################################################################
+			function tryout_jaz_stringCamelcase(objKernelLibs, myString, objControl){	 			
+				var sScript = "tryout_jaz_stringCamelcase: ";
+				var sReturn="nixnix"; 
+				var bReturnControl=false;
+				var sReturnControl="Fehler";	
+				
+				try{															
+					//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						print("Keine Kernel Ant Js Libs uebergeben.");
+					} else {						
+						if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+							print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+						} else {
+							print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+							for (var i = 0; i < objKernelLibs.length; i++) { 	
+								//print("Lib: " + objKernelLibs[i]["Alias"]);					
+								//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+								//funktioniert: 
+								eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+								//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+							}
+						}
+					}
+					print("#######################");								
+					enableJava();
+		   
+					//Allgemein für Import Statements gilt:
+					//importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
+					//                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
+	 
+					// import statements, funktionieren beide
+					//importClass(package.basic.zBasic.util.datatype.string.StringZZZ);
+					//importPackage(basic.zBasic.util.datatype.string);
+					importPackage(Packages.basic.zBasic.util.datatype.string);
+	 
+					var test = java.lang.System.getProperty("java.class.path");
+					println("classpath="+test);
+		
+					 //#### EINGABE ######	 
+					print("myString="+myString);
+					
+					//#### Java, etc.
+					sReturn = StringZZZ.toCamelCase(myString,"_");
+					print("sReturn="+sReturn);
+					
+					sReturnControl=sScript+"Alles o.k.";
+					bReturnControl=true;
+					
+					}catch(err){	
+						print("Fehler gefangen: " + err);
+						//#### SIMPLES ERROR HANDLING #######							
+						//bReturnControl=false;
+						//sReturnControl=sScript+"Fehler. "+ err;	
+
+
+						//#### ERROR HANDLING #######
+						try{																
+							//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+							var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+							var myErrorString = handleError(err,objControlErrh);
+							if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+							bReturnControl = false;
+							sReturnControl= myErrorString;				
+						}catch(e){
+							print(e);					
+							bReturnControl=false;
+							sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+						}
+					}
+					
+					//#### RÜCKGABE #####
+					objControl.sReturnControl=sReturnControl;				
+					objControl.bReturnControl=bReturnControl;
+					return sReturn;
+				}
 	      ]]>
   </scriptdef>
   				
@@ -110,7 +186,7 @@
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
 			var objKernelLibs = new Array();
 			var objControlCaller=new Object();
-			var bReturn = enableKernelAntJs(objKernelLibs, objControlCaller);
+			var bReturn = enableKernelAntJs(objKernelLibs, "", objControlCaller);
 			if(!objControlCaller.bReturnControl){								
 				bReturn=false;
 				sReturn="";
@@ -121,7 +197,6 @@
 					bReturn=false;
 					sReturn="";
 				}else{					
-					bReturn=true;
 				}
 			}	
 			bReturnControl=objControlCaller.bReturnControl;
@@ -132,41 +207,26 @@
 			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
 
 			//###################################################################
-            //#### KERNEL Libs
+            //#### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
-			function enableKernelAntJs(objKernelLibs, objControl){			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
 				var sScript = "enableKernelAntJs: ";
-				var bReturn=false; 
-				var bReturnControl=false;
-				var sReturnControl="Fehler";
 				try{
 					if(objKernelLibs==undefined || objKernelLibs==null){
 						var err = new Error("objKernelLibs nicht deklariert.");
 						throw err;
 					}
-					
-					//Erstelle eine Array der grundlegenden JavaScript-Kernel Funktionen, die in externen Dateien ausgelagert wurden.								
-					objKernelLibs[0] = new Object();
-					objKernelLibs[0]["ALIAS"] = "ReflectCode";
-					objKernelLibs[0]["DIRECTORY"] = "jsscriptdef";
-					objKernelLibs[0]["FILE"] = "ZAnt.basic.zBasic.ReflectCodeZZZ.js";
-
-					objKernelLibs[1] = new Object();
-					objKernelLibs[1]["ALIAS"] = "HandleError";
-					objKernelLibs[1]["DIRECTORY"] = "jsscriptdef"; 
-					objKernelLibs[1]["FILE"] = "ZAnt.basic.zBasic.HandleErrorZZZ.js";
-															
-					objKernelLibs[2] = new Object();
-					objKernelLibs[2]["ALIAS"] = "HandleError";
-					objKernelLibs[2]["DIRECTORY"] = "jsscriptdef"; 
-					objKernelLibs[2]["FILE"] = "ZAnt.basic.zBasic.JavaHelperZZZ.js";
-					
-					//REM Das Original aus dem grundlegendne Import-Tryout.
-					//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
-					for (var i = 0; i < objKernelLibs.length; i++) { 															
-						objKernelLibs[i]["LOADINGSTRING"] = "org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(\"../"+objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"]+"\"))";
-						objKernelLibs[i]["LOADER"] = eval(objKernelLibs[i]["LOADINGSTRING"]); //Der LOADER kann dann mit eval(objKernelLibs[i]["LOADER"]) ausgeführt werden
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
 					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
 					bReturnControl=true;
 					sReturnControl=sScript+"Alles o.k."
 					bReturn=true;
@@ -196,7 +256,7 @@
 						} else {
 							//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
 							for (var i = 0; i < objKernelLibs.length; i++) { 									
-								eval(objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.								
+								eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.								
 							}
 						}
 					}
@@ -253,20 +313,24 @@
 					//}				
 				
 				}catch(err) {
-					//#### ERROR HANDLING #######
 					print("Fehler gefangen: " + err);
-					try{																
-						//Wende Funktion an, zur Ermittlung der aktuellen Funktion
-						var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
-						var myErrorString = handleError(err,objControlErrh);
-						if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-						bReturnControl = false;
-						sReturnControl= myErrorString;				
-					}catch(e){
-						print(e);					
-						bReturnControl=false;
-						sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
-					}
+						//#### SIMPLES ERROR HANDLING #######							
+						//bReturnControl=false;
+						//sReturnControl=sScript+"Fehler. "+ err;	
+
+						//#### ERROR HANDLING #######
+						try{																
+							//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+							var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+							var myErrorString = handleError(err,objControlErrh);
+							if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+							bReturnControl = false;
+							sReturnControl= myErrorString;				
+						}catch(e){
+							print(e);					
+							bReturnControl=false;
+							sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+						}
 				}
 				print("zuruegegebener controlstring aus JAZ-Fehler:" + sReturnControl);
 				objControl.sReturnControl=sReturnControl;				
@@ -281,9 +345,103 @@
  <scriptdef name="tryout_jaz_fileeasy_isRoot" language="javascript">
      <attribute name="inputfilepath" />
      <attribute name="returnboolean" />
+	 <attribute name="returncontrol" />
+	 <attribute name="returncontrolstring" />
      <![CDATA[
-		   enableJava();
-		   
+			var myFilepath = attributes.get("inputfilepath");
+			
+			var sReturn=""; 
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
+		
+			//Die benoetigten Kernel-Funktionen laden
+			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var objKernelLibs = new Array();
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs,"", objControlCaller);
+			if(!objControlCaller.bReturnControl){								
+				bReturn=false;
+				sReturn="";
+			}else{										
+				bReturn=tryout_jaz_fileeasyIsRoot(objKernelLibs,myFilepath, objControlCaller);		
+				if(!objControlCaller.bReturnControl){									
+					bReturn=false;
+					sReturn="";
+				}else{										
+				}
+			}	
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+			project.setProperty(attributes.get("returnboolean"),bReturn);
+			//project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k."
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					//print("Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
+			}
+			
+		//#################################################################################################
+		function tryout_jaz_fileeasyIsRoot(objKernelLibs, myFilepath, objControl){	 			
+				var sScript = "tryout_jaz_stringCamelcase: ";
+				//var sReturn="nixnix"; 
+				var bReturn=false;
+				var bReturnControl=false;
+				var sReturnControl="Fehler";	
+				
+				try{															
+					//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						print("Keine Kernel Ant Js Libs uebergeben.");
+					} else {						
+						if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+							print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+						} else {
+							print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+							for (var i = 0; i < objKernelLibs.length; i++) { 	
+								//print("Lib: " + objKernelLibs[i]["Alias"]);					
+								//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+								//funktioniert: 
+								eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+								//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+							}
+						}
+					}
+					print("#######################");								
+					enableJava();
+		
 		   //Allgemein für Import Statements gilt:
 		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
 		   //                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
@@ -296,61 +454,43 @@
 			var test = java.lang.System.getProperty("java.class.path");
 			print("classpath="+test);
 			
-			
-			//#############
-			 //#### EINGABE ######	 
-			var myFilepath = attributes.get("inputfilepath");
+
+			 //#### EINGABE ######
 			print("myFilepath="+myFilepath);
 			
 			//#### Java, etc.
-			var bErg = FileEasyZZZ.isRoot(myFilepath);
-			print("bErg="+bErg);
+			bReturn = FileEasyZZZ.isRoot(myFilepath);
+			print("bReturn="+bReturn);
 			
-			
-			//var serg = StringZZZ.toCamelCase(file2search,"_");
-			//var serg = "test ohne java";
-			//println("serg="+serg);
-			
-			// create and use a Task via Ant API
-			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
-			//echo = self.getProject().createTask("echo");
-			//echo.setMessage("Ergebnis + ": " + serg);
-			//echo.perform();
-         
-			  
-		//	var arrayFilenames=new Array();
-		//	var arrayFilelengths=new Array();
-			
-		//	arrayFilenames.push('Woa'); 
-		//	arrayFilenames.push('Wob'); 
-		//	arrayFilelengths.push(1234); 
-			
-			
-			//#### RÜCKGABE #####
-			project.setProperty(attributes.get("returnboolean"), bErg);  
-		//	project.setProperty(attributes.get("filenames"), arrayFilenames);
-		//	project.setProperty(attributes.get("filelengths"), arrayFilelengths); 
-		
-		
-		
-		//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//println("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
+					sReturnControl=sScript+"Alles o.k.";
+					bReturnControl=true;
+					
+					}catch(err){	
+						print("Fehler gefangen: " + err);
+						//#### SIMPLES ERROR HANDLING #######							
+						//bReturnControl=false;
+						//sReturnControl=sScript+"Fehler. "+ err;	
+
+
+						//#### ERROR HANDLING #######
+						try{																
+							//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+							var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+							var myErrorString = handleError(err,objControlErrh);
+							if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+							bReturnControl = false;
+							sReturnControl= myErrorString;				
+						}catch(e){
+							print(e);					
+							bReturnControl=false;
+							sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+						}
+					}
+					
+					//#### RÜCKGABE #####
+					objControl.sReturnControl=sReturnControl;				
+					objControl.bReturnControl=bReturnControl;
+					return bReturn;
 			}
 	      ]]>
   </scriptdef>
@@ -361,7 +501,7 @@
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!--<target name="compile" depends=" -myTestJAZUsedByJavaScript_ErrorHandling, -myTestJAZUsedByJavaScript_ErrorHandlingCascaded, -myTestJAZUsedByJavaScript_FileEasyZZZ, -myTestJAZUsedByJavaScript_StringZZZ, ">-->
- <target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandling">
+ <target name="compile" depends="-myTestJAZUsedByJavaScript_ErrorHandlingCascaded">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -622,6 +762,10 @@
 		<fl:let>sScript::='-myTestJAZUsedByJavaScript_FileEasyZZZ: '</fl:let>
 		<fl:let>sTrace::=""</fl:let>
 		<echo>${sScript}Start</echo>
+		
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
 
 		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
 		<ac:if>
@@ -637,28 +781,51 @@
 	 </ac:if>
 	 
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<tryout_jaz_fileeasy_isRoot inputfilepath="c:\\" returnboolean="myReturnValue"/>
+		<tryout_jaz_fileeasy_isRoot inputfilepath="c:\\" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<echo message="myReturnValue = ${myReturnValue}" />
 		
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<tryout_jaz_fileeasy_isRoot inputfilepath="c:\\temp" returnboolean="myReturnValue"/>
+		<tryout_jaz_fileeasy_isRoot inputfilepath="c:\\temp" returnboolean="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<echo message="myReturnValue = ${myReturnValue}" />
 		
-		<!-- Verwende antcontrib für eine Schleife über die Arrays --><!-- do something with @{myelement} -->
-<!-- 		<for list="${myfilenames}" param="myelement">
-			<sequential>				
-				<echo>myelement= @{myelement}</echo>
-			</sequential>
-		</for> -->
+		</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+	</trycatch>
 		
 	</target> 
 	
 	<target name="-myTestJAZUsedByJavaScript_StringZZZ">
-		<echo>myTestJavaUsedByJavaScript: </echo>
-		<property name="fs.dir" value="../testused"/>
-		<property name="fs.includes" value="**/*.txt"/>
-		<property name="fs.excludes" value="**/*.tmp"/>
+		<fl:let>sScript::='-myTestJAZUsedByJavaScript_StringZZZ: '</fl:let>
+		<fl:let>sTrace::=""</fl:let>
+		<echo>${sScript}Start</echo>
 
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+		
 		<!-- Probier aus, ob eine Java - Klasse zur Verfügung steht. Merke: Weil if nicht im scriptdef - Tag eingesetzt werden kann, ist das so nur hier möglich. -->
 		<ac:if>
 		<not>
@@ -672,16 +839,43 @@
 	   </ac:else>
 	 </ac:if>
 	 
-		<!-- Hier wird die scriptdef Methode tryout_java_file_length aufgerufen -->
-		<tryout_jaz_string_camelcase filename_search="Das_ist_ein_camelcase_test" filenames="myfilenames" filelengths="myfilelengths" tryout="mytryout_string"/>
-		<echo message="mytryout_string = ${mytryout_string}" />
+	 
+		<!-- Hier wird die scriptdef Methode tryout_jaz_string_camelcase aufgerufen -->
+		<tryout_jaz_string_camelcase inputstring="Das_ist_ein_camelcase_test" returnstring="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
+		<echo message="myReturnValue = ${myReturnValue}" />
 		
-		<!-- Verwende antcontrib für eine Schleife über die Arrays --><!-- do something with @{myelement} -->
-<!-- 		<for list="${myfilenames}" param="myelement">
-			<sequential>				
-				<echo>myelement= @{myelement}</echo>
-			</sequential>
-		</for> -->
+		
+		<!-- Hier wird die scriptdef Methode tryout_jaz_string_camelcase aufgerufen. -->
+		<tryout_jaz_string_camelcase inputstring="h_a" returnstring="myReturnValue" returncontrol="myReturnControl" returnControlString="myReturnControlString"/>
+		<echo message="myReturnControl | myReturnConstrolString | myReturnValue = ${myReturnControl} | ${myReturnControlString} | ${myReturnValue}" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
+		<echo message="myReturnValue = ${myReturnValue}" />
+		
+	</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+	</trycatch>
+		
 		
 	</target> 
  </project>

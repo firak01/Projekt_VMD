@@ -23,6 +23,7 @@
 
   <!-- ############################################################-->
 	<scriptdef name="tryout_importKernelAntJs" language="javascript">		 
+		 <attribute name="sDirRepositoryJsscriptdef" />
 		 <attribute name="returnstring" />
 		 <attribute name="returncontrol" />
 		 <attribute name="returncontrolstring" />
@@ -31,7 +32,7 @@
 			 Dies ist z.B. wichtig um genauere Log-Ausgaben zu erzeugen und den Code generisch zu halten -->
 				
 		<![CDATA[		
-		    //attributes.get("inputParameter_denEsHierNichtGibt");
+		    var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
 			
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
 			var sReturn="";
@@ -40,9 +41,9 @@
 			var sReturnControl="Fehler";
 				
 			//Die benoetigten Kernel-Funktionen laden
-			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: Eigenes Objekt in den Funktionsruempfen, da sonst bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden müssten.
+			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 			var objControlCaller=new Object();
-			var bReturn = enableKernelAntJs(objKernelLibs, objControlCaller);			
+			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
 			if(!objControlCaller.bReturnControl){								
 				bReturn=false;
 				sReturn="";
@@ -52,7 +53,6 @@
 					bReturn=false;
 					sReturn="";
 				}else{					
-					bReturn=true;
 				}
 			}	
 			bReturnControl=objControlCaller.bReturnControl;
@@ -62,135 +62,26 @@
 			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
 						
 			//###################################################################
-            //#### KERNEL Libs
+            //#### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
-			function enableKernelAntJs(objKernelLibs, objControl){			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
 				var sScript = "enableKernelAntJs: ";
-				if(objKernelLibs==undefined || objKernelLibs==null){
-					var err = new Error("objKernelLibs nicht deklariert.");
-					throw err;
-				}
-				
-			    //Erstelle eine Array der grundlegenden JavaScript-Kernel Funktionen, die in externen Dateien ausgelagert wurden.				
-				var bReturn=false; 
-				var bReturnControl=false;
-				var sReturnControl="Fehler";						
-				try{					
-					objKernelLibs[0] = new Object();
-					objKernelLibs[0]["ALIAS"] = "ReflectCode";
-					objKernelLibs[0]["DIRECTORY"] = "jsscriptdef";
-					objKernelLibs[0]["FILE"] = "ZAnt.basic.zBasic.ReflectCodeZZZ.js";
-
-					objKernelLibs[1] = new Object();
-					objKernelLibs[1]["ALIAS"] = "HandleError";
-					objKernelLibs[1]["DIRECTORY"] = "jsscriptdef"; 
-					objKernelLibs[1]["FILE"] = "ZAnt.basic.zBasic.HandleErrorZZZ.js";
-															
-					objKernelLibs[2] = new Object();
-					objKernelLibs[2]["ALIAS"] = "HandleError";
-					objKernelLibs[2]["DIRECTORY"] = "jsscriptdef"; 
-					objKernelLibs[2]["FILE"] = "ZAnt.basic.zBasic.JavaHelperZZZ.js";
-					
-
-
-					//REM Das Original aus dem grundlegendne Import-Tryout.
-					//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
-					for (var i = 0; i < objKernelLibs.length; i++) { 									
-						//print("Lies Kernel Ant Js Bibliothek ein: '" + objKernelLibs[i]["ALIAS"]+"'"); 
-						//for (var objEigenschaft in objKernelLibs[i]) {
-						//	print("Eigenschaft: '" + objEigenschaft + " = " + objKernelLibs[i][objEigenschaft] + "'"); 							
-						//}	
-						
-						//Merke: basedir im Ant-Projekt ist auf ".." gesetzt.
-						//print("'../" + objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"] +"'");																
-						objKernelLibs[i]["LOADINGSTRING"] = "org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(\"../"+objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"]+"\"))";
-						//print("objKernelLibs[i][LOADINGSTRING] = " + objKernelLibs[i]["LOADINGSTRING"]);
-						objKernelLibs[i]["LOADER"] = eval(objKernelLibs[i]["LOADINGSTRING"]); //Der LOADER kann dann mit eval(objKernelLibs[i]["LOADER"]) ausgeführt werden
-						//Das ist dann etwas zuviel und funktioniert nicht... objKernelLibs[i]["CODEEXECUTED"] = eval('' + eval(objKernelLibs[i]["LOADER"])) ;						
-						//Das ist dann etwas zuviel und funktioniert nicht... objKernelLibs[i]["CODEEXECUTED"] = eval(objKernelLibs[i]["LOADER"]) ;
-					}
-					//objControl["KERNELLIBS"]=objKernelLibs; //Ich hab mich dazu entschlossen das Kernelobjekt eingeständig zu machen.
-					bReturnControl=true;
-					sReturnControl=sScript+"Alles o.k."
-					bReturn=true;
-				}catch(err){	
-					//#### SIMPLES ERROR HANDLING #######
-					//print("Fehler gefangen: " + err);
-					bReturnControl=false;
-					sReturnControl=sScript+"Fehler. "+ err;					
-				}
-				objControl.bReturnControl=bReturnControl;
-				objControl.sReturnControl=sReturnControl;
-				return bReturn;
-			}
-			
-			//####################################################################################
-			function loadKernelAntJsExample(objKernelLibs, objControl){			
-				var sScript = "loadKernelAntJsExample: ";
-				
-				//Führe ein eval über die Kernelfunktionen aus und lies sie damit ein. 
-				//Problem: Die Funktionen stehen nur in der aufrufenden Funktion zur Verfügung, in der das eval gemacht wurde.
-				var bReturn=false; 
-				var bReturnControl=false;
-				var sReturnControl="Fehler";						
-				try{	
-					print("#######################");
-					//if(objControl["KERNELLIBS"]==undefined || objControl["KERNELLIBS"]==null){ //Es ist günstiger das KernelObj eigenständig zu halten.
+				try{
 					if(objKernelLibs==undefined || objKernelLibs==null){
-						print("Keine Kernel Ant Js Libs uebergeben zum Laden");
-					} else {
-						//var objKernelLibs = objControl["KERNELLIBS"];
-						if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
-							print(sScript+"Keine Kernel Ant Js Libs vorhanden zum Laden");
-						} else {
-							print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
-							for (var i = 0; i < objKernelLibs.length; i++) { 	
-								print("Lib: " + objKernelLibs[i]["Alias"]);					
-								print("Loader: " + objKernelLibs[i]["Loader"]);
-								//var erg=eval('' + objKernelLibs[i]["Loader"] +'');
-								
-								//Beispiel aus dem Tryout:
-								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
-								
-								//ALSO: Wenn der Loader nicht funktioniert hier den Pfad nachbauen.
-								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../objKernelLibs[i]["Directory"]/objKernelLibs[i]["File"]')));//Syntax für Dateinamen ist falsch
-								
-								var spath = "../" + objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"];
-								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader('" + spath + "')));//file not found exception spath!!
-								
-								//Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
-								//org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(spath)); //So wird die datei gefunden
-								//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(spath)) ); //So werden die Funktionen aus der gefundene Datei bereitgestellt
-								//funktioniert:eval('' + eval(objKernelLibs[i]["LOADER"])); //funktioniert
-								//eval(objKernelLibs[i]["CODEEXECUTED"]);   //funktioniert NICHT, ist dann ein bissl zuviel
-								
-								//funktioniert: 
-								eval(objKernelLibs[i]["LOADER"]); //funktioniert, so wird der Code eingebunden.
-								
-								//objKernelLibs[i]["CODEEXECUTED"] = eval(objKernelLibs[i]["LOADER"]); //funktioniert
-								//funktioniert nicht: eval(objKernelLibs[i]["CODEEXECUTED"]); //functioniert nicht, ist ein bissl zuviel.
-								
-								//mal sehn, ob die letze funktion des externen Scripts zur Verfügung steht.
-								errorTraced();
-							}
-						}
-					}					
-					print("#######################");
-					print("### Versuche errorTraced auszufuehren");
-					//mal sehn, ob die letze funktion des externen Scripts zur Verfügung steht.
-					errorTraced();
-					print("### errorTraced ausgefuehrt");
-					print("#######################");
-					
-					print("#######################");
-					print("### Versuche reflectMethodCurrent_Name auszufuehren");
-					//mal sehn, ob die reflectMethodCurrent_Name funktion des externen Scripts zur Verfügung steht.
-					var objControlCaller = new Object();
-					var stemp = reflectMethodCurrent_Name(null, objControlCaller);
-					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);					
-					print("### reflectMethodCurrent_Name ausgeführt. stemp="+stemp);					
-					print("#######################");		
-					
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
 					bReturnControl=true;
 					sReturnControl=sScript+"Alles o.k."
 					bReturn=true;
@@ -204,27 +95,19 @@
 				objControl.sReturnControl=sReturnControl;
 				return bReturn;
 			}
-			
-						
+					
+             //####################################################################################################					
 			function tryout_importKernelAntJs(objKernelLibs, objControl){	 			
 				var sScript = "tryout_importKernelAntJs: ";
 				var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
 				var bReturnControl=false;
 				var sReturnControl="Fehler";	
 				
-				try{										
-					var objControlCaller=new Object();
-					//objControlCaller["KERNELLIBS"]=objControl["KERNELLIBS"]; //DARUM WIRD DAS objKernelLibs eigenständg gehalten.
-					//Obwohl man hiermit das Laden der JS-Funktionen durchführt, stehen die Funktionen an dieser Stelle nicht zur Verfügung. Daher explizit hier mit eval die Funktionen laden.
-					loadKernelAntJsExample(objKernelLibs, objControlCaller); 
-					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
-											
-					//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG
-					//if(objControlCaller["KERNELLIBS"]==undefined || objControlCaller["KERNELLIBS"]==null){
+				try{															
+					//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
 					if(objKernelLibs==undefined || objKernelLibs==null){
 						print("Keine Kernel Ant Js Libs uebergeben.");
 					} else {						
-						//var objKernelLibs = objControlCaller["KERNELLIBS"];						
 						if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
 							print("Keine Kernel Ant Js Libs vorhanden zum Laden");
 						} else {
@@ -232,21 +115,26 @@
 							for (var i = 0; i < objKernelLibs.length; i++) { 	
 								//print("Lib: " + objKernelLibs[i]["Alias"]);					
 								//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
-								//funktioniert: eval('' + eval(objKernelLibs[i]["LOADER"])); //Man muss 2mal eval kombinieren, um den Loader-String einzusetzen.
 								//funktioniert: 
-								eval(objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+								eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
 								//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
 							}
 						}
 					}
-					print("#######################");					
-					print("### versuche errorTraced HIER auszuführen");
+					print("#######################");										
+					var objControlCaller=new Object();
+					//objControlCaller["KERNELLIBS"]=objControl["KERNELLIBS"]; //DARUM WIRD DAS objKernelLibs eigenständg gehalten.
+					//Obwohl man hiermit das Laden der JS-Funktionen durchführt, stehen die Funktionen an dieser Stelle nicht zur Verfügung. Daher explizit hier mit eval die Funktionen laden.
+					loadKernelAntJsExample(objKernelLibs, objControlCaller); 
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+																
+					print(sScript+"### versuche errorTraced HIER auszuführen");
 					errorTraced();
 					print("### errorTraced ausgeführt");
 					print("#######################");
 					
 					print("#######################");
-					print("### Versuche reflectMethodCurrent_Name auszufuehren");
+					print(sScript+"### Versuche reflectMethodCurrent_Name auszufuehren");
 					//mal sehn, ob die reflectMethodCurrent_Name funktion des externen Scripts zur Verfügung steht.
 					var objControlCaller = new Object();
 					var stemp = reflectMethodCurrent_Name(null, objControlCaller);					
@@ -289,7 +177,7 @@
 						} else {
 							print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
 							for (var i = 0; i < objKernelLibs.length; i++) { 	
-								eval(objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.							
+								eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.							
 							}
 						}
 					}
@@ -334,10 +222,10 @@
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
+ <!-- <target name="compile" depends="-declaration,-myTestStringExplode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
  <!-- TODO Test für stringUnencodeJsZZZ und stringEncodeJsZZZ -->
  <!--<target name="compile" depends="-myTestImportKernelAntJs, ">-->
- <target name="compile" depends="-myTestImportKernelAntJs">
+ <target name="compile" depends="-declaration,-myTestImportKernelAntJs">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -351,6 +239,10 @@
     	<classpath refid="project.classpath"/>
     </javac>
 	-->
+  </target>
+  
+  <target name="-declaration">
+	<property name="project.vmd.dirRepositoryJsscriptdef" value="jsscriptdef" />
   </target>
    
   <target name="-myTestImportKernelAntJs">

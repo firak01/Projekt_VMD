@@ -2002,6 +2002,7 @@
 	        TODO diese Werte in projekt-Konfigurationsdatei uebernehmen, 
 	        nachdem sie in den "...checProperties..." Methoden aufgenommen wurden und dort als Fallback mit dem defaultwert versehen wurden. -->
   <property name="project.vmd.dirRepositoryLib" value="lib" />
+  <property name="project.vmd.dirRepositoryJsscriptdef" value="jsscriptdef" />
   <property name="project.vmd.dirRepositorySrc" value="src" />
   <property name="project.vmd.dirRepositoryMisc" value="misc" />
   <property name="project.vmd.dirRepositoryTest" value="test" />
