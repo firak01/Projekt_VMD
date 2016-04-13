@@ -29,10 +29,12 @@ ECHO VMD_DATETIME="!VMD_DATETIME!"
 REM ###################################################################
 REM DEN HOST RECHNERNAMEN AN DIE LOG DATEIEN ANHAENGEN, dieser wurde schon per aufrufender Batch gesetzt. 
 ::Das ist ein anderer als der computername und ist auf dem Hostrechner selbst leer, d.h. es gibt ihn nur für einen VMWare client
-ECHO HOST ist %HOST%
+ECHO HOST ist '%HOST%'
 IF NOT "%HOST%"=="" (
+    ECHO Batch wird in einer VM, auf einem Host ausgefuehrt.
 	set "VMD_HOST=%HOST%_"
    ) ELSE (
+	ECHO Batch wird auf dem Host selber und nicht in einer VM ausgefuehrt.
     set "VMD_HOST="
    )
 
@@ -81,15 +83,19 @@ REM Solange wie noch nicht gewünscht wird diese Logs im Repository zu archiviere
 :: und im Ant-Script ausgelesen.
 REM SET "VMD_OPERATION_MODE=PROD (kann_fuer_Test_gesetzt_werden_in_'project_%COMPUTERNAME%_%VMD_HOST%vmd.properties'_auf_'test')"
 echo.VMD_OPERATION_MODE='%VMD_OPERATION_MODE%'
-IF NOT "%VMD_OPERATION_MODE%"=="test" (
+IF "%VMD_OPERATION_MODE%"=="test" (
+	echo."Testmodus. Protokolliere den Lauf nicht."
+) ELSE (
+	IF "%VMD_OPERATION_MODE%"=="" (
+	    REM Hinweismeldung. Beachte, dass dies in Hochkommata gesetzt wird, weil darin Klammern verwendet werden.
+		echo."Prodmodus (Modus kann gesetzt werden in 'project_%COMPUTERNAME%_%VMD_HOST%vmd.properties'. Z.B. für auf 'test' damit die Testkonfiguration test_vmd.properties verwendet wird.)"
+	) 
     md c:\temp 2> NUL
 	md c:\temp\Projekt_VMD 2> NUL
 	md c:\temp\Projekt_VMD\log 2> NUL
 	COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\temp\Projekt_VMD\log\log%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
 	COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\temp\Projekt_VMD\log\error%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
-) ELSE (
-	echo.Testmodus. Protokolliere den Lauf nicht.
-)
+) 
 
 REM zu jedem SETLOCAL muss es ein endlocal geben, damit das funktioniert
 ENDLOCAL

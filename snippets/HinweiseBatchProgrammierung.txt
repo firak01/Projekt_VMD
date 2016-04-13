@@ -14,6 +14,7 @@ REM zur Schleife:
 REM Zum if - Befehl
 	REM Der Parameter /i unterbindet eine Differenzierung der Groﬂ-/Kleinbuchstaben.
 	REM Bei der Verwendung mehrerer Befehle muss zwischen Bedingung und der Klammer "(" ein Leerzeichen sein.
+	REM Wird innerhalb einer IF ... ( ) ELSE ( ... ) eine Ausgabe mit echo gemacht, dann muss man sie in Hochkommata setzen, wenn man in der Ausgabe runde Klammern verwendet.
 	
 REM Zum set - Befehl, d.h. zu Variablen:
 	REM Der Parameter /a 
