@@ -33,12 +33,12 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [exec] Wert 'test' wurde gesetzt als Umgebungsvariable fuer VMD_OPERATION_MODE
      [exec] 
      [exec] ERFOLGREICH: Angegebener Wert wurde gespeichert.
-     [echo] VMD_OPERATION_MODE='PROD (kann_fuer_Test_gesetzt_werden_in_'project_PATTON-PRV_vmd.properties'_auf_'test')'
+     [echo] VMD_OPERATION_MODE='test'
 
 -init:
      [echo] Receiving timestamp:
-     [echo] Current Timestamp: 20160413_082116
-     [echo] Backup-Filenames: vmd20160413_082116.zip, misc20160413_082116.zip
+     [echo] Current Timestamp: 20160413_083825
+     [echo] Backup-Filenames: vmd20160413_083825.zip, misc20160413_083825.zip
 
 -FglRepository_Main:
 
@@ -81,9 +81,9 @@ Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
      [echo] project.vmd.dirRepositoryArchive = "vmd"
      [echo] conf.dirRepositoryArchive = "vmd"
      [echo] myTargetDirectory = "C:/1fgl/repository/Projekt_VMDBackups"
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160413_082116.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160413_083825.zip
      [echo] b) VmdRepository Misc:
-      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160413_082116.zip
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160413_083825.zip
   [fl:echo] FglRepositoryBackup erfolgreich. Fahre fort.
 
 -FglRepositoryCopyClient2archive:
