@@ -1172,9 +1172,98 @@
 	 <attribute name="returncontrol" />
 	 <attribute name="returncontrolstring" />
      <![CDATA[
-	 isFileRootZZZ();
-	 function isFileRootZZZ(){
-		   enableJava();
+			var myFilepath = attributes.get("inputfilepath");
+			
+			var sReturn=""; 
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
+		
+			//Die benoetigten Kernel-Funktionen laden
+			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var objKernelLibs = new Array();
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs,"", objControlCaller);
+			if(!objControlCaller.bReturnControl){								
+				bReturn=false;
+				sReturn="";
+			}else{										
+				bReturn=isFileRootZZZ(objKernelLibs,myFilepath, objControlCaller);		
+				if(!objControlCaller.bReturnControl){									
+					bReturn=false;
+					sReturn="";
+				}else{										
+				}
+			}	
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+			project.setProperty(attributes.get("returnboolean"),bReturn);
+			//project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k."
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					//print("Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
+			}
+	 
+	 //####################################################
+	 function isFileRootZZZ(objKernelLibs, myFilepath, objControl){
+		 var sScript = "isFileRootZZZ: ";
+		//var sReturn="nixnix"; 
+		var bReturn=false;
+		var bReturnControl=false;
+		var sReturnControl="Fehler";	
+		try{															
+			//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+			if(objKernelLibs==undefined || objKernelLibs==null){
+				print("Keine Kernel Ant Js Libs uebergeben.");
+			} else {						
+				if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+					print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+				} else {
+					print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["Alias"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						//funktioniert: 
+						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+					}
+				}
+			}
+			print("#######################");								
+			enableJava();
 		   
 		   //Allgemein für Import Statements gilt:
 		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
@@ -1184,102 +1273,44 @@
 			importClass(Packages.basic.zBasic.ExceptionZZZ);
 			importPackage(Packages.basic.zBasic.util.file);
 	 
-			//#############
+			//###########################
 			 //#### EINGABE ######	 
 			var myFilepath = attributes.get("inputfilepath");
 			//print("myFilepath="+myFilepath);
 			
 			//#### Java, etc.
-			var bErg = false;
-			var myReturnControl = true;
-			var myReturnControlString = "Alles o.k.";
-			
-			try{
-			bErg = FileEasyZZZ.isRoot(myFilepath);
-			//print("bErg="+bErg);
-			
-			}catch(err) {
-				bErg = false; //sicher ist sicher....
-				myReturnControl = false;
-				myReturnControlString = handleError(err);
+			bReturn = FileEasyZZZ.isRoot(myFilepath);
+			//print("bReturn="+bReturn);
+			sReturnControl=sScript+"Alles o.k.";
+			bReturnControl=true;			
+		}catch(err){	
+				print("Fehler gefangen: " + err);
+				//#### SIMPLES ERROR HANDLING #######							
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. "+ err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+				}
 			}
 			
-		
-			
-			// create and use a Task via Ant API
-			//funktioniert hier nicht, selbst wenn man den Projektnamen angibt echo = MyProject.createTask("echo");
-			//echo = self.getProject().createTask("echo");
-			//echo.setMessage("Ergebnis + ": " + serg);
-			//echo.perform();
-         			
 			//#### RÜCKGABE #####
-			project.setProperty(attributes.get("returnboolean"), bErg);
-			project.setProperty(attributes.get("returncontrol"), myReturnControl);
-			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);			
+			objControl.sReturnControl=sReturnControl;				
+			objControl.bReturnControl=bReturnControl;
+			return bReturn;	
 	}//End function isFileRootZZZ
 				
-			//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//println("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-					//print("Verwende das alte Rhino unter Java 8");
-				}catch(e){
-					//print("Verwende Standard JavaScript Engine dieser Java Vesion.");
-				}
-			}//End function enableJava
-			
-			 function handleError(err){		
-		//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
-		//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
-		if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
-			//print("################################");
-			print("ExceptionZZZ Fehler abgefangen (NASHORN)");			
-			myReturnControlString = "Error: " + err.getMessageLast();
-		}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
-			//print("################################");
-			print("ExceptionZZZ Fehler abgefangen (RHINO)");						
-			var caller_line="Kein Stacktrace vorhanden.";
-			if(undefined!=err.stack){									
-				caller_line = err.stack.split("\n")[0];
-			}							
-			myReturnControlString = "Error: '" + err.javaException.getMessageLast() + "' " + caller_line;
-		}else{			
-			//print("################################");
-			print("Unbestimmten Fehler abfangen.");
-			var version = java.lang.System.getProperty("java.version");
-			print("JavaVersion: " + version);
-			print("typeof err: "+typeof(err));					   
-			if(version.substring(0,3)=="1.8"){
-				print ("Javascript Engine: 'Nashorn'");				
-				myReturnControlString = "Error: " + err.message;//Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
-			}else{
-				print("################################");
-				print ("Javascript Engine: 'Rhino'");
-				print("err.contructor.name="+err.constructor.name);				
-				if(err.constructor.name=='JavaException'){					
-					print("Error=" + err);
-					myReturnControlString = "Error: " + err.javaException.getMessage();
-				}else{
-					print("normaler Fehler.  Error=" + err); //In Rhino wird der Fehler nicht direkt zurückgegeben.
-				    myReturnControlString = "Error: " + err.message;
-				}									
-			}
-		}					
-		return myReturnControlString;
-		}//End function handleError		
+	
 	      ]]>
   </scriptdef>
 	

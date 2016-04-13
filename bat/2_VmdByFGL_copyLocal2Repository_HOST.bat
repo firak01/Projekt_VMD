@@ -55,7 +55,7 @@ REM                                                          Z.B. call ant -buil
 REM                                                          Hier soll das Target blabla ausgeführt werden. Ohne solch eine Targetangabe wird gestartet was unter <project ... default="..." > angegeben ist.
 REM %* gibt alle Parameter aus, mit denen diese Batch aufgerufen wurde. Diese werden an Ant weitergegeben.
 REM Unbedingt mit call aufrufen, sonst werden nachfolgende Anweisungen nicht mehr ausgeführt.
-SET "VMD_OPERATION_MODE=muss_ueberschrieben_werden_aus_'project_RECHNERNAME_vmd.properties'"
+SET "VMD_OPERATION_MODE=PROD (kann_fuer_Test_gesetzt_werden_in_'project_%COMPUTERNAME%_%VMD_HOST%vmd.properties'_auf_'test')"
 IF NOT "%1"=="" (
 		REM Fehler "missing value for property" wenn -D nix dahinterstehendes hat.
 		call ant -buildfile ..\src\VMDbyFGL_HostChangesPush.xml -Dvmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties -D%* > ..\log\log.txt 2> ..\log\error.txt
@@ -77,12 +77,16 @@ if errorlevel 1 (
 )
 	
 REM Dokumentiere jeden Lauf, ausser im Testfall. Kopiere dazu das Log in eine Datei mit dem aktuellen Timestamp.
+REM Solange wie noch nicht gewünscht wird diese Logs im Repository zu archivieren, werden sie in ein temp - Verzeichnis kopiert.
 :: Diese Umgebungsvariable wird im Ant-Script gesetzt. Dieser Wert wird in der project_RECHNERNAME_vmd.properties Datei gesetzt
 :: und im Ant-Script ausgelesen.
-echo.ausgabe %VMD_OPERATION_MODE%
+echo.VMD_OPERATION_MODE='%VMD_OPERATION_MODE%'
 IF NOT "%VMD_OPERATION_MODE%"=="test" (
-	COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\1fgl\repository\Projekt_VMD\log\log%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
-	COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\1fgl\repository\Projekt_VMD\log\error%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
+    md c:\temp 2> NUL
+	md c:\temp\Projekt_VMD 2> NUL
+	md c:\temp\Projekt_VMD\log 2> NUL
+	COPY C:\1fgl\repository\Projekt_VMD\log\log.txt C:\temp\Projekt_VMD\log\log%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
+	COPY C:\1fgl\repository\Projekt_VMD\log\error.txt C:\temp\Projekt_VMD\log\error%VMD_HOST%%COMPUTERNAME%_%VMD_DATETIME%.txt
 ) ELSE (
 	echo.Testmodus. Protokolliere den Lauf nicht.
 )

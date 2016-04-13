@@ -415,7 +415,7 @@
 			
 		//#################################################################################################
 		function tryout_jaz_fileeasyIsRoot(objKernelLibs, myFilepath, objControl){	 			
-				var sScript = "tryout_jaz_stringCamelcase: ";
+				var sScript = "tryout_jaz_fileeasyIsRoot: ";
 				//var sReturn="nixnix"; 
 				var bReturn=false;
 				var bReturnControl=false;
@@ -470,7 +470,6 @@
 						//#### SIMPLES ERROR HANDLING #######							
 						//bReturnControl=false;
 						//sReturnControl=sScript+"Fehler. "+ err;	
-
 
 						//#### ERROR HANDLING #######
 						try{																

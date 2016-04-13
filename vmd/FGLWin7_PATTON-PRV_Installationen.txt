@@ -1,5 +1,7 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
+20160330: ENERGENIE Power Manager EG-PMS2-LAN installiert
+
 20151216: Windows Updates installieren.
 20151216: Backup
 
