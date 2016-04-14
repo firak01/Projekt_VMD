@@ -1,0 +1,400 @@
+Buildfile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml
+
+-declaration:
+     [echo] Wert fuer controlstring= ${nothing}
+     [echo] VMD CONSTROLSTRING= ${env.controlstring}
+     [echo] Wert fuer vmd=C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties
+     [echo] VMD aus Uebergabeparameter= C:/1fgl/repository/Projekt_VMD/bat/project_vmd.properties
+     [echo] Wert fuer host= ${nothing}
+     [echo] HOST aus Umgebungsvariable = ${env.host}
+     [echo] VMD_OS= Win7
+     [echo] Normierter Pfad (Windows Style)= C:\1fgl\repository\Projekt_VMD\bat\project_vmd.properties
+  [fl:echo] groesse tempa per scriptdef Aufruf: 6
+     [echo] Pfadbestandteilausgabe
+     [echo] Pfadbestandteil: [C:
+     [echo] Pfadbestandteil:  1fgl
+     [echo] Pfadbestandteil:  repository
+     [echo] Pfadbestandteil:  Projekt_VMD
+     [echo] Pfadbestandteil:  bat
+     [echo] Pfadbestandteil:  project_vmd.properties]
+     [echo] errechneter wert fuer Index des letzten Pfadteils: 5
+     [echo] An letzter Stelle gefundener wert: project_vmd.properties
+     [echo] Der Pfad ist: 'C:\1fgl\repository\Projekt_VMD\bat'
+     [echo] Pruefe Existenz lokaler Uebersteuerungs-Projektdatei: C:\1fgl\repository\Projekt_VMD\bat\project_PATTON-PRV_vmd.properties
+     [echo] Lokale Projektdatei existiert: C:\1fgl\repository\Projekt_VMD\bat\project_PATTON-PRV_vmd.properties
+     [echo] Verwende Projektdatei: C:\1fgl\repository\Projekt_VMD\bat\project_PATTON-PRV_vmd.properties
+     [echo] Verwendet Projektkonfiguration: C:\1fgl\repository\Projekt_VMD\bat\project_PATTON-PRV_vmd.properties
+     [echo] Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert: C:\1fgl\repository\Projekt_VMD\bat\project_PATTON-PRV_vmd.properties
+     [echo] test1 hat den Wert: einTestWert
+     [echo] project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}
+     [echo] project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}
+     [echo] project.vmd.os hat den Wert: Win7
+     [echo] project.vmd.operation_mode hat den Wert: test
+     [exec] Wert 'test' wurde gesetzt als Umgebungsvariable fuer VMD_OPERATION_MODE
+     [exec] 
+     [exec] ERFOLGREICH: Angegebener Wert wurde gespeichert.
+     [echo] VMD_OPERATION_MODE='test'
+
+-init:
+     [echo] Receiving timestamp:
+     [echo] Current Timestamp: 20160414_072420
+     [echo] Backup-Filenames: vmd20160414_072420.zip, misc20160414_072420.zip
+
+-FglRepository_Main:
+
+-FglCheckProjectPropertiesRepository:
+
+-FglCheckProjectProperties:
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard 'C:/1fgl/repository/Projekt_VMD'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+[arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard 'c:/1fgl/client'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+  [fl:echo] project.vmd.os hat den Wert: 'Win7'
+     [echo] myDirRepositoryPath hat den Wert: "C:/1fgl/repository/Projekt_VMD"
+     [echo] myDirPathClientFgl hat den Wert: "c:/1fgl/client"
+     [echo] myOs hat den Wert: "Win7"
+  [fl:echo] myGoon hat den Wert: true
+  [fl:echo] Hinweis: Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.
+  [fl:echo] Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.
+     [echo] VMD_OS=Win7
+
+-computeFilenameVMD:
+
+-isHostVMD:
+     [echo] VMD_OS= Win7
+
+-computeFilenameHostVMD:
+     [echo] errechneter Dateiname = FGLWin7_PATTON-PRV_Installationen.txt
+     [echo] Pruefe Existenz der Datei: c:/1fgl/client\FGLWin7_PATTON-PRV_Installationen.txt
+     [echo] Client Verzeichnis Host-VMD-Datei existiert: c:/1fgl/client\FGLWin7_PATTON-PRV_Installationen.txt
+     [echo] Ergebnis'isHostVMD' = true
+  [fl:echo] Hostrechner identifiziert.
+
+-computeFilenameHostVMD:
+     [echo] Errechneter wert der VMD Datei=FGLWin7_PATTON-PRV_Installationen.txt
+
+-FglRepositoryBackup:
+     [echo] Creating Backup: C:/1fgl/repository/Projekt_VMDBackups
+     [echo] a) VmdRepository Archive:
+     [echo] project.vmd.dirRepositoryArchive = "vmd"
+     [echo] conf.dirRepositoryArchive = "vmd"
+     [echo] myTargetDirectory = "C:/1fgl/repository/Projekt_VMDBackups"
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\vmd20160414_072420.zip
+     [echo] b) VmdRepository Misc:
+      [zip] Building zip: C:\1fgl\repository\Projekt_VMDBackups\misc20160414_072420.zip
+  [fl:echo] FglRepositoryBackup erfolgreich. Fahre fort.
+
+-FglRepositoryCopyClient2archive:
+     [echo] Pushing Files to Repository:
+     [echo] a) VMD File:
+     [echo] b) Misc Files:
+
+-FglVmd_Main:
+     [echo] ######################################
+
+-FglCheckProjectPropertiesVmd:
+
+-FglCheckProjectProperties:
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard 'C:/1fgl/repository/Projekt_VMD'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+[arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard 'c:/1fgl/client'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+  [fl:echo] project.vmd.os hat den Wert: 'Win7'
+     [echo] myDirRepositoryPath hat den Wert: "C:/1fgl/repository/Projekt_VMD"
+     [echo] myDirPathClientFgl hat den Wert: "c:/1fgl/client"
+     [echo] myOs hat den Wert: "Win7"
+  [fl:echo] project.vmd.operation_mode hat den Wert: 'test'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 2: 'Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard 'bat'.'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryBat%27%20verwende%20als%20Standard%20%27bat%27.'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+  [fl:echo] myGoon hat den Wert: true
+  [fl:echo] Hinweis: Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryPath%27%20verwende%20als%20Standard%20%27C%3A%2F1fgl%2Frepository%2FProjekt_VMD%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirPathClientFgl%27%20verwende%20als%20Standard%20%27c%3A%2F1fgl%2Fclient%27.,Nicht%20konfiguriert%3A%20%27project.vmd.dirRepositoryBat%27%20verwende%20als%20Standard%20%27bat%27.
+  [fl:echo] Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.
+  [fl:echo] testmodus
+     [echo] Copy files general, by property file:
+     [echo] C:/1fgl/repository/Projekt_VMD/bat/test_vmd.properties
+
+-FglFileControlController_Main:
+     [echo] Datei existiert: C:/1fgl/repository/Projekt_VMD/bat/test_vmd.properties
+     [echo] Dateiinhalt Zeile fuer Zeile:
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] zu verarbeitende Zeile:'del://C:\temp\Projekt_VMD\testused02'
+
+-FglSchemaController_Analyzer:
+     [echo] myReturnString.Schema="del"
+     [echo] Noch nicht gesetztes altes Schema
+     [echo] Keine Schemaaenderung
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'C:\temp\Projekt_VMD\testused02'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused02'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+     [echo] Noch hat kein Schemawechsel stattgefunden.
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] zu verarbeitende Zeile:'del://C:\temp\Projekt_VMD\testused'
+
+-FglSchemaController_Analyzer:
+     [echo] myReturnString.Schema="del"
+     [echo] Keine Schemaaenderung
+[arrayAppendJsZZZ] Wert encoded anhängen an position 1: 'C:\temp\Projekt_VMD\testused'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+     [echo] Noch hat kein Schemawechsel stattgefunden.
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] zu verarbeitende Zeile:'del://C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt'
+
+-FglSchemaController_Analyzer:
+     [echo] myReturnString.Schema="del"
+     [echo] Keine Schemaaenderung
+[arrayAppendJsZZZ] Wert encoded anhängen an position 2: 'C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5Cfile_copyBeispiel02renamed.txt'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+     [echo] Noch hat kein Schemawechsel stattgefunden.
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] Leerzeile, wird übersprungen...
+  [fl:echo] AUFRUF DES ABSCHLIESSENDEN SCHEMA-CONTROLLERS
+
+-FglSchemaController_Controller:
+  [fl:echo] -FglSchemaController_Controller: AUFRUF DES CONTROLLERS FUER DEN DEL-FALL
+
+-FglDelController_Main:
+     [echo] -FglDelController_Main: Errechneter ubound Wert des Arrays: 2
+     [echo] ######################-FglDelController_Main:  3 EINTRAEGE in diesem Schemalauf
+     [echo] ##################-FglDelController_Main: icounter ist 0
+[arrayGetJsZZZ] x=0
+[arrayGetJsZZZ] objectArray[x]=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused02
+  [fl:echo] -FglDelController_Main: zu verarbeitende Zeile (ohne Schema) 0 :'C:\temp\Projekt_VMD\testused02'
+
+-FglDelController_LineController:
+  [fl:echo] -FglDelController_LineController: Steuerungszeile linker Teil vom '=' => C:\temp\Projekt_VMD\testused02
+  [fl:echo] -FglDelController_LineController: Steuerungszeile rechter Teil vom '=' => ${myRightPart}
+     [echo] -FglDelController_LineController: Nur linker Teil der Steuerungsanweisung existiert (Dateinamen... ohne Schema): C:\temp\Projekt_VMD\testused02
+
+-FglDelLocal_AnalyseSingle:
+     [echo] -FglDelLocal_AnalyseSingle: Datei/Verzeichnis existiert NICHT (damit nicht relevant fuer Loeschung): C:\temp\Projekt_VMD\testused02
+  [fl:echo] -FglDelController_LineController: Ergebnis von -FGLDelLocal_AnalyseMatrix bzw. -FglDelLocal_AnalyseSingle=true
+  [fl:echo] -FglDelController_LineController: returna.filedir=<#!!FGLUNDEFINED!!#>
+  [fl:echo] -FglDelController_LineController: returna.filename=<#!!FGLUNDEFINED!!#>
+  [fl:echo] -FglDelController_LineController: myArrayIsEmpty=true
+  [fl:echo] -FglDelController_LineController: Ergebnis: true => kein Arraywert anzuhaengen.
+     [echo] ##################-FglDelController_Main: icounter ist 1
+[arrayGetJsZZZ] x=0
+[arrayGetJsZZZ] objectArray[x]=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused02
+[arrayGetJsZZZ] x=1
+[arrayGetJsZZZ] objectArray[x]=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused
+  [fl:echo] -FglDelController_Main: zu verarbeitende Zeile (ohne Schema) 1 :'C:\temp\Projekt_VMD\testused'
+
+-FglDelController_LineController:
+  [fl:echo] -FglDelController_LineController: Steuerungszeile linker Teil vom '=' => C:\temp\Projekt_VMD\testused
+  [fl:echo] -FglDelController_LineController: Steuerungszeile rechter Teil vom '=' => ${myRightPart}
+     [echo] -FglDelController_LineController: Nur linker Teil der Steuerungsanweisung existiert (Dateinamen... ohne Schema): C:\temp\Projekt_VMD\testused
+
+-FglDelLocal_AnalyseSingle:
+     [echo] -FglDelLocal_AnalyseSingle: Datei/Verzeichnis existiert: C:\temp\Projekt_VMD\testused
+     [echo] -FglDelLocal_AnalyseSingle: Teil: Ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'C:\temp\Projekt_VMD\testused'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: '**.**'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: '**.**'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+  [fl:echo] -FglDelController_LineController: Ergebnis von -FGLDelLocal_AnalyseMatrix bzw. -FglDelLocal_AnalyseSingle=true
+  [fl:echo] -FglDelController_LineController: returna.filedir=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused
+  [fl:echo] -FglDelController_LineController: returna.filename=**.**
+  [fl:echo] -FglDelController_LineController: myArrayIsEmpty=false
+  [fl:echo] -FglDelController_LineController: Ergebnis: true, haenge Array an.
+     [echo] ##################-FglDelController_Main: icounter ist 2
+[arrayGetJsZZZ] x=0
+[arrayGetJsZZZ] objectArray[x]=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused02
+[arrayGetJsZZZ] x=1
+[arrayGetJsZZZ] objectArray[x]=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused
+[arrayGetJsZZZ] x=2
+[arrayGetJsZZZ] objectArray[x]=C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5Cfile_copyBeispiel02renamed.txt
+  [fl:echo] -FglDelController_Main: zu verarbeitende Zeile (ohne Schema) 2 :'C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt'
+
+-FglDelController_LineController:
+  [fl:echo] -FglDelController_LineController: Steuerungszeile linker Teil vom '=' => C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt
+  [fl:echo] -FglDelController_LineController: Steuerungszeile rechter Teil vom '=' => ${myRightPart}
+     [echo] -FglDelController_LineController: Nur linker Teil der Steuerungsanweisung existiert (Dateinamen... ohne Schema): C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt
+
+-FglDelLocal_AnalyseSingle:
+     [echo] -FglDelLocal_AnalyseSingle: Datei/Verzeichnis existiert: C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt
+     [echo] -FglDelLocal_AnalyseSingle: Teil: Ist KEIN Verzeichnis
+[getFilenameFromPathJsZZZ] Starte getFilenameFromPathZZZ 'C:\1fgl\repository\Projekt_VMD\testused02\file_copyBeispiel02renamed.txt'
+     [echo] -FglDelLocal_AnalyseSingle: Der Dateiname ist: 'file_copyBeispiel02renamed.txt'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'file_copyBeispiel02renamed.txt'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'file_copyBeispiel02renamed.txt'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+     [echo] -FglDelLocal_AnalyseSingle: Der Pfad ist: 'C:\1fgl\repository\Projekt_VMD\testused02\'
+[arrayAppendJsZZZ] Wert encoded anhängen an position 0: 'C:\1fgl\repository\Projekt_VMD\testused02\'
+[arrayAppendJsZZZ] Encoded Wert wird kopiert: 'C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C'
+     [echo] myReturnControl | myReturnConstrolString = true | Alles o.k.
+  [fl:echo] -FglDelController_LineController: Ergebnis von -FGLDelLocal_AnalyseMatrix bzw. -FglDelLocal_AnalyseSingle=true
+  [fl:echo] -FglDelController_LineController: returna.filedir=C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C
+  [fl:echo] -FglDelController_LineController: returna.filename=file_copyBeispiel02renamed.txt
+  [fl:echo] -FglDelController_LineController: myArrayIsEmpty=false
+  [fl:echo] -FglDelController_LineController: Ergebnis: true, haenge Array an.
+  [fl:echo] -FglSchemaController_Controller: Ergebnis des Controllers fuer den DEL-FALL: ${returnControlString}
+[arrayDebugJsZZZ] typeof myarray = object
+[arrayDebugJsZZZ] kein Array uebergeben bekommen.
+[arrayDebugJsZZZ] Object uebergeben bekommen.
+[arrayDebugJsZZZ] #################################
+[arrayDebugJsZZZ] myArray ist jetzt leider ein String ='C%3A%5Ctemp%5CProjekt_VMD%5Ctestused,C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C'
+[arrayDebugJsZZZ] splitte diesen String nach Komma.
+[arrayDebugJsZZZ] x: '0'
+[arrayDebugJsZZZ] x: '1'
+[arrayDebugJsZZZ] #################################
+[arrayDebugJsZZZ] Versuch die Werte auszugeben: 
+[arrayDebugJsZZZ] yy: '0'
+[arrayDebugJsZZZ] zugriff ueber yy: 'C%3A%5Ctemp%5CProjekt_VMD%5Ctestused'
+[arrayDebugJsZZZ] yy: '1'
+[arrayDebugJsZZZ] zugriff ueber yy: 'C%3A%5C1fgl%5Crepository%5CProjekt_VMD%5Ctestused02%5C'
+[arrayDebugJsZZZ] typeof myarray = object
+[arrayDebugJsZZZ] kein Array uebergeben bekommen.
+[arrayDebugJsZZZ] Object uebergeben bekommen.
+[arrayDebugJsZZZ] #################################
+[arrayDebugJsZZZ] myArray ist jetzt leider ein String ='**.**,file_copyBeispiel02renamed.txt'
+[arrayDebugJsZZZ] splitte diesen String nach Komma.
+[arrayDebugJsZZZ] x: '0'
+[arrayDebugJsZZZ] x: '1'
+[arrayDebugJsZZZ] #################################
+[arrayDebugJsZZZ] Versuch die Werte auszugeben: 
+[arrayDebugJsZZZ] yy: '0'
+[arrayDebugJsZZZ] zugriff ueber yy: '**.**'
+[arrayDebugJsZZZ] yy: '1'
+[arrayDebugJsZZZ] zugriff ueber yy: 'file_copyBeispiel02renamed.txt'
+  [fl:echo] -FglSchemaController_Controller: DEL Controller beendet mit true. Fahre fort.
+
+-FGLDelLocal_Main:
+     [echo] ControlString: 
+
+-FGLDelLocal_Delete:
+
+-FGLDelLocal_DeleteFileByFile:
+  [fl:echo] -FGLDelLocal_DeleteFileByFile: Alle Arrays haben gleich viel Elemente: 2 
+     [echo] -FGLDelLocal_DeleteFileByFile: icounter is 0
+[arrayGetJsZZZ] x=0
+[arrayGetJsZZZ] objectArray[x]=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused
+[arrayGetJsZZZ] x=0
+[arrayGetJsZZZ] objectArray[x]=**.**
+
+-stringEscapeBackslashZZZ:
+     [echo] -stringEscapeBackslashZZZ: 0:'mysString'=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused
+
+--stringEscapeBackslashZZZ:
+[stringUnencodeJsZZZ] Starte stringUnencodeJsZZZ
+     [echo] --stringEscapeBackslashZZZ: bcontrol | mysStringUnecoded = true | C:\temp\Projekt_VMD\testused
+     [echo] --stringEscapeBackslashZZZ: Unencoded lassen
+
+-FGLDelLocal_DeleteFileSingle:
+     [echo] Deleting File C:\temp\Projekt_VMD\testused**.**
+[stringExplodeJsZZZ] myStringEncoded=C%3A%5Ctemp%5CProjekt_VMD%5Ctestused
+[stringExplodeJsZZZ] myDelimiterEncoded=%5C
+[stringExplodeJsZZZ] values[i]=C%3A
+[stringExplodeJsZZZ] values[i]=temp
+[stringExplodeJsZZZ] values[i]=Projekt_VMD
+[stringExplodeJsZZZ] values[i]=testused
+[arrayStringTrimJsZZZ] objectArray[x]=C:
+[arrayStringTrimJsZZZ] objectArray[x]=temp
+[arrayStringTrimJsZZZ] objectArray[x]=Projekt_VMD
+[arrayStringTrimJsZZZ] objectArray[x]=testused
+     [echo] -FGLDelLocal_DeleteFileSingle: arrayStringImplode=
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] objKernelLibs[0][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleKernelZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[1][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.ReflectCodeZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[2][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleErrorZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[3][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.JavaHelperZZZ.js"))
+[isFileRootJsZZZ] Loading Kernel Ant Js Libs: 4
+[isFileRootJsZZZ] #######################
+     [echo] -FGLDelLocal_DeleteFileSingle: Root noch nicht erreicht. Weitere Verarbeitung moeglich.
+     [echo] -FGLDelLocal_DeleteFileSingle: arrayStringImplode=
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] objKernelLibs[0][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleKernelZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[1][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.ReflectCodeZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[2][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleErrorZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[3][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.JavaHelperZZZ.js"))
+[isFileRootJsZZZ] Loading Kernel Ant Js Libs: 4
+[isFileRootJsZZZ] #######################
+     [echo] -FGLDelLocal_DeleteFileSingle: Root noch nicht erreicht. Weitere Verarbeitung moeglich.
+     [echo] -FGLDelLocal_DeleteFileSingle: arrayStringImplode=
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] objKernelLibs[0][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleKernelZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[1][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.ReflectCodeZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[2][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleErrorZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[3][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.JavaHelperZZZ.js"))
+[isFileRootJsZZZ] Loading Kernel Ant Js Libs: 4
+[isFileRootJsZZZ] #######################
+     [echo] -FGLDelLocal_DeleteFileSingle: Root erreicht. Keine weitere Verarbeitung.
+     [echo] -FGLDelLocal_DeleteFileSingle: arrayStringImplode=
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] sDirSubDefault=jsscriptdef
+[isFileRootJsZZZ] objKernelLibs[0][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleKernelZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[1][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.ReflectCodeZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[2][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.HandleErrorZZZ.js"))
+[isFileRootJsZZZ] objKernelLibs[3][LOADINGSTRING] = org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader("../jsscriptdef/ZAnt.basic.zBasic.JavaHelperZZZ.js"))
+[isFileRootJsZZZ] Loading Kernel Ant Js Libs: 4
+[isFileRootJsZZZ] #######################
+[isFileRootJsZZZ] Fehler gefangen: JavaException: basic.zBasic.ExceptionZZZ: null
+[isFileRootJsZZZ] ################################
+[isFileRootJsZZZ] ##### in handleError:  #######
+[isFileRootJsZZZ] gefundener aufrufender Funktionsname: isFileRootZZZ
+[isFileRootJsZZZ] handleError: Error Objekt vorhanden
+[isFileRootJsZZZ] reflectMethod_StackLine: 7: Stack im Error Objekt vorhanden
+[isFileRootJsZZZ] gefundener error Funktionsname: isFileRootZZZ
+[isFileRootJsZZZ] #############################################################
+[isFileRootJsZZZ] ##### in handle Error fuer den Java oder sonstigen Fehler ###
+[isFileRootJsZZZ] Error Objekt: JavaException: basic.zBasic.ExceptionZZZ: null
+[isFileRootJsZZZ] ExceptionZZZ Fehler abgefangen (RHINO, Java 7), Zeilennummer steht nicht zur Verfügung
+[isFileRootJsZZZ] err.javaException.getMessageLast()=DirectoryPath
+[isFileRootJsZZZ] err.javaException.getFunctionLast()=null/isRoot
+     [echo] -FGLDelLocal_DeleteFileSingle: Fehler geworfen: isFileRootZZZ: ExceptionZZZ: 'null/isRoot - DirectoryPath'.
+     [echo] In <finally>-FGLDelLocal_DeleteFileSingle: .
+     [echo] In <finally>-FGLDelLocal_DeleteFileByFile: .
+  [fl:echo] -FGLDelLocal_Delete: Fehler in -FGLDelLocal_DeleteFilebyFile festgestellt - '-FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4989: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:5021: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4865: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4913: isFileRootZZZ: ExceptionZZZ: 'null/isRoot - DirectoryPath'.''
+     [echo] In <finally>-FGLDelLocal_Delete: .
+     [echo] In <finally>-FGLDelLocal_Main: .
+  [fl:echo] -FglSchemaController_Controller: Ergebnis des Loeschens: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4719: -FGLDelLocal_Delete: -FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4989: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:5021: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4865: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4913: isFileRootZZZ: ExceptionZZZ: 'null/isRoot - DirectoryPath'.'
+     [echo] In <finally>-FglSchemaController_Controller: .
+     [echo] In <finally>-FglFileControlController_Main: .
+  [fl:echo] Ergebnis des FileControll Controllers: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4719: -FGLDelLocal_Delete: -FGLDelLocal_DeleteFileByFile: C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4989: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:5021: -FGLDelLocal_DeleteFileByFile: 'C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4865: The following error occurred while executing this line:
+  [fl:echo] C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:4913: isFileRootZZZ: ExceptionZZZ: 'null/isRoot - DirectoryPath'.'
+     [echo] In <finally>-FglVmd_Main: .
+
+compile:
+
+BUILD SUCCESSFUL
+Total time: 2 seconds

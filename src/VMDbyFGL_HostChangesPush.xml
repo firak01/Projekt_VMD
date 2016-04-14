@@ -702,6 +702,7 @@
     <![CDATA[
 		arrayStringImplodeZZZ();
 		function arrayStringImplodeZZZ(){
+			var sScript="arrayStringImplodeZZZ: ";
 			//normalerweise verwendet man join, wie in dem Beispiel:
 			//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
 			//var myarray = str_to_split.split(",");
@@ -714,8 +715,8 @@
 			var myDelimiter = attributes.get("inputdelimiter");
 			var myiIndexLow = attributes.get("inputindexlow");
 			var myiIndexHigh = attributes.get("inputindexhigh");
-			//print("myiIndexLow=" + myiIndexLow);
-			//print("myiIndexHigh=" + myiIndexHigh);
+			print(sScript+"myiIndexLow=" + myiIndexLow);
+			print(sScript+"myiIndexHigh=" + myiIndexHigh);
 			
 			
 			var myStringReturn = "";
@@ -754,7 +755,7 @@
 											
 					//Hole die Anzahl der Einträge im Array, ggfs. für einen ungueltigen oberen Wert
 					myiIndexMax = objectArray.length-1;
-					//print("myiIndexMax="+myiIndexMax);
+					print(sScript+"myiIndexMax="+myiIndexMax);
 					if(myiIndexHigh===undefined){
 						myiIndexHigh=myiIndexMax;
 					}else if(myiIndexLow==null){
@@ -770,16 +771,18 @@
 					//	print("myArrayString[i]="+myArrayString[i]);
 					//	myStringReturn+=myArrayString[i];
 					//	print("myStringReturn="+myStringReturn);
-					//}						 		
+					//}						 
+					print(sScript+"myiIndexLow="+myiIndexLow);					
+					print(sScript+"myiIndexHigh="+myiIndexHigh);	
 					var iIndexCount=-1;
 					for(x in objectArray){
 						iIndexCount++;
-						//print("objectArray[x]="+objectArray[x]);
-						if(iIndexCount>=myiIndexLow){  //noch kaputt: Fehler durch >= provizieren . Richtig muss es nur >  heissen.
-							if(iIndexCount >= myiIndexHigh) break;
+						print("objectArray["+x+"]="+objectArray[x]);
+						if(iIndexCount>=myiIndexLow){  
+							if(iIndexCount > myiIndexHigh) break; //noch kaputt: Fehler in isRootJsZZZ durch >= provizieren . Richtig muss es nur >  heissen. Wirkt sich z.B. auf isFileRootJsZZZ aus, wenn ein Leerstring zurückgeliefert wird.
 							if(myStringReturn!="") myStringReturn+=myDelimiter;
 							myStringReturn+=objectArray[x];					
-							//print("myStringReturn="+myStringReturn);
+							print(iIndexCount+": myStringReturn="+myStringReturn);
 						}
 					}								
 				}
@@ -4830,7 +4833,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<fl:let>sDelimiter::='\\'</fl:let><!-- escapter Backslash -->
 		<stringExplodeJsZZZ inputstring="${myDir}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
 		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
-		<!--<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>-->
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 	
 		<!-- Trimme das Array, dadurch wird ein leeres Element, z.B. erzeugt durch einen abschliessenden Backslash entfernt -->
 		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returncontrol="myReturnControl2"/>
@@ -4874,10 +4877,10 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			
 			<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub" returncontrolstring="myReturnControlSubString"/>
 			<!--<echo>${sScript}Verzeichnis ${myReturnStringSub}</echo>-->
-			<echo>${sScript}arrayStringImplode=${myReturnControlSubString}</echo>
+			<echo>${sScript}arrayStringImplode=${myReturnStringSub} (Merke: Bei Leerstring Fehler in isFileRootJsZZZ)</echo>
 						
 			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
-			<fl:let>myReturnControl::="${returnControlSub}"</fl:let>
+			<fl:let>myReturnControl::="${myReturnControlSub}"</fl:let>
 
 			<!-- Root nicht versuchen zu löschen -->			
 		<isFileRootJsZZZ inputfilepath="${myReturnStringSub}" returnboolean="myReturnValue2" returncontrol="myReturnControl2" returncontrolstring="myReturnControlString2"/>

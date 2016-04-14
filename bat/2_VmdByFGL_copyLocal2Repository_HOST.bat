@@ -84,7 +84,7 @@ REM Solange wie noch nicht gewünscht wird diese Logs im Repository zu archiviere
 REM SET "VMD_OPERATION_MODE=PROD (kann_fuer_Test_gesetzt_werden_in_'project_%COMPUTERNAME%_%VMD_HOST%vmd.properties'_auf_'test')"
 echo.VMD_OPERATION_MODE='%VMD_OPERATION_MODE%'
 IF "%VMD_OPERATION_MODE%"=="test" (
-	echo."Testmodus. Protokolliere den Lauf nicht."
+	echo."Testmodus. Archiviere Protokolle des Laufs nicht."
 ) ELSE (
 	IF "%VMD_OPERATION_MODE%"=="" (
 	    REM Hinweismeldung. Beachte, dass dies in Hochkommata gesetzt wird, weil darin Klammern verwendet werden.
