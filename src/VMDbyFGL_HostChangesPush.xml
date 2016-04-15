@@ -2136,35 +2136,44 @@
 			<echo>project.vmd.dirRepositoryPath hat den Wert: ${project.vmd.dirRepositoryPath}</echo> 							
 			<echo>project.vmd.dirPathClientFgl hat den Wert: ${project.vmd.dirPathClientFgl}</echo>	
 			<echo>project.vmd.os hat den Wert: ${project.vmd.os}</echo>
-						
+			<echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>
 						
 			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
 					   dies passiert hier durch flaka´s install-property handler task -->
 				<fl:install-property-handler />  	
 				<property environment="env" /> <!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-					
+				<property name="env.VMD_OPERATION_MODE" value="${project.vmd.operation_mode}"/><!-- Setze die Umgebungsvariable, was aber nur innerhalb des Ant-Scripts gilt UND das nur für nicht(!) bereits gesetzte (z.B. in einer Batch) Umgebungsvariablen klappt. -->
+				<echo>Nach dem Setzen per Property-Handler: VMD_OPERATION_MODE='${env.VMD_OPERATION_MODE}'</echo>
+							
+			<!-- Noch Kaputt 20160415: 
+				WIE SCHREIBT MAN EINE Umgebungsvariable AUS EINEM ANT - SCRIPT, SO DASS SIE IN EINER LAUFENDEN BATCH WEITERVERARBEITET WERDEN KANN -->	
+
 			<!-- Gib den operation_mode als Umgebungsvariable zurück.
                  Dadurch steht diese information direkt der Batch zur Verfügung.
                  Ziel: Die Erzeugung von Protokolldateien steuern. -->
-				 <echo>project.vmd.operation_mode hat den Wert: ${project.vmd.operation_mode}</echo>
-				<!-- damit provoziert man einen Fehler im Ant Script und setzt errorlevel im Batch anders -->
-				<!-- <exec>
-				<env key="VMD_OPERATION_MODE" value="${project.vmd.operation_mode}"/>				
-				</exec> -->
-				
+				 
+			
+				<!-- Die so erzeugte Umgebungsvariable ist aber nur im exec-Teil gültig. -->
 				<exec executable="cmd" failonerror="true">
 				<env key="VMD_OPERATION_MODE" value="${project.vmd.operation_mode}"/>
 				<arg value="/C"/>
-				<arg value="echo Wert '%VMD_OPERATION_MODE%' wurde gesetzt als Umgebungsvariable fuer VMD_OPERATION_MODE"/>
-				</exec>
+				<arg value="echo Wert '%VMD_OPERATION_MODE%' wurde gesetzt als Umgebungsvariable fuer VMD_OPERATION_MODE (gilt aber nur innerhalb des exec-Blocks)."/>
+				</exec>				
+				<!-- Merke: Damit provoziert man einen Fehler im Ant Script und setzt errorlevel im Batch anders -->
+				<!-- <exec>
+				<env key="VMD_OPERATION_MODE" value="${project.vmd.operation_mode}"/>				
+				</exec> -->
+			
 				
-				
-				
+				<!-- Angeblich kann man die Umgebungsvariable ändern, wenn es sie zuvor schon gibt, also: 
+				     Hiermit den Konfigurierten ANT-MODUS auch in die Batch zurückübergeben.-->
+				<!-- Ggfs. Fehler wg. fehlender Rechte in restriktiven Umgebungen (z.B. Firmen). Darum dann den Wert in der Batch selbst setzen. 
+					 "FEHLER: Der Zugriff auf den Registrierungspfad wurde verweigert." -->
 				<exec executable="setx.exe">
-					<arg line="VMD_OPERATION_MODE test"/>
-					<arg line="/m"/>
+						<arg line="OPERATION_MODE_BATCH ${project.vmd.operation_mode}"/>
+						<arg line="/m"/>
 				</exec>
-				<echo>VMD_OPERATION_MODE='${env.VMD_OPERATION_MODE}'</echo>
+				<echo>Nach setx.exe: OPERATION_MODE_BATCH='${env.OPERATION_MODE_BATCH}'</echo>
 			
 			<!-- TODO GOON: Prüfe die Controldateien auf Existenz. -->
 			<!-- TODO : Prüfe die Controldatei auf Validität. -->

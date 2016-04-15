@@ -45,9 +45,10 @@ REM Merke: Die Pfadangaben sind mit Slash und nicht mit Backslash
 
 REM Varinte A) Für Batch Alternative Möglichkeit über Umgebungsvariablen Parameter zu übergeben.
 REM Das nur unter Windows DOS Box aufrufen, unter Eclipse werden die Pfade nicht gefunden.
-SET TRYOUT_ANT="Das ist ein Test"
-SET VMD="C:/1fgl/repository/Projekt_VMD"
-
+SET "TRYOUT_ANT=Das ist ein Test"
+SET "VMD=C:/1fgl/repository/Projekt_VMD"
+SET "OPERATION_MODE_BATCH=prod"
+echo.Vor dem AntScript: OPERATION_MODE_BATCH='%OPERATION_MODE_BATCH%'
 
 
 REM Variante B) Sowohl für Eclipse (Run Konfiguration) als auch Batch. 
@@ -76,19 +77,22 @@ if errorlevel 1 (
 ) else (
 	echo.errorlevel ist nicht 1
 )
+
 	
 REM Dokumentiere jeden Lauf, ausser im Testfall. Kopiere dazu das Log in eine Datei mit dem aktuellen Timestamp.
 REM Solange wie noch nicht gewünscht wird diese Logs im Repository zu archivieren, werden sie in ein temp - Verzeichnis kopiert.
 :: Diese Umgebungsvariable wird im Ant-Script gesetzt. Dieser Wert wird in der project_RECHNERNAME_vmd.properties Datei gesetzt
 :: und im Ant-Script ausgelesen.
 REM SET "VMD_OPERATION_MODE=PROD (kann_fuer_Test_gesetzt_werden_in_'project_%COMPUTERNAME%_%VMD_HOST%vmd.properties'_auf_'test')"
-echo.VMD_OPERATION_MODE='%VMD_OPERATION_MODE%'
-IF "%VMD_OPERATION_MODE%"=="test" (
-	echo."Testmodus. Archiviere Protokolle des Laufs nicht."
+REM Das Setzen dieser Umgebungsvariablen passiert im DECLARATION-Teil des Ant-Scripts....
+REM PROBLEM: FEHLENDE RECHTE....
+echo.Nach dem AntScript: OPERATION_MODE_BATCH='%OPERATION_MODE_BATCH%'
+IF "%OPERATION_MODE_BATCH%"=="test" (
+	echo."Testmodus der Batch. Archiviere Protokolle des Laufs nicht."
 ) ELSE (
-	IF "%VMD_OPERATION_MODE%"=="" (
+	IF "%OPERATION_MODE_BATCH%"=="" (
 	    REM Hinweismeldung. Beachte, dass dies in Hochkommata gesetzt wird, weil darin Klammern verwendet werden.
-		echo."Prodmodus (Modus kann gesetzt werden in 'project_%COMPUTERNAME%_%VMD_HOST%vmd.properties'. Z.B. für auf 'test' damit die Testkonfiguration test_vmd.properties verwendet wird.)"
+		echo."Prodmodus der Batch (Modus des AntScripts kann gesetzt werden in 'project_%COMPUTERNAME%_%VMD_HOST%vmd.properties'. Z.B. auf 'test' damit die Testkonfiguration test_vmd.properties verwendet wird.)"
 	) 
     md c:\temp 2> NUL
 	md c:\temp\Projekt_VMD 2> NUL
