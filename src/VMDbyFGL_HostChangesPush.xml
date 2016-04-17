@@ -2491,8 +2491,8 @@
 <target name="-FglVmd_Main">
 	<fl:let>sScript::='-FglVmd_Main: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
-	<ac:var name="myReturnControl" value="true" unset="true" />
-	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	<ac:var name="myReturnControl" value="true" /> <!-- unset="true" /> -->
+	<ac:var name="myReturnControlString" value="alles o.k." /> <!-- unset="true" /> -->
 		
 		<!-- ErrorHandling -->
 	<ac:trycatch property="myError" reference="myErrorObject">
@@ -2679,8 +2679,8 @@
 <target name="-FglFileControlController_Main">
 	<fl:let>sScript::='-FglFileControlController_Main: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
-	<ac:var name="myReturnControl" value="true" unset="true" />
-	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	<ac:var name="myReturnControl" value="true" /> <!--unset="true" />-->
+	<ac:var name="myReturnControlString" value="alles o.k." /> <!-- unset="true" /> -->
 		
 		<!-- ErrorHandling -->
 	<ac:trycatch property="myError" reference="myErrorObject">
@@ -2817,6 +2817,7 @@
 					</antcallback>										
 					
 					<!-- TODO: Die Meldungen aus den aufgerufenen Unterfunktionen zurueckgeben und nicht blos hier alles auf supergut setzen. -->
+					<echo>${sScript}Ergebnis des AUFRUF DES ABSCHLIESSENDEN SCHEMA-CONTROLLERS zurueckgeben: ${returnControlString}</echo>
 					<ac:var name="myReturnControl" value="${returnControl}" />
 					<ac:var name="myReturnControlString" value="${returnControlString}"/>																					
 				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
@@ -2849,7 +2850,8 @@
 			
 			<!-- Rueckgabebwerte -->
 			<ac:var name="returnControl" value="${myReturnControl}" />
-			<ac:var name="returnControlString" value="${myReturnControlString}" />
+			<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
+			
 			<!-- <arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 			<!-- <arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
 			<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->
@@ -2994,8 +2996,8 @@
 <target name="-FglSchemaController_Controller">
 	<fl:let>sScript::='-FglSchemaController_Controller: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
-	<ac:var name="myReturnControl" value="true" unset="true" />
-	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	<ac:var name="myReturnControl" value="true" /> <!-- unset="true" /> -->
+	<ac:var name="myReturnControlString" value="alles o.k." /> <!-- unset="true" /> -->
 	<!-- Merke: Orientier dich bei der Vergabe der Schema Namen an den DOS - Befehlen -->
 	<!-- Bisher umgesetzt: vmd, copy -->
 	<!-- TODO umzusetzen: del, zip -->
@@ -3035,7 +3037,7 @@
 					<fl:echo>${sScript}Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
 					
 					<!-- Beim VMD-Kopiern ein Flag mitgeben, das erst bewirkt, dass der HOSTNAME als Suffix hinter den Dateinamen kommt -->					
-					<antcallback target="-FGLCopyLocal_Main" return="returnString, returnControl">
+					<antcallback target="-FGLCopyLocal_Main" return="returnControlString, returnControl">
 						<param name="controlString" value="append_hostname"/>	
 						<!-- Scheinbar kann man als Parameter auch arrays direkt uebergeben, nur Arrays zurückgeben ist dann halt etwas schwieriger -->
 						<param name="mySrcaTotal.filedir" value="${srcaTotal.filedir}"/>	
@@ -3043,7 +3045,7 @@
 						<param name="myDestaTotal.filedir" value="${destaTotal.filedir}"/>	
 						<param name="myDestaTotal.filename" value="${destaTotal.filename}"/>	
 					</antcallback>      
-					<fl:echo>${sScript}Ergebnis des Kopierens: ${returnString}</fl:echo>			
+					<fl:echo>${sScript}Ergebnis des Kopierens: ${returnControlString}</fl:echo>			
 				</ac:else> <!-- Controller erfolgreich -->
 			</ac:if><!-- Ergebnis des VMD Controllers -->																
 		</ac:then>
@@ -3072,7 +3074,7 @@
 					<fl:echo>${sScript}Alle notwendigen Konfigurations-Properties vorhanden. Fahre fort.</fl:echo>
 					
 					<!-- Beim COPY-Kopiern kein Flag mitgeben, das bewirkt, dass der Dateiname verändert wird -->					
-					<antcallback target="-FGLCopyLocal_Main" return="returnString, returnControl">
+					<antcallback target="-FGLCopyLocal_Main" return="returnControlString, returnControl">
 						<param name="controlString" value=""/>	
 						<!-- Scheinbar kann man als Parameter auch arrays direkt uebergeben, nur Arrays zurückgeben ist dann halt etwas schwieriger -->
 						<param name="mySrcaTotal.filedir" value="${srcaTotal.filedir}"/>	
@@ -3080,7 +3082,7 @@
 						<param name="myDestaTotal.filedir" value="${destaTotal.filedir}"/>	
 						<param name="myDestaTotal.filename" value="${destaTotal.filename}"/>	
 					</antcallback>      
-					<fl:echo>${sScript}Ergebnis des Kopierens: ${returnString}</fl:echo>			
+					<fl:echo>${sScript}Ergebnis des Kopierens: ${returnControlString}</fl:echo>	
 				</ac:else> <!-- Controller erfolgreich -->
 			</ac:if><!-- Ergebnis des VMD Controllers -->																
 		</ac:then>
@@ -3114,14 +3116,15 @@
 						<param name="saTotal.filedir" value="${mysaTotal.filedir}"/>	
 						<param name="saTotal.filename" value="${mysaTotal.filename}"/>							
 					</antcallback>      
-					<fl:echo>${sScript}Ergebnis des Loeschens: ${returnControlString}</fl:echo>			
+					<fl:echo>${sScript}Ergebnis des Loeschens: ${returnControlString}</fl:echo>						
 				</ac:else> <!-- Controller erfolgreich -->
 			</ac:if><!-- Ergebnis des VMD Controllers -->																
 		</ac:then>
 	 </ac:if>	
 	<!-- ###################################################### -->	
-	<fl:let>myReturnControl::=${returnControl}</fl:let>
+	<!--<fl:let>myReturnControl::=${returnControl}</fl:let>-->
 	<!--<fl:let>myReturnControlString::=${returnControlString}</fl:let>-->
+	<ac:var name="myReturnControl" value="${returnControl}"/>
 	<ac:var name="myReturnControlString" value="${returnControlString}"/>
 		
 		
@@ -3143,7 +3146,7 @@
 		
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnControlString" value="${myReturnControlString}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 	<!--<arrayCopyJsZZZ arrayinput="${mylineaNext.Schema}" arrayreturn="linea.Schema" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->
 </target>
 
@@ -3235,7 +3238,7 @@
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 	<arrayCopyJsZZZ arrayinput="${mysaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 	<arrayCopyJsZZZ arrayinput="${mysaTotal.filename}" arrayreturn="return.srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 </target>
@@ -3370,7 +3373,7 @@
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 	<arrayCopyJsZZZ arrayinput="${mysaTotal.filedir}" arrayreturn="return.saTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywert zurueck -->
 	<arrayCopyJsZZZ arrayinput="${mysaTotal.filename}" arrayreturn="return.saTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywert zurueck -->		
 </target>
@@ -3473,7 +3476,7 @@
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />	
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />	
 	<arrayCopyJsZZZ arrayinput="${mysaTotal.filedir}" arrayreturn="returna.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->				
 	<arrayCopyJsZZZ arrayinput="${mysaTotal.filename}" arrayreturn="returna.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->				
 </target>
@@ -3561,7 +3564,7 @@
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 	<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
@@ -3751,7 +3754,7 @@
 
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- Merke: So gibt man einen Arraywertzurueck -->
 </target>
 
@@ -3814,24 +3817,24 @@
 						
 											
 					
-						<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnControl,returnString">					
+						<antcallback target="-FGLCopyLocal_CopyFileSingle" return="returnControl,returnControlString">					
 								<param name="src.sFiledir" value="${mySrc.sFiledirNormed}"/>
 								<param name="src.sFilename" value="${mySrcaTotal.filename}"/>								
 								<param name="dest.sFiledir" value="${myDest.sFiledirNormed}"/>
 								<param name="dest.sFilename" value="${myDestaTotal.filename}"/>					
 						</antcallback>	
 						<fl:let>myReturnControl ::="${returnControl}"</fl:let>
-						<fl:let>myReturnString ::="${returnString}"</fl:let>
+						<fl:let>myReturnControlString ::="${returnControlString}"</fl:let>
 					</ac:then>
 					<ac:else> 
-					<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnControl,returnString">					
+					<antcallback target="-FGLCopyLocal_CopyFileByFile" return="returnControl,returnControlString">					
 								<param name="srca.filename" value="${mySrcaTotal.filename}"/>
 								<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
 								<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
 								<param name="desta.filename" value="${myDestaTotal.filename}"/>					
 						</antcallback>
 						<fl:let>myReturnControl ::="${returnControl}"</fl:let>
-						<fl:let>myReturnString ::="${returnString}"</fl:let>
+						<fl:let>myReturnControlString ::="${returnControlString}"</fl:let>
 					</ac:else>
 					</ac:if> 
 				</ac:else>
@@ -3839,9 +3842,11 @@
 			
 			<!-- Rueckgabewerte -->
 			<ac:var name="returnControl" value="${myReturnControl}" />
-			<ac:var name="returnString" value="${myReturnString}" />			
+			<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />		
 </target>
 <target name="-FGLCopyLocal_CopyFileByFile">
+	<fl:let>sScript::='-FGLCopyLocal_CopyFileByFile: '</fl:let>
+	
 	<fl:let>mySrca.filedir ::= "${srca.filedir}"</fl:let>
 	<fl:let>mySrca.filename ::= "${srca.filename}"</fl:let>
 	<fl:let>myDesta.filedir ::= "${desta.filedir}"</fl:let>
@@ -3896,7 +3901,7 @@
 			<!-- 4. Der eigentliche Kopiervorgang -->
 			<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
 			<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-			<echo>Pushing File ${mySrc.filedir}\${mySrc.filename} to Destination: ${myDest.filedir}\${myDest.filename} </echo>
+			<echo>Pushing File FileByFile ${mySrc.filedir}\${mySrc.filename} to Destination: ${myDest.filedir}\${myDest.filename} </echo>
 														
 			<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	 
 			<!-- ACHTUNG: Existiert die Quelldatei nicht, kommt es hier zu einem BUILD Fehler.
@@ -3922,10 +3927,11 @@
 		</ac:for>		
 
 	<!-- Rueckgabewerte -->
-	<ac:var name="returnControl" value="true" />
-	<ac:var name="returnString" value="CopyFileByFile: Alles ok." />
+	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 </target>
 <target name="-FGLCopyLocal_CopyFileSingle">
+	<fl:let>sScript::='-FGLCopyLocal_CopyFileSingle: '</fl:let>
 	<fl:let>mySrc.sFiledir::="${src.sFiledir}"</fl:let>
 	<fl:let>mySrc.sFilename::="${src.sFilename}"</fl:let>
 	<fl:let>myDest.sFiledir::="${dest.sFiledir}"</fl:let>
@@ -3938,7 +3944,7 @@
 	<!-- 4. Der eigentliche Kopiervorgang -->
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->
 	<!-- Schiebe die spezielle VMD Datei des Host-Rechners in das Repository -->
-	<echo>Pushing File ${mySrc.sFiledir}\${mySrc.sFilename} to Destination: ${myDest.sFiledir}\${myDest.sFilename} </echo>
+	<echo>Pushing File Single ${mySrc.sFiledir}\${mySrc.sFilename} to Destination: ${myDest.sFiledir}\${myDest.sFilename} </echo>
 													
 	<!-- Dateien, die neuer sind, werden nicht ueberschrieben. -->	 
 	<!-- ACHTUNG: Existiert die Quelldatei nicht, kommt es hier zu einem BUILD Fehler.
@@ -3963,10 +3969,11 @@
 	
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnControl" value="true" />
-	<ac:var name="returnString" value="CopySingleFile: Alles ok." />
+	<ac:var name="returnControlString" value="${sScript}Alles o.k." />
 </target>
 
 <target name="-FGLCopyLocal_Analyze">
+	<fl:let>sScript::='-FGLCopyLocal_Analyze: '</fl:let>
 	<fl:let>myLeftPart ::= "${leftPart}"</fl:let>
 	<fl:let>myRightPart ::= "${rightPart}"</fl:let>
 	<fl:let>myCaseTotal ::= ""</fl:let>
@@ -4007,6 +4014,7 @@
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->				
 </target>
 <target name="-FGLCopyLocal_AnalyzePart">
+	<fl:let>sScript::='-FGLCopyLocal_AnalyzePart: '</fl:let>
 	<fl:let>myPart::="${sPartToAnalyze}"</fl:let>
 	
 	<!-- Prüfe, ob Datei vom Linken Teil existiert -->
@@ -4066,6 +4074,7 @@
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->		
 </target>
 <target name="-FGLCopyLocal_Control">
+	<fl:let>sScript::='-FGLCopyLocal_Control: '</fl:let>
 	<fl:let>myAnalyze::="${analyze}"</fl:let>
 	<fl:let>myLeftPart::="${leftPart}"</fl:let>
 	<fl:let>myRightPart::="${rightPart}"</fl:let>
@@ -4230,10 +4239,11 @@
 </target>
 
 <target name="-FGLCopyLocal_Control_FD">
+	<fl:let>sScript::='-FGLCopyLocal_Control_FD: '</fl:let>
 	<!-- Fall: Kopiere die benannte Datei von links nach rechts in das benannte Verzeichnis. -->	
 	<fl:let>myLeftPart::="${leftPart}"</fl:let>
 	<fl:let>myRightPart::="${rightPart}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_FD</fl:echo>
+	<fl:echo>Start von ${sScript}</fl:echo>
 	<!-- TODO: Dynamisch auf den aktuellen TargetNamen zugreifen.... tryoutAnt_Reflection - currentTarget name
 	siehe mein Dokument:
 	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )		
@@ -4301,10 +4311,11 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 </target>
 
 <target name="-FGLCopyLocal_Control_DF">
+	<fl:let>sScript::='-FGLCopyLocal_Control_DF: '</fl:let>
 	<!-- Fall: Kopiere die recht benannte Datei vom Verzeichnis links nach rechts an den benannten Dateinamen. -->	
 	<fl:let>myLeftPart::="${leftPart}"</fl:let>
 	<fl:let>myRightPart::="${rightPart}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_DF</fl:echo>
+	<fl:echo>Start von ${sScript}</fl:echo>
 	<!-- TODO: Dynamisch auf den aktuellen TargetNamen zugreifen.... tryoutAnt_Reflection - currentTarget name
 	siehe mein Dokument:
 	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )		
@@ -4366,10 +4377,12 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 </target>
 
 <target name="-FGLCopyLocal_Control_FF">
+	<fl:let>sScript::='-FGLCopyLocal_Control_FF: '</fl:let>
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
 	<fl:let>myLeftPart::="${leftPart}"</fl:let>
 	<fl:let>myRightPart::="${rightPart}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_FF</fl:echo>
+	<fl:echo>Start von ${sScript}</fl:echo>
+
 	<!-- TODO: Dynamisch auf den aktuellen TargetNamen zugreifen.... tryoutAnt_Reflection - currentTarget name
 	siehe mein Dokument:
 	Java / Ant : BasisObjekte. project / elements (nutzbar auch in scriptdef - JavaScript bietet ein wenig Reflection )		
@@ -4434,9 +4447,10 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 </target>
 
 <target name="-FGLCopyLocal_Control_F_Part">
+	<fl:let>sScript::='-FGLCopyLocal_Control_F_Part: '</fl:let>
+	<fl:echo>Start von ${sScript}</fl:echo>
 	<!-- der einfachste Fall, kopiere die Datei von links nach rechts, d.h. hier packe die reinkommenden Werte in die Returnarrays -->	
-	<fl:let>myPart::="${sPart}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_F_Part</fl:echo>
+	<fl:let>myPart::="${sPart}"</fl:let>	
 	<fl:echo>fuer: ${myPart}</fl:echo>
 	
 	
@@ -4517,10 +4531,11 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 </target>
 
 <target name="-FGLCopyLocal_Control_D_Part">
+	<fl:let>sScript::='-FGLCopyLocal_Control_D_Part: '</fl:let>
+	<fl:echo>Start von ${sScript}</fl:echo>
 	<!-- Fall: Hole den Verzeichnisnamen aus dem rechten Teil und verwende die ermittelten Dateinamen aus dem linken Teil. -->	
 	<fl:let>myPart::="${sPart}"</fl:let>
 	<fl:let>myAFilename::="${saFilename}"</fl:let>
-	<fl:echo>Start von FGLCopyLocal_Control_D_Part</fl:echo>
 	<fl:echo>fuer: ${myPart}</fl:echo>
 	<fl:echo>fuer: ${myAFilename}</fl:echo>
 		
@@ -4556,9 +4571,10 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 <!-- ## Loeschanalyse/control Targets ########################################## -->
 <target name="-FGLDelLocal_Main"><!-- Parameter controlString: Noch nix -->
 	<fl:let>sScript::='-FGLDelLocal_Main: '</fl:let>
+	<fl:echo>Start von ${sScript}</fl:echo>
 	<fl:let>sTrace::=""</fl:let>
-	<ac:var name="myReturnControl" value="true" unset="true" />
-	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	<ac:var name="myReturnControl" value="true"/> <!-- unset="true" /> -->
+	<ac:var name="myReturnControlString" value="alles o.k."/> <!-- unset="true" /> -->
 	
 	<fl:let>myControlString::='${controlString}'</fl:let> 	
 	<echo>ControlString: ${myControlString}</echo>	
@@ -4619,14 +4635,15 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnControlString" value="${myReturnControlString}" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 	<!-- <arrayCopyJsZZZ arrayinput="${myDestaTotal.filename}" arrayreturn="destaTotal.filename" sflagcontrol="" /> --><!-- Merke: So gibt man einen Arraywertzurueck -->
 </target>
 <target name="-FGLDelLocal_Delete">
 	<fl:let>sScript::='-FGLDelLocal_Delete: '</fl:let>
+	<fl:echo>Start von ${sScript}</fl:echo>
 	<fl:let>sTrace::=""</fl:let>
-	<ac:var name="myReturnControl" value="true" unset="true" />
-	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	<ac:var name="myReturnControl" value="true" /> <!-- unset="true" /> -->
+	<ac:var name="myReturnControlString" value="alles o.k." /> <!-- unset="true" /> -->
     <arrayCopyJsZZZ arrayinput="${saTotal.filedir}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />	
 	<arrayCopyJsZZZ arrayinput="${saTotal.filename}" arrayreturn="mysaTotal.filename" sflagcontrol="" />	
 
@@ -4758,15 +4775,16 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			
 	<!-- Rueckgabewerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnControlString" value="${myReturnControlString}" />			
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />			
 </target>
 <target name="-FGLDelLocal_DeleteFileSingle"> 
 	<fl:let>sScript::='-FGLDelLocal_DeleteFileSingle: '</fl:let>
+	<fl:echo>Start von ${sScript}</fl:echo>
 	<fl:let>sTrace::=""</fl:let>
 	<!-- Durch dieses gekapselte Target kann in antcallback in einer Schleife eingebaut werden, der dann sowohl für den ubound=0 als auch für den ubound > 0 Fall aufgerufen werden kann. -->
 	<!-- Verwende für die von 'unten' nach 'oben' (also Richtung main-Methode) durchgereichten Variablen antcontrib mit unset="true". Verwende nicht flaka! -->
-	<ac:var name="myReturnControl" value="true" unset="true"/>
-	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	<ac:var name="myReturnControl" value="true" /> <!-- unset="true"/> -->
+	<ac:var name="myReturnControlString" value="alles o.k." /> <!-- unset="true" /> -->
 	
 	<!-- Uebernahme von Einzelwerten -->
 	<fl:let>myDir::='${sFiledir}'</fl:let><!-- Warum geht hier die Referenz verloren? Das muss mit den Backslashes zu tun haben. Ausserdem muss der Wert mit Backslashes in Hochkommata übertragen werden, quasi eine Möglichkeit es als byValue zu übertragen. -->
@@ -4802,7 +4820,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- TODO Fange Fehler ab, wenn eine Datei / ein Verzeichnis nicht (mehr) vorhanden ist -->
 	<!-- TODO GOON noch kaputt: Den Fall abfangen, falls eine Datei nicht gelöscht werden kann, wg. Rechte, in anderem Programm geöffnet, etc. -->
 	<!-- TODO GGON noch kaputt: Prüfe, ob der Backslash am Emde steht, ergänze ihn falls notwendig -->
-	<echo>Deleting File ${myDir}${myFile}</echo>
+	<echo>Deleting File Single ${myDir}\\${myFile}</echo>
 											
     <!-- Dokumentation: -->											
 	<!-- 	Relative Pfade verwenden, auch beim Löschen?:
@@ -4818,18 +4836,13 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- so werden aber auch die txt-Dateien aus dem Ausgangsverzeichnis nicht kopiert exclude name="**/**/**.txt" />-->
 					
 	<!-- absolute Pfade verwenden: -->
-	<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
-	<delete includeEmptyDirs="true"> -->
-		<fileset dir="${myDir}" includes="${myFile}" defaultexcludes="false"><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->		
-														
-			<!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->	
-			<include name="${myFile}" />				
+	<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen. --> 
+	<delete includeEmptyDirs="true"><!-- Lösche das Ausgangsverzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
+		<fileset dir="${myDir}" includes="${myFile}" defaultexcludes="false"><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->																			
+			<include name="${myFile}" /><!--Hier den errechneten Namen der Dateien verwenden und nicht z.B. alle Dateien mit der txt Endung --><!-- <include name="**/**.txt"/>-->					
 		</fileset>	
-		
-		<!-- Lösche das Ausgangsverzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
-		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->							
-		<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
-	</delete>-->
+		<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->									
+	</delete>
 	
 		<!-- Problem: Damit wird aber nicht der ganze Pfad gelöscht, falls er nur aus leeren Verzeichnissen besteht. -->
 		<!-- Lösungsansatz: Mache eine Funktion, mit der man einen String in ein Array zerlegen kann.
@@ -4868,9 +4881,11 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<var name="op2" value="1"/>
 		<var name="op" value="-"/>
 		<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-		<!--<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>-->
+		<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>
 	
+		<!-- Ziel: Leere Verzeichnisse auch loeschen -->
 		<!-- Baue aus dem Array immer wieder neu den absoluten Verzeichnispfad, aber immer wieder um eine obere Indexposition weniger -->
+		<!-- Fange aber nicht bei dem obersten Verzeichnis an, das wurde durch Ant-Funktionalität schon geloescht (includeEmptyDirs="true") -->
 		<!-- Verwende dazu eine Schleife und inputindexhigh wird darin immer um 1 reduziert. -->
 		<!-- <ac:for param="i" end="1" begin="1"> --><!-- nettes Attribut: beginn -->
 		<!-- <ac:for param="icounter" end="${iubound}" keepgoing="true">	--><!-- keepgoing sorgt dafuer, dass die Schleife selbst nicht abgebrochen wird. Der Fehler würde anschliessend geworfen. -->
@@ -4882,11 +4897,27 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 			<var name="op2" value="@{icounter}"/>
 			<var name="op" value="-"/>
 			<math result="iIndexTemp" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
-			<!--<echo>${sScript}Errechnete Obergrenze des Arrays fuer diesen Lauf: ${iIndexTemp}</echo>-->
+						
+			<!--Das Ausgangsverzeichnis wurde schon durch Ant-Funktionaliaet geloescht (includeEmptyDirs="true"). Darum noch ein Verzeichnis weniger -->
+			<var name="op1" value="${iIndexTemp}"/>
+			<var name="op2" value="1"/>
+			<var name="op" value="-"/>
+			<math result="iIndexTemp02" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+			<echo>${sScript}Errechnete Obergrenze des Arrays fuer diesen Lauf: ${iIndexTemp02}</echo>
+			<ac:if>
+			<not>
+				<equals arg1="-1" arg2="${iIndexTemp02}"/>				
+			</not>
+			<ac:then>			
+				<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp02}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub" returncontrolstring="myReturnControlSubString"/>			
+				<echo>${sScript}arrayStringImplode=${myReturnStringSub} (Merke: Bei Leerstring Fehler in isFileRootJsZZZ)</echo>
+				<echo>${sScript}zu loeschendes Verzeichnis ${myReturnStringSub}</echo>								
+			</ac:then>
+			<ac:else>
+				<echo>${sScript}Obergrenzenmaximum erreicht.</echo>
+			</ac:else>
+			</ac:if>
 			
-			<arrayStringImplodeJsZZZ inputarraystring="${myArray}" inputdelimiter="\\" inputindexlow="-1" inputindexhigh="${iIndexTemp}" returnstring="myReturnStringSub" returncontrol="myReturnControlSub" returncontrolstring="myReturnControlSubString"/>
-			<!--<echo>${sScript}Verzeichnis ${myReturnStringSub}</echo>-->
-			<echo>${sScript}arrayStringImplode=${myReturnStringSub} (Merke: Bei Leerstring Fehler in isFileRootJsZZZ)</echo>
 						
 			<!-- TODO GOON noch kaput: Im Fehlerfall die sequential - Anweisung abbrechen. -->
 			<fl:let>myReturnControl::="${myReturnControlSub}"</fl:let>
@@ -4911,12 +4942,10 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 				<echo>${sScript}Root noch nicht erreicht. Weitere Verarbeitung moeglich.</echo>
 				
 				<fl:let>myDir::="${myReturnStringSub}"</fl:let>
-				<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
-				<delete includeEmptyDirs="true"> -->
-				<!-- Lösche das Verzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->
-				<!--<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" />--><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->				
-			    <!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen 
-				</delete>			-->
+				<!-- Das eigentliche Löschen beim Test temporaer raus, sonst muss man sich immer wieder neu die Testdateien hinlegen -->
+				<delete includeEmptyDirs="true"><!-- Lösche das Verzeichnis, wenn es leer ist (was durch includeEmptyDirs='true' gesteuert wird. -->					
+					<fileset dir="${myDir}" excludes="**/*" defaultexcludes="false" /><!-- z.B. *.svn Dateien gehoeren zu den Defautlexcludes, d.h. wuerden nicht geloescht. -->									
+				</delete>			
 			</ac:then>
 			</ac:elseif>
 			<ac:else>
@@ -4949,15 +4978,16 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!--<echo>${sScript} gibt zurueck: ${myReturnControlString}</echo>-->
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnControlString" value="'${myReturnControlString}'" />
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
 	<!--<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" />--><!-- So gibt man einen Arraywertzurueck -->	
 </target>
 <target name="-FGLDelLocal_DeleteFileByFile">
-	<fl:let>sScript::='-FGLDelLocal_DeleteFileByFile: '</fl:let>	
+	<fl:let>sScript::='-FGLDelLocal_DeleteFileByFile: '</fl:let>
+	<fl:echo>Start von ${sScript}</fl:echo>	
 	<fl:let>sTrace::=""</fl:let>
 	<!-- Verwende für die von 'unten' nach 'oben' (also Richtung main-Methode) durchgereichten Variablen antcontrib mit unset="true". Verwende nicht flaka! -->
-	<ac:var name="myReturnControl" value="true" unset="true" />
-	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+	<ac:var name="myReturnControl" value="true" /> <!-- unset="true" /> -->
+	<ac:var name="myReturnControlString" value="alles o.k." /> <!-- unset="true" /> -->
 	
 	<!--<echo>${sScript}Uebergebene Eingangs-Arrays:</echo>-->
 	<arrayCopyJsZZZ arrayinput="${saTotal.sFiledir}" arrayreturn="mysaTotal.sFiledir" sflagcontrol="" />	
