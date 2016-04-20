@@ -3633,13 +3633,15 @@
 	<fl:let>myAnalyze::="${returnString}"</fl:let>
 																
 	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->									
-	<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
+	<antcallback target="-FGLCopyLocal_Control" return="returnControl, returnControlString, returnSrca.filedir, returnSrca.filename, returnDesta.filedir, returnDesta.filename">
 		<param name="analyze" value="${myAnalyze}"/>
 		<param name="leftPart" value="${myLeftPart}"/>
 		<param name="rightPart" value="${myRightPart}"/>												
 	</antcallback>
 	<fl:let>myReturnControl::="${returnControl}"</fl:let>											
 	<fl:echo>myReturnControl=${myReturnControl}</fl:echo>
+	<fl:let>myReturnControlString::="${returnControlString}"</fl:let>											
+	<fl:echo>myReturnControlString=${myReturnControlString}</fl:echo>
 	<fl:echo>returnSrca.filedir=${returnSrca.filedir}</fl:echo>
 	<fl:echo>returnSrca.filename=${returnSrca.filename}</fl:echo>
 	<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
@@ -3672,7 +3674,7 @@
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<ac:var name="returnControlString" value="${myReturnControlString}" />
 	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filedir}" arrayreturn="return.srcaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 	<arrayCopyJsZZZ arrayinput="${mySrcaTotal.filename}" arrayreturn="return.srcaTotal.filename" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
 	<arrayCopyJsZZZ arrayinput="${myDestaTotal.filedir}" arrayreturn="return.destaTotal.filedir" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
@@ -3724,14 +3726,14 @@
 			<!-- Hänge an alle Einträge des arrays den _HOSTNAME + Endung String an -->
 			<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
 	
-			<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnString">					
+			<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnControlString">					
 				<param name="srca.filename" value="${mySrcaTotal.filename}"/>
 				<param name="srca.filedir" value="${mySrcaTotal.filedir}"/>
 				<param name="desta.filedir" value="${myDestaTotal.filedir}"/>
 				<param name="desta.filename" value="${myDestaTotalExtended.filename}"/>					
 			</antcallback>
 			<fl:let>myReturnControl ::="${returnControl}"</fl:let>
-			<fl:let>myReturnString ::="${returnString}"</fl:let>
+			<fl:let>myReturnControlString ::="${returnControlString}"</fl:let>
 		
 		
 			<!--### Automatischer 2. Lauf, wenn auf einem HOSTrechner gestartet wird: ????? #####################-->
@@ -4097,6 +4099,7 @@
 		<ac:then>
 			<echo>Fall: Verzeichnis links nicht existent, Verzeichnis rechts nicht existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControlString::="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	<ac:elseif>
@@ -4105,6 +4108,7 @@
 		<ac:then>
 			<echo>Fall: Linker Ausdruck nicht interpretierbar, rechter Ausdruck nicht interpretierbar</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControlString::="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	</ac:elseif>		
@@ -4113,6 +4117,7 @@
 		<ac:then>
 			<echo>Fall: Datei links nicht existent, rechts Datei nicht existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControlString::="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	</ac:elseif>
@@ -4121,6 +4126,7 @@
 		<ac:then>
 			<echo>Fall: Verzeichnis links nicht existent, rechts Verzeichnis existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControlString::="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	</ac:elseif>
@@ -4129,6 +4135,7 @@
 		<ac:then>
 			<echo>Fall: Datei links NICHT existent, rechts Verzeichnis existent</echo>
 			<!-- <fl:fail message="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
+			<fl:let>myReturnControlString::="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	</ac:elseif>
@@ -4139,6 +4146,7 @@
 			<!-- Merke: Nicht existierende Verzeichnisse werden automatisch durch ant erstellt. -->
 			
 			<!-- TODO noch Kaputt: Kopiere alle Dateien des Verzeichnisses links in das Verzeichnis nach rechts. -->
+			<fl:let>myReturnControlString::="NOCH NICHT ENTWICKELT. Kopiere alle Dateien des Verzeichnisses links in das Verzeichnis nach rechts. Analyseergebnis ist: ${myAnalyze}"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	</ac:elseif>
@@ -4160,6 +4168,7 @@
 			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 			<fl:echo>Ergebnis des Control_DF Aufrufs: ${returnControl}</fl:echo>
+			<fl:let>myReturnControlString ::="Ergebnis des Control_DF Aufrufs: ${returnControl}"</fl:let>
 			<fl:let>myReturnControl::="${returnControl}"</fl:let>	
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
@@ -4184,6 +4193,7 @@
 			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 			<fl:echo>Ergebnis des Control_FD Aufrufs: ${returnControl}</fl:echo>
+			<fl:let>myReturnControlString ::="Ergebnis des Control_FD Aufrufs: ${returnControl}"</fl:let>
 			<fl:let>myReturnControl::="${returnControl}"</fl:let>	
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
@@ -4196,6 +4206,7 @@
 		<ac:then>
 			<echo>Fall: links Verzeichnis, rechts Verzeichnis</echo>
 			<!-- TODO GOON 20150923: Kopiere alle Dateien aus dem einen Verzeichnis in das andere -->
+			<fl:let>myReturnControlString::="NOCH NICHT ENTWICKELT. Kopiere alle Dateien aus dem einen Verzeichnis in das andere. Analyseergebnis ist: ${myAnalyze}"</fl:let>
 			<fl:let>myReturnControl::=false</fl:let>
 		</ac:then>
 	</ac:elseif>
@@ -4217,24 +4228,50 @@
 			<!-- <arrayDebugJsZZZ arrayinput="${returnDesta.filename}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 			<fl:echo>Ergebnis des Control_FF Aufrufs: ${returnControl}</fl:echo>
+			<fl:let>myReturnControlString ::="Ergebnis des Control_FF Aufrufs: ${returnControl}"</fl:let>
 			<fl:let>myReturnControl ::= "${returnControl}"</fl:let>
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filedir}" arrayreturn="mySrca.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnSrca.filename}" arrayreturn="mySrca.filename" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnDesta.filedir}" arrayreturn="myDesta.filedir" sflagcontrol="" />
 			<arrayCopyJsZZZ arrayinput="${returnDesta.filename}" arrayreturn="myDesta.filename" sflagcontrol="" />
 		</ac:then>
-	</ac:elseif>									
-	<ac:else>
+	</ac:elseif>	
+	<ac:elseif>
+		<ac:or>			
+			<ac:equals arg1="${myAnalyze}" arg2="fd"/>
+			<ac:equals arg1="${myAnalyze}" arg2="df"/>
+		</ac:or>
+		<ac:then>			
+			<echo>Fall: Datei nicht existent, Verzeichnis nicht existent</echo>
+			
+			<!-- Kein komplettes abbrechen, nur weil eine Datei nicht existiert. -->
+			<fl:let>myReturnControlString::="Ungueltiges Konfiguration. Analyseergebnis ist: ${myAnalyze}"</fl:let>
+			<fl:let>myReturnControl::=false</fl:let>		
+
+			<!-- TODO NOCH KAPUTT: Dafür sorgen, das keine Datei / kein Verzeichnis zurückgegeben wird. -->
+		</ac:then>
+	</ac:elseif>	
+	<ac:else>		
 		<fl:fail message="Ungueltiges Analyseergebnis: ${myAnalyze}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->										
 	</ac:else>											
 	</ac:if>	
 	
 	<!-- Rueckgabebwerte -->
+	<fl:echo>${sScript}##############################################################################################################################</fl:echo>
+	<fl:echo>${sScript}zurueckgegebene Arrays. Es sollten die 'unerwuenschten' Dateien und Verzeichnisskombinationen nicht mehr darin enthalten sein.</fl:echo>
+	<arrayDebugJsZZZ arrayinput="${mySrca.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${mySrca.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${myDesta.filedir}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	<arrayDebugJsZZZ arrayinput="${myDesta.filename}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->	
+	
+	
 	<ac:var name="returnControl" value="${myReturnControl}" />
+	<ac:var name="returnControlString" value="${myReturnControlString}" />
 	<arrayCopyJsZZZ arrayinput="${mySrca.filedir}" arrayreturn="returnSrca.filedir" sflagcontrol="" />
 	<arrayCopyJsZZZ arrayinput="${mySrca.filename}" arrayreturn="returnSrca.filename" sflagcontrol="" />
 	<arrayCopyJsZZZ arrayinput="${myDesta.filedir}" arrayreturn="returnDesta.filedir" sflagcontrol="" />
 	<arrayCopyJsZZZ arrayinput="${myDesta.filename}" arrayreturn="returnDesta.filename" sflagcontrol="" />
+		
 	<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
 </target>
 
