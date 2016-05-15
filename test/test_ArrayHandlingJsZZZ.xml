@@ -597,6 +597,7 @@
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="sDirRepositoryJsscriptdef" /><!-- Falls mal der Name des Verzeichnisses der Bibliothek überschrieben werden soll -->
 				
 	<!-- Fügt die Strings eines Arrays zusammen. Dabei untere / oberen Indes als Grenze der zu verarbeitenden Arraywerte angeben. -1 ist jeweils min / max. -->
 	<attribute name="inputarraystring" />
@@ -606,6 +607,8 @@
 
     <attribute name="returnstring" /> 
 	<attribute name="returncontrol" /> 
+	<attribute name="returncontrolString" />
+	
 	
     <![CDATA[
 		//normalerweise verwendet man join, wie in dem Beispiel:
@@ -616,6 +619,8 @@
 		//Aber hier soll nur ein bestimmter Bereich von... bis... gejoint werden. 
 		//Sinnvoll um vom Array vorne oder hinten etwas abzuschneiden.
 	    
+		var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+		
 		var myArrayString = attributes.get("inputarraystring");		
 		var myDelimiter = attributes.get("inputdelimiter");
 		var myiIndexLow = attributes.get("inputindexlow");
@@ -624,73 +629,118 @@
 		print("myiIndexHigh=" + myiIndexHigh);
 		
 		
-		var myStringReturn = "";
-		var bReturnControl = true;
-		
-		if(myArrayString===undefined){
-			//print("myString = undefined");
-			bReturnControl = false;
-		}else if(myArrayString===null){
-			//print("myString = null");			
-			bReturnControl = false;
-		}else{
-			if(myDelimiter===undefined){
-				//print("myDelimiter = 'undefined'");
-				myStringReturn=myArrayString.join("");
-				bReturnControl = false;
-			}else if(myDelimiter===''){
-				//print("myDelimiter = 'leer'");
-				myStringReturn=myArrayString.join("");
-				bReturnControl = false;
-			}else{	
-				//print("myDelimiter = " + myDelimiter);
-			
-				if(myiIndexLow===undefined){
-					myiIndexLow=0;
-				}else if(myiIndexLow==null){
-					myiIndexLow=0;
-				}else if(myiIndexLow<=-1){
-					myiIndexLow=0;
-				}
+		//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var sReturn="";
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
 				
-				//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
-				var objectArray = myArrayString.split(',');  
-										
-				//Hole die Anzahl der Einträge im Array, ggfs. für einen ungueltigen oberen Wert
-				myiIndexMax = objectArray.length-1;
-				//print("myiIndexMax="+myiIndexMax);
-				if(myiIndexHigh===undefined){
-					myiIndexHigh=myiIndexMax;
-				}else if(myiIndexLow==null){
-					myiIndexHigh=myiIndexMax;
-				}else if(myiIndexHigh>myiIndexMax){
-					myiIndexHigh=myiIndexMax;
-				}else if(myiIndexHigh<=-1){
-					myiIndexHigh=myiIndexMax;
+			//Die benoetigten Kernel-Funktionen laden
+			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
+			if(!objControlCaller.bReturnControl){								
+				bReturnControl=false;
+				sReturn="";
+			}else{				
+				sReturn=arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexHigh, objControlCaller);				
+				if(!objControlCaller.bReturnControl){									
+					bReturnControl=false;
+					sReturn="";
+				}else{					
 				}
-				
-				//Falsch: damit geht man Buchstabe für Buchstabe vor: 
-				//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
-				//	print("myArrayString[i]="+myArrayString[i]);
-				//	myStringReturn+=myArrayString[i];
-				//	print("myStringReturn="+myStringReturn);
-				//}						 		
-				var iIndexCount=-1;
-				for(x in objectArray){
-					iIndexCount++;
-					//print("objectArray[x]="+objectArray[x]);
-					if(iIndexCount>=myiIndexLow){
-						if(iIndexCount > myiIndexHigh) break;
-						if(myStringReturn!="") myStringReturn+=myDelimiter;
-						myStringReturn+=objectArray[x];					
-						//print("myStringReturn="+myStringReturn);
+			}	
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+			project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+						
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
 					}
-				}								
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k.";
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					print("Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
 			}
-		}				 
-		project.setProperty(attributes.get("returnstring"), myStringReturn);
-		project.setProperty(attributes.get("returncontrol"), bReturnControl);
+			
+			
+			
+		
+		
+		 //####################################################################################################					
+		function arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexMax, objControl){	 	
+			var sScript = "arrayStringImplodeJs: ";
+			print(sScript + "START");
 				
+			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
+				
+			try{															
+				//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+				if(objKernelLibs==undefined || objKernelLibs==null){
+					print("Keine Kernel Ant Js Libs uebergeben.");
+				} else {						
+					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+					} else {
+						print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+						for (var i = 0; i < objKernelLibs.length; i++) { 	
+							print("Lib: " + objKernelLibs[i]["Alias"]);					
+							print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+							//funktioniert: 
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+							}
+						}
+					}
+				print("#######################");
+				var objControlCaller=new Object();				
+				sReturn=arrayStringImplodeZZZ(objKernelLibs,myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControlCaller);
+				if(!objControlCaller.bReturnControl){														
+					sReturn="";
+				}
+				bReturnControl=objControlCaller.bReturnControl;
+				sReturnControl=objControlCaller.sReturnControl;
+				bReturnControl=true;
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. " + err;					
+			}
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;			
+			return sReturn;
+		}			
      ]]>
 	</scriptdef>
 	
@@ -1028,8 +1078,8 @@
 			 
 <!-- TODO Test für isarrayEmptyJsZZZ -->			 
 			 
-<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayStringTrimJsZZZ">
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
+<target name="compile" depends="-declaration,-myTestArrayStringImplodeJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -1492,7 +1542,7 @@
 				
 		<fl:let>sDelimiter::="x"</fl:let>
 		<arrayCopyJsZZZ arrayinput="${myArray}" arrayreturn="myArrayNew" sflagcontrol="" />
-		<arrayStringImplodeJsZZZ inputarraystring="${myArrayNew}" inputdelimiter="${sDelimiter}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString" returncontrol="myReturnControl"/>
+		<arrayStringImplodeJsZZZ inputarraystring="${myArrayNew}" inputdelimiter="${sDelimiter}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"/>
 		<echo>${sScript}Ergebnisstring: ${myReturnString}</echo>
 
 		<echo> </echo>
@@ -1509,7 +1559,7 @@
 				
 		<fl:let>sDelimiter2::="\\"</fl:let><!-- Backslash muss maskiert werden -->
 		<arrayCopyJsZZZ arrayinput="${myArray2}" arrayreturn="myArray2New" sflagcontrol="" />
-		<arrayStringImplodeJsZZZ inputarraystring="${myArray2New}" inputdelimiter="${sDelimiter2}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString2" returncontrol="myReturnControl"/>
+		<arrayStringImplodeJsZZZ inputarraystring="${myArray2New}" inputdelimiter="${sDelimiter2}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString2" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"/>
 		<echo>${sScript}Ergebnisstring: ${myReturnString2}</echo>		
 	</target>
 
@@ -1567,6 +1617,7 @@
 		<echo> </echo>								
 	</target>
 
+	
 	
 		<!-- Beispiel für JAVA Arrays
 		<scriptdef name="validateTimeZone" language="javascript">

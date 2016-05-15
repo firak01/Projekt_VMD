@@ -704,6 +704,165 @@
 		]]>
 	</scriptdef>
 	
+	 <!-- ########################### -->
+  <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
+	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+				
+	<!-- Fügt die Strings eines Arrays zusammen. Dabei untere / oberen Indes als Grenze der zu verarbeitenden Arraywerte angeben. -1 ist jeweils min / max. -->
+	<attribute name="inputarraystring" />
+	<attribute name="inputdelimiter"/>
+	<attribute name="inputindexlow"/>
+	<attribute name="inputindexhigh"/>
+
+    <attribute name="returnstring" /> 
+	<attribute name="returncontrol" /> 
+	<attribute name="returncontrolstring" /> 
+	
+    <![CDATA[
+		arrayStringImplodeZZZ();
+		function arrayStringImplodeZZZ(){
+			var sScript="arrayStringImplodeZZZ: ";
+			//normalerweise verwendet man join, wie in dem Beispiel:
+			//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
+			//var myarray = str_to_split.split(",");
+			//var output=myarray.join("");
+			//
+			//Aber hier soll nur ein bestimmter Bereich von... bis... gejoint werden. 
+			//Sinnvoll um vom Array vorne oder hinten etwas abzuschneiden.
+			
+			var myArrayString = attributes.get("inputarraystring");		
+			var myDelimiter = attributes.get("inputdelimiter");
+			var myiIndexLow = attributes.get("inputindexlow");
+			var myiIndexHigh = attributes.get("inputindexhigh");
+			print(sScript+"myiIndexLow=" + myiIndexLow);
+			print(sScript+"myiIndexHigh=" + myiIndexHigh);
+			
+			
+			var myStringReturn = "";
+			var myReturnControl = true;
+			var myReturnControlString = "";
+			
+			try{
+			if(myArrayString===undefined){
+				//print("myString = undefined");
+				myReturnControl = false;
+			}else if(myArrayString===null){
+				//print("myString = null");			
+				myReturnControl = false;
+			}else{
+				if(myDelimiter===undefined){
+					//print("myDelimiter = 'undefined'");
+					myStringReturn=myArrayString.join("");
+					myReturnControl = false;
+				}else if(myDelimiter===''){
+					//print("myDelimiter = 'leer'");
+					myStringReturn=myArrayString.join("");
+					myReturnControl = false;
+				}else{	
+					//print("myDelimiter = " + myDelimiter);
+				
+					if(myiIndexLow===undefined){
+						myiIndexLow=0;
+					}else if(myiIndexLow==null){
+						myiIndexLow=0;
+					}else if(myiIndexLow<=-1){
+						myiIndexLow=0;
+					}
+					
+					//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
+					var objectArray = myArrayString.split(',');  
+											
+					//Hole die Anzahl der Einträge im Array, ggfs. für einen ungueltigen oberen Wert
+					myiIndexMax = objectArray.length-1;
+					print(sScript+"myiIndexMax="+myiIndexMax);
+					if(myiIndexHigh===undefined){
+						myiIndexHigh=myiIndexMax;
+					}else if(myiIndexLow==null){
+						myiIndexHigh=myiIndexMax;
+					}else if(myiIndexHigh>myiIndexMax){
+						myiIndexHigh=myiIndexMax;
+					}else if(myiIndexHigh<=-1){
+						myiIndexHigh=myiIndexMax;
+					}
+					
+					//Falsch: damit geht man Buchstabe für Buchstabe vor: 
+					//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
+					//	print("myArrayString[i]="+myArrayString[i]);
+					//	myStringReturn+=myArrayString[i];
+					//	print("myStringReturn="+myStringReturn);
+					//}						 
+					print(sScript+"myiIndexLow="+myiIndexLow);					
+					print(sScript+"myiIndexHigh="+myiIndexHigh);	
+					var iIndexCount=-1;
+					for(x in objectArray){
+						iIndexCount++;
+						print("objectArray["+x+"]="+objectArray[x]);
+						if(iIndexCount>=myiIndexLow){  
+							if(iIndexCount > myiIndexHigh) break; //noch kaputt: Fehler in isRootJsZZZ durch >= provizieren . Richtig muss es nur >  heissen. Wirkt sich z.B. auf isFileRootJsZZZ aus, wenn ein Leerstring zurückgeliefert wird.
+							if(myStringReturn!="") myStringReturn+=myDelimiter;
+							myStringReturn+=objectArray[x];					
+							print(iIndexCount+": myStringReturn="+myStringReturn);
+						}
+					}								
+				}
+			}
+
+			}catch(err) {
+					myReturnControl = false;
+					myReturnControlString = handleError(err);
+				}
+
+			
+			project.setProperty(attributes.get("returnstring"), myStringReturn);
+			project.setProperty(attributes.get("returncontrol"), myReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);
+		}//End function arrayStringImplodeZZZ		
+				
+        function handleError(err){		
+		//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
+		//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
+		if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
+			//print("################################");
+			print("ExceptionZZZ Fehler abgefangen (NASHORN)");			
+			myReturnControlString = "Error: " + err.getMessageLast();
+		}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
+			//print("################################");
+			print("ExceptionZZZ Fehler abgefangen (RHINO)");						
+			var caller_line="Kein Stacktrace vorhanden.";
+			if(undefined!=err.stack){									
+				caller_line = err.stack.split("\n")[0];
+			}							
+			myReturnControlString = "Error: aaaaaaa'" + err.javaException.getMessageLast() + "' " + caller_line;
+		}else{			
+			//print("################################");
+			print("Unbestimmten Fehler abfangen.");
+			var version = java.lang.System.getProperty("java.version");
+			print("JavaVersion: " + version);
+			print("typeof err: "+typeof(err));					   
+			if(version.substring(0,3)=="1.8"){
+				print ("Javascript Engine: 'Nashorn'");				
+				myReturnControlString = "Error: " + err.message;//Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+			}else{
+				print("################################");
+				print ("Javascript Engine: 'Rhino'");
+				print("err.contructor.name="+err.constructor.name);				
+				if(err.constructor.name=='JavaException'){					
+					print("Error=" + err);
+					myReturnControlString = "Error: " + err.javaException.getMessage();
+				}else{
+					print("normaler Fehler.  Error=" + err); //In Rhino wird der Fehler nicht direkt zurückgegeben.
+				    myReturnControlString = "Error: " + err.message;
+				}									
+			}
+		}					
+		return myReturnControlString;
+		}//End function handleError				
+				
+     ]]>
+	</scriptdef>	
+	
 	<!-- ############################################################-->	
 	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
 		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
@@ -1173,7 +1332,7 @@
 			 
 <!-- TODO Test für isarrayEmptyJsZZZ -->			 
 			 
-<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ, -myTestArrayGetJsZZZ> -->
+<!-- <target name="compile" depends="-declaration,myTestArrayStringEscapeBackslash> -->
 <target name="compile" depends="-declaration,-myTestArrayStringEscapeBackslash">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
@@ -1250,5 +1409,8 @@
     ]]> 
 </scriptdef> 
 -->
+
+	
+
 		
  </project>

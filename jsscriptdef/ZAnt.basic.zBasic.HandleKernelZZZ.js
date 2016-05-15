@@ -40,7 +40,10 @@
 					objKernelLibs[3]["DIRECTORY"] = sDirSubDefault; 
 					objKernelLibs[3]["FILE"] = "ZAnt.basic.zBasic.JavaHelperZZZ.js";
 					
-
+					objKernelLibs[4] = new Object();
+					objKernelLibs[4]["ALIAS"] = "ArrayHandling";
+					objKernelLibs[4]["DIRECTORY"] = sDirSubDefault; 
+					objKernelLibs[4]["FILE"] = "ZAnt.basic.zBasic.util.datatype.string.StringArrayZZZ.js";
 
 					//REM Das Original aus dem grundlegendne Import-Tryout.
 					//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
@@ -61,11 +64,11 @@
 					}
 					//objControl["KERNELLIBS"]=objKernelLibs; //Ich hab mich dazu entschlossen das Kernelobjekt eingeständig zu machen.
 					bReturnControl=true;
-					sReturnControl=sScript+"Alles o.k."
+					sReturnControl=sScript+"Alles o.k.";
 					bReturn=true;
 				}catch(err){	
 					//#### SIMPLES ERROR HANDLING #######
-					//print("Fehler gefangen: " + err);
+					print("Fehler gefangen: " + err);
 					bReturnControl=false;
 					sReturnControl=sScript+"Fehler. "+ err;					
 				}
@@ -75,6 +78,8 @@
 			}
 			
 			//####################################################################################
+			//BEISPIEL: SO WERDEN DIE BIBLIOTHEKEN ALLE GELADEN INNERHALB EINER FUNKTION:
+			//          ABER: Merke dass in den einfachen Scriptfunktionen NICHT ebenfalls ein Laden gemacht werden darf.
 			function loadKernelAntJsExample(objKernelLibs, objControl){			
 				var sScript = "loadKernelAntJsExample: ";
 				
@@ -144,11 +149,11 @@
 					print("#######################");		
 					
 					bReturnControl=true;
-					sReturnControl=sScript+"Alles o.k."
+					sReturnControl=sScript+"Alles o.k.";
 					bReturn=true;
 				}catch(err){	
 					//#### SIMPLES ERROR HANDLING #######
-					//print("Fehler gefangen: " + err);
+					print("Fehler gefangen: " + err);
 					bReturnControl=false;
 					sReturnControl=sScript+"Fehler. "+ err;					
 				}
