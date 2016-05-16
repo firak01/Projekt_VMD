@@ -683,11 +683,12 @@
 		]]>
 	</scriptdef>
 	
-  <!-- ########################### -->
+     <!-- ########################### -->
   <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+	<attribute name="sDirRepositoryJsscriptdef" /><!-- Falls mal der Name des Verzeichnisses der Bibliothek überschrieben werden soll -->
 				
 	<!-- Fügt die Strings eines Arrays zusammen. Dabei untere / oberen Indes als Grenze der zu verarbeitenden Arraywerte angeben. -1 ist jeweils min / max. -->
 	<attribute name="inputarraystring" />
@@ -697,150 +698,153 @@
 
     <attribute name="returnstring" /> 
 	<attribute name="returncontrol" /> 
-	<attribute name="returncontrolstring" /> 
+	<attribute name="returncontrolString" />
+	
 	
     <![CDATA[
-		arrayStringImplodeZZZ();
-		function arrayStringImplodeZZZ(){
-			var sScript="arrayStringImplodeZZZ: ";
-			//normalerweise verwendet man join, wie in dem Beispiel:
-			//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
-			//var myarray = str_to_split.split(",");
-			//var output=myarray.join("");
-			//
-			//Aber hier soll nur ein bestimmter Bereich von... bis... gejoint werden. 
-			//Sinnvoll um vom Array vorne oder hinten etwas abzuschneiden.
-			
-			var myArrayString = attributes.get("inputarraystring");		
-			var myDelimiter = attributes.get("inputdelimiter");
-			var myiIndexLow = attributes.get("inputindexlow");
-			var myiIndexHigh = attributes.get("inputindexhigh");
-			print(sScript+"myiIndexLow=" + myiIndexLow);
-			print(sScript+"myiIndexHigh=" + myiIndexHigh);
-			
-			
-			var myStringReturn = "";
-			var myReturnControl = true;
-			var myReturnControlString = "";
-			
-			try{
-			if(myArrayString===undefined){
-				//print("myString = undefined");
-				myReturnControl = false;
-			}else if(myArrayString===null){
-				//print("myString = null");			
-				myReturnControl = false;
-			}else{
-				if(myDelimiter===undefined){
-					//print("myDelimiter = 'undefined'");
-					myStringReturn=myArrayString.join("");
-					myReturnControl = false;
-				}else if(myDelimiter===''){
-					//print("myDelimiter = 'leer'");
-					myStringReturn=myArrayString.join("");
-					myReturnControl = false;
-				}else{	
-					//print("myDelimiter = " + myDelimiter);
+		//normalerweise verwendet man join, wie in dem Beispiel:
+		//var str_to_split = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
+		//var myarray = str_to_split.split(",");
+		//var output=myarray.join("");
+		//
+		//Aber hier soll nur ein bestimmter Bereich von... bis... gejoint werden. 
+		//Sinnvoll um vom Array vorne oder hinten etwas abzuschneiden.
+	    
+		var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+		
+		var myArrayString = attributes.get("inputarraystring");		
+		var myDelimiter = attributes.get("inputdelimiter");
+		var myiIndexLow = attributes.get("inputindexlow");
+		var myiIndexHigh = attributes.get("inputindexhigh");
+		print("myiIndexLow=" + myiIndexLow);
+		print("myiIndexHigh=" + myiIndexHigh);
+		
+		
+		//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var sReturn="";
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
 				
-					if(myiIndexLow===undefined){
-						myiIndexLow=0;
-					}else if(myiIndexLow==null){
-						myiIndexLow=0;
-					}else if(myiIndexLow<=-1){
-						myiIndexLow=0;
+			//Die benoetigten Kernel-Funktionen laden
+			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
+			if(!objControlCaller.bReturnControl){								
+				bReturnControl=objControlCaller.bReturnControl;
+				sReturnControl=objControlCaller.sReturnControl;
+				sReturn="";
+			}else{
+				var objControlCallerImplode=new Object();
+				sReturn=arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexHigh, objControlCallerImplode);				
+				if(!objControlCallerImplode.bReturnControl){									
+					bReturnControl=false;
+					sReturn="";
+				}else{					
+				}
+				bReturnControl=objControlCallerImplode.bReturnControl;
+				sReturnControl=objControlCallerImplode.sReturnControl;
+			}	
+			project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+						
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
 					}
-					
-					//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
-					var objectArray = myArrayString.split(',');  
-											
-					//Hole die Anzahl der Einträge im Array, ggfs. für einen ungueltigen oberen Wert
-					myiIndexMax = objectArray.length-1;
-					print(sScript+"myiIndexMax="+myiIndexMax);
-					if(myiIndexHigh===undefined){
-						myiIndexHigh=myiIndexMax;
-					}else if(myiIndexLow==null){
-						myiIndexHigh=myiIndexMax;
-					}else if(myiIndexHigh>myiIndexMax){
-						myiIndexHigh=myiIndexMax;
-					}else if(myiIndexHigh<=-1){
-						myiIndexHigh=myiIndexMax;
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
 					}
-					
-					//Falsch: damit geht man Buchstabe für Buchstabe vor: 
-					//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
-					//	print("myArrayString[i]="+myArrayString[i]);
-					//	myStringReturn+=myArrayString[i];
-					//	print("myStringReturn="+myStringReturn);
-					//}						 
-					print(sScript+"myiIndexLow="+myiIndexLow);					
-					print(sScript+"myiIndexHigh="+myiIndexHigh);	
-					var iIndexCount=-1;
-					for(x in objectArray){
-						iIndexCount++;
-						print("objectArray["+x+"]="+objectArray[x]);
-						if(iIndexCount>=myiIndexLow){  
-							if(iIndexCount > myiIndexHigh) break; //noch kaputt: Fehler in isRootJsZZZ durch >= provizieren . Richtig muss es nur >  heissen. Wirkt sich z.B. auf isFileRootJsZZZ aus, wenn ein Leerstring zurückgeliefert wird.
-							if(myStringReturn!="") myStringReturn+=myDelimiter;
-							myStringReturn+=objectArray[x];					
-							print(iIndexCount+": myStringReturn="+myStringReturn);
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k.";
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					print(sScript+"Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
+			}
+			
+		//####################################################################################################					
+		function arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexMax, objControl){	 	
+			var sScript = "arrayStringImplodeJs: ";
+			print(sScript + "START");
+				
+			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
+				
+			try{															
+				//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+				if(objKernelLibs==undefined || objKernelLibs==null){
+					print("Keine Kernel Ant Js Libs uebergeben.");
+				} else {						
+					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+					} else {
+						print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+						for (var i = 0; i < objKernelLibs.length; i++) { 	
+							print("Lib: " + objKernelLibs[i]["Alias"]);					
+							print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+							//funktioniert: 
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+							}
 						}
-					}								
+					}
+				print("#######################");
+				var objControlCaller=new Object();				
+				sReturn=arrayStringImplodeZZZ(myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControlCaller);
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+					
+				bReturnControl=objControlCaller.bReturnControl;
+				sReturnControl=objControlCaller.sReturnControl;
+				bReturnControl=true;
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. " + err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
 				}
 			}
-
-			}catch(err) {
-					myReturnControl = false;
-					myReturnControlString = handleError(err);
-				}
-
-			
-			project.setProperty(attributes.get("returnstring"), myStringReturn);
-			project.setProperty(attributes.get("returncontrol"), myReturnControl);
-			project.setProperty(attributes.get("returncontrolstring"), myReturnControlString);
-		}//End function arrayStringImplodeZZZ		
-				
-        function handleError(err){		
-		//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
-		//                                                                                       In Nashorn steht das Objekt direkter zur Verfügung.
-		if(err instanceof ExceptionZZZ) {  //So geht das nur mit NASHORN.
-			//print("################################");
-			print("ExceptionZZZ Fehler abgefangen (NASHORN)");			
-			myReturnControlString = "Error: " + err.getMessageLast();
-		}else if(err.javaException instanceof ExceptionZZZ) {  // So geht das nur mit RHINO !!!
-			//print("################################");
-			print("ExceptionZZZ Fehler abgefangen (RHINO)");						
-			var caller_line="Kein Stacktrace vorhanden.";
-			if(undefined!=err.stack){									
-				caller_line = err.stack.split("\n")[0];
-			}							
-			myReturnControlString = "Error: aaaaaaa'" + err.javaException.getMessageLast() + "' " + caller_line;
-		}else{			
-			//print("################################");
-			print("Unbestimmten Fehler abfangen.");
-			var version = java.lang.System.getProperty("java.version");
-			print("JavaVersion: " + version);
-			print("typeof err: "+typeof(err));					   
-			if(version.substring(0,3)=="1.8"){
-				print ("Javascript Engine: 'Nashorn'");				
-				myReturnControlString = "Error: " + err.message;//Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
-			}else{
-				print("################################");
-				print ("Javascript Engine: 'Rhino'");
-				print("err.contructor.name="+err.constructor.name);				
-				if(err.constructor.name=='JavaException'){					
-					print("Error=" + err);
-					myReturnControlString = "Error: " + err.javaException.getMessage();
-				}else{
-					print("normaler Fehler.  Error=" + err); //In Rhino wird der Fehler nicht direkt zurückgegeben.
-				    myReturnControlString = "Error: " + err.message;
-				}									
-			}
-		}					
-		return myReturnControlString;
-		}//End function handleError				
-				
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;			
+			return sReturn;
+		}			
      ]]>
-	</scriptdef>	
+	</scriptdef>
 	
   <!-- ########################### -->
   <scriptdef name="arrayStringTrimJsZZZ" language="javascript">

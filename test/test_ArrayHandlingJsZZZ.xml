@@ -602,8 +602,7 @@
 		]]>
 	</scriptdef>
 	
-   <!-- ########################### -->
-  <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
+ <scriptdef name="arrayStringImplodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
@@ -650,18 +649,20 @@
 			var objControlCaller=new Object();
 			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
 			if(!objControlCaller.bReturnControl){								
-				bReturnControl=false;
+				bReturnControl=objControlCaller.bReturnControl;
+				sReturnControl=objControlCaller.sReturnControl;
 				sReturn="";
-			}else{				
-				sReturn=arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexHigh, objControlCaller);				
-				if(!objControlCaller.bReturnControl){									
+			}else{
+				var objControlCallerImplode=new Object();
+				sReturn=arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexHigh, objControlCallerImplode);				
+				if(!objControlCallerImplode.bReturnControl){									
 					bReturnControl=false;
 					sReturn="";
 				}else{					
 				}
+				bReturnControl=objControlCallerImplode.bReturnControl;
+				sReturnControl=objControlCallerImplode.sReturnControl;
 			}	
-			bReturnControl=objControlCaller.bReturnControl;
-			sReturnControl=objControlCaller.sReturnControl;
 			project.setProperty(attributes.get("returnstring"),sReturn);
 			project.setProperty(attributes.get("returncontrol"),bReturnControl);
 			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
@@ -701,11 +702,7 @@
 				return bReturn;
 			}
 			
-			
-			
-		
-		
-		 //####################################################################################################					
+		//####################################################################################################					
 		function arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexMax, objControl){	 	
 			var sScript = "arrayStringImplodeJs: ";
 			print(sScript + "START");
@@ -733,12 +730,12 @@
 						}
 					}
 				print("#######################");
-				var objControlCaller=new Object();				
-				sReturn=arrayStringImplodeZZZ(objKernelLibs,myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControlCaller);
-				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+				var objControlCallerImplode=new Object();				
+				sReturn=arrayStringImplodeZZZ(myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControlCallerImplode);
+				if(!objControlCallerImplode.bReturnControl) throw new Error(sScript + objControlCallerImplode.sReturnControl);	
 					
-				bReturnControl=objControlCaller.bReturnControl;
-				sReturnControl=objControlCaller.sReturnControl;
+				bReturnControl=objControlCallerImplode.bReturnControl;
+				sReturnControl=objControlCallerImplode.sReturnControl;
 				bReturnControl=true;
 			}catch(err){	
 				//#### SIMPLES ERROR HANDLING #######
