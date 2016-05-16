@@ -1,53 +1,23 @@
 		//###############################################################
 		//### ARRAY STRING HANDLING
 		//###############################################################
-		function arrayStringImplodeZZZ(objKernelLibs,myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControl){			
-				var sScript = "arrayStringImplodeZZZ: ";
-				print(sScript+"START");
-				
-				//Führe ein eval über die Kernelfunktionen aus und lies sie damit ein. 
-				//Problem: Die Funktionen stehen nur in der aufrufenden Funktion zur Verfügung, in der das eval gemacht wurde.
+		function arrayStringImplodeZZZ(objKernelLibs,myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControl){							
 				var sReturn=""; 
 				var bReturnControl=false;
-				var sReturnControl="Fehler";						
+				var sReturnControl="Fehler";		
 				try{	
-					print("#######################");			
-
-					print ("hier imploden");
-					var objControlCaller=new Object();
-					//objControlCaller["KERNELLIBS"]=objControl["KERNELLIBS"]; //DARUM WIRD DAS objKernelLibs eigenständg gehalten.
-					//Obwohl man hiermit das Laden der JS-Funktionen durchführt, stehen die Funktionen an dieser Stelle nicht zur Verfügung. Daher explizit hier mit eval die Funktionen laden.
-					//loadKernelAntJsExampleXX(objKernelLibs, objControlCaller); 
-					//if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
-																
-					print(sScript+"### versuche errorTraced HIER auszuführen");
-					errorTraced();
-					print("### errorTraced ausgeführt");
-					
-					print("#######################");
-					print(sScript+"### Versuche reflectMethodCurrent_Name auszufuehren");
-					//mal sehn, ob die reflectMethodCurrent_Name funktion des externen Scripts zur Verfügung steht.
-					var objControlCaller = new Object();
-					var stemp = reflectMethodCurrent_Name(null, objControlCaller);					
-					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
-					print("### reflectMethodCurrent_Name ausgeführt. stemp="+stemp);					
-					print("#######################");	
-											
-					var sScript = reflectMethodCurrent_Name(null, objControlCaller);										
-					sScript=sScript+": ";
-					sReturnControl=sScript+"Fehler";		
-					print("Name der aktuellen Funktion: "+sScript);
-					
+				var objControlCaller = new Object();
+				var sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+				//print(sScript+"START");				
 				
-					sReturnControl="Alles o.k."
-					bReturnControl=true;
-		
-		
+				try{					
+					var myStringReturn=sReturn;				
 					if(myArrayString===undefined){
-						//print("myString = undefined");
+						//print("myArrayString = undefined");
 						bReturnControl = false;
 					}else if(myArrayString===null){
-						//print("myString = null");			
+						//print("myArrayString = null");			
 						bReturnControl = false;
 					}else{
 						if(myDelimiter===undefined){
@@ -84,8 +54,7 @@
 							}else if(myiIndexHigh<=-1){
 								myiIndexHigh=myiIndexMax;
 							}
-						
-							
+													
 							//Falsch: damit geht man Buchstabe für Buchstabe vor: 
 							//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
 							//	print("myArrayString[i]="+myArrayString[i]);
@@ -105,16 +74,25 @@
 							}								
 						}
 					}
-
-					print("#######################");					
-				
-					var myStringReturn="xxxx";
+					
+					//Fehler provozieren, um das ErrorHandling zu testen. xxxx ist nicht definiert.					
+					print("yyyyyyyyyyyyyyyyyyy    " + xxxx);
+					
+					sReturnControl="Alles o.k."
+					bReturnControl=true;					
 					sReturn=myStringReturn;
 				}catch(err){	
 					//#### SIMPLES ERROR HANDLING #######
 					print(sScript+"Fehler gefangen: " + err);
 					bReturnControl=false;
 					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					print("Fehler (vor Funktionsnamensermittlung) gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl="Fehler. "+ err;					
 				}
 				objControl.bReturnControl=bReturnControl;
 				objControl.sReturnControl=sReturnControl;

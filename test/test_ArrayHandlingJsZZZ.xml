@@ -1,6 +1,16 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>  
 <project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+	
+	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
+	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<!-- gebraucht wird das z.B. für den <for> </for> Task. -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
 	
 	<!-- ############################################################-->
 	<scriptdef name="arrayAppendJsZZZ" language="javascript">
@@ -682,7 +692,7 @@
 					bReturn=true;
 				}catch(err){	
 					//#### SIMPLES ERROR HANDLING #######
-					print("Fehler gefangen: " + err);
+					print(sScript+"Fehler gefangen: " + err);
 					bReturnControl=false;
 					sReturnControl=sScript+"Fehler. "+ err;					
 				}
@@ -725,17 +735,30 @@
 				print("#######################");
 				var objControlCaller=new Object();				
 				sReturn=arrayStringImplodeZZZ(objKernelLibs,myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControlCaller);
-				if(!objControlCaller.bReturnControl){														
-					sReturn="";
-				}
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+					
 				bReturnControl=objControlCaller.bReturnControl;
 				sReturnControl=objControlCaller.sReturnControl;
 				bReturnControl=true;
 			}catch(err){	
 				//#### SIMPLES ERROR HANDLING #######
 				print(sScript+"Fehler gefangen: " + err);
-				bReturnControl=false;
-				sReturnControl=sScript+"Fehler. " + err;					
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. " + err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+				}
 			}
 			objControl.bReturnControl=bReturnControl;
 			objControl.sReturnControl=sReturnControl;			
@@ -1526,6 +1549,9 @@
   <target name="-myTestArrayStringImplodeJsZZZ">
 		<fl:let>sScript::='-myTestArrayStringImplodeJsZZZ: '</fl:let>
 		<fl:let>sTrace::=""</fl:let>
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
 		<fl:logo>${sScript}Start
 		Meine Loesung: Scriptdef arrayStringImplodeJsZZZ</fl:logo>
 		<echo> </echo>
@@ -1543,6 +1569,13 @@
 		<fl:let>sDelimiter::="x"</fl:let>
 		<arrayCopyJsZZZ arrayinput="${myArray}" arrayreturn="myArrayNew" sflagcontrol="" />
 		<arrayStringImplodeJsZZZ inputarraystring="${myArrayNew}" inputdelimiter="${sDelimiter}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"/>
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<echo>${sScript}Ergebnisstring: ${myReturnString}</echo>
 
 		<echo> </echo>
@@ -1560,12 +1593,34 @@
 		<fl:let>sDelimiter2::="\\"</fl:let><!-- Backslash muss maskiert werden -->
 		<arrayCopyJsZZZ arrayinput="${myArray2}" arrayreturn="myArray2New" sflagcontrol="" />
 		<arrayStringImplodeJsZZZ inputarraystring="${myArray2New}" inputdelimiter="${sDelimiter2}" inputindexlow="-1" inputindexhigh="-1" returnstring="myReturnString2" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"/>
-		<echo>${sScript}Ergebnisstring: ${myReturnString2}</echo>		
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
+		<echo>${sScript}Ergebnisstring: ${myReturnString2}</echo>	
+
+		</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+		</trycatch>				
 	</target>
 
   <target name="-myTestArrayStringTrimJsZZZ">
 		<fl:let>sScript::='-myTestArrayStringTrimJsZZZ: '</fl:let>
 		<fl:let>sTrace::=""</fl:let>
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+		
 		<fl:logo>${sScript}Start
 		Meine Loesung: Scriptdef arrayStringTrimJsZZZ</fl:logo>
 		<echo> </echo>
@@ -1614,7 +1669,18 @@
 		<echo>${sScript}# myReturnControl2 nach arrayStringTrimJsZZZ=${myReturnControl2}</echo>
 		<arrayCopyJsZZZ arrayinput="${myReturnArray2}" arrayreturn="myArray2" sflagcontrol="" />		
 		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>
-		<echo> </echo>								
+		<echo> </echo>
+
+		</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+		</trycatch>		
 	</target>
 
 	
