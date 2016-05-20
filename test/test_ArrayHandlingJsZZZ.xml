@@ -7,6 +7,7 @@
 	<!--     Die Definiton von basedir in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_arrayZZZ.xml"/>
 	
 	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
 	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
@@ -209,127 +210,7 @@
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
 		]]>
 	</scriptdef>
-	
-	<!-- ########################### -->
-	<scriptdef name="arrayDebugJsZZZ" language="javascript">
-		<!-- Hiermit gibt man Informationen eines vorher erstelltes JavaScript-Arrays aus.
-			   - ob die übergebene Variable gar kein JavaScript-Array mehr ist, sondern nur noch ein Objekt, 
-			   - der Inhalt
-			   - die Größe des Arrays			-->
 		
-		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-		<attribute name="arrayinput" />
-		<attribute name="ilevel" />	
-		<![CDATA[	
-			enableJava();
-			var myArray = attributes.get("arrayinput");					
-			var myLevel = attributes.get("ilevel");					
-			if(myLevel<=0){
-				
-			}else{
-			if(myArray===undefined) print("myarray = undefined");
-			if(myArray==null) print("myarray = NULL");	
-			
-			//Typausgabe
-			print("typeof myarray = " + typeof(myArray));
-					
-			
-			var iSize=0;
-			if(Array.isArray(myArray)){
-				print("Array uebergeben bekommen");
-				iSize = myArray.length;
-				print("Arraygroesse="+iSize);
-				
-				//TODO: Die gleichen Ausgaben wie im KEIN ARRAY Fall.
-				//- Werte
-			}else{
-				print("kein Array uebergeben bekommen.");
-				
-				var icount=0;					
-				if(typeof(myArray)=="object"){
-					print("Object uebergeben bekommen.");
-					
-					if(myLevel>=2){
-					//das listet alle Methoden des objekts auf.... scheint ein String zu sein....
-					//print("ALLE METHODEN DES OBJEKTS:");
-					//for(x in myArray){
-					//	print(x);		
-					//};	
-					
-					print("#################################");
-					print("ALLE METHODEN UND CODEINHALT DES OBJEKTS:");
-					for(xx in myArray){
-						print("xx: '"+ xx + "'");		//ABER: Damit bekommt man die Namen der Methoden
-						print("zugriff ueber xx: '" + myArray[xx] + "'"); //damit bekommt man codeinhalt der Methoden.
-					};
-					};//myLevel>=2;
-					
-					debugArrayAsString(myArray);
-				}else{
-					print("kein Objekt");
-					debugArrayAsString(myArray);					
-				};
-			};
-			};//myLevel <= 0;
-			
-			
-			function debugArrayAsString(myArray){
-					print("#################################");
-					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
-					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
-					
-					print("splitte diesen String nach Komma.");
-					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
-					for(x in objectArray){
-						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
-					};
-					
-					//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
-					//for(x2 in objectArray02){
-					//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
-					//};
-					
-					//var objectArrayString = myArray.toString();
-					//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
-					//for(z in objectArray03){
-					//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
-					//};
-					
-					print("#################################");
-					print("Versuch die Werte auszugeben: ");	
-					//Merke: Voraussetzung ist:
-					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
-					 for(yy in objectArray){
-							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
-							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
-						};
-			}
-			
-			
-			//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//println("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
-			}
-			
-		]]>
-	</scriptdef>
-	
 	 <!-- ########################### -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.

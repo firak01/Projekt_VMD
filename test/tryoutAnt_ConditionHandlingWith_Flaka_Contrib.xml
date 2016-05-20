@@ -3,6 +3,15 @@
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka">
 	
+	 <!-- ### Notepad++ Hotkeys:
+        ALT + 0, ALT +1, .... XML Tags der Ebene zusammenklappen. -->
+    
+   	<!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
+	<!--     Die Definiton von basedr in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
+	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
+	<!--<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_arrayZZZ.xml"/>-->
+
+	
    <!-- ### Einbinden von flaka ### -->
    <!--xmlns:fl="antlib:it.haefelinger.flaka"> --><!-- damit definiert man fuer FLAKA einen eigenen Namespace -->
 
