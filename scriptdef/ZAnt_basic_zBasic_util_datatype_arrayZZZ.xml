@@ -11,6 +11,8 @@
 		
 		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="sDirRepositoryJsscriptdef" /><!-- Falls mal der Name des Verzeichnisses der Bibliothek überschrieben werden soll -->
+	
 		<attribute name="arrayinput" />
 		<attribute name="ilevel" />	
 		
@@ -20,6 +22,8 @@
 	
 		<![CDATA[	
 			enableJava();
+			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+		
 			var myArray = attributes.get("arrayinput");					
 			var myLevel = attributes.get("ilevel");					
 			if(myLevel<=0){
@@ -45,7 +49,7 @@
 			}else{
 				var objControlCallerImplode=new Object();
 				//sReturn=arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexHigh, objControlCallerImplode);				
-				arrayDebugJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexHigh, objControlCallerImplode);				
+				arrayDebugJs(objKernelLibs, myArray, objControlCallerImplode);				
 				if(!objControlCallerImplode.bReturnControl){									
 					//bReturnControl=false;
 					//sReturn="";
@@ -57,7 +61,8 @@
 			//project.setProperty(attributes.get("returnstring"),sReturn);
 			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
 			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
-				
+			}//else myLevel <=0
+			
 			//###################################################################
             //#### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
@@ -97,11 +102,10 @@
 		function arrayDebugJs(objKernelLibs, myArray, objControl){	 	
 			var sScript = "arrayDebugJs: ";
 			print(sScript + "START");
-		
-		
-			//var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
-			//var bReturnControl=false;
-			//var sReturnControl="Fehler";	
+				
+			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
 				
 			try{															
 				//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
