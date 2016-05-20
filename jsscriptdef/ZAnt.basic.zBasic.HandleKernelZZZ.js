@@ -43,6 +43,11 @@ function usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControl){
 		objKernelLibs[4]["ALIAS"] = "ArrayHandling";
 		objKernelLibs[4]["DIRECTORY"] = sDirSubDefault; 
 		objKernelLibs[4]["FILE"] = "ZAnt.basic.zBasic.util.datatype.string.StringArrayZZZ.js";
+		
+		objKernelLibs[5] = new Object();
+		objKernelLibs[5]["ALIAS"] = "HandleDebug";
+		objKernelLibs[5]["DIRECTORY"] = sDirSubDefault; 
+		objKernelLibs[5]["FILE"] = "ZAnt.basic.zBasic.HandleDebugZZZ.js";
 
 		//REM Das Original aus dem grundlegendne Import-Tryout.
 		//eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( 'tryoutAnt_ImportJavascriptJs.js' ) ) );
