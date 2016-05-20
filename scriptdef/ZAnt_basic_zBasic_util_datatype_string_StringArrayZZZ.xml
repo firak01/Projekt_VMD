@@ -121,14 +121,15 @@
 					} else {
 						print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
 						for (var i = 0; i < objKernelLibs.length; i++) { 	
-							print("Lib: " + objKernelLibs[i]["ALIAS"]);					
-							print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+							//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+							//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 							//funktioniert: 
 							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
 							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
 							}
 						}
 					}
+				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden				
 				print("#######################");
 				var objControlCallerImplode=new Object();				
 				sReturn=arrayStringImplodeZZZ(myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControlCallerImplode);

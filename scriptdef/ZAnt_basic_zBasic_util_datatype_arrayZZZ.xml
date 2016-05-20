@@ -1,4 +1,4 @@
-﻿ <project name="ZAnt_basic_util_datatype_string_StringArrayZZZ"   basedir=".."
+﻿ <project name="ZAnt_basic_util_datatype_arrayZZZ"   basedir=".."
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 	
@@ -21,7 +21,6 @@
 	<attribute name="returncontrolString" />-->
 	
 		<![CDATA[	
-			enableJava();
 			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
 		
 			var myArray = attributes.get("arrayinput");					
@@ -33,10 +32,10 @@
 			if(myArray==null) print("myarray = NULL");	
 			
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
-			//var sReturn="";
-			//var bReturn=false; //Wird hier nicht zurueckgegeben
-			//var bReturnControl=false;
-			//var sReturnControl="Fehler";
+			var sReturn="";
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
 		
 			//Die benoetigten Kernel-Funktionen laden
 			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
@@ -46,17 +45,17 @@
 				bReturnControl=objControlCaller.bReturnControl;
 				sReturnControl=objControlCaller.sReturnControl;
 				sReturn="";
-			}else{
+			}else{	
 				var objControlCallerImplode=new Object();
 				//sReturn=arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexHigh, objControlCallerImplode);				
 				arrayDebugJs(objKernelLibs, myArray, objControlCallerImplode);				
 				if(!objControlCallerImplode.bReturnControl){									
-					//bReturnControl=false;
-					//sReturn="";
+					bReturnControl=false;
+					sReturn="";
 				}else{					
 				}
-				//bReturnControl=objControlCallerImplode.bReturnControl;
-				//sReturnControl=objControlCallerImplode.sReturnControl;
+				bReturnControl=objControlCallerImplode.bReturnControl;
+				sReturnControl=objControlCallerImplode.sReturnControl;
 			}	
 			//project.setProperty(attributes.get("returnstring"),sReturn);
 			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
@@ -68,6 +67,9 @@
             //###################################################################			
 			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
 				var sScript = "enableKernelAntJs: ";
+				var bReturn=false; //Wird hier nicht zurueckgegeben
+				var bReturnControl=false;
+				var sReturnControl="Fehler";
 				try{
 					if(objKernelLibs==undefined || objKernelLibs==null){
 						var err = new Error("objKernelLibs nicht deklariert.");
@@ -101,44 +103,45 @@
 		//####################################################################################################					
 		function arrayDebugJs(objKernelLibs, myArray, objControl){	 	
 			var sScript = "arrayDebugJs: ";
-			print(sScript + "START");
+			//print(sScript + "START");
 				
 			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
 			var bReturnControl=false;
 			var sReturnControl="Fehler";	
 				
-			try{															
-				//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+			try{	
+                //#############################################################################			
+				//### KERNEL LIBS LADEN: IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+				//#############################################################################
 				if(objKernelLibs==undefined || objKernelLibs==null){
 					print("Keine Kernel Ant Js Libs uebergeben.");
 				} else {						
 					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
 						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
 					} else {
-						print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+						//print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
 						for (var i = 0; i < objKernelLibs.length; i++) { 	
-							print("Lib: " + objKernelLibs[i]["ALIAS"]);					
-							print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+							//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+							//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 							//funktioniert: 
 							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
 							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
 							}
 						}
 					}
-				print("#######################");
-						
+				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden				
+				print("#######################");			
+					
 				var objControlCallerDebug=new Object();			
 				debugArray(myArray,objControlCallerDebug);
-				if(!objControlCallerDebug.bReturnControl) throw new Error(sScript + objControlCallerDebug.sReturnControl);	
-					
-				//bReturnControl=objControlCallerDebug.bReturnControl;
-				//sReturnControl=objControlCallerDebug.sReturnControl;
-				//bReturnControl=true;
+				if(!objControlCallerDebug.bReturnControl) throw new Error(sScript + objControlCallerDebug.sReturnControl);						
+				bReturnControl=objControlCallerDebug.bReturnControl;
+				sReturnControl=objControlCallerDebug.sReturnControl;
 			}catch(err){	
 				//#### SIMPLES ERROR HANDLING #######
 				print(sScript+"Fehler gefangen: " + err);
-				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. " + err;	
 
 				//#### ERROR HANDLING #######
 				try{																
@@ -159,7 +162,13 @@
 			return sReturn;
 		}			
 		
-		function debugArray(myArray){
+		function debugArray(myArray,objControl){
+			var sScript = "debugArray: ";
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
+			try{
+		
 			//Typausgabe
 			print("typeof myarray = " + typeof(myArray));
 					
@@ -194,67 +203,96 @@
 					};
 					};//myLevel>=2;
 					
-					debugArrayAsString(myArray);
+					var objControlDebugAsString=new Object();//wichtig: Neues ErrorControl Objekt.
+					debugArrayAsString(myArray,objControlDebugAsString);
+					if(!objControlDebugAsString.bReturnControl) throw new Error(sScript + objControlDebugAsString.sReturnControl);						
+					bReturnControl=objControlDebugAsString.bReturnControl;
+					sReturnControl=objControlDebugAsString.sReturnControl;
 				}else{
 					print("kein Objekt");
-					debugArrayAsString(myArray);					
-				};
-			};
+					var objControlDebugAsString=new Object();//wichtig: Neues ErrorControl Objekt.
+					debugArrayAsString(myArray,objControlDebugAsString);	
+					if(!objControlDebugAsString.bReturnControl) throw new Error(sScript + objControlDebugAsString.sReturnControl);						
+					bReturnControl=objControlDebugAsString.bReturnControl;
+					sReturnControl=objControlDebugAsString.sReturnControl;
+				};											
+			};			
+			bReturn=true;	
+			
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. " + err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+				}
+			}
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;			
+			return bReturn;
 		}
 			
-			function debugArrayAsString(myArray){
+			function debugArrayAsString(myArray,objControl){
+			var sScript = "debugArrayAsString: ";
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
+			try{
 					print("#################################");
 					print("myArray ist jetzt leider ein String ='"+ myArray +"'");
-					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instce field or method named "0".
+					//print("myArray[0]='"+myArray[0]+"'");    //Versuch so auf den Inhalt des Arrays zuzugreifen. ABER FEHLER: java.lang.String has no public instance field or method named "0".
 					
 					print("splitte diesen String nach Komma.");
 					var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.
 					for(x in objectArray){
 						print("x: '"+ x + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
 					};
-					
-					//var objectArray02= new Array(myArray);				//Merke: Versuche so ein Array zu machen.
-					//for(x2 in objectArray02){
-					//	print("x2: '"+ x2 + "'");  //ABER: Durch die neuezuweisung bekommt man nur noch die "0"
-					//};
-					
-					//var objectArrayString = myArray.toString();
-					//var objectArray03 = objectArrayString.split(',');		//Merke: Versuche so ein Array zu machen.
-					//for(z in objectArray03){
-					//	print("z: '"+ z + "'");		//ABER: Damit bekommt man die Indizes und nicht die Werte. Also "0","1","2" !!!!	Man erzeugt also damit auch kein Array
-					//};
-					
+										
 					print("#################################");
-					print("Versuch die Werte auszugeben: ");	
-					//Merke: Voraussetzung ist:
-					//var objectArray = myArray.split(',');						//Merke: Versuche so ein Array zu machen.	
+					print("Versuch die Werte auszugeben: ");						
 					 for(yy in objectArray){
 							print("yy: '"+ yy + "'");		//ABER: Damit bekommt man die Namen der Methoden
 							print("zugriff ueber yy: '" + objectArray[yy] + "'"); //BINGO !!!!
 						};
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k.";
+					bReturn=true;	
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					print(sScript+"Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. " + err;	
+
+					//#### ERROR HANDLING #######
+					try{																
+						//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+						var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+						var myErrorString = handleError(err,objControlErrh);
+						if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+						bReturnControl = false;
+						sReturnControl= myErrorString;				
+					}catch(e){
+						print(e);					
+						bReturnControl=false;
+						sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					}
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;			
+				return bReturn;							
 			}
-			
-			
-			//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//println("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
-			}
-			
 		]]>
 	</scriptdef>
 </project>
