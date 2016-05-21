@@ -164,7 +164,420 @@
 		]]>
 	</scriptdef>
 
-<!-- ############################################################-->		
+
+ <!-- ############################################################# -->	
+	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
+		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	 -->
+		
+		 <!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+		<attribute name="sDirRepositoryJsscriptdef" /><!-- Falls mal der Name des Verzeichnisses der Bibliothek überschrieben werden soll -->
+				
+	
+		<attribute name="arrayinput" />
+		<attribute name="ireturn" />
+
+		<attribute name="returnstring" /> 
+		<attribute name="returncontrol" /> 
+		<attribute name="returncontrolString" />
+			
+
+		<![CDATA[
+			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+		
+			var lista = attributes.get("arrayinput");		 
+			var iReturn = -1;
+			
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
+
+			//###################################################################
+			//### Die benoetigten Kernel-Funktionen laden
+			//###################################################################			
+			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
+			if(!objControlCaller.bReturnControl){								
+				bReturnControl=objControlCaller.bReturnControl;
+				sReturnControl=objControlCaller.sReturnControl;
+				sReturn=null;
+				iRetun=-1;
+			}else{
+				var objControlCallerCount=new Object();
+				iReturn=arrayElementCountJs(objKernelLibs, objControlCallerCount);				
+				if(!objControlCallerCount.bReturnControl){									
+					bReturnControl=false;
+					sReturn="";
+					iReturn=-1;
+				}else{					
+				}
+				bReturnControl=objControlCallerCount.bReturnControl;
+				sReturnControl=objControlCallerCount.sReturnControl;
+			}
+			project.setProperty(attributes.get("ireturn"), iReturn);			
+			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
+			//project.setProperty(attributes.get("returnstring"),sReturn);
+			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+						
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verf�gung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k.";
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					print(sScript+"Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
+			}
+			
+		//######################################################################################################
+		function arrayElementCountJs(objKernelLibs, objControl){	
+			var sScript=null;
+			var iReturn=-1;
+			var arrReturn=null;
+			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
+			var bKernelInitialised=true;
+							
+            //######################################################################################################################			
+			//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
+            //######################################################################################################################
+			try{				
+				if(objKernelLibs==undefined || objKernelLibs==null){
+					print("Keine Kernel Ant Js Libs uebergeben.");
+				} else {						
+					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+					} else {
+						//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+						for (var i = 0; i < objKernelLibs.length; i++) { 	
+							//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+							//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+							//funktioniert: 
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+							}
+						}
+					}
+				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
+				var objControlCaller = new Object();
+				sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+				
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING VOR SCRIPT ERMITTLUNG #######
+				print("Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. "+ err;
+				bKernelInitialised=false;
+			}
+			try{
+				if(bKernelInitialised){
+			
+					//print(sScript + "START");								
+					//print("######################################################");
+				
+					//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+				
+					var icount=0;
+					var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+					if(typeof(objectArray)=="object"){
+						for(x in objectArray){
+							//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+							if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+							}else{
+								icount++;
+							};				
+						}	
+						iReturn=icount;
+					}else{
+						iReturn=0;
+					}
+
+					//bReturnControl=objControlCallerImplode.bReturnControl;
+					//sReturnControl=objControlCallerImplode.sReturnControl;
+					sReturnControl="Alles o.k.";
+					bReturnControl=true;
+				}//end if bKernelInitialised
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. " + err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+				}
+			}			
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;						
+			return iReturn;	
+			}
+		]]>
+	</scriptdef>
+	
+<!-- ########################### -->	
+	<scriptdef name="arrayGetJsZZZ" language="javascript">
+		<!-- Hiermit holt man den Wert an einer Indexposition (beginnend mit 0)
+		Es wird einfach ein String hinsichtlich der Kommata zerlegt. DAS IST GEFAEHRLICH.	-->
+				
+		<!-- Verwende dieses Ergebnis aus der Tatsache, dass FLAKA keine korrekte Größe einer Liste zurückgibt -->
+		<!-- Merke: Es gibt in Ant und auch in den dazugehörigen Bibliotheken (Flaka, AntContrib) nix für entsprechende Listenobperationen.
+					Also weder für die Größenermittlung, noch für den Zugriff auf ein Listenelement mit Index, wie z.B. lista[2].
+					Es gibt zwar z.B. size(list(1,2)), das aber hier nicht funktioniert.
+					Darum mit scriptdef behelfen. -->
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
+		<attribute name="sDirRepositoryJsscriptdef" /><!-- Falls mal der Name des Verzeichnisses der Bibliothek überschrieben werden soll -->
+				
+		<attribute name="arrayinput" />
+		<attribute name="index" />
+		<attribute name="arrayget" />
+		<attribute name="sflagcontrol" /><!-- sflagcontrol werte: raw=mache kein unescape. -->
+		
+		<attribute name="returnstring" /> 
+		<attribute name="returncontrol" /> 
+		<attribute name="returncontrolString" />
+		
+		<![CDATA[
+			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+		
+			var lista = attributes.get("arrayinput");		 
+			var iIndex = attributes.get("index");
+			var mysFlagControl = attributes.get("sflagcontrol");
+			var objReturn="<#!!FGLUNDEFINED!!#>";
+			
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
+
+			//###################################################################
+			//### Die benoetigten Kernel-Funktionen laden
+			//###################################################################			
+			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
+			if(!objControlCaller.bReturnControl){								
+				bReturnControl=objControlCaller.bReturnControl;
+				sReturnControl=objControlCaller.sReturnControl;
+				sReturn=null;
+				iRetun=-1;
+				objReturn="<#!!FGLUNDEFINED!!#>";
+			}else{
+				var objControlCallerKernel=new Object();
+				objReturn=arrayGetJs(objKernelLibs, lista, iIndex, objControlCallerKernel);				
+				if(!objControlCallerKernel.bReturnControl){									
+					bReturnControl=false;
+					sReturn="";
+					iReturn=-1;
+					objReturn="<#!!FGLUNDEFINED!!#>";
+				}else{					
+				}
+				bReturnControl=objControlCallerKernel.bReturnControl;
+				sReturnControl=objControlCallerKernel.sReturnControl;
+			}
+			project.setProperty(attributes.get("arrayget"), objReturn);
+			
+			//project.setProperty(attributes.get("ireturn"), iReturn);			
+			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
+			//project.setProperty(attributes.get("returnstring"),sReturn);
+			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+						
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verf�gung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k.";
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					print(sScript+"Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
+			}
+			
+		function arrayGetJs(objKernelLibs,lista,iIndex,objControl){
+		var sScript=null;
+			var iReturn=-1;
+			var objReturn="<#!!FGLUNDEFINED!!#>";
+			var arrReturn=null;
+			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
+			var bKernelInitialised=true;
+							
+            //######################################################################################################################			
+			//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
+            //######################################################################################################################
+			try{				
+				if(objKernelLibs==undefined || objKernelLibs==null){
+					print("Keine Kernel Ant Js Libs uebergeben.");
+				} else {						
+					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+					} else {
+						//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+						for (var i = 0; i < objKernelLibs.length; i++) { 	
+							//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+							//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+							//funktioniert: 
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+							}
+						}
+					}
+				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
+				var objControlCaller = new Object();
+				sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+				
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING VOR SCRIPT ERMITTLUNG #######
+				print("Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. "+ err;
+				bKernelInitialised=false;
+			}
+			try{
+				if(bKernelInitialised){
+			
+					//print(sScript + "START");								
+					//print("######################################################");
+								
+					main:{
+						if(iIndex <= -1) break main;
+						
+						//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
+					
+						var icount=-1;
+						var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+						if(typeof(objectArray)=="object"){
+						for(x in objectArray){
+							//print("x="+x);
+							//print("objectArray[x]="+objectArray[x]);
+							
+							//Undefinierte, d.h. nur initialisierte Arrays abfangen
+							//Sie haben die Groesse 0 und an erster Stelle das <#!!FGLUNDEFINED!!#>
+							if(objectArray.length<=1 && objectArray[x]=="<#!!FGLUNDEFINED!!#>"){						
+								break main;
+							}else{
+								icount++;
+								if(icount==iIndex){
+									//Per Schalter das unescapen abstellbar machen. Also auf Wunsch also die 'raw Werte' zurückliefern.
+									if(mysFlagControl=='raw'){
+										objReturn = objectArray[x];
+									}else{
+										var textUnescaped = unescape(objectArray[x]); //Merke: In ArrayAppendJsZZZ werden die Strings nur noch encoded angehängt.
+										objReturn = textUnescaped;								
+									}
+									break main;
+								}				
+							}; //end if
+							}; //end for
+						}; //end if(typeof(objectArray)=="object")				
+					}; //end main:
+					//bReturnControl=objControlCallerImplode.bReturnControl;
+					//sReturnControl=objControlCallerImplode.sReturnControl;
+					sReturnControl="Alles o.k.";
+					bReturnControl=true;
+				}//end if bKernelInitialised
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. " + err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+				}
+			}			
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;						
+			return objReturn;	
+			}
+		]]>
+	</scriptdef>
+				
+	<!-- ############################################################-->		
 	<scriptdef name="arrayInitJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Erstellung eines Arrays.
 			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
