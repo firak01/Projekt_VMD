@@ -1,6 +1,6 @@
-		//###############################################################
-		//### ARRAY STRING HANDLING
-		//###############################################################
+//###############################################################
+//### ARRAY STRING HANDLING
+//###############################################################
 		function arrayStringImplodeZZZ(myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControl){							
 				var sReturn=""; 
 				var bReturnControl=false;
@@ -96,7 +96,7 @@
 				return sReturn;
 			}
 			
-			
+		//################################################################
 			function arrayStringTrimZZZ(objKernelLibs,myArrayString,objControl){							
 				var sReturn=""; 
 				var bReturnControl=false;
@@ -191,3 +191,6 @@
 				objControl.sReturnControl=sReturnControl;
 				return sReturn;
 			}
+			
+			
+			

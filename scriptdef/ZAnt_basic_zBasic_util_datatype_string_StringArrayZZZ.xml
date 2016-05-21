@@ -104,9 +104,7 @@
 			
 		//####################################################################################################					
 		function arrayStringImplodeJs(objKernelLibs, myArrayString, myDelimiter, myiIndexLow, myiIndexMax, objControl){	 	
-			var sScript = "arrayStringImplodeJs: ";
-			print(sScript + "START");
-				
+			var sScript=null;
 			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
 			var bReturnControl=false;
 			var sReturnControl="Fehler";	
@@ -119,7 +117,7 @@
 					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
 						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
 					} else {
-						print(sScript+"Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+						print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
 						for (var i = 0; i < objKernelLibs.length; i++) { 	
 							//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 							//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
@@ -129,7 +127,10 @@
 							}
 						}
 					}
-				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden				
+				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden		
+				sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+				print(sScript + "START");				
 				print("#######################");
 				var objControlCallerImplode=new Object();				
 				sReturn=arrayStringImplodeZZZ(myArrayString,myDelimiter,myiIndexLow,myiIndexHigh,objControlCallerImplode);

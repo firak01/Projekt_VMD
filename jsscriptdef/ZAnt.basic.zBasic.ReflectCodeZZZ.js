@@ -1,6 +1,6 @@
 //###############################################################
-		//### REFLECTION 
-		//###############################################################
+//### REFLECTION 
+//###############################################################
 		function reflectMethodCurrent_Name(myError, objControl){
 			var sScript="reflectMethodCurrent_Name: ";				
 			var sReturn="";

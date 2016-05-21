@@ -306,52 +306,7 @@
 		]]>
 	</scriptdef>
 			
-	<!-- ############################################################-->		
-	<scriptdef name="arrayInitJsZZZ" language="javascript">
-		<!-- Hiermit faked man die Erstellung eines Arrays.
-			 Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-		
-		 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				 Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-		<attribute name="isize" />
-		<attribute name="arrayreturn" />		
-		<![CDATA[										 
-			var mySize = attributes.get("isize");	
-			//print("iSize = '" + mySize + "'");
-			
-			//Prüfen, ob mySize eine Zahl ist. 
-			//Merke: Ist z.B. die Flaka - Variable nicht oder leer deklariert, kommt hier der Variablenname '${irgendwas}' an.
-			//           Das bewirkt, dass dieses '${irgendwas}' als erstes Element in´s Array kommt und das Array sofort die Größe 1 hat, was in dem Fall nicht beabsichtigt ist.
-			if(isNumber(mySize)){
-				//print("eine Zahl");
-				var myArrayReturn = new Array(); //Merke: Egal was man hier als Groesse angiebt [irgendwas] wird als Wert übernommen genauso wie leiglich: irgendwas
-				
-				if(mySize==0){
-					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-					myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
-				}
-				if(mySize>=1){
-					//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-					for(icount=0; icount<=mySize-1; icount++){
-						myArrayReturn[icount]="<#!!FGLEMPTY!!#>";
-					}												
-				}								
-			}else{
-				//print("KEINE Zahl");
-				var myArrayReturn = new Array();
 
-				//Analog zu LSZ: ZCraft.Logic.Formula32  wie <#!!FGLSLASH!!#> <#!!FGLDBLSLASH!!#>
-				myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
-			}
-						
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-			
-			function isNumber(n) {
-				return !isNaN(parseFloat(n)) && isFinite(n);
-			}
-		]]>
-	</scriptdef>
-				
 	<!-- ############################################################-->	
 	<scriptdef name="arrayLeftBackStringJsZZZ" language="javascript">
 		<!-- Hiermit schneodet man von den Werten eines Arrays einen Stringwert ab. -->
@@ -824,7 +779,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 	 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayStringImplodeJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayInitJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
