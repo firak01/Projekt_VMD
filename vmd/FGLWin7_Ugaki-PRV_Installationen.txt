@@ -2,6 +2,8 @@
 
 #########################################################
 
+20160520: Spiel "Wargame - AirLand Battle" installiert mit Produktschlüssel: WKR7B-LA24J-4L43Z-8GZ8X-2ATFF
+
 20160328: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
 
 20151129: Reinstallation von Steam in den Ordner c:\Spiel, dabei Kopie vom Ordner SteamApps gemacht, funktioniert.

@@ -256,39 +256,7 @@
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
 		]]>
 	</scriptdef>
-	
-	<!-- ############################################################-->
-	<scriptdef name="arrayCopyJsZZZ" language="javascript">
-		<!-- Hiermit man ein Array in eine anderes neues Array.
-             Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
-             man aber noch mit dem alten 'Variablennamen' weiterarbeiten möchte.			 -->
-		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="arrayinput" />
-		<attribute name="arrayreturn" />
-		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
-		<![CDATA[
-			var myArray = attributes.get("arrayinput");		 
-			var myFlagControl = attributes.get("sflagcontrol");
-			var myArrayReturn = new Array();
-								
-			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-			var icount=-1;
-			
-			//Kopiervorgang, noch ohne irgendwelche FlagControl Erweiterungen.			
-			for(x in objectArray){
-				//print("Wert: '" + objectArray[x]+ "'");
-				icount++;
-				myArrayReturn[icount]=objectArray[x];
-			};
-															
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-		]]>
-	</scriptdef>
-			
+				
 	<!-- ############################################################-->	
 	<scriptdef name="arrayLeftBackStringJsZZZ" language="javascript">
 		<!-- Hiermit schneodet man von den Werten eines Arrays einen Stringwert ab. -->
