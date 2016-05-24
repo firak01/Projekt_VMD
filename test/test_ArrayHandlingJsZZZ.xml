@@ -651,7 +651,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 	 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayGetJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayInitJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
