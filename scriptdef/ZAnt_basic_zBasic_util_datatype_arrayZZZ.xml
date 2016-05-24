@@ -364,7 +364,6 @@
 		]]>
 	</scriptdef>
 
-
  <!-- ############################################################# -->	
 	<scriptdef name="arrayElementCountJsZZZ" language="javascript">
 		<!-- Hiermit faked man die Ermittlung einer size, welche nach Anwendung flaks von split(...) nicht das gewünschte Ergebnis liefert.
@@ -409,15 +408,15 @@
 			}
 			bReturnControl=objControlCaller.bReturnControl;
 			sReturnControl=objControlCaller.sReturnControl;
-			}
+	
 			project.setProperty(attributes.get("ireturn"), iReturn);			
 			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
 			//project.setProperty(attributes.get("returnstring"),sReturn);
 			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
 			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
 						
-			//###################################################################
-            //#### KERNEL LIBS HINZUFÜGEN
+			//### START SNIPPET 01 ################################################################
+            //### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
 			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
 				var sScript = "enableKernelAntJs: ";
@@ -450,6 +449,7 @@
 				objControl.sReturnControl=sReturnControl;
 				return bReturn;
 			}
+			//### ENDE SNIPPET 01 ################################################################
 			
 		//######################################################################################################
 		function arrayElementCountJs(objKernelLibs, objControl){	
@@ -457,7 +457,7 @@
 			var arrReturn=null;
 			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
 
-			 //######################################################################################################################			
+			//###START SNIPPET 02 ###################################################################################################################			
 			//IN JEDER FUNKTION DAS LADEN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
             //######################################################################################################################
 			var sScript=null;
@@ -502,28 +502,28 @@
 				if(bKernelInitialised){						
 					main:{			
 						//print(sScript + "START");								
-						//print("######################################################");
+						//print("###ENDE SNIPPET 02 ###################################################");
 									
-					var icount=0;
-					var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
-					if(typeof(objectArray)=="object"){
-						for(x in objectArray){
-							//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-							if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-							}else{
-								icount++;
-							};				
-						}	
-						iReturn=icount;
-					}else{
-						iReturn=0;
-					}
+						var icount=0;
+						var objectArray = lista.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
+						if(typeof(objectArray)=="object"){
+							for(x in objectArray){
+								//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+								if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+								}else{
+									icount++;
+								};				
+							}	
+							iReturn=icount;
+						}else{
+							iReturn=0;
+						}
 
-					//bReturnControl=objControlCallerImplode.bReturnControl;
-					//sReturnControl=objControlCallerImplode.sReturnControl;
-					sReturnControl="Alles o.k.";
-					bReturnControl=true;
-				//print("######################################################");
+						//bReturnControl=objControlCallerImplode.bReturnControl;
+						//sReturnControl=objControlCallerImplode.sReturnControl;
+						sReturnControl="Alles o.k.";
+						bReturnControl=true;
+						//print("### START SNIPPET 03 ###################################################");
 						//print(sScript + "ENDE");								
 					} //end main:
 				}//end if bKernelInitialised
@@ -548,7 +548,8 @@
 				}
 			}
 			objControl.bReturnControl=bReturnControl;
-			objControl.sReturnControl=sReturnControl;			
+			objControl.sReturnControl=sReturnControl;
+            //### ENDE SNIPPET 03 ###########################################################			
 			return iReturn;	
 			}
 		]]>
@@ -589,32 +590,20 @@
 			var bReturn=false; //Wird hier nicht zurueckgegeben
 			var bReturnControl=false;
 			var sReturnControl="Fehler";	
-
-			//###################################################################
-			//### Die benoetigten Kernel-Funktionen laden
-			//###################################################################			
-			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+			
+			var objKernelLibs = new Array();
 			var objControlCaller=new Object();
-			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
-			if(!objControlCaller.bReturnControl){								
-				bReturnControl=objControlCaller.bReturnControl;
-				sReturnControl=objControlCaller.sReturnControl;
-				sReturn=null;
-				iRetun=-1;
+			objReturn=arrayGetJs(objKernelLibs, lista, iIndex, objControlCaller);				
+			if(!objControlCaller.bReturnControl){									
+				bReturnControl=false;
+				sReturn="";
+				iReturn=-1;
 				objReturn="<#!!FGLUNDEFINED!!#>";
-			}else{
-				var objControlCallerKernel=new Object();
-				objReturn=arrayGetJs(objKernelLibs, lista, iIndex, objControlCallerKernel);				
-				if(!objControlCallerKernel.bReturnControl){									
-					bReturnControl=false;
-					sReturn="";
-					iReturn=-1;
-					objReturn="<#!!FGLUNDEFINED!!#>";
-				}else{					
-				}
-				bReturnControl=objControlCallerKernel.bReturnControl;
-				sReturnControl=objControlCallerKernel.sReturnControl;
+			}else{					
 			}
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+			
 			project.setProperty(attributes.get("arrayget"), objReturn);
 			
 			//project.setProperty(attributes.get("ireturn"), iReturn);			
@@ -623,8 +612,8 @@
 			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
 			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
 						
-			//###################################################################
-            //#### KERNEL LIBS HINZUFÜGEN
+			//### START SNIPPET 01 ################################################################
+            //### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
 			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
 				var sScript = "enableKernelAntJs: ";
@@ -657,7 +646,9 @@
 				objControl.sReturnControl=sReturnControl;
 				return bReturn;
 			}
+			//### ENDE SNIPPET 01 ################################################################
 			
+		//######################################################################################################
 		function arrayGetJs(objKernelLibs,lista,iIndex,objControl){
 			var sScript=null;
 			var iReturn=-1;
@@ -668,26 +659,35 @@
 			var sReturnControl="Fehler";
 			var bKernelInitialised=true;
 							
-            //######################################################################################################################			
-			//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
+            //###START SNIPPET 02 ###################################################################################################################			
+			//IN JEDER FUNKTION DAS LADEN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
             //######################################################################################################################
+			var sScript=null;
+			var bKernelInitialised=true;
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
 			try{				
 				if(objKernelLibs==undefined || objKernelLibs==null){
-					print("Keine Kernel Ant Js Libs uebergeben.");
-				} else {						
+					throw new Error("Keine Kernel Ant Js Libs uebergeben.");
+				} else{						
 					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
-						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
-					} else {
-						//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
-						for (var i = 0; i < objKernelLibs.length; i++) { 	
-							//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
-							//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
-							//funktioniert: 
-							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
-							}
-						}
+						//print("Noch keine Kernel Ant Js Libs vorhanden zum Laden, lade sie jetzt.");
+						
+						var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+						var objControlCallerKernel=new Object();
+						var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCallerKernel);			
+						if(!objControlCallerKernel.bReturnControl) throw new Error(objControlCallerKernel.sReturnControl);	
 					}
+					
+					//print("Eval Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						//funktioniert: 
+						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+					}				
+				}
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
 				var objControlCaller = new Object();
 				sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
@@ -701,12 +701,11 @@
 				bKernelInitialised=false;
 			}
 			try{
-				if(bKernelInitialised){
-			
-					//print(sScript + "START");								
-					//print("######################################################");
-								
-					main:{
+				if(bKernelInitialised){						
+					main:{			
+						//print(sScript + "START");								
+						//print("###ENDE SNIPPET 02 ###################################################");
+					
 						if(iIndex <= -1) break main;
 						
 						//Merke: lista ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
@@ -741,7 +740,9 @@
 						//sReturnControl=objControlCallerImplode.sReturnControl;
 						sReturnControl="Alles o.k.";
 						bReturnControl=true;
-					}; //end main:					
+						//print("### START SNIPPET 03 ###################################################");
+						//print(sScript + "ENDE");								
+					} //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
 				//#### SIMPLES ERROR HANDLING #######
@@ -762,9 +763,10 @@
 					bReturnControl=false;
 					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
 				}
-			}			
+			}
 			objControl.bReturnControl=bReturnControl;
-			objControl.sReturnControl=sReturnControl;						
+			objControl.sReturnControl=sReturnControl;
+            //### ENDE SNIPPET 03 ###########################################################								
 			return objReturn;	
 			}
 		]]>
@@ -803,30 +805,23 @@
 			//### Die benoetigten Kernel-Funktionen laden
 			//###################################################################			
 			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
-			var objControlCaller=new Object();
-			var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCaller);			
-			if(!objControlCaller.bReturnControl){								
-				bReturnControl=objControlCaller.bReturnControl;
-				sReturnControl=objControlCaller.sReturnControl;
-				sReturn=null;
-			}else{
-				var objControlCallerInit=new Object();
-				arrReturn=arrayInitJs(objKernelLibs, mySize, objControlCallerInit);				
-				if(!objControlCallerInit.bReturnControl){									
-					bReturnControl=false;
-					sReturn="";
-				}else{					
-				}
-				bReturnControl=objControlCallerInit.bReturnControl;
-				sReturnControl=objControlCallerInit.sReturnControl;
-			}	
+			var objControlCaller=new Object();			
+			arrReturn=arrayInitJs(objKernelLibs, mySize, objControlCaller);				
+			if(!objControlCaller.bReturnControl){									
+				bReturnControl=false;
+				sReturn="";
+			}else{					
+			}
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+			
 			project.setProperty(attributes.get("arrayreturn"), arrReturn);
 			//project.setProperty(attributes.get("returnstring"),sReturn);
 			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
 			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
 						
-			//###################################################################
-            //#### KERNEL LIBS HINZUFÜGEN
+			//### START SNIPPET 01 ################################################################
+            //### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
 			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
 				var sScript = "enableKernelAntJs: ";
@@ -859,45 +854,61 @@
 				objControl.sReturnControl=sReturnControl;
 				return bReturn;
 			}
-			
-			
-			
+			//### ENDE SNIPPET 01 ################################################################
 			
 		//######################################################################################################
 		function arrayInitJs(objKernelLibs, mySize, objControl){	
 			var sScript=null;
 			var arrReturn=null;
 			var sReturn="nixnix"; //Ziel dieses Tests ist es den Namen der in der Unterfunktion ermitteltent aufrufenden Funktion an die aufrufende Ant-Script-Ebene zurueckzugeben.
+			//###START SNIPPET 02 ###################################################################################################################			
+			//IN JEDER FUNKTION DAS LADEN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
+            //######################################################################################################################
+			var sScript=null;
+			var bKernelInitialised=true;
 			var bReturnControl=false;
 			var sReturnControl="Fehler";	
-				
-			try{
-                //######################################################################################################################			
-				//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
-                //######################################################################################################################				
+			try{				
 				if(objKernelLibs==undefined || objKernelLibs==null){
-					print("Keine Kernel Ant Js Libs uebergeben.");
-				} else {						
+					throw new Error("Keine Kernel Ant Js Libs uebergeben.");
+				} else{						
 					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
-						print("Keine Kernel Ant Js Libs vorhanden zum Laden");
-					} else {
-						//print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
-						for (var i = 0; i < objKernelLibs.length; i++) { 	
-							//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
-							//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
-							//funktioniert: 
-							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
-							}
-						}
+						//print("Noch keine Kernel Ant Js Libs vorhanden zum Laden, lade sie jetzt.");
+						
+						var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+						var objControlCallerKernel=new Object();
+						var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCallerKernel);			
+						if(!objControlCallerKernel.bReturnControl) throw new Error(objControlCallerKernel.sReturnControl);	
 					}
+					
+					//print("Eval Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						//funktioniert: 
+						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+					}				
+				}
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
 				var objControlCaller = new Object();
 				sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
 				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
-				//print(sScript + "START");								
-				//print("######################################################");
 				
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING VOR SCRIPT ERMITTLUNG #######
+				print("Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. "+ err;
+				bKernelInitialised=false;
+			}
+			try{
+				if(bKernelInitialised){						
+					main:{			
+						//print(sScript + "START");								
+						//print("###ENDE SNIPPET 02 ###################################################");
+						
+						
 				var objControlCallerInit=new Object();				
 				arrReturn=arrayInitZZZ(objKernelLibs,mySize,objControlCallerInit);
 				if(!objControlCallerInit.bReturnControl) throw new Error(sScript + objControlCallerInit.sReturnControl);	
@@ -905,6 +916,10 @@
 				bReturnControl=objControlCallerInit.bReturnControl;
 				sReturnControl=objControlCallerInit.sReturnControl;
 				bReturnControl=true;
+			//print("### START SNIPPET 03 ###################################################");
+						//print(sScript + "ENDE");								
+					} //end main:
+				}//end if bKernelInitialised
 			}catch(err){	
 				//#### SIMPLES ERROR HANDLING #######
 				print(sScript+"Fehler gefangen: " + err);
@@ -926,8 +941,8 @@
 				}
 			}
 			objControl.bReturnControl=bReturnControl;
-			objControl.sReturnControl=sReturnControl;			
-			//return sReturn;
+			objControl.sReturnControl=sReturnControl;
+            //### ENDE SNIPPET 03 ###########################################################			
 			return arrReturn;
 		}			
 		]]>
