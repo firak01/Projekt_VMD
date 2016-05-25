@@ -20,90 +20,7 @@
 	
 	<!-- TODO: Test für isarrayEmptyJsZZZ -->	
 	<!-- TODO: Alle scriptdefs auslagern -->
-	
-	<!-- ############################################################-->
-	<scriptdef name="arrayAppendJsZZZ" language="javascript">
-		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
 		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="arrayinput" />
-		<attribute name="valueinput" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
-		<attribute name="arrayreturn" />
-		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
-		<![CDATA[
-			var myArray = attributes.get("arrayinput");		 
-			var myValue = attributes.get("valueinput");
-			var myFlagControl = attributes.get("sflagcontrol");
-			var myArrayReturn = new Array();
-								
-			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-			var icount=-1;
-			var iuboundfilled=-1;
-			var bnormal=true;
-			
-			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
-			for(x in objectArray){
-				//print("Wert: '" + objectArray[x]+ "'");
-				icount++;
-			
-				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-				    if(bnormal==true){					
-						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
-						bnormal = false;
-					}
-				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
-					//nix tun bei leeren Werten.
-					bnormal=true;
-				}else{
-					//nix tun bei normalen Werten.
-					bnormal=true;
-				};				
-			};
-			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
-						
-
-			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
-			icount=-1; icountGlobal=-1;
-			for(x in objectArray){
-				icount++;
-				if(icount<=iuboundfilled){
-					icountGlobal++;					
-					myArrayReturn[icount]=objectArray[x];
-				}else{
-					//nix
-				}
-			}
-						
-			//3. Erweitere das Array UM ENCODIERTEN WERT
-			icountGlobal++;
-			print("Wert encoded anhängen an position " + icountGlobal + ": '" + myValue + "'");
-			var textEncoded = encodeMyHtml(myValue);
-			print("Encoded Wert wird kopiert: '" + textEncoded + "'");
-			
-			//TODO An dieser Stelle bei der Erweiterung arrays anzuhängen: Prüfen, ob das ein Einzelwert oder ein Array ist.
-			myArrayReturn[icountGlobal]=textEncoded;
-																						
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-			
-			
-		//TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-		]]>
-	</scriptdef>
-	
 	<!-- ############################################################-->
 	<scriptdef name="arrayAppendArrayJsZZZ" language="javascript">
 		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an.
@@ -651,7 +568,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 	 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayInitJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayAppendJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -699,7 +616,14 @@
 		<fl:let>
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -723,7 +647,14 @@
 		<fl:let>
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -748,7 +679,14 @@
 		<fl:let>
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -772,7 +710,14 @@
 		<fl:let>
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 			
 		<!-- Ausgabe des neuen Arrays -->	
@@ -795,7 +740,14 @@
 		<fl:let>
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -831,7 +783,14 @@
 		<arrayCopyJsZZZ arrayinput="${myArray2appendNew}" arrayreturn="myArray2append" sflagcontrol="" />
 		
 		<!-- Wert des zweiten Arrays an das erste Array anhängen -->		
-		<arrayAppendArrayJsZZZ arrayinput="${myArray}" array2append="${myArray2append}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendArrayJsZZZ arrayinput="${myArray}" array2append="${myArray2append}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+			</ac:then>		
+		</ac:if>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -889,7 +848,7 @@
 		<fl:let>
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
@@ -905,7 +864,7 @@
 		<fl:let>
 			mySingleValue::= "angehängte Endung beachten\\"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
