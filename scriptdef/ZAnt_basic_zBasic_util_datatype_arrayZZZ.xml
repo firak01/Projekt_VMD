@@ -117,7 +117,7 @@
 				//#### SIMPLES ERROR HANDLING VOR SCRIPT ERMITTLUNG #######
 				print("Fehler gefangen: " + err);
 				bReturnControl=false;
-				sReturnControl=sScript+"Fehler. "+ err;
+				sReturnControl="Fehler. "+ err;
 				bKernelInitialised=false;
 			}
 			try{
@@ -215,6 +215,224 @@
 			
 			return myArrayReturn;
 		}																		
+		]]>
+	</scriptdef>
+	
+	<!-- ############################################################-->
+	<scriptdef name="arrayAppendArrayJsZZZ" language="javascript">
+		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an.
+             Merke: Hier wird nicht encoded da davon ausgegangen wird, das die anzuhängenden Werte schon encoded erzeugt wurden.-->
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+		<attribute name="arrayinput" />
+		<attribute name="array2append" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
+		<attribute name="arrayreturn" />
+		<attribute name="returncontrol" />
+		<attribute name="returncontrolstring" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
+
+		<![CDATA[
+			var myArray = attributes.get("arrayinput");		 
+			var myArray2append = attributes.get("array2append");
+			var myFlagControl = attributes.get("sflagcontrol");
+						
+			//Aufruf der "Arbeitsfunktion".
+			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+			var objControlCaller=new Object();
+			var arrReturn = arrayAppendArrayJs(objKernelLibs, myArray, myArray2append, objControlCaller);				
+			if(!objControlCaller.bReturnControl){									
+				bReturnControl=false;
+				sReturn="";
+				iReturn=-1;
+			}else{					
+			}
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+	
+			//project.setProperty(attributes.get("ireturn"), iReturn);				
+			project.setProperty(attributes.get("arrayreturn"), arrReturn);
+			//project.setProperty(attributes.get("returnstring"),sReturn);
+				
+			
+			//### START SNIPPET 01 ################################################################
+			project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+		
+			//###################################################################
+            //### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verf�gung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k.";
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					print(sScript+"Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
+			}
+			//### ENDE SNIPPET 01 ################################################################
+			
+		//######################################################################################################
+		function arrayAppendArrayJs(objKernelLibs, myArray, myArray2append, objControl){
+			var myArrayReturn = new Array();
+			
+			//###START SNIPPET 02 ###################################################################################################################			
+			//IN JEDER FUNKTION DAS LADEN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
+            //######################################################################################################################
+			var sScript=null;
+			var bKernelInitialised=true;
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
+			try{				
+				if(objKernelLibs==undefined || objKernelLibs==null)	throw new Error("Keine Kernel Ant Js Libs uebergeben.");
+				if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+					//print("Noch keine Kernel Ant Js Libs vorhanden zum Laden, lade sie jetzt.");
+						
+					var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+					var objControlCallerKernel=new Object();
+					var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCallerKernel);			
+					if(!objControlCallerKernel.bReturnControl) throw new Error(objControlCallerKernel.sReturnControl);	
+				}
+				
+				//print("Eval Kernel Ant Js Libs: " + objKernelLibs.length);
+				for (var i = 0; i < objKernelLibs.length; i++) { 	
+					//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+					//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+					//funktioniert: 
+					eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+					//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+				}				
+				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
+				var objControlCaller = new Object();
+				sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+				
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING VOR SCRIPT ERMITTLUNG #######
+				print("Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl="Fehler. "+ err;
+				bKernelInitialised=false;
+			}
+			try{
+				if(bKernelInitialised){						
+					main:{			
+						//print(sScript + "START");								
+						//print("###ENDE SNIPPET 02 ###################################################");
+			
+			var objectArray2append = myArray2append.split(',');  //Merke: Versuche so ein Array zu machen.							
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			var iuboundfilled=-1;
+			var bnormal=true;
+						
+			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
+			for(x in objectArray){
+				//print("Wert: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+				    if(bnormal==true){					
+						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
+						bnormal = false;
+					};
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					//nix tun bei leeren Werten.
+					bnormal=true;
+				}else{
+					//nix tun bei normalen Werten.
+					bnormal=true;
+				};				
+			};
+			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
+						
+
+			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugebende Array
+			icount=-1; 
+			var icountGlobal=-1;
+			for(x in objectArray){
+				icount++;
+				if(icount<=iuboundfilled){
+					icountGlobal++;
+					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
+					myArrayReturn[icount]=objectArray[x];
+				}else{
+					//nix
+				};
+			};
+						
+			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
+			for(z in objectArray2append){								
+				if(objectArray2append[z]=="<#!!FGLUNDEFINED!!#>"){
+					print("<#!!FGLUNDEFINED!!#> Wert NICHT anhaengen.");
+				}else{
+					icountGlobal++;
+					print("Wert anhaengen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
+					myArrayReturn[icountGlobal]=objectArray2append[z];
+				};							
+			};			
+			
+			
+			//bReturnControl=objControlCallerImplode.bReturnControl;
+			//sReturnControl=objControlCallerImplode.sReturnControl;
+			sReturnControl="Alles o.k.";
+			bReturnControl=true;
+					//print("### START SNIPPET 03 ###################################################");
+					//print(sScript + "ENDE");								
+					} //end main:
+				}//end if bKernelInitialised
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. " + err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+				}
+			}
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;
+            //### ENDE SNIPPET 03 ###########################################################			
+			
+			return myArrayReturn;
+			}
 		]]>
 	</scriptdef>
 	

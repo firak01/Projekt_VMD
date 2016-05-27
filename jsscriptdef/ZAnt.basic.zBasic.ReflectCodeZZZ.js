@@ -409,7 +409,7 @@ if(bJava7){
   //+++ ENDE Java7 Fall
   //+++ START Java8 Fall
   }else{
-	print(sScript+"Java8 Fall");
+	//print(sScript+"Java8 Fall");
 	try {
 		var objError = new Error();
 		callstack=objError.stack;

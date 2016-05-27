@@ -3,8 +3,7 @@
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka">
    <!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
-   
-   
+      
    <!-- ### Notepad++ Hotkeys:
         ALT + 0, ALT +1, .... XML Tags der Ebene zusammenklappen. -->
     
@@ -33,84 +32,7 @@
 	  </classpath>
 	</taskdef>
 		
-    <!-- ######## Scriptdefs ############################################################################--> 		
-	<!-- ############################################################-->
-	<scriptdef name="arrayAppendArrayJsZZZ" language="javascript">
-		<!-- Hiermit häng man an ein Array einen anderen Wert (Array oder Einzelwert) an. -->
-		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="arrayinput" />
-		<attribute name="array2append" /><!-- Erst einmal nur als Einzelstring, später auch Array an Array anhängen. -->
-		<attribute name="arrayreturn" />
-		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
-		<![CDATA[
-			var myArray = attributes.get("arrayinput");		 
-			var myArray2append = attributes.get("array2append");
-			var myFlagControl = attributes.get("sflagcontrol");
-			var myArrayReturn = new Array();
-			
-			var objectArray2append = myArray2append.split(',');  //Merke: Versuche so ein Array zu machen.							
-			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-			var icount=-1;
-			var iuboundfilled=-1;
-			var bnormal=true;
-						
-			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".		
-			//print("Uebernimm Werte des Ausgangsarrays:");
-			for(x in objectArray){
-				//print("Wert vom Ausgangsarray: '" + objectArray[x]+ "'");
-				icount++;
-			
-				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-				    if(bnormal==true){					
-						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
-						bnormal = false;
-					};
-				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
-					//nix tun bei leeren Werten.
-					bnormal=true;
-				}else{
-					//nix tun bei normalen Werten.
-					bnormal=true;
-				};				
-			};
-			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
-						
-
-			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugebende Array
-			icount=-1; 
-			var icountGlobal=-1;
-			for(x in objectArray){
-				icount++;
-				if(icount<=iuboundfilled){
-					icountGlobal++;
-					//print("Wert wird kopiert: '" + objectArray[x]+ "'");
-					myArrayReturn[icount]=objectArray[x];
-				}else{
-					//nix
-				};
-			};
-						
-			//3. Erweitere das Array, UM ALLE ANDEREN ARRAYWERTE
-			for(z in objectArray2append){								
-				if(objectArray2append[z]=="<#!!FGLUNDEFINED!!#>"){
-					//print("<#!!FGLUNDEFINED!!#> Wert NICHT anhaengen.");
-				}else{
-					icountGlobal++;
-					//print("Wert anhaengen an position " + icountGlobal + ": '" + objectArray2append[z]+ "'");
-					myArrayReturn[icountGlobal]=objectArray2append[z];
-				};
-				
-				
-			};			
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-		]]>
-	</scriptdef>
-				
+    <!-- ######## Scriptdefs ############################################################################--> 						
 	<!-- ############################################################-->	
 	<scriptdef name="arrayLeftBackStringJsZZZ" language="javascript">
 		<!-- Hiermit schneodet man von den Werten eines Arrays einen Stringwert ab. -->
@@ -2763,9 +2685,23 @@
 		
 		<ac:then>		
 			<fl:echo>${sScript}Ergebnis: ${returnControl}, haenge Array an.</fl:echo>
-			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filedir}" array2append="${mysaFiledir}" arrayReturn="myArrayTotal1"/>
+			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filedir}" array2append="${mysaFiledir}" arrayReturn="myArrayTotal1" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal1}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />						
-			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filename}" array2append="${mysaFilename}" arrayReturn="myArrayTotal2"/>
+			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filename}" array2append="${mysaFilename}" arrayReturn="myArrayTotal2"   returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal2}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
 			
 			<!--<fl:echo>${sScript}Ergebnis mit angehaengtem Array:</fl:echo>-->
@@ -3062,16 +2998,44 @@
 		<equals arg1="${returnControl}" arg2="true"/>
 		<ac:then>
 			<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
-			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"/>
+			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
 
-			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"/>
+			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
 
-			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"/>
+			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"   returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
 								
-			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"/>
+			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"   returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<ac:if>
+				<equals arg1="false" arg2="${myReturnControl}"/>
+				<ac:then>							
+					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
 		</ac:then>
 		<ac:else>
