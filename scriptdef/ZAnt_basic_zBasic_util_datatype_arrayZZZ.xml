@@ -133,6 +133,10 @@
 				break main;
 			}
 			
+			//TEST: FEHLER PROVOZIEREN
+			print ("Ddas gibts nicht" + nixda);
+						
+			
 			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
 			var icount=-1;
 			var iuboundfilled=-1;
@@ -190,23 +194,22 @@
 					} //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
-				//#### SIMPLES ERROR HANDLING #######
+				//#### ERROR HANDLING #######				
 				print(sScript+"Fehler gefangen: " + err);
 				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
-
-				//#### ERROR HANDLING #######
+				//sReturnControl=sScript+"Fehler. " + err;					
 				try{																
 					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
 					var myErrorString = handleError(err,objControlErrh);
 					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-					bReturnControl = false;
-					sReturnControl= myErrorString;				
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
 				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
 					print(e);					
 					bReturnControl=false;
-					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}
 			objControl.bReturnControl=bReturnControl;
@@ -350,7 +353,7 @@
 			var icount=-1;
 			var iuboundfilled=-1;
 			var bnormal=true;
-						
+					
 			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
 			for(x in objectArray){
 				//print("Wert: '" + objectArray[x]+ "'");
@@ -408,23 +411,22 @@
 					} //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
-				//#### SIMPLES ERROR HANDLING #######
+				//#### ERROR HANDLING #######				
 				print(sScript+"Fehler gefangen: " + err);
 				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
-
-				//#### ERROR HANDLING #######
+				//sReturnControl=sScript+"Fehler. " + err;					
 				try{																
 					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
 					var myErrorString = handleError(err,objControlErrh);
 					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-					bReturnControl = false;
-					sReturnControl= myErrorString;				
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
 				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
 					print(e);					
 					bReturnControl=false;
-					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}
 			objControl.bReturnControl=bReturnControl;
@@ -592,23 +594,22 @@
 					}; //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
-				//#### SIMPLES ERROR HANDLING #######
+				//#### ERROR HANDLING #######				
 				print(sScript+"Fehler gefangen: " + err);
 				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
-
-				//#### ERROR HANDLING #######
+				//sReturnControl=sScript+"Fehler. " + err;					
 				try{																
 					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
 					var myErrorString = handleError(err,objControlErrh);
 					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-					bReturnControl = false;
-					sReturnControl= myErrorString;				
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
 				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
 					print(e);					
 					bReturnControl=false;
-					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}			
 			objControl.bReturnControl=bReturnControl;
@@ -773,23 +774,22 @@
 					}; //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
-				//#### SIMPLES ERROR HANDLING #######
+				//#### ERROR HANDLING #######				
 				print(sScript+"Fehler gefangen: " + err);
 				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
-
-				//#### ERROR HANDLING #######
+				//sReturnControl=sScript+"Fehler. " + err;					
 				try{																
 					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
 					var myErrorString = handleError(err,objControlErrh);
 					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-					bReturnControl = false;
-					sReturnControl= myErrorString;				
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
 				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
 					print(e);					
 					bReturnControl=false;
-					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}			
 			objControl.bReturnControl=bReturnControl;
@@ -963,23 +963,22 @@
 					} //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
-				//#### SIMPLES ERROR HANDLING #######
+				//#### ERROR HANDLING #######				
 				print(sScript+"Fehler gefangen: " + err);
 				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
-
-				//#### ERROR HANDLING #######
+				//sReturnControl=sScript+"Fehler. " + err;					
 				try{																
 					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
 					var myErrorString = handleError(err,objControlErrh);
 					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-					bReturnControl = false;
-					sReturnControl= myErrorString;				
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
 				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
 					print(e);					
 					bReturnControl=false;
-					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}
 			objControl.bReturnControl=bReturnControl;
@@ -1180,23 +1179,22 @@
 					} //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
-				//#### SIMPLES ERROR HANDLING #######
+				//#### ERROR HANDLING #######				
 				print(sScript+"Fehler gefangen: " + err);
 				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
-
-				//#### ERROR HANDLING #######
+				//sReturnControl=sScript+"Fehler. " + err;					
 				try{																
 					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
 					var myErrorString = handleError(err,objControlErrh);
 					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-					bReturnControl = false;
-					sReturnControl= myErrorString;				
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
 				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
 					print(e);					
 					bReturnControl=false;
-					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}
 			objControl.bReturnControl=bReturnControl;
@@ -1356,23 +1354,22 @@
 					} //end main:
 				}//end if bKernelInitialised
 			}catch(err){	
-				//#### SIMPLES ERROR HANDLING #######
+				//#### ERROR HANDLING #######				
 				print(sScript+"Fehler gefangen: " + err);
 				//bReturnControl=false;
-				//sReturnControl=sScript+"Fehler. " + err;	
-
-				//#### ERROR HANDLING #######
+				//sReturnControl=sScript+"Fehler. " + err;					
 				try{																
 					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
 					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
 					var myErrorString = handleError(err,objControlErrh);
 					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
-					bReturnControl = false;
-					sReturnControl= myErrorString;				
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
 				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
 					print(e);					
 					bReturnControl=false;
-					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}
 			objControl.bReturnControl=bReturnControl;

@@ -8,7 +8,7 @@
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_arrayZZZ.xml"/>
-	
+		
 	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
 	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
 	<!-- gebraucht wird das z.B. für den <for> </for> Task. -->
@@ -17,6 +17,38 @@
 		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
+	
+	<macrodef name="catchReturnControlZZZ">
+	    <!-- Aufruf des macrodef mit: <catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/> -->
+		<!-- Der Aufruf dieses Macrodefs ersetzt folgenden Code in den Ant-Targets selbst: -->
+		<!--<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" />--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+		<!--	</ac:then>		
+		</ac:if>-->
+	
+	
+	    <!-- Merke: attribute unterstuetzt das Attribut 'optional' nicht.-->
+		<!-- Merke: auf die uebergebenen Attribute kann man hier nur mit @ zugreifen.-->
+		<attribute name="script"/>
+		<attribute name="returncontrol"/>
+		<attribute name="returncontrolstring"/>
+		<!-- Merke: Ueber element kann xml von aussen hier an die gewuenschte Stelle hinzugegeben werden. Dabei wird das Attribut 'optional' unterstuetzt -->
+		<!-- <element name="codeVonAussen" optional="no"/> -->		
+		<sequential>
+			<echo>script: @{script} | returncontrol=@{returncontrol} | returncontrolstring=@{returncontrolstring}</echo>	
+			<ac:if>
+				<equals arg1="false" arg2="@{returncontrol}"/>
+				<ac:then>							
+					<echo>@{script}Fehler aus Funktion zurueckgegeben: @{returncontrolstring}</echo>	
+					<fail message="@{script}@{returncontrolstring}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
+			<!-- <codeVonAussen/> -->
+		</sequential>
+	</macrodef>	
 	
 	<!-- TODO: Test für isarrayEmptyJsZZZ -->	
 	<!-- TODO: Alle scriptdefs auslagern -->		
@@ -493,7 +525,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 	 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayAppendArrayJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayAppendJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -516,6 +548,7 @@
   </target>
   
   <target name="-myTestArrayAppendJsZZZ">
+		<fl:let>sScript::='-myTestArrayAppendJsZZZ: '</fl:let>
 		<!-- Testen etwas an ein Array anzuhaengen -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
@@ -542,13 +575,7 @@
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
 		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -573,13 +600,7 @@
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
 		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -605,13 +626,7 @@
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
 		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -636,13 +651,7 @@
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
 		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 			
 		<!-- Ausgabe des neuen Arrays -->	
@@ -666,13 +675,7 @@
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
 		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -681,6 +684,7 @@
 	</target>
 	
 	<target name="-myTestArrayAppendArrayJsZZZ">
+		<fl:let>sScript::='-myTestArrayAppendArrayJsZZZ: '</fl:let>
 		<!-- Testen etwas an ein Array anzuhaengen -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
@@ -709,13 +713,7 @@
 		
 		<!-- Wert des zweiten Arrays an das erste Array anhängen -->		
 		<arrayAppendArrayJsZZZ arrayinput="${myArray}" array2append="${myArray2append}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
-		<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-			</ac:then>		
-		</ac:if>
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 	
 		<!-- Ausgabe des neuen Arrays -->	
@@ -723,6 +721,7 @@
 	</target>
   
 	<target name="-myTestArrayGetJsZZZ">
+		<fl:let>sScript::='-myTestArrayGetJsZZZ: '</fl:let>
 		<!-- Teste einen Wert aus dem Array auszulesen. -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
@@ -774,6 +773,7 @@
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
 		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
@@ -790,6 +790,7 @@
 			mySingleValue::= "angehängte Endung beachten\\"; 
 		</fl:let>
 		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
 		
@@ -815,6 +816,8 @@
 	</target>
 
 	<target name="-myTestArrayDebugJsZZZ">
+		<fl:let>sScript::='-myTestArrayDebugJsZZZ: '</fl:let>
+		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
 		<fl:logo>myTestArrayDebugJsZZZ:
 		Meine Loesung: Scriptdef arrayDebugJsZZZ</fl:logo>		
@@ -842,6 +845,8 @@
 	
 	
   <target name="-myTestArrayInitJsZZZ">
+		<fl:let>sScript::='-myTestArrayInitJsZZZ: '</fl:let>
+		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
 		<fl:logo>myTestArrayInitJsZZZ:
 			Meine Loesung: Scriptdef arrayInitJsZZZ</fl:logo>		
@@ -915,6 +920,8 @@
 	</target>
 	
 	<target name="-myTestArrayLeftBackStringJsZZZ">
+		<fl:let>sScript::='-myTestArrayLeftBackStringJsZZZ: '</fl:let>
+		
 		<!-- Teste einen String an die Werte eines Arrays anzuhaengen -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
@@ -951,6 +958,8 @@
 	</target>
 	
 	<target name="-myTestArrayPlusStringJsZZZ">
+		<fl:let>sScript::='-myTestArrayPlusStringJsZZZ: '</fl:let>
+		
 		<!-- Teste einen String an die Werte eines Arrays anzuhaengen -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
@@ -1116,7 +1125,7 @@
 		</trycatch>		
 	</target>
 
-	
+
 	
 		<!-- Beispiel für JAVA Arrays
 		<scriptdef name="validateTimeZone" language="javascript">
