@@ -30,9 +30,10 @@
 				sReturn="";
 				iReturn=-1;
 			}else{					
-			}
+			}			
 			bReturnControl=objControlCaller.bReturnControl;
 			sReturnControl=objControlCaller.sReturnControl;
+			print("arrayAppendJsZZZ: " + bReturnControl +" | " + sReturnControl);
 	
 			//project.setProperty(attributes.get("ireturn"), iReturn);			
 			project.setProperty(attributes.get("arrayreturn"), arrReturn);
@@ -212,6 +213,7 @@
 					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
 				}
 			}
+			print(sScript+bReturnControl+" | " + sReturnControl);
 			objControl.bReturnControl=bReturnControl;
 			objControl.sReturnControl=sReturnControl;
             //### ENDE SNIPPET 03 ###########################################################			
@@ -455,7 +457,7 @@
 		
 		<attribute name="returnstring" /> 
 		<attribute name="returncontrol" /> 
-		<attribute name="returncontrolString" />
+		<attribute name="returncontrolstring" />
 			
 
 		<![CDATA[

@@ -5,7 +5,8 @@
    <!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
       
    <!-- ### Notepad++ Hotkeys:
-        ALT + 0, ALT +1, .... XML Tags der Ebene zusammenklappen. -->
+        ALT & 0, ALT & 1, .... XML Tags der Ebene zusammenklappen.
+        STRG & + bzw. - .... Schrift vergrößern bzw. verkleinern		-->
     
    	<!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
 	<!--     Die Definiton von basedr in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
@@ -58,7 +59,10 @@
 				<equals arg1="false" arg2="@{returncontrol}"/>
 				<ac:then>							
 					<echo>@{script}Fehler aus Funktion zurueckgegeben: @{returncontrolstring}</echo>	
-					<fail message="@{script}@{returncontrolstring}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+					<ac:var name="myReturnControlString" value="@{script}@{returncontrolstring}"/>
+					<echo>@{script}Fehler aus Funktion zurueckzugegeben: ${myReturnControlString}</echo>
+					<ac:var name="returncontrolstring" value="${myReturnControlString}"/>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
 				</ac:then>		
 			</ac:if>
 			<!-- <codeVonAussen/> -->
@@ -1699,7 +1703,7 @@
 		</ac:then>
 		<ac:else><!-- TODO GOON: Default nur verwenden, wenn project.useDefault konfiguriert ist -->
 			<fl:let>myDirRepositoryPath ::= "C:/1fgl/repository/Projekt_VMD"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard '${myDirRepositoryPath}'." arrayreturn="myaError"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />			
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryPath' verwende als Standard '${myDirRepositoryPath}'." arrayreturn="myaError"  returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />			
 			<!--<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />-->
 			
 			<ac:if>
@@ -1725,7 +1729,7 @@
 		</ac:then>
 		<ac:else>
 			<fl:let>myDirPathClientFgl ::= "c:/1fgl/client"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard '${myDirPathClientFgl}'." arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirPathClientFgl' verwende als Standard '${myDirPathClientFgl}'." arrayreturn="myaError" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"  sflagcontrol="" />
 			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 			<ac:if>
 				<equals arg1="false" arg2="${myReturnControl}"/>
@@ -1750,7 +1754,7 @@
 		</ac:then>
 		<ac:else>
 			<fl:let>myGoon ::= false</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.os'" arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.os'" arrayreturn="myaError" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"  sflagcontrol="" />
 			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 			<ac:if>
 				<equals arg1="false" arg2="${myReturnControl}"/>
@@ -1989,7 +1993,7 @@
 		</ac:then>
 		<ac:else>			
 			<fl:let>myOperation_mode ::= "prod"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.operation_mode' verwende als Standard '${myOperation_mode}'." arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.operation_mode' verwende als Standard '${myOperation_mode}'." arrayreturn="myaError" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 			<ac:if>
 				<equals arg1="false" arg2="${myReturnControl}"/>
@@ -2015,7 +2019,7 @@
 		</ac:then>
 		<ac:else>					
 			<fl:let>myDirRepositoryBat ::= "bat"</fl:let>
-			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard '${myDirRepositoryBat}'." arrayreturn="myaError" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myaError}" valueinput="Nicht konfiguriert: 'project.vmd.dirRepositoryBat' verwende als Standard '${myDirRepositoryBat}'." arrayreturn="myaError" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 			<ac:if>
 				<equals arg1="false" arg2="${myReturnControl}"/>
@@ -2042,8 +2046,8 @@
 <target name="-FglFileControlController_Main">
 	<fl:let>sScript::='-FglFileControlController_Main: '</fl:let>
 	<fl:let>sTrace::=""</fl:let>
-	<ac:var name="myReturnControl" value="true" /> <!--unset="true" />-->
-	<ac:var name="myReturnControlString" value="alles o.k." /> <!-- unset="true" /> -->
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
 		
 		<!-- ErrorHandling -->
 	<ac:trycatch property="myError" reference="myErrorObject">
@@ -2126,11 +2130,14 @@
 										<ac:else>
 											<fl:echo>zu verarbeitende Zeile:'${myLineTrimmed}'</fl:echo>																																																							
 											<!-- <fl:echo>1. myStringCurrent.Schema:'${myStringCurrent.Schema}'</fl:echo> -->
-											<antcallback target="-FglSchemaController_Analyzer" return="returnString, returnControl,returnString.Schema,returnControl.SchemaChanged,linea.UnSchema">
+											<ac:var name="myReturnControlCaller" value="true" unset="true" />
+											<ac:var name="myReturnControlStringCaller" value="alles o.k." unset="true" />
+											<antcallback target="-FglSchemaController_Analyzer" return="myReturnControlCaller,myReturnControlStringCaller,returnControlString.Schema,returnControl.SchemaChanged,linea.UnSchema">
 												<param name="lineCurrent" value="${myLineTrimmed}" />
 												<param name="stringCurrent.Schema" value="${myStringCurrent.Schema}"/>
 												<param name="lineaCurrent.UnSchema" value="${myLineaCurrent.UnSchema}"/><!-- Das sind die Zeilen ohne den voranstehenden Schema Teil -->												
 											</antcallback>
+											<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControlCaller}" returncontrolstring="${myReturnControlStringCaller}"/>
 																																
 											<!-- Nach dem Untercontrolleraufruf, oder ohne Untercontrolleraufruf: Fülle linea.Schema als Kopie von lineaCurrent.Schema -->
 												<!--<fl:echo>2a. returnString.Schema:'${returnString.Schema}'</fl:echo>												
@@ -2182,12 +2189,12 @@
 					<!-- TODO: Die Meldungen aus den aufgerufenen Unterfunktionen zurueckgeben und nicht blos hier alles auf supergut setzen. -->
 					<echo>${sScript}Ergebnis des AUFRUF DES ABSCHLIESSENDEN SCHEMA-CONTROLLERS zurueckgeben: ${returnControlString}</echo>
 					<ac:var name="myReturnControl" value="${returnControl}" />
-					<ac:var name="myReturnControlString" value="${returnControlString}"/>																					
+					<ac:var name="myReturnControlString" value="${sScript}${returnControlString}"/>																					
 				</fl:when><!-- Existiert die Konfigurationsdatei für das lokale Ausführen -->
 				<otherwise><!-- Merke: otherwise gehört nicht zu flaka! -->
 					<!-- <fl:fail message="Datei existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
 					<ac:var name="myReturnControl" value="false" />
-					<ac:var name="myReturnControlString" value="Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"/>	
+					<ac:var name="myReturnControlString" value="${sScript}Konfigurations-Datei existiert NICHT: ${myLocalFileControlPath}"/>	
 				</otherwise>
 			</fl:choose>
 			
@@ -2203,7 +2210,7 @@
 					
 			<ac:var name="myReturnControl" value="false" />
 			<ac:var name="myReturnControlString" value="'${baz}'"/>			
-			<!--<echo>${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
+			<!--<echo>Im ErrorHandling ${sScript}Fehler zurueckgeben: ${myReturnControlString}</echo>-->
 		</ac:catch>
 
 		<ac:finally>
@@ -2222,6 +2229,15 @@
 </target>
 
 <target name="-FglSchemaController_Analyzer">
+	<fl:let>sScript::='-FglSchemaController_Analyzer: '</fl:let>
+	<fl:let>sTrace::=""</fl:let>
+	<ac:var name="myReturnControl" value="true" unset="true" />
+	<ac:var name="myReturnControlString" value="alles o.k." unset="true" />
+		<!-- ErrorHandling -->
+	<ac:trycatch property="myError" reference="myErrorObject">
+		<ac:try>
+			
+
 	<fl:let>myLineNextSchema::="${lineCurrent}"</fl:let>
 	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />	
 	<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
@@ -2308,15 +2324,12 @@
 			<fl:let>myReturnControl.SchemaChanged::=false</fl:let>
 										
 			<!-- Hänge an bestehendes Array an -->
-			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
-			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
-			<ac:if>
-				<equals arg1="false" arg2="${myReturnControl}"/>
-				<ac:then>							
-					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-				</ac:then>		
-			</ac:if>
+			<ac:var name="myReturnControlCaller" value="true" unset="true" />
+			<ac:var name="myReturnControlStringCaller" value="alles o.k." unset="true" />
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" returncontrol="myReturnControlCaller" returncontrolstring="myReturnControlStringCaller" sflagcontrol="" />
+			<echo message="${sScript}yyyyyyyymyReturnControlCaller | myReturnControlStringCaller = ${myReturnControlCaller} | ${myReturnControlStringCaller}" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControlCaller}" returncontrolstring="${myReturnControlStringCaller}"/>
+			<echo message="${sScript}zzzzzzzzzzzzzzzmyReturnControlCaller | myReturnControlStringCaller = ${myReturnControlCaller} | ${myReturnControlStringCaller}" />			
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
@@ -2329,15 +2342,11 @@
 			
 			<!-- Mache neues Array. Hänge an neues Array an -->			
 			<arrayInitJsZZZ isize="0" arrayreturn="mylineaNext.UnSchema"/>
-			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />
-			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
-			<ac:if>
-				<equals arg1="false" arg2="${myReturnControl}"/>
-				<ac:then>							
-					<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-				</ac:then>		
-			</ac:if>
+			<ac:var name="myReturnControlCaller" value="true" unset="true" />
+			<ac:var name="myReturnControlStringCaller" value="alles o.k." unset="true" />
+			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"  sflagcontrol="" />
+			<echo message="${sScript}xxxxxxxxxmyReturnControlCaller | myReturnControlStringCaller = ${myReturnControlCaller} | ${myReturnControlStringCaller}" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControlCaller}" returncontrolstring="${myReturnControlStringCaller}"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
@@ -2346,11 +2355,32 @@
 		</otherwise>
 	</fl:choose>	
 	<fl:let>myReturnControl::=true</fl:let>
-	<fl:let>myReturnString::="alles ok"</fl:let>
+	<fl:let>myReturnControlString::="${sScript}Alles ok"</fl:let>
+	
+	</ac:try>
+		<ac:catch>
+			<!--<echo>In &lt;catch&gt;${sScript}.</echo>-->
+			<!--<echo>${sScript}Fehler abgefangen: ${myError}</echo>-->
+			<!-- 20160222 noch kaputt: PROBLEM myError wird nicht zurückgegeben. --> 
+			<property name="baz" refid="myErrorObject" />
+			<echo>${sScript}Fehler Object abgefangen: '${baz}'</echo>
+					
+			<ac:var name="myReturnControl" value="false" />
+			<ac:var name="myReturnControlString" value="${baz}"/>						
+		</ac:catch>
+
+		<ac:finally>
+			<echo>In &lt;finally&gt;${sScript}.</echo>
+		</ac:finally>
+	</ac:trycatch>			
 	
 	<!-- Rueckgabebwerte -->
 	<ac:var name="returnControl" value="${myReturnControl}" />
-	<ac:var name="returnString" value="${myReturnString}" />
+	<echo>${sScript}Am Ende returnControlString=${sScript}${myReturnControlString}</echo>
+	<ac:var name="returnControlString" value="${sScript}${myReturnControlString}" />
+	
+	<!-- Rueckgabebwerte -->
+	<!--<ac:var name="returnString" value="${myReturnString}" />-->
 	<ac:var name="returnControl.SchemaChanged" value="${myReturnControl.SchemaChanged}" />
 	<ac:var name="returnString.Schema" value="${myReturnString.Schema}" />		
 	<arrayCopyJsZZZ arrayinput="${mylineaNext.UnSchema}" arrayreturn="linea.UnSchema" sflagcontrol="" /><!-- So gibt man einen Arraywertzurueck -->
@@ -2719,10 +2749,10 @@
 		
 		<ac:then>		
 			<fl:echo>${sScript}Ergebnis: ${returnControl}, haenge Array an.</fl:echo>
-			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filedir}" array2append="${mysaFiledir}" arrayReturn="myArrayTotal1" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filedir}" array2append="${mysaFiledir}" arrayReturn="myArrayTotal1" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>			
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal1}" arrayreturn="mysaTotal.filedir" sflagcontrol="" />						
-			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filename}" array2append="${mysaFilename}" arrayReturn="myArrayTotal2"   returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filename}" array2append="${mysaFilename}" arrayReturn="myArrayTotal2"   returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal2}" arrayreturn="mysaTotal.filename" sflagcontrol="" />
 			
@@ -2768,7 +2798,7 @@
 			<fl:when test="${myisdirectoryPart} == true">
 					<!-- A) Teil - Verzeichnis-Fall: -->
 					<echo>${sScript}Teil: Ist Verzeichnis, damit sollten alle Dateien im Verzeichnis geloescht werden.</echo>
-					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${mySinglePart}" arrayreturn="mysaTotal.filedir" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 					<ac:if>
 						<equals arg1="false" arg2="${myReturnControl}"/>
@@ -2777,7 +2807,7 @@
 							<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
 						</ac:then>		
 					</ac:if>					
-					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="**.**" arrayreturn="mysaTotal.filename" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />								
+					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="**.**" arrayreturn="mysaTotal.filename" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />								
 					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 					<ac:if>
 						<equals arg1="false" arg2="${myReturnControl}"/>
@@ -2796,7 +2826,7 @@
 					<!-- Ermittle aus dem Pfad den Verzeichnis und den Dateiteil -->
 					<getFilenameFromPathJsZZZ pathstring="${mySinglePart}" returnfilename="myFilename" returncontrol="mytempReturnControl" returnacontrolstring="myaReturnControl" sflagcontrol="" />
 					<echo>${sScript}Der Dateiname ist: '${myFilename}'</echo>
-					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="${myFilename}" arrayreturn="mysaTotal.filename" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+					<arrayAppendJsZZZ arrayinput="${mysaFilename}" valueinput="${myFilename}" arrayreturn="mysaTotal.filename" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 					<ac:if>
 						<equals arg1="false" arg2="${myReturnControl}"/>
@@ -2808,7 +2838,7 @@
 					<fl:let>myDirectoryPath::=''</fl:let>
 					<stringLeftBackStringZZZ text="${mySinglePart}" matchstring="${myFilename}" returnstring="myDirectoryPath" />
 					<echo>${sScript}Der Pfad ist: '${myDirectoryPath}'</echo>					
-					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" returncontrol="myReturnControl" returnControlString="myReturnControlString"  sflagcontrol="" />								
+					<arrayAppendJsZZZ arrayinput="${mysaFiledir}" valueinput="${myDirectoryPath}" arrayreturn="mysaTotal.filedir" returncontrol="myReturnControl" returncontrolstring="myReturnControlString"  sflagcontrol="" />								
 					<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 					<ac:if>
 						<equals arg1="false" arg2="${myReturnControl}"/>
@@ -3020,19 +3050,19 @@
 		<equals arg1="${returnControl}" arg2="true"/>
 		<ac:then>
 			<fl:echo>Ergebnis von -FGLCopyLocal_Control: ${returnControl}, haenge Array an.</fl:echo>
-			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filedir}" array2append="${mySrca.filedir}" arrayReturn="myArrayTotal"  returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filedir" sflagcontrol="" />
 
-			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendArrayJsZZZ arrayinput="${mySrcaTotal.filename}" array2append="${mySrca.filename}" arrayReturn="myArrayTotal"  returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="mySrcaTotal.filename" sflagcontrol="" />
 
-			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"   returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filedir}" array2append="${myDesta.filedir}" arrayReturn="myArrayTotal"   returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filedir" sflagcontrol="" />
 								
-			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"   returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendArrayJsZZZ arrayinput="${myDestaTotal.filename}" array2append="${myDesta.filename}" arrayReturn="myArrayTotal"   returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 			<arrayCopyJsZZZ arrayinput="${myArrayTotal}" arrayreturn="myDestaTotal.filename" sflagcontrol="" />
 		</ac:then>
@@ -3904,7 +3934,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	
 	<!-- 4. Packe die Werte in ein Array -->
 	<arrayInitJsZZZ isize="0" arrayreturn="fileadir"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt. -->
-	<arrayAppendJsZZZ arrayinput="${fileadir}" valueinput="${myPath}" arrayreturn="myFileadir" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	
+	<arrayAppendJsZZZ arrayinput="${fileadir}" valueinput="${myPath}" arrayreturn="myFileadir" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />	
 	<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 	<ac:if>
 		<equals arg1="false" arg2="${myReturnControl}"/>
@@ -3916,7 +3946,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- <arrayDebugJsZZZ arrayinput="${myFileadir}" ilevel="1"/> --><!-- Ausgabe des neuen Arrays -->	
 
 	<arrayInitJsZZZ isize="0" arrayreturn="fileaname"/><!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
-	<arrayAppendJsZZZ arrayinput="${fileaname}" valueinput="${xtractedvalue}" arrayreturn="myFileaname" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+	<arrayAppendJsZZZ arrayinput="${fileaname}" valueinput="${xtractedvalue}" arrayreturn="myFileaname" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 	<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 	<ac:if>
 		<equals arg1="false" arg2="${myReturnControl}"/>
@@ -3954,7 +3984,7 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<ac:for param="icounter" end="${iSize}">
 		<sequential>
 			<arrayInitJsZZZ isize="0" arrayreturn="myAFiledir"/> <!-- Groesse 0, sonst wird das erste Element ein "empty element" und das neue wird angehängt.-->
-			<arrayAppendJsZZZ arrayinput="${myAFiledir}" valueinput="${myPart}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<arrayAppendJsZZZ arrayinput="${myAFiledir}" valueinput="${myPart}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />
 			<echo message="myReturnControl | myReturnConstrolString = ${myReturnControl} | ${myReturnControlString}" />
 			<ac:if>
 				<equals arg1="false" arg2="${myReturnControl}"/>

@@ -40,7 +40,7 @@ function handleError(err,objControl){
 		
 		print("#############################################################");
 		print("##### in handle Error fuer den Java oder sonstigen Fehler ###");				
-		print("Error Objekt: " + err);//Hier wird in Nashorn der Name der Exception-Klasse direkt zurückgegeben.
+		print("Error Objekt: " + err);//Hier wird in Nashorn (Java 8) der Name der Exception-Klasse direkt zurückgegeben.
 		
 		//Aber: Wir wollen auf ein ExceptionZZZ Objekt zugreifen. 
 		//      Seit Aenderung der Javascript Engine in Nashorn ist dies Unterschiedlich.
