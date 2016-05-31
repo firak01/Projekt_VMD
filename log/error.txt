@@ -1,1 +1,7 @@
-     [exec] Result: 1
+
+BUILD FAILED
+C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:1575: The following error occurred while executing this line:
+C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:1665: The following error occurred while executing this line:
+C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:1713: arrayAppendJs: arrayAppendJs: Error: "nixda" is not defined.
+
+Total time: 1 second
