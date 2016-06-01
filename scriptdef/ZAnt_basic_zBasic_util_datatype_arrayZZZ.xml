@@ -1,4 +1,4 @@
-﻿ <project name="ZAnt_basic_util_datatype_arrayZZZ"   basedir=".."
+﻿ <project name="ZAnt_basic_util_datatype_ArrayZZZ"   basedir=".."
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 
@@ -17,6 +17,9 @@
 		<attribute name="returncontrolstring" />
 		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
 		<![CDATA[
+		    //Merke: In diesem Aufrufteil gibt es ein explizites Errorhandling (sonst müsste man die Funktionen auch hier laden),
+			//       also auch keinen "Funktionsnamen". Ergo taucht dieser Teil nicht im "Stack der Funktionen" auf.
+			//       Darum ist es Konvention, dass die "Arbeitsfunktion" genauso heisst wie das Scriptdef.
 			var myArray = attributes.get("arrayinput");		 
 			var myValue = attributes.get("valueinput");
 			var myFlagControl = attributes.get("sflagcontrol");
@@ -30,10 +33,11 @@
 				sReturn="";
 				iReturn=-1;
 			}else{					
-			}			
+			}	
+			
 			bReturnControl=objControlCaller.bReturnControl;
 			sReturnControl=objControlCaller.sReturnControl;
-			print("arrayAppendJsZZZ: " + bReturnControl +" | " + sReturnControl);
+			//print("arrayAppendJsZZZ: " + bReturnControl +" | " + sReturnControl);
 	
 			//project.setProperty(attributes.get("ireturn"), iReturn);			
 			project.setProperty(attributes.get("arrayreturn"), arrReturn);
@@ -133,11 +137,7 @@
 				sReturnControl="Alles o.k.. Anzuhängender Wert war NULL oder undefined.";
 				break main;
 			}
-			
-			//TEST: FEHLER PROVOZIEREN
-			print ("Ddas gibts nicht" + nixda);
-						
-			
+	
 			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
 			var icount=-1;
 			var iuboundfilled=-1;

@@ -8,7 +8,7 @@
 				try{	
 				var objControlCaller = new Object();
 				var sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
-				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 				//print(sScript+"START");				
 				
 				try{					

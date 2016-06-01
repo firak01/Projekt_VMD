@@ -11,8 +11,9 @@
    	<!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
 	<!--     Die Definiton von basedr in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
+	<import file="../scriptdef/ZAnt_basic_zBasic_ExceptionZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
-	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_arrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_ArrayZZZ.xml"/>
 
    <!-- ### Einbinden von Ant-Contrib ### -->
    <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
@@ -32,118 +33,8 @@
 		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
-	
-    <!-- macrodefs -->
-	<macrodef name="catchReturnControlZZZ">
-	    <!-- Aufruf des macrodef mit: <catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/> -->
-		<!-- Der Aufruf dieses Macrodefs ersetzt folgenden Code in den Ant-Targets selbst: -->
-		<!--<ac:if>
-			<equals arg1="false" arg2="${myReturnControl}"/>
-			<ac:then>							
-				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
-				<fail message="${myReturnControlString}" />--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-		<!--	</ac:then>		
-		</ac:if>-->
-	
-	
-	    <!-- Merke: attribute unterstuetzt das Attribut 'optional' nicht.-->
-		<!-- Merke: auf die uebergebenen Attribute kann man hier nur mit @ zugreifen.-->
-		<attribute name="script"/>
-		<attribute name="returncontrol"/>
-		<attribute name="returncontrolstring"/>
-		<!-- Merke: Ueber element kann xml von aussen hier an die gewuenschte Stelle hinzugegeben werden. Dabei wird das Attribut 'optional' unterstuetzt -->
-		<!-- <element name="codeVonAussen" optional="no"/> -->		
-		<sequential>
-			<echo>script: @{script} | returncontrol=@{returncontrol} | returncontrolstring=@{returncontrolstring}</echo>	
-			<ac:if>
-				<equals arg1="false" arg2="@{returncontrol}"/>
-				<ac:then>							
-					<echo>@{script}Fehler aus Funktion zurueckgegeben: @{returncontrolstring}</echo>	
-					<ac:var name="myReturnControlString" value="@{script}@{returncontrolstring}"/>
-					<echo>@{script}Fehler aus Funktion zurueckzugegeben: ${myReturnControlString}</echo>
-					<ac:var name="returncontrolstring" value="${myReturnControlString}"/>	
-					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
-				</ac:then>		
-			</ac:if>
-			<!-- <codeVonAussen/> -->
-		</sequential>
-	</macrodef>		
-	
-    <!-- ######## Scriptdefs ############################################################################--> 						
-	<!-- ############################################################-->	
-	<scriptdef name="arrayLeftBackStringJsZZZ" language="javascript">
-		<!-- Hiermit schneodet man von den Werten eines Arrays einen Stringwert ab. -->
 		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="arrayinput" />
-		<attribute name="sinput" />
-		<attribute name="arrayreturn" />
-		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'before' von vorne bzw. 'behind' von hinten realisieren. -->
-		<![CDATA[
-			var myArray = attributes.get("arrayinput");		 
-			var myValue = attributes.get("sinput");
-			var myFlagControl = attributes.get("sflagcontrol");
-			var myArrayReturn = new Array();
-								
-			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-			var icount=-1;
-			var iuboundfilled=-1;
-			var bnormal=true;
-			
-			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
-			for(x in objectArray){
-				//print("Wert: '" + objectArray[x]+ "'");
-				icount++;
-			
-				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-				    if(bnormal==true){					
-						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
-						bnormal = false;
-					}
-				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
-					//nix tun bei leeren Werten.
-					bnormal=true;
-				}else{
-					//nix tun bei normalen Werten.
-					bnormal=true;
-				};				
-			};
-			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
-						
-
-			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
-			//   UND erweitere jeden Arrayeintrag um den gewünschten String.
-			//   TODO: sFlagControl auswerten, zum unterscheiden ob der String vorangestellt oder angehängt wird.
-			icount=-1; icountGlobal=-1;
-			for(x in objectArray){
-				icount++;
-				if(icount<=iuboundfilled){
-					icountGlobal++;
-					//print("Wert wird kopiert und abgeschnitten: '" + objectArray[x]+ "' leftback von '" + myValue + "'");
-					myArrayReturn[icount]=getStrLeftBackStr(objectArray[x], myValue);
-				}else{
-					//nix
-				}
-			}
-						
-													
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-			
-			
-			//äquivalent zu JSZ - Kernel
-			//@LeftBack equivalent, !!! casesensitive
-			function getStrLeftBackStr(sourceStr, keyStr){
-				arr = sourceStr.split(keyStr)
-				arr.pop();
-				return (keyStr==null | keyStr=='') ? '' : arr.join(keyStr)
-			}
-		]]>
-	</scriptdef>
-	
+    <!-- ######## Scriptdefs ############################################################################--> 							
 	<!-- ############################################################-->	
 	<scriptdef name="arrayPlusStringJsZZZ" language="javascript">
 		<!-- Hiermit häng man an die Werte eines Arrays einen Stringwert an. -->
@@ -2237,7 +2128,6 @@
 	<ac:trycatch property="myError" reference="myErrorObject">
 		<ac:try>
 			
-
 	<fl:let>myLineNextSchema::="${lineCurrent}"</fl:let>
 	<arrayCopyJsZZZ arrayinput="${lineaCurrent.UnSchema}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />	
 	<!-- <arrayDebugJsZZZ arrayinput="${mylineaNext.Schema}" ilevel="1"/> -->
@@ -2328,8 +2218,7 @@
 			<ac:var name="myReturnControlStringCaller" value="alles o.k." unset="true" />
 			<arrayAppendJsZZZ arrayinput="${mylineaNext.UnSchema}" valueinput="${myLineNext}" arrayreturn="myArrayNew" returncontrol="myReturnControlCaller" returncontrolstring="myReturnControlStringCaller" sflagcontrol="" />
 			<echo message="${sScript}yyyyyyyymyReturnControlCaller | myReturnControlStringCaller = ${myReturnControlCaller} | ${myReturnControlStringCaller}" />
-			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControlCaller}" returncontrolstring="${myReturnControlStringCaller}"/>
-			<echo message="${sScript}zzzzzzzzzzzzzzzmyReturnControlCaller | myReturnControlStringCaller = ${myReturnControlCaller} | ${myReturnControlStringCaller}" />			
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControlCaller}" returncontrolstring="${myReturnControlStringCaller}"/>			
 			<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="mylineaNext.UnSchema" sflagcontrol="" />
 	
 			<!-- Ausgabe des neuen Arrays -->	
@@ -3103,7 +2992,8 @@
 
 			<!-- 1. Rechne das Dateinamen aus, ergaenzt um das Postfix -->
 			<!-- 1a. Dateiendung entfernen -->
-			<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" sflagcontrol="" />
+			<arrayLeftBackStringJsZZZ arrayinput="${myDestaTotal.filename}" sinput=".txt" arrayreturn="myDestaTotalReduced.filename" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 
 			<!-- 1b. Hostnamen und Endung ausrechnen -->
 			<!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.

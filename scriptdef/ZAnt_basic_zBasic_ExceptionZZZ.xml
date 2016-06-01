@@ -1,0 +1,42 @@
+﻿ <project name="ZAnt_basic_zBasic_ExceptionZZZ"   basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+
+	 <!-- macrodefs -->
+	 <!-- ############################################################-->
+	<macrodef name="catchReturnControlZZZ">
+	    <!-- Aufruf des macrodef mit: <catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/> -->
+		<!-- Der Aufruf dieses Macrodefs ersetzt folgenden Code in den Ant-Targets selbst: -->
+		<!--<ac:if>
+			<equals arg1="false" arg2="${myReturnControl}"/>
+			<ac:then>							
+				<echo>${sScript}Fehler aus Funktion zurueckgegeben: ${myReturnControlString}</echo>	
+				<fail message="${myReturnControlString}" />--><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+		<!--	</ac:then>		
+		</ac:if>-->
+	
+	
+	    <!-- Merke: attribute unterstuetzt das Attribut 'optional' nicht.-->
+		<!-- Merke: auf die uebergebenen Attribute kann man hier nur mit @ zugreifen.-->
+		<attribute name="script"/>
+		<attribute name="returncontrol"/>
+		<attribute name="returncontrolstring"/>
+		<!-- Merke: Ueber element kann xml von aussen hier an die gewuenschte Stelle hinzugegeben werden. Dabei wird das Attribut 'optional' unterstuetzt -->
+		<!-- <element name="codeVonAussen" optional="no"/> -->		
+		<sequential>
+			<!--<echo>script: @{script} | returncontrol=@{returncontrol} | returncontrolstring=@{returncontrolstring}</echo>-->
+			<ac:if>
+				<equals arg1="false" arg2="@{returncontrol}"/>
+				<ac:then>							
+					<!--<echo>@{script}Fehler aus Funktion zurueckgegeben: @{returncontrolstring}</echo>-->
+					<ac:var name="myReturnControlString" value="@{script}@{returncontrolstring}"/>
+					<echo>@{script}Fehler aus Funktion zurueckzugegeben: ${myReturnControlString}</echo>
+					<ac:var name="returncontrolstring" value="${myReturnControlString}"/>	
+					<fail message="${myReturnControlString}" /><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird --><!-- das keepgoing-Attribut koennte in der for-Schleife sichergestellt werden, das jetzt nicht alles komplett aufhört -->				
+				</ac:then>		
+			</ac:if>
+			<!-- <codeVonAussen/> -->
+		</sequential>
+	</macrodef>		
+				
+	</project>
