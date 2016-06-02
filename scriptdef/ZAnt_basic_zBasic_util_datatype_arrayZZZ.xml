@@ -44,8 +44,9 @@
 			//project.setProperty(attributes.get("returnstring"),sReturn);
 						
 			//### START SNIPPET 01 ################################################################
-			project.setProperty(attributes.get("returncontrol"),bReturnControl);
-			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+
 		
 			//###################################################################
             //### KERNEL LIBS HINZUFÜGEN
@@ -263,8 +264,9 @@
 				
 			
 			//### START SNIPPET 01 ################################################################
-			project.setProperty(attributes.get("returncontrol"),bReturnControl);
-			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+
 		
 			//###################################################################
             //### KERNEL LIBS HINZUFÜGEN
@@ -487,8 +489,11 @@
 			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);			
 			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
 			//project.setProperty(attributes.get("returnstring"),sReturn);
-			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
-			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+			
+			
+			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+
 						
 			//###################################################################
             //#### KERNEL LIBS HINZUFÜGEN
@@ -670,8 +675,9 @@
 				sReturnControl=objControlCaller.sReturnControl;
 					
 				//project.setProperty(attributes.get("returnstring"),sReturn);
-				//project.setProperty(attributes.get("returncontrol"),bReturnControl);
-				//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+				
+				if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+				if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
 			}//else myLevel <=0
 			
 			//###################################################################
@@ -849,10 +855,12 @@
 			project.setProperty(attributes.get("ireturn"), iReturn);			
 			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
 			//project.setProperty(attributes.get("returnstring"),sReturn);
-			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
-			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
-						
+									
 			//### START SNIPPET 01 ################################################################
+			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+
+			//###################################################################
             //### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
 			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
@@ -1045,10 +1053,12 @@
 			//project.setProperty(attributes.get("ireturn"), iReturn);			
 			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
 			//project.setProperty(attributes.get("returnstring"),sReturn);
-			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
-			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
-						
+			
 			//### START SNIPPET 01 ################################################################
+			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+			
+			//### ###############################################################
             //### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
 			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
@@ -1252,10 +1262,12 @@
 			
 			project.setProperty(attributes.get("arrayreturn"), arrReturn);
 			//project.setProperty(attributes.get("returnstring"),sReturn);
-			//project.setProperty(attributes.get("returncontrol"),bReturnControl);
-			//project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
-						
+			
 			//### START SNIPPET 01 ################################################################
+			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+						
+			//###################################################################
             //### KERNEL LIBS HINZUFÜGEN
             //###################################################################			
 			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
@@ -1382,4 +1394,5 @@
 		]]>
 	</scriptdef>
 				
+	
 	</project>

@@ -1,5 +1,18 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
+
+20160529: Windows Product Key Viewer installiert. Ermittelter Product Key: MHGKX-8Y4GT-KVGXY-M3VGW-Q9VKC
+20160528: Installtion von MediathekView und VLC Player zum Download aus den Mediatheken des Staatsfernsehns
+
+20160528: Windows Updates. 
+         ! Paket nicht installieren, sonst startet das ASUS Board mit UEFI nicht mehr!
+         Nach dem Update wird Möglichkeit eingeblendet auf Win10 upzugraden.
+                            
+20160527: Backup und Recovery auf anderer Platte
+
+20160526: Installation von Avast Free Antivirus 2016
+20160508: Installation von Wise Registry cleaner - Backup der Registry und Durchführen der Säuberung
+
 20160330: ENERGENIE Power Manager EG-PMS2-LAN installiert
 
 20151216: Windows Updates installieren.

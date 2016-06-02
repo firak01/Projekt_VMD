@@ -34,160 +34,7 @@
 	  </classpath>
 	</taskdef>
 		
-    <!-- ######## Scriptdefs ############################################################################--> 							
-	<!-- ############################################################-->	
-	<scriptdef name="arrayPlusStringJsZZZ" language="javascript">
-		<!-- Hiermit häng man an die Werte eines Arrays einen Stringwert an. -->
-		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="arrayinput" />
-		<attribute name="sinput" />
-		<attribute name="arrayreturn" />
-		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'before' von vorne bzw. 'behind' von hinten realisieren. -->
-		<![CDATA[
-			var myArray = attributes.get("arrayinput");		 
-			var myValue = attributes.get("sinput");
-			var myFlagControl = attributes.get("sflagcontrol");
-			var myArrayReturn = new Array();
-								
-			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-			var icount=-1;
-			var iuboundfilled=-1;
-			var bnormal=true;
-			
-			//1. Ermittle von hinten die "UNDEFINED" Werte und somit das ubound "gefuellter Werte".									
-			for(x in objectArray){
-				//print("Wert: '" + objectArray[x]+ "'");
-				icount++;
-			
-				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-				    if(bnormal==true){					
-						iuboundfilled = icount-1; //und diese Grenze nur noch verschieben, wenn ein normaler Wert dazwischen kommt.
-						bnormal = false;
-					}
-				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
-					//nix tun bei leeren Werten.
-					bnormal=true;
-				}else{
-					//nix tun bei normalen Werten.
-					bnormal=true;
-				};				
-			};
-			if(iuboundfilled==-1 && bnormal==true) iuboundfilled = icount;
-						
-
-			//2. Kopiere die Werte von 0 bis iboundfilled in das zurueckzugenbende Array
-			//   UND erweitere jeden Arrayeintrag um den gewünschten String.
-			//   TODO: sFlagControl auswerten, zum unterscheiden ob der String vorangestellt oder angehängt wird.
-			icount=-1; icountGlobal=-1;
-			for(x in objectArray){
-				icount++;
-				if(icount<=iuboundfilled){
-					icountGlobal++;
-					//print("Wert wird kopiert und erweitert: '" + objectArray[x]+ "' plus '" + myValue + "'");
-					myArrayReturn[icount]=objectArray[x] + myValue;
-				}else{
-					//nix
-				}
-			}
-																			
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-		]]>
-	</scriptdef>
-		
-  <!-- ########################### -->
-  <scriptdef name="arrayStringTrimJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-				
-	<!-- Entfernt leere Strings aus einem Array. bReturnControl=true, wenn etwas entfernt wurde. -->
-	<!-- Controlstring: "trim = die einzelnen Strings sollen einem trim zur Pruefung unterzogen werden. Keine Veraenderung des Werts"
-						 trimmed = wie trim, aber Veraenderung des Werts.-->
-	<attribute name="inputarraystring" />
-	<attribute name="inputcontrolstring" /> <!-- so mögliche Erweiterungen wie 'fulltrim' realisieren. -->
-	
-    <attribute name="returnarraystring" /> 
-	<attribute name="returncontrol" /> 
-	
-    <![CDATA[
-		var myArrayString = attributes.get("inputarraystring");		
-		var myControlString = attributes.get("inputcontrolstring");	
-	
-		var myArrayReturn = new Array();			
-		var bReturnControl = false;
-		
-		if(myArrayString===undefined){
-			print("myString = undefined");
-			bReturnControl = false;
-		}else if(myArrayString===null){
-			print("myString = null");			
-			bReturnControl = false;
-		}else{
-						
-				//Merke: Versuche so ein 'echtes' Array zu machen, sonst geht man Buchstabe für Buchstabe vor.
-				var objectArray = myArrayString.split(',');  
-														
-				//Falsch: damit geht man Buchstabe für Buchstabe vor: 
-				//for (var i = myiIndexLow, len = myiIndexHigh; i<len; i++){
-				//	print("myArrayString[i]="+myArrayString[i]);
-				//	myStringReturn+=myArrayString[i];
-				//	print("myStringReturn="+myStringReturn);
-				//}	
-
-			
-				
-				//innerhalb der Schleife bReturnControl nur auf true setzen, nicht auf false... Grund: Einmal true gesetzt, soll es so gesetzt bleiben.
-				var iIndexCount = -1;
-				for(x in objectArray){
-					print("objectArray[x]="+objectArray[x]);
-					var sCheckValue = objectArray[x];
-					var sValue = objectArray[x];
-					if(myControlString=="trimmed"){
-						sCheckValue = objectArray[x].trim();
-						sValue= objectArray[x].trim();						
-					}else if(myControlString=="trim"){	
-						sCheckValue = objectArray[x].trim();
-						//Keine Veraenderung des Werts
-					};	
-					
-					//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-					if(sCheckValue=="<#!!FGLUNDEFINED!!#>"){
-						//mache nix... myArrayReturn[icount]="<#!!FGLUNDEFINED!!#>";		//Wenn undefiniert, dann bleibt der Wert undefiniert.
-						bReturnControl=true;
-					}else if(sCheckValue=="<#!!FGLEMPTY!!#>"){
-						//mache nix... myArrayReturn[icount]="Neuer Wert "+ icount; 		//Leere Werte werden automatisch erzeugt.
-						bReturnControl=true;
-					}else if(sCheckValue==""){
-						//mache nix...
-						bReturnControl=true;
-					}else{						
-						iIndexCount++;
-						myArrayReturn[iIndexCount]=sValue; //Bestehende Werte werden nur kopiert.
-						if(sValue==objectArray[x]){
-							//mache nix...
-						}else{	
-							bReturnControl=true;
-						};
-					};		
-				}								
-			}	
-			
-			//abschliessende Pruefung
-			if(myArrayReturn.lenght==0){
-				print("Setze undefined Dummy - Wert.");
-				myArrayReturn[0]="<#!!FGLUNDEFINED!!#>";
-			};	
-		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
-		project.setProperty(attributes.get("returncontrol"), bReturnControl);
-				
-     ]]>
-	</scriptdef>	
-	
+   <!-- ######## Scriptdefs ############################################################################--> 									
 	<!-- ############################################################-->	
 	<scriptdef name="getFilenameFromPathJsZZZ" language="javascript">
 		 <attribute name="pathstring" />
@@ -3013,7 +2860,8 @@
 			
 		
 			<!-- Hänge an alle Einträge des arrays den _HOSTNAME + Endung String an -->
-			<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename" sflagcontrol="" />
+			<arrayPlusStringJsZZZ arrayinput="${myDestaTotalReduced.filename}" sinput="${sHostSuffix}" arrayreturn="myDestaTotalExtended.filename"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	
 			<antcallback target="-FGLCopyLocal_Copy" return="returnControl,returnControlString">					
 				<param name="srca.filename" value="${mySrcaTotal.filename}"/>
@@ -4184,9 +4032,10 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 	
 		<!-- Trimme das Array, dadurch wird ein leeres Element, z.B. erzeugt durch einen abschliessenden Backslash entfernt -->
-		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returncontrol="myReturnControl2"/>
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returnboolean="myReturnBoolean" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl2}" returncontrolstring="${myReturnControlString}"/>
 		<ac:if>
-			<equals arg1="true" arg2="${myReturnControl2}"/>
+			<equals arg1="true" arg2="${myReturnBoolean}"/>
 			<ac:then>			
 				<!--<echo>${sScript}Array wurde getrimmt. myReturnControl2=${myReturnControl2}</echo>-->
 				<arrayCopyJsZZZ arrayinput="${myReturnArray2}" arrayreturn="myArray" sflagcontrol="" />
