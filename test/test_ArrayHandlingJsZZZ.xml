@@ -20,7 +20,6 @@
 	  </classpath>
 	</taskdef>
 		
-	<!-- TODO: Test für isarrayEmptyJsZZZ -->	
 	<!-- TODO: Alle scriptdefs auslagern -->		
 										
 	<!-- ############################################################-->	
@@ -90,52 +89,7 @@
 			}
 		]]>
 	</scriptdef>
-					
-	<!-- ########################### -->
-	<scriptdef name="isArrayEmptyJsZZZ" language="javascript">
-		<!-- Hiermit prueft man, ob das Array nur Werte hat, die aber als Leerwert gekennzeichet ist. -->
-		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-												
-		<attribute name="arrayinput" />
-		<attribute name="returnboolean" />
-		<attribute name="sflagcontrol" />
-		<![CDATA[		   		  
-		   var bReturn = true;		   
-		   var myArrayInput = attributes.get("arrayinput");
-		   //print("myArrayInput='"+myArrayInput+"'");		   			
-			
-			//Das Array in einer Schleife durchgehen			
-			main:{				
-				//Merke: arrayinput ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
-			
-				var icount=-1;
-				var objectArray = myArrayInput.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
-				//print('typeof(objectArray)=' + typeof(objectArray));
-				if(typeof(objectArray)=="object"){
-					if(objectArray.length<=0)break main;
-					
-					var btemp=false;
-					for(x in objectArray){
-						//print("x="+x);
-						//print("objectArray[x]="+objectArray[x]);
-											
-						//Prüfe alle Werte ab, ob man nicht doch noch einen definierten Wert im Array findet.
-						if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-							btemp=true;							
-						}else{							
-							break main;
-						}; //end if
-					}; //end for
-					bReturn=btemp;
-				}; //end if(typeof(objectArray)=="object")				
-			}; //end main:	
-			project.setProperty(attributes.get("returnboolean"), bReturn);						
-		 ]]>
-	</scriptdef>	
-	
+						
 	  <!-- ########################### -->
   <scriptdef name="stringExplodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -266,8 +220,8 @@
 <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 	 			 
-<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayStringTrimJsZZZ">
+<!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestIsArrayEmptyJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
+<target name="compile" depends="-declaration,-myTestIsArrayEmptyJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -514,7 +468,7 @@
 		<fl:let>
 			mySingleValue::= "angehängter Wert"; 
 		</fl:let>
-		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
 		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
 		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
@@ -878,6 +832,68 @@
 		</trycatch>		
 	</target>
 
+	<target name="-myTestIsArrayEmptyJsZZZ">
+		<fl:let>sScript::='-myTestIsArrayEmptyJsZZZ: '</fl:let>
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef isArrayEmptyJsZZZ</fl:logo>	
+
+		<echo>### 1. Testaufbau: Array blanko 'initialisieren' ########################################################</echo>
+		<fl:let>
+			myArraySize::=; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArrayNew"/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Prüfe das Array -->
+		<isArrayEmptyJsZZZ arrayinput="${myArray}" returnboolean="myValue01" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
+		<echo>${sScript}Pruefung nach ArrayInit: ${myValue01}</echo> 		
+		<echo></echo>		
+		
+		<echo>###  2. Testaufbau: Array mit 3 'initialisieren'  ########################################################</echo>
+		<fl:let>
+			myArraySize::=3; 
+		</fl:let>
+		<echo>ArrayGroesse: ${myArraySize}</echo>
+		<arrayInitJsZZZ isize="${myArraySize}" arrayreturn="myArray"/>
+		<echo>myArray nachher: ${myArray}</echo>
+		
+		<!-- Prüfe das Array -->
+		<isArrayEmptyJsZZZ arrayinput="${myArray}" returnboolean="myValue02" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
+		<echo>${sScript}Pruefung nach ArrayInit mit 3: ${myValue02}</echo> 
+		<echo></echo>		
+		
+		<echo>### 3. Testaufbau: Array und Werte eingeben ########################################################</echo>
+		<arrayValueTestFillJsZZZ arrayinput="${myArray}" ilbound="0" iubound="" arrayreturn="myArrayNew" ireturn=""/>
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+	
+		<!-- Prüfe das Array -->
+		<isArrayEmptyJsZZZ arrayinput="${myArray}" returnboolean="myValue03" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
+		<echo>${sScript}Pruefung nach ArrayInit und Fuellen: ${myValue03}</echo> 
+		<echo></echo>		
+		
+		<echo>###  4. Testaufbau: Wert 'mit BACKSLASH am Ende' an das Array anhängen ################</echo>
+		<fl:let>
+			mySingleValue::= "angehängte Endung beachten\\"; 
+		</fl:let>
+		<arrayAppendJsZZZ arrayinput="${myArray}" valueinput="${mySingleValue}" arrayreturn="myArrayNew"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
+		<arrayCopyJsZZZ arrayinput="${myArrayNew}" arrayreturn="myArray" sflagcontrol="" />
+		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/><!-- Ausgabe des neuen Arrays -->
+		
+		<!-- Prüfe das Array -->
+		<isArrayEmptyJsZZZ arrayinput="${myArray}" returnboolean="myValue04" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
+		<echo>${sScript}Pruefung nach ArrayInit und Fuellen (mit Backslash): ${myValue04}</echo> 
+		<echo></echo>		
+	</target>
 
 	
 		<!-- Beispiel für JAVA Arrays

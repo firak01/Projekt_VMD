@@ -389,8 +389,7 @@
      ]]>
 	</scriptdef>
 
-
-   <!-- ########################### -->
+  <!-- ########################### -->
   <scriptdef name="arrayStringTrimJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -656,9 +655,7 @@
 	<!-- ############################################################-->	
 	<scriptdef name="arrayPlusStringJsZZZ" language="javascript">
 		<!-- Hiermit häng man an die Werte eines Arrays einen Stringwert an. -->
-		
 		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
 		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
 					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
 		<attribute name="arrayinput" />
@@ -790,6 +787,7 @@
 				break main;
 			}
 			
+			//Merke: arrayinput ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
 			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
 			var icount=-1;
 			var iuboundfilled=-1;

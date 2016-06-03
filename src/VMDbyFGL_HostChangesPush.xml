@@ -106,53 +106,7 @@
 		 ]]>
 	</scriptdef>
 	
-	<!-- ########################### -->
-	<scriptdef name="isArrayEmptyJsZZZ" language="javascript">
-		<!-- Hiermit prueft man, ob das Array nur Werte hat, die aber als Leerwert gekennzeichet ist. -->
 		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-												
-		<attribute name="arrayinput" />
-		<attribute name="returnboolean" />
-		<attribute name="sflagcontrol" />
-		<![CDATA[		   		  
-		   var bReturn=true;		   
-		   var myArrayInput=attributes.get("arrayinput");
-		   //print("myArrayInput='"+myArrayInput+"'");		   			
-			
-			//Das Array in einer Schleife durchgehen			
-			main:{				
-				//Merke: arrayinput ist irgendwie nur ein String, oder das was einen String zurückgibt: lista.lastIndexOf('a'); //funktioniert
-			
-				var icount=-1;
-				var objectArray = myArrayInput.split(',');						//Merke: Man erzeugt damit auch kein normales Array, aber man kann die Werte durchzählen.
-				//print('typeof(objectArray)=' + typeof(objectArray));
-				if(typeof(objectArray)=="object"){
-					if(objectArray.length<=0)break main;
-					
-					var btemp=false;
-					for(x in objectArray){
-						//print("x="+x);
-						//print("objectArray[x]="+objectArray[x]);
-											
-						//Prüfe alle Werte ab, ob man nicht doch noch einen definierten Wert im Array findet.
-						if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-							btemp=true;							
-						}else{	
-							btemp=false;
-							bReturn=btemp;
-							break main;
-						}; //end if
-					}; //end for
-					bReturn=btemp;
-				}; //end if(typeof(objectArray)=="object")				
-			}; //end main:	
-			project.setProperty(attributes.get("returnboolean"), bReturn);						
-		 ]]>
-	</scriptdef>	
-	
  	<!-- ############################################################ -->		
 	<scriptdef name="isBooleanZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
@@ -2466,7 +2420,8 @@
 	 <arrayCopyJsZZZ arrayinput="${returna.filename}" arrayreturn="mysaFilename" sflagcontrol="" />
 
 	<!-- Hänge die zurückgelieferten Arrays an die schon existierenden an -->	
-	<isArrayEmptyJsZZZ arrayinput="${mysaFilename}" returnboolean="myArrayIsEmpty" sflagcontrol="" />
+	<isArrayEmptyJsZZZ arrayinput="${mysaFilename}" returnboolean="myArrayIsEmpty" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	<fl:echo>${sScript}myArrayIsEmpty=${myArrayIsEmpty}</fl:echo>
 	<ac:if>
 		<and>
