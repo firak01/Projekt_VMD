@@ -12,8 +12,9 @@
 	<!--     Die Definiton von basedr in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
 	<import file="../scriptdef/ZAnt_basic_zBasic_ExceptionZZZ.xml"/>
-	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_ArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_math_MathZZZ.xml"/>
 
    <!-- ### Einbinden von Ant-Contrib ### -->

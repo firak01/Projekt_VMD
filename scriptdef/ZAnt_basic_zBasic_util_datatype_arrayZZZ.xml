@@ -1333,7 +1333,13 @@
 						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 						//funktioniert: 
-						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+						try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}
 						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
 					}				
 				}

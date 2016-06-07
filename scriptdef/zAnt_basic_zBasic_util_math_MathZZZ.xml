@@ -1,4 +1,4 @@
-<project name="ZAnt_basic_zBasic_util_math_MathZZZ"   basedir=".."
+﻿<project name="ZAnt_basic_zBasic_util_math_MathZZZ"   basedir=".."
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
  

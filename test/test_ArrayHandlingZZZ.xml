@@ -10,9 +10,11 @@
 	<!--     Die Definiton von basedir in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
 	<import file="../scriptdef/ZAnt_basic_zBasic_ExceptionZZZ.xml"/>
-	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_ArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_math_MathZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_test_HelperZZZ.xml"/>
 	
 	<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
 	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
@@ -29,100 +31,7 @@
 	
 	  
 
-	<!-- ######## Scriptdefs #############################################-->			
-	<!-- ############################################################-->	
-	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
-		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
-			 TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
-				   Damit soll das Auffüllen der Testwerte auf einen bestimmten Indexbereich beschränkt werden. -->
-		
-		<!-- Merke: Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
-		<attribute name="arrayinput" />
-		<attribute name="ilbound" />
-		<attribute name="iubound" />
-		<attribute name="arrayreturn" />
-		<attribute name="ireturn" /><!-- true, false -->
-		<![CDATA[
-			enableJava();
-			var myArray = attributes.get("arrayinput");		 
-			var iReturn = false;
-			var myArrayReturn = new Array();
-								
-			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-			var icount=-1;
-			for(x in objectArray){
-				//print("Wert vorher: '" + objectArray[x]+ "'");
-				icount++;
-			
-				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
-				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
-					myArrayReturn[icount]="<#!!FGLUNDEFINED!!#>";		//Wenn undefiniert, dann bleibt der Wert undefiniert.
-				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
-					myArrayReturn[icount]="Neuer Wert "+ icount; 		//Leere Werte werden automatisch erzeugt.
-				}else{
-					myArrayReturn[icount]=objectArray[x]+ " " + icount; //Bestehende Werte werden verändert.
-				};				
-			}	
-
-			//for(x in myArrayReturn){
-			//	print("Wert nachher: '" + myArrayReturn[x]+ "'");
-			//}														
-			iReturn = true;											
-		
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-			project.setProperty(attributes.get("ireturn"), iReturn);
-			
-			
-			//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//println("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
-				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
-			}
-		]]>
-	</scriptdef>
-					
-		
-	
- <!-- ########################### -->
- <scriptdef name="stringLeftStringZZZ" language="javascript">
- <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returnstring" />     
-     <![CDATA[
-	   var text = attributes.get("text");
-       var match = attributes.get("matchstring");
-       
-       sReturn = getStrLeftStr(text, match);
-	   
-       project.setProperty(attributes.get("returnstring"), sReturn);
-	   
-	   //aus JSZ - Kernel 
-	   function getStrLeftStr(sourceStr, keyStr){
-		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
-		}
-     ]]>
-  </scriptdef>
-
+<!-- ######## Scriptdefs #############################################-->					
   <!-- ########################### -->
   <scriptdef name="stringLeftBackStringZZZ" language="javascript">
    <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		

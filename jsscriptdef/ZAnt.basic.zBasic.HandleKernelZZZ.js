@@ -73,10 +73,15 @@ function usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControl){
 			//}	
 			
 			//Merke: basedir im Ant-Projekt ist auf ".." gesetzt.
-			//print("'../" + objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"] +"'");																
-			objKernelLibs[i]["LOADINGSTRING"] = "org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(\"../"+objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"]+"\"))";
-			//print("objKernelLibs["+i+"][LOADINGSTRING] = " + objKernelLibs[i]["LOADINGSTRING"]);
-			objKernelLibs[i]["LOADER"] = eval(objKernelLibs[i]["LOADINGSTRING"]); //Der LOADER kann dann mit eval(objKernelLibs[i]["LOADER"]) ausgeführt werden
+			//print("'../" + objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"] +"'");																			
+			try{
+				objKernelLibs[i]["LOADINGSTRING"] = "org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader(\"../"+objKernelLibs[i]["DIRECTORY"] + "/" + objKernelLibs[i]["FILE"]+"\"))";
+				//print("objKernelLibs["+i+"][LOADINGSTRING] = " + objKernelLibs[i]["LOADINGSTRING"]);
+				objKernelLibs[i]["LOADER"] = eval(objKernelLibs[i]["LOADINGSTRING"]); //Der LOADER kann dann mit eval(objKernelLibs[i]["LOADER"]) ausgeführt werden
+			}catch(errEval){
+				//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+				print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);			
+			}
 			//Gibt den ganzen Inhalt der Bibliothek aus: print("Loader: " + objKernelLibs[i]["LOADER"]);
 			//Das ist dann etwas zuviel und funktioniert nicht... objKernelLibs[i]["CODEEXECUTED"] = eval('' + eval(objKernelLibs[i]["LOADER"])) ;						
 			//Das ist dann etwas zuviel und funktioniert nicht... objKernelLibs[i]["CODEEXECUTED"] = eval(objKernelLibs[i]["LOADER"]) ;
@@ -87,7 +92,7 @@ function usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControl){
 		bReturn=true;
 	}catch(err){	
 		//#### SIMPLES ERROR HANDLING #######
-		print("Fehler gefangen: " + err);
+		print("Fehler gefangen usedKernelAntLibs: " + err);
 		bReturnControl=false;
 		sReturnControl=sScript+"Fehler. "+ err;					
 	}

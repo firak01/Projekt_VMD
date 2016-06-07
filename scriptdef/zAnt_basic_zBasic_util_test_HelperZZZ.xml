@@ -1,0 +1,72 @@
+﻿<project name="ZAnt_basic_zBasic_util_test_HelperZZZ"   basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man fuer FLAKA einen eigenen Namespace -->
+ 
+	 <!-- ############################################################-->	
+	<scriptdef name="arrayValueTestFillJsZZZ" language="javascript">
+		<!-- Hiermit füllt man ein Array mit default-Werten. Zu Testzwecken.
+			 TODO: Die Paramter ilbound und iubound müssen noch ausprogrammiert werden.
+				   Damit soll das Auffüllen der Testwerte auf einen bestimmten Indexbereich beschränkt werden. -->
+		
+		<!-- Merke: Da scheinbar kein "call by reference" gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
+			 
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung!!! -->
+		<attribute name="arrayinput" />
+		<attribute name="ilbound" />
+		<attribute name="iubound" />
+		<attribute name="arrayreturn" />
+		<attribute name="ireturn" /><!-- true, false -->
+		<![CDATA[
+			enableJava();
+			var myArray = attributes.get("arrayinput");		 
+			var iReturn = false;
+			var myArrayReturn = new Array();
+								
+			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
+			var icount=-1;
+			for(x in objectArray){
+				//print("Wert vorher: '" + objectArray[x]+ "'");
+				icount++;
+			
+				//Merke: Bei ArrayInit() wird dies gesetzt, damit ein lediglich nur initialisiertes Array erkannt werden kann.
+				if(objectArray[x]=="<#!!FGLUNDEFINED!!#>"){
+					myArrayReturn[icount]="<#!!FGLUNDEFINED!!#>";		//Wenn undefiniert, dann bleibt der Wert undefiniert.
+				}else if(objectArray[x]=="<#!!FGLEMPTY!!#>"){
+					myArrayReturn[icount]="Neuer Wert "+ icount; 		//Leere Werte werden automatisch erzeugt.
+				}else{
+					myArrayReturn[icount]=objectArray[x]+ " " + icount; //Bestehende Werte werden verändert.
+				};				
+			}	
+
+			//for(x in myArrayReturn){
+			//	print("Wert nachher: '" + myArrayReturn[x]+ "'");
+			//}														
+			iReturn = true;											
+		
+			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
+			project.setProperty(attributes.get("ireturn"), iReturn);
+			
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+		]]>
+	</scriptdef>
+	</project>
