@@ -111,8 +111,14 @@
 					//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 					//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 					//funktioniert: 
-					eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-					//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+					try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}		
 				}				
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
 				var objControlCaller = new Object();
@@ -331,8 +337,14 @@
 					//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 					//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 					//funktioniert: 
-					eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-					//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+				try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}		
 				}				
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
 				var objControlCaller = new Object();
@@ -561,8 +573,14 @@
 						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 						//funktioniert: 
-						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}		
 					}				
 				}
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
@@ -749,8 +767,14 @@
 						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 						//funktioniert: 
-						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}	
 					}				
 				}
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
@@ -927,8 +951,14 @@
 						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 						//funktioniert: 
-						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}	
 					}				
 				}
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
@@ -1130,8 +1160,14 @@
 						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 						//funktioniert: 
-						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}	
 					}				
 				}
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
@@ -1335,12 +1371,12 @@
 						//funktioniert: 
 						try{
 							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
 						}catch(errEval){
 							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
 							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
                             throw new Error("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
-						}
-						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}						
 					}				
 				}
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
@@ -1506,8 +1542,14 @@
 					//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
 					//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
 					//funktioniert: 
-					eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
-					//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+					try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}	
 				}				
 				enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
 				var objControlCaller = new Object();

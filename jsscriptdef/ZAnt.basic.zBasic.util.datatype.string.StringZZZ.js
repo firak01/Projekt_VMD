@@ -39,7 +39,7 @@ function getStrLeftBackStr(sourceStr,keyStr,objControl){
 }
 
  //aus JSZ - Kernel 
-function getStrLeftStr(sourceStr, keyStr,objControl)){
+function getStrLeftStr(sourceStr, keyStr,objControl){
 	var sReturn="";
 	var bReturnControl=false;
 	var sReturnControl="Fehler";		
