@@ -414,7 +414,7 @@
 	<attribute name="inputcontrolstring" /> <!-- so mögliche Erweiterungen wie 'fulltrim' realisieren. -->
 	
     <attribute name="returnarraystring" /> 
-	<attribute name="returnboolean" /> 
+	<attribute name="returnchanged" /> 
 	
 	<attribute name="returncontrol" />
 	<attribute name="returncontrolstring" />
@@ -442,12 +442,13 @@
 			//project.setProperty(attributes.get("ireturn"), iReturn);			
 			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
 			//project.setProperty(attributes.get("returnstring"),sReturn);
-			project.setProperty(attributes.get("returnboolean"),bReturnChanged);
+			project.setProperty(attributes.get("returnchanged"),bReturnChanged);
 			project.setProperty(attributes.get("returnarraystring"),arrReturn);
 						
 			//### START SNIPPET 01 ################################################################
 			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
 			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+			if(attributes.get("returnchanged")!=null){ project.setProperty(attributes.get("returnchanged"),bReturnChanged); 	}
 		
 			//###################################################################
             //### KERNEL LIBS HINZUFÜGEN

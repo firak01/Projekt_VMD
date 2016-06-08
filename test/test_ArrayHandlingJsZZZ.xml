@@ -7,6 +7,7 @@
 	<!--     Die Definiton von basedir in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
 	<import file="../scriptdef/ZAnt_basic_zBasic_ExceptionZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_ArrayZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_test_HelperZZZ.xml"/>
@@ -21,117 +22,13 @@
 	  </classpath>
 	</taskdef>
 		
-	<!-- TODO: Alle scriptdefs auslagern -->		
-						
-	<!-- ########################### -->
-  <scriptdef name="stringExplodeJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="inputstring" />
-	<attribute name="inputdelimiter"/>
-
-    <attribute name="returnarraystring" /> 
-	<attribute name="returncontrol" /> 
-	
-    <![CDATA[
-		var myString = attributes.get("inputstring");
-		var myDelimiter = attributes.get("inputdelimiter") ;
-		
-		var myArrayReturn = new Array();
-		var bReturnControl = true;
-		if(myString===undefined){
-			print("myString = undefined");
-			bReturnControl = false;
-		}else if(myString===''){
-			print("myString = leer");			
-			bReturnControl = false;
-		}else{
-			if(myDelimiter===undefined){
-				print("myDelimiter = 'undefined'");
-				myArrayReturn[0]=myString;
-				bReturnControl = false;
-			}else if(myDelimiter===''){
-				print("myDelimiter = 'leer'");
-				myArrayReturn[0]=myString;
-				bReturnControl = false;
-			}else{	
-				var myStringEncoded = encodeMyHtml(myString);
-				var myDelimiterEncoded = encodeMyHtml(myDelimiter);
-		
-				 values = myStringEncoded.split(myDelimiterEncoded);
-				 for(i=0; i<values.length; i++) {
-					//So wird ein Array künstlich erzeugt.... project.setNewProperty(attributes.get("inputprefix")+i, values[i]);
-					myArrayReturn[i]=unescape(values[i]);//Das encoden wieder rueckgaengig machen.
-				 }				 		
-			}
-		}				 
-		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
-		project.setProperty(attributes.get("returncontrol"), bReturnControl);
-		
-			//TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-     ]]>
-	</scriptdef>
-	
-  <!-- ########################### -->
-  <scriptdef name="stringLeftBackStringZZZ" language="javascript">
-   <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-   <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returnstring" />     
-     <![CDATA[
-	  var text = attributes.get("text");
-	  var match = attributes.get("matchstring");
-       
-      sReturn = getStrLeftBackStr(text, match);
-	   
-      project.setProperty(attributes.get("returnstring"), sReturn);
-	   
-	//äquivalent zu JSZ - Kernel
-	//@LeftBack equivalent, !!! casesensitive
-	function getStrLeftBackStr(sourceStr, keyStr){
-		arr = sourceStr.split(keyStr)
-		arr.pop();
-		return (keyStr==null | keyStr=='') ? '' : arr.join(keyStr)
-	}
-  ]]>
-  </scriptdef>
-  
-  <!-- ############################################################ -->
-	<scriptdef name="stringSubStringZZZ" language="javascript">
-	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
-		 <attribute name="text" />
-		 <attribute name="start" />
-		 <attribute name="end" />
-		 <attribute name="property" />
-		 <![CDATA[
-		   var text = attributes.get("text");
-		   var start = attributes.get("start");
-		   var end = attributes.get("end") || text.length();
-		   project.setProperty(attributes.get("property"), text.substring(start, end));
-		 ]]>
-	</scriptdef>
-
-	
 <!-- ################################################################################# -->
 <!-- Die einzelnen Tests im depends hinzufügen -->
 <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 	 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestIsArrayEmptyJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestIsArrayEmptyJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayStringTrimJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -158,7 +55,7 @@
 		<!-- Testen etwas an ein Array anzuhaengen -->
 		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
-		<fl:logo>myTestArrayAppendJsZZZ:
+		<fl:logo>${sScript}
 		Meine Loesung: Scriptdef arrayAppendJsZZZ</fl:logo>	
 
 
@@ -681,12 +578,13 @@
 		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
 		<fl:let>sDelimiter::="\\"</fl:let>
 		<arrayInitJsZZZ isize="0" arrayreturn="myReturnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>			
 		<echo> </echo>
 		<echo>${sScript}# Nun inputcontrolstring='trim' ##############</echo>
-		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returnboolean="myReturnBoolean" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2" returnchanged="myReturnBoolean" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
 		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>		
 		<echo>${sScript}wurde etwas veraendert=${myReturnBoolean}</echo>
 		
@@ -694,7 +592,7 @@
 		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>		
 		<echo> </echo>
 		<echo>${sScript}# Nun inputcontrolstring='trimmed' ##############</echo>
-		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trimmed" returnarraystring="myReturnArray2"  returnboolean="myReturnBoolean" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trimmed" returnarraystring="myReturnArray2"  returnchanged="myReturnBoolean" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
 		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<echo>${sScript}wurde etwas veraendert=${myReturnBoolean}</echo>
 		
@@ -709,12 +607,13 @@
 		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
 		<fl:let>sDelimiter::="\\"</fl:let>
 		<arrayInitJsZZZ isize="0" arrayreturn="myReturnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>			
 		<echo> </echo>
 		<echo>${sScript}# Nun inputcontrolstring='trim' ##############</echo>
-		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2"  returnboolean="myReturnBoolean" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trim" returnarraystring="myReturnArray2"  returnchanged="myReturnBoolean" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
 		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<echo>${sScript}wurde etwas veraendert=${myReturnBoolean}</echo>
 		
@@ -722,7 +621,7 @@
 		<arrayDebugJsZZZ arrayinput="${myArray2}" ilevel="1"/>
 		<echo> </echo>
 		<echo>${sScript}# Nun inputcontrolstring='trimmed' ##############</echo>
-		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trimmed" returnarraystring="myReturnArray2"  returnboolean="myReturnBoolean"  returncontrol="myReturnControl2" returnControlString="myReturnControlString" sflagcontrol="" />
+		<arrayStringTrimJsZZZ inputarraystring="${myArray}" inputcontrolstring="trimmed" returnarraystring="myReturnArray2"  returnchanged="myReturnBoolean"  returncontrol="myReturnControl2" returnControlString="myReturnControlString" sflagcontrol="" />
 		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl2}" returncontrolstring="${myReturnControlString}"/>
 		<echo>${sScript}wurde etwas veraendert=${myReturnBoolean}</echo>
 		

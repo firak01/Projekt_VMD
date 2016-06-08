@@ -6,10 +6,14 @@
 	 <!-- ### Notepad++ Hotkeys:
         ALT + 0, ALT +1, .... XML Tags der Ebene zusammenklappen. -->
     
-   	<!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
-	<!--     Die Definiton von basedr in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
+   <!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
+	<!--     Die Definiton von basedir in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
-	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_arrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_ExceptionZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_ArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_test_HelperZZZ.xml"/>
 
 	<!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
 	<!-- <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/lib/ant-contrib-1.0b3.jar" />
@@ -25,37 +29,7 @@
 	</taskdef>
 	
 <!-- ######## Scriptdefs ############################################################################--> 
-<!-- ############################################################-->
-	<scriptdef name="arrayCopyJsZZZ" language="javascript">
-		<!-- Hiermit man ein Array in eine anderes neues Array.
-             Beispielsweise sinnvoll, wenn von einer Funktion ein neues Array zurückgegeben wird,
-             man aber noch mit dem alten 'Variablennamen' weiterarbeiten möchte.			 -->
-		
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss das neue Array als neue Variable zurückgegeben werden.-->
-			 
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="arrayinput" />
-		<attribute name="arrayreturn" />
-		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
-		<![CDATA[
-			var myArray = attributes.get("arrayinput");		 
-			var myFlagControl = attributes.get("sflagcontrol");
-			var myArrayReturn = new Array();
-								
-			var objectArray = myArray.split(',');  //Merke: Versuche so ein Array zu machen.				
-			var icount=-1;
-			
-			//Kopiervorgang, noch ohne irgendwelche FlagControl Erweiterungen.			
-			for(x in objectArray){
-				//print("Wert: '" + objectArray[x]+ "'");
-				icount++;
-				myArrayReturn[icount]=objectArray[x];
-			};
-															
-			project.setProperty(attributes.get("arrayreturn"), myArrayReturn);
-		]]>
-	</scriptdef>
+<!-- TODO: Scriptdefs in eigene Bibliothek auslagern -->
 	
 <!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
  <scriptdef name="stringContainsStringZZZ" language="javascript">
@@ -145,117 +119,8 @@
 		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
 	   }
      ]]>
-  </scriptdef>	
-  
-  <!-- ########################### -->
-  <scriptdef name="stringExplodeJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="inputstring" />
-	<attribute name="inputdelimiter"/>
-
-    <attribute name="returnarraystring" /> 
-	<attribute name="returncontrol" /> 
-	
-    <![CDATA[
-		var myString = attributes.get("inputstring");
-		var myDelimiter = attributes.get("inputdelimiter") ;
-		
-		var myArrayReturn = new Array();
-		var bReturnControl = true;
-		if(myString===undefined){
-			print("myString = undefined");
-			bReturnControl = false;
-		}else if(myString===''){
-			print("myString = leer");			
-			bReturnControl = false;
-		}else{
-			if(myDelimiter===undefined){
-				print("myDelimiter = 'undefined'");
-				myArrayReturn[0]=myString;
-				bReturnControl = false;
-			}else if(myDelimiter===''){
-				print("myDelimiter = 'leer'");
-				myArrayReturn[0]=myString;
-				bReturnControl = false;
-			}else{	
-				var myStringEncoded = encodeMyHtml(myString);
-				var myDelimiterEncoded = encodeMyHtml(myDelimiter);
-		
-				 values = myStringEncoded.split(myDelimiterEncoded);
-				 for(i=0; i<values.length; i++) {
-					//So wird ein Array künstlich erzeugt.... project.setNewProperty(attributes.get("inputprefix")+i, values[i]);
-					myArrayReturn[i]=unescape(values[i]);//Das encoden wieder rueckgaengig machen.
-				 }				 		
-			}
-		}				 
-		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
-		project.setProperty(attributes.get("returncontrol"), bReturnControl);
-		
-			//TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-     ]]>
-	</scriptdef>
-	
- <!-- ########################### -->
-  <scriptdef name="stringLeftStringZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returnstring" />     
-     <![CDATA[
-	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-	   //print("Starte stringLeftStringZZZ");
-	   
-	   var text = attributes.get("text");
-       var match = attributes.get("matchstring");
-       //print("matchstring="+match);
+  </scriptdef>	  
 	  
-	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
-	   var matchToEncode=match;
-	   var matchEncoded = encodeMyHtml(matchToEncode);
-	   //print("encoded matchstring=" + matchEncoded);
-	   
-	   var textToEncode=text;
-	   var textEncoded = encodeMyHtml(textToEncode);
-	   //print("encoded textstring=" + textEncoded);
-       sReturn = getStrLeftStr(textEncoded, matchEncoded);
-	   sReturn = unescape(sReturn);
-	   //print("sReturn="+sReturn);
-	   
-       project.setProperty(attributes.get("returnstring"), sReturn);
-	   
-	   //aus JSZ - Kernel 
-	   function getStrLeftStr(sourceStr, keyStr){
-		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
-	  }
-		
-		//TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-     ]]>
-  </scriptdef>
-  
   <!-- ########################### -->
  <scriptdef name="stringRightStringZZZ" language="javascript">
 	 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -481,14 +346,19 @@
 	<target name="-myTestStringExplode">
 		<fl:let>sScript::='-myTestStringExplode: '</fl:let>
 		<fl:let>sTrace::=""</fl:let>
-		<echo>${sScript}Start</echo>
+				
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef stringLeftStringJsZZZ</fl:logo>	
+				
 		<echo>#### Eingabewert ohne Backslash ##############################</echo>
 		<fl:let>sValue::="a,b,c"</fl:let>
 		<echoproperties prefix="sValue"/>
 		
 		<fl:let>sDelimiter::=","</fl:let>
 		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 		<echo> </echo>
@@ -498,7 +368,8 @@
 		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
 		<fl:let>sDelimiter::="i"</fl:let>
 		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 		
@@ -510,7 +381,8 @@
 		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
 		<fl:let>sDelimiter::="i"</fl:let>
 		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 		
@@ -521,7 +393,8 @@
 		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
 		<fl:let>sDelimiter::="\\"</fl:let><!-- Der Backslash muss maskiert werden -->
 		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 		
@@ -532,7 +405,8 @@
 		<!--<echo>${sScript}sString2escape=${sString2escape}</echo>-->
 		<fl:let>sDelimiter::="\\"</fl:let><!-- Der Backslash muss maskiert werden -->
 		<arrayInitJsZZZ isize="0" arrayreturn="returnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
-		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${sValue}" inputdelimiter="${sDelimiter}" returnarraystring="returnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${returnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 	</target>
@@ -549,13 +423,19 @@
 	</target> 
 	
 	<target name="-myTestStringLeftString">
-		<echo>myTestStringLeft: </echo>
+		<fl:let>sScript::='-myTestArrayAppendJsZZZ: '</fl:let>
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef stringLeftStringJsZZZ</fl:logo>	
 		
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringLeftStringZZZ text="asdfasdfasdf" matchstring="fas" returnstring="lefttext" />
+		<stringLeftStringJsZZZ inputstring="asdfasdfasdf" inputmatchstring="fas" returnstring="lefttext"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<echo message="lefttext = ${lefttext}" />
 		
-		<stringLeftStringZZZ text="asdfasdfasdf" matchstring="sdf" returnstring="lefttext" />
+		<stringLeftStringJsZZZ inputstring="asdfasdfasdf" inputmatchstring="sdf" returnstring="lefttext"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<echo message="lefttext = ${lefttext}" />
 	</target> 
 	

@@ -585,120 +585,7 @@
 	   }
      ]]>
   </scriptdef>	
-	
-	 <!-- ########################### -->
-  <scriptdef name="stringExplodeJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="inputstring" />
-	<attribute name="inputdelimiter"/>
-
-    <attribute name="returnarraystring" /> 
-	<attribute name="returncontrol" /> 
-	
-    <![CDATA[
-		var myString = attributes.get("inputstring");
-		var myDelimiter = attributes.get("inputdelimiter") ;
 		
-		var myArrayReturn = new Array();
-		var bReturnControl = true;
-		if(myString===undefined){
-			//print("myString = undefined");
-			bReturnControl = false;
-		}else if(myString===''){
-			//print("myString = leer");			
-			bReturnControl = false;
-		}else{
-			if(myDelimiter===undefined){
-				//print("myDelimiter = 'undefined'");
-				myArrayReturn[0]=myString;
-				bReturnControl = false;
-			}else if(myDelimiter===''){
-				//print("myDelimiter = 'leer'");
-				myArrayReturn[0]=myString;
-				bReturnControl = false;
-			}else{	
-				var myStringEncoded = encodeMyHtml(myString);
-				print("myStringEncoded="+myStringEncoded);
-				var myDelimiterEncoded = encodeMyHtml(myDelimiter);
-				print("myDelimiterEncoded="+myDelimiterEncoded);
-		
-				 values = myStringEncoded.split(myDelimiterEncoded);
-				 for(i=0; i<values.length; i++) {
-					//So wird ein Array künstlich erzeugt.... project.setNewProperty(attributes.get("inputprefix")+i, values[i]);
-					print("values[i]="+values[i]);
-					myArrayReturn[i]=unescape(values[i]);//Das encoden wieder rueckgaengig machen.
-				 }				 		
-			}
-		}				 
-		project.setProperty(attributes.get("returnarraystring"), myArrayReturn);
-		project.setProperty(attributes.get("returncontrol"), bReturnControl);
-		
-		
-			//TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-     ]]>
-	</scriptdef>
-	
-	<!-- ########################################################### -->
-	 <scriptdef name="stringLeftStringZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returnstring" />     
-     <![CDATA[
-	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-	   //print("Starte stringLeftStringZZZ");
-	   
-	   var text = attributes.get("text");
-       var match = attributes.get("matchstring");
-       //print("matchstring="+match);
-	  
-	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
-	   var matchToEncode=match;
-	   var matchEncoded = encodeMyHtml(matchToEncode);
-	   //print("encoded matchstring=" + matchEncoded);
-	   
-	   var textToEncode=text;
-	   var textEncoded = encodeMyHtml(textToEncode);
-	   //print("encoded textstring=" + textEncoded);
-       sReturn = getStrLeftStr(textEncoded, matchEncoded);
-	   sReturn = unescape(sReturn);
-	   //print("sReturn="+sReturn);
-	   
-       project.setProperty(attributes.get("returnstring"), sReturn);
-	   
-	   //aus JSZ - Kernel 
-	   function getStrLeftStr(sourceStr, keyStr){
-		return (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
-	  }
-		
-		//TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-     ]]>
-  </scriptdef>
-	
 	  <!-- ########################### -->
 	 <scriptdef name="stringRightStringZZZ" language="javascript">
 	 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -1116,7 +1003,8 @@
 	<!-- <fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo>  -->
 	<fl:let>xtractedvalueTemp ::= #{"format('\\%s', xtractedvalue)"}	</fl:let>
 	<!-- <fl:let>xtractedvalueTemp ::= #{"format('/%s', xtractedvalue)"}</fl:let> -->
-	<stringLeftStringZZZ text="${vmdUsed}" matchstring="${xtractedvalueTemp}" returnstring="myPath" />
+	<stringLeftStringJsZZZ inputstring="${vmdUsed}" inputmatchstring="${xtractedvalueTemp}" returnstring="myPath"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	<echo>Der Pfad ist: '${myPath}'</echo>
 
   <fl:let>vmdLocalFilePath ::= "${myPath}\\project_${env.COMPUTERNAME}_vmd.properties"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
@@ -1921,7 +1809,8 @@
 	<!-- Ermittle den neuen Schema-Teil, falls leer dann mache copy als Default-Schema -->
 	<!-- Ermittle die Zeile ohne Schema-Anfang.-->
 	<!--<echo>myLineNextSchema="${myLineNextSchema}"</echo>-->
-	<stringLeftStringZZZ text="${myLineNextSchema}" matchstring="://" returnstring="schemanext" />
+	<stringLeftStringJsZZZ inputstring="${myLineNextSchema}" inputmatchstring="://" returnstring="schemanext"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	<fl:let>mySchemaNext::="${schemanext}"</fl:let>
 	<!--<echo>mySchemaNext="${mySchemaNext}"</echo>-->
 	<fl:let>mySchemaNextTrimmed::=trim('${mySchemaNext}')</fl:let>
@@ -3583,7 +3472,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 	<!-- Merke: das in eine Variable packen, sonst kann man es nicht an 'stringLeftStringZZZ' uebergeben. -->
 	<fl:echo>#{format('\\%s', xtractedvalue)}</fl:echo> 
 	<fl:let>xtractedvalueTemp::=#{"format('\\%s', xtractedvalue)"}	</fl:let>
-	<stringLeftStringZZZ text="${myPart}" matchstring="${xtractedvalueTemp}" returnstring="myPath" />
+	<stringLeftStringJsZZZ inputstring="${myPart}" inputmatchstring="${xtractedvalueTemp}" returnstring="myPath"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	<echo>Der Pfad ist: ${myPath}</echo>
 	
 	<!-- 4. Packe die Werte in ein Array -->
@@ -3943,7 +3833,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		<!--<echo>Exploding directory path to array: ${myDir}</echo>-->
 		<arrayInitJsZZZ isize="0" arrayreturn="myReturnArray"/>	<!-- Das Testarray wieder neu initialisieren -->
 		<fl:let>sDelimiter::='\\'</fl:let><!-- escapter Backslash -->
-		<stringExplodeJsZZZ inputstring="${myDir}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl"/>
+		<stringExplodeJsZZZ inputstring="${myDir}" inputdelimiter="${sDelimiter}" returnarraystring="myReturnArray" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<arrayCopyJsZZZ arrayinput="${myReturnArray}" arrayreturn="myArray" sflagcontrol="" />
 		<arrayDebugJsZZZ arrayinput="${myArray}" ilevel="1"/>
 	
