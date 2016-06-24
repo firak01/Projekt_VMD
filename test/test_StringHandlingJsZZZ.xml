@@ -30,25 +30,7 @@
 	
 <!-- ######## Scriptdefs ############################################################################--> 
 <!-- TODO: Scriptdefs in eigene Bibliothek auslagern -->
-	
-<!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
- <scriptdef name="stringContainsStringZZZ" language="javascript">
- <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returnboolean" />     
-     <![CDATA[
-	   var text = attributes.get("text");
-       var match = attributes.get("matchstring");
-       
-       var bReturn = text.indexOf(match)> -1;
-	   
-       project.setProperty(attributes.get("returnboolean"), bReturn);
-     ]]>
-  </scriptdef>
-  
+	  
   <!-- ########################### -->
 <!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
  <scriptdef name="stringCountStringZZZ" language="javascript">
@@ -289,7 +271,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
  <!-- TODO Test für stringUnencodeJsZZZ und stringEncodeJsZZZ -->
- <target name="compile" depends="-myTestStringExplode">
+ <target name="compile" depends="-myTestStringContainsString">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -306,12 +288,18 @@
   </target>
   
   <target name="-myTestStringContainsString">
-		<echo>myTestStringContainsString: </echo>
+		<fl:let>sScript::='-myTestStringContainsString: '</fl:let>
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef stringContainsStringJsZZZ</fl:logo>
+
 		<property name="totaltext01" value="asdfasdfasdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich -->	
 		<echo message="totaltext = ${totaltext01}" />
 		
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringContainsStringZZZ text="${totaltext01}" matchstring="sdf" returnboolean="bcontains" />
+		<stringContainsStringJsZZZ inputstring="${totaltext01}" inputmatchstring="sdf" returnboolean="bcontains" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<echo message="bcontains = ${bcontains}" />
 		<echo message="############################" />
 		
@@ -319,7 +307,8 @@
 		<echo message="totaltext = ${totaltext02}" />
 		
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringContainsStringZZZ text="${totaltext02}" matchstring="sdf" returnboolean="bcontains" />		
+		<stringContainsStringJsZZZ inputstring="${totaltext02}" inputmatchstring="sdf" returnboolean="bcontains" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<echo message="bcontains = ${bcontains}" />
 		
 	</target> 

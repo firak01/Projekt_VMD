@@ -2,7 +2,199 @@
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
 	
-<!-- ######## Scriptdefs #############################################-->					
+<!-- ######## Scriptdefs #############################################-->			
+
+ <!-- ########################### -->
+<!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
+ <scriptdef name="stringContainsStringJsZZZ" language="javascript">
+ <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+	<attribute name="inputstring" />
+    <attribute name="inputmatchstring" />
+    <attribute name="returnboolean" />     
+	
+	<attribute name="returncontrol" />
+	<attribute name="returncontrolstring" />
+	<!-- <attribute name="returnchanged" /> -->
+	<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen realisieren. -->
+     <![CDATA[
+	   var myString = attributes.get("inputstring");
+       var myMatch = attributes.get("inputmatchstring");
+	   
+	   
+	   //Aufruf der "Arbeitsfunktion".
+		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+		var objControlCaller=new Object();
+		var arrReturn = stringContainsJs(objKernelLibs, myString, myMatch, objControlCaller);				
+		if(!objControlCaller.bReturnControl){									
+			bReturnControl=false;
+			bReturnChanged=false;
+			sReturn="";
+			iReturn=-1;
+		}else{					
+		}	
+		if(!objControlCaller.bReturnIsChanged==undefined && !!objControlCaller.bReturnIsChanged==null){
+			bReturnChanged = objControlCaller.bReturnIsChanged;
+		}else{
+			bReturnChanged = null;
+		}						
+		bReturnControl=objControlCaller.bReturnControl;
+		sReturnControl=objControlCaller.sReturnControl;
+						
+		//project.setProperty(attributes.get("returnstring"), sReturn);
+		//project.setProperty(attributes.get("ireturn"), iReturn);			
+		//project.setProperty(attributes.get("arrayreturn"), arrReturn);
+		//project.setProperty(attributes.get("returnChanged"),bReturnChanged);
+		//project.setProperty(attributes.get("returnarraystring"),arrReturn);
+		project.setProperty(attributes.get("returnboolean"), bReturn);
+						
+		//### START SNIPPET 01 ################################################################
+		if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+		if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+		if(attributes.get("returnchanged")!=null){ project.setProperty(attributes.get("returnchanged"),bReturnChanged); 	}
+		
+		//###################################################################
+        //### KERNEL LIBS HINZUFÜGEN
+        //###################################################################			
+		function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){				
+			var sScript = "enableKernelAntJs: ";
+			try{
+				if(objKernelLibs==undefined || objKernelLibs==null){
+					var err = new Error("objKernelLibs nicht deklariert.");
+					throw err;
+				}
+				if(sDirSubDefault==undefined || sDirSubDefault==null){				
+					sDirSubDefault="jsscriptdef";
+				}else if(sDirSubDefault.trim()==''){
+					sDirSubDefault="jsscriptdef";
+				}
+				eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verf�gung gestellt werden.
+									
+				var objControlCaller=new Object();
+				usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+					
+				bReturnControl=true;
+				sReturnControl=sScript+"Alles o.k.";
+				bReturn=true;
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. "+ err;					
+			}
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;
+			return bReturn;
+		}
+		//### ENDE SNIPPET 01 ################################################################
+			
+		//######################################################################################################
+		function stringContainsJs(objKernelLibs, myString, myMatch, objControl){	
+			var bReturn = false;			
+        
+			//###START SNIPPET 02 ###################################################################################################################			
+			//IN JEDER FUNKTION DAS LADEN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
+			//######################################################################################################################
+			var sScript=null;
+			var bKernelInitialised=true;
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
+			var bReturnChanged=null;
+			try{				
+					if(objKernelLibs==undefined || objKernelLibs==null)	throw new Error("Keine Kernel Ant Js Libs uebergeben.");
+					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+						//print("Noch keine Kernel Ant Js Libs vorhanden zum Laden, lade sie jetzt.");
+							
+						var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+						var objControlCallerKernel=new Object();
+						var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCallerKernel);			
+						if(!objControlCallerKernel.bReturnControl) throw new Error(objControlCallerKernel.sReturnControl);	
+					}
+					
+					//print("Eval Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						//funktioniert: 
+						try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}	
+					}				
+					enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
+					var objControlCaller = new Object();
+					sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+					
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING VOR SCRIPT ERMITTLUNG #######
+					print("Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl="Fehler. "+ err;
+					bKernelInitialised=false;
+				}
+				try{
+					if(bKernelInitialised){						
+						main:{			
+							//print(sScript + "START");								
+							//print("###ENDE SNIPPET 02 ###################################################");
+							
+							if(myString==undefined || myString==null) break main;
+							if(myMatch == undefined || myMatch == null){								
+								break main;
+							}
+							
+							 						
+							var myStringEncoded = encodeMyHtml(myString);
+							var myMatchEncoded = encodeMyHtml(myMatch);
+		
+							bReturn = myStringEncoded.indexOf(myMatchEncoded)> -1;
+																					
+							sReturnControl="Alles o.k.";
+							bReturnControl=true;
+					//print("### START SNIPPET 03 ###################################################");
+					//print(sScript + "ENDE");								
+					} //end main:
+				}//end if bKernelInitialised
+			}catch(err){	
+				//#### ERROR HANDLING #######				
+				print(sScript+"Fehler gefangen: " + err);
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. " + err;					
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
+				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
+				}
+			}
+			print(sScript+bReturnControl+" | " + sReturnControl);
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;
+			objControl.bReturnChanged=bReturnChanged;
+            //### ENDE SNIPPET 03 ###########################################################			
+			
+			return bReturn;
+		}	
+     
+       
+     ]]>
+  </scriptdef>
+
+		
  <!-- ########################### -->
  <scriptdef name="stringLeftStringJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
