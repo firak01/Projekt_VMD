@@ -3,6 +3,39 @@
 //###############################################################
 //äquivalent zu JSZ - Kernel
 
+//Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.   
+String.prototype.count = function(lit, cis) {
+	//lit is the string to search for ( such as 'ex' ), and 
+	//cis is case-insensitivity, defaulted to false, it will allow for choice of case insensitive matches.
+	var iReturn=-1;
+	try{	
+		//Merke: Zumindest unter Java 7 kann kein Funktionsname ermittelt werden, wenn die Funktion per Prototype hinzugefuegt wurde.
+		var objControlCaller = new Object();
+		var sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+
+		var sScript = "String.prototype.count: "; //Hier zur Identifizierung hart vorgeben.
+		try{
+			var m = this.toString().match(new RegExp(lit, ((cis) ? "gi" : "g")));
+			//print(sScript + "TTTTTESTEST"); //Print Ausgaben vor dem RETURN
+			
+			iReturn = (m != null) ? m.length : 0;
+		}catch(err){	
+			//#### SIMPLES ERROR HANDLING #######
+			print(sScript+"Fehler gefangen: " + err);
+			bReturnControl=false;
+			sReturnControl=sScript+"Fehler. "+ err;					
+		}				
+	}catch(err){	
+		//#### SIMPLES ERROR HANDLING #######
+		print("Fehler (vor Funktionsnamensermittlung) gefangen: " + err);
+		bReturnControl=false;
+		sReturnControl="Fehler. "+ err;					
+	}	
+	return iReturn;
+}
+
+
 //TODO: In den JSZ Kernel bringen
 function encodeMyHtml(htmlToEncode) {
 	var encodedHtml = escape(htmlToEncode);

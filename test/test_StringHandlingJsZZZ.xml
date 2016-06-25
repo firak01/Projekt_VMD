@@ -31,36 +31,7 @@
 <!-- ######## Scriptdefs ############################################################################--> 
 <!-- TODO: Scriptdefs in eigene Bibliothek auslagern -->
 	  
-  <!-- ########################### -->
-<!-- TODO: Diese Funktion in den JSZ-Kernel uebernehmen -->
- <scriptdef name="stringCountStringZZZ" language="javascript">
- <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returninteger" />     
-     <![CDATA[
-	   var text = attributes.get("text");
-       var match = attributes.get("matchstring");
-       	   
-	   //Merke: So bindet man per Prototype erzeugte, die Klassen erweiternde Methoden in dieses CDATA-Konstrukt ein.   
-	   String.prototype.count = function(lit, cis) {
-	    //lit is the string to search for ( such as 'ex' ), and 
-	    //cis is case-insensitivity, defaulted to false, it will allow for choice of case insensitive matches.
-		var m = this.toString().match(new RegExp(lit, ((cis) ? "gi" : "g")));
-		return (m != null) ? m.length : 0;
-	  }
-	  
-       var iReturn = text.count(match, false);	   
-	   
-       project.setProperty(attributes.get("returninteger"), iReturn);
-	   	   
-	  
-     ]]>
-  </scriptdef>
-
-   <!-- ########################### -->
+<!-- ########################### -->
 <scriptdef name="stringEncodeJsZZZ" language="javascript">
 	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -271,7 +242,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
  <!-- TODO Test für stringUnencodeJsZZZ und stringEncodeJsZZZ -->
- <target name="compile" depends="-myTestStringContainsString">
+ <target name="compile" depends="-myTestStringCountString">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -314,12 +285,19 @@
 	</target> 
 		
 	<target name="-myTestStringCountString">
+		<fl:let>sScript::='-myTestStringCountString: '</fl:let>
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef stringCountStringJsZZZ</fl:logo>
+
 		<echo>myTestStringCountString: </echo>
 		<property name="totaltext01" value="asdfasdfasdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich -->	
 		<echo message="totaltext = ${totaltext01}" />
 		
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringCountStringZZZ text="${totaltext01}" matchstring="sdf" returninteger="icontains" />
+		<stringCountStringJsZZZ inputstring="${totaltext01}" inputmatchstring="sdf" returninteger="icontains" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 		<echo message="icontains = ${icontains}" />
 		<echo message="############################" />
 		
@@ -327,7 +305,8 @@
 		<echo message="totaltext = ${totaltext02}" />
 		
 		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringCountStringZZZ text="${totaltext02}" matchstring="sdf" returninteger="icontains" />		
+		<stringCountStringJsZZZ inputstring="${totaltext02}" inputmatchstring="sdf" returninteger="icontains" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 		<echo message="icontains = ${icontains}" />
 		
 	</target> 
