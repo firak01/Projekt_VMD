@@ -35,7 +35,13 @@
 				iReturn=-1;
 			}else{					
 			}	
-			
+			//print("objControlCaller.bReturnChanged="+objControlCaller.bReturnChanged);
+			if(!(objControlCaller.bReturnChanged==undefined) && !(objControlCaller.bReturnChanged==null)){
+				bReturnChanged = objControlCaller.bReturnChanged;
+			}else{
+				bReturnChanged = null;
+			}						
+			//print("bReturnChanged="+bReturnChanged);			
 			bReturnControl=objControlCaller.bReturnControl;
 			sReturnControl=objControlCaller.sReturnControl;
 			
@@ -46,7 +52,7 @@
 			//### START SNIPPET 01 ################################################################
 			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
 			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
-
+			if(attributes.get("returnchanged")!=null){ project.setProperty(attributes.get("returnchanged"),bReturnChanged); 	}
 		
 			//###################################################################
             //### KERNEL LIBS HINZUFÜGEN
@@ -435,14 +441,19 @@
 				iReturn=-1;
 			}else{					
 			}	
-			bReturnChanged=objControlCaller.bReturnIsChanged;
+			//print("objControlCaller.bReturnChanged="+objControlCaller.bReturnChanged);
+			if(!(objControlCaller.bReturnChanged==undefined) && !(objControlCaller.bReturnChanged==null)){
+				bReturnChanged = objControlCaller.bReturnChanged;
+			}else{
+				bReturnChanged = null;
+			}						
+			//print("bReturnChanged="+bReturnChanged);	
 			bReturnControl=objControlCaller.bReturnControl;
 			sReturnControl=objControlCaller.sReturnControl;
 			
 			//project.setProperty(attributes.get("ireturn"), iReturn);			
 			//project.setProperty(attributes.get("arrayreturn"), arrReturn);
-			//project.setProperty(attributes.get("returnstring"),sReturn);
-			project.setProperty(attributes.get("returnchanged"),bReturnChanged);
+			//project.setProperty(attributes.get("returnstring"),sReturn);			
 			project.setProperty(attributes.get("returnarraystring"),arrReturn);
 						
 			//### START SNIPPET 01 ################################################################
@@ -709,7 +720,13 @@
 				iReturn=-1;
 			}else{					
 			}	
-					
+			//print("objControlCaller.bReturnChanged="+objControlCaller.bReturnChanged);
+			if(!(objControlCaller.bReturnChanged==undefined) && !(objControlCaller.bReturnChanged==null)){
+				bReturnChanged = objControlCaller.bReturnChanged;
+			}else{
+				bReturnChanged = null;
+			}						
+			//print("bReturnChanged="+bReturnChanged);						
 			bReturnControl=objControlCaller.bReturnControl;
 			sReturnControl=objControlCaller.sReturnControl;
 			
@@ -720,6 +737,7 @@
 			//### START SNIPPET 01 ################################################################
 			if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
 			if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+			if(attributes.get("returnchanged")!=null){ project.setProperty(attributes.get("returnchanged"),bReturnChanged); 	}
 		
 			//###################################################################
             //### KERNEL LIBS HINZUFÜGEN

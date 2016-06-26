@@ -496,50 +496,7 @@
 			}		   
 		 ]]>
 	</scriptdef>
-		  	
-	 <!-- ########################### -->
-	<scriptdef name="stringEncodeJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="inputstring" />
-    <attribute name="returnstring" /> 
-	<attribute name="returncontrol" />     
-     <![CDATA[
-	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-		print("Starte stringEncodeJsZZZ");
-			  	
-       var myString = attributes.get("inputstring");
-       print("myString="+myString);
-	   
-	   var myReturnControl=false;
-
-	   var textEncoded = encodeMyHtml(myString);
-	   print("encoded textstring=" + textEncoded);
-	  
-	   //Feedback, ob etwas geändert worden ist.	  
-	   if(textEncoded!=myString){			
-			myReturnControl = true;
-		};
-	   	   	 
-       project.setProperty(attributes.get("returnstring"), textEncoded);
-	   project.setProperty(attributes.get("returncontrol"), myReturnControl);
-	   
-	   
-	   //TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-     ]]>
-  </scriptdef>	
-		
+		  		
 	  <!-- ########################### -->
 	 <scriptdef name="stringRightStringZZZ" language="javascript">
 	 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
