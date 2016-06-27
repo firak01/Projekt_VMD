@@ -496,56 +496,7 @@
 			}		   
 		 ]]>
 	</scriptdef>
-		  		
-	  <!-- ########################### -->
-	 <scriptdef name="stringRightStringZZZ" language="javascript">
-	 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-		<attribute name="text" />
-		<attribute name="matchstring" />
-		<attribute name="returnstring" />     
-		 <![CDATA[
-		   var text = attributes.get("text");
-		   //print("entgegengenommenes Attribut text="+text);
-		   var match = attributes.get("matchstring");
-		   //print("entgegengenommenes Attribut matchstring="+match);
-		   
-		    //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
-			var matchToEncode=match;
-			var matchEncoded =encodeMyHtml(matchToEncode);
-			//print("encoded matchstring=" + matchEncoded);
-		   		    
-			var textToEncode=text;
-			var textEncoded=encodeMyHtml(textToEncode);
-			//print("encoded textstring=" + textEncoded);
-		   
-		   sReturn = getStrRightStr(textEncoded, matchEncoded);
-		   //print("sReturn="+sReturn);
-		   sReturn = unescape(sReturn);
-		   //print("sReturn unescaped="+sReturn);
-	   
-		   project.setProperty(attributes.get("returnstring"), sReturn);
-		   
-		   //aus JSZ - Kernel 
-		   function getStrRightStr(sourceStr, keyStr){
-				idx = sourceStr.indexOf(keyStr);
-				return (idx == -1 | keyStr=='') ? '' : sourceStr.substr(idx+keyStr.length);
-			}
-				
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-		 ]]>
-	  </scriptdef>
-	
+		  			
 	<!-- ########################### -->
 	<scriptdef name="stringLeftBackStringZZZ" language="javascript">
    <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
@@ -1734,7 +1685,8 @@
 			</ac:then>
 			<ac:else>
 				<!-- Ermittle die Zeile ohne Schemateil -->				
-				<stringRightStringZZZ text="${myLineNextSchema}" matchstring="${mySchemaNext}://" returnstring="myLineNext" />
+				<stringRightStringJsZZZ inputstring="${myLineNextSchema}" inputmatchstring="${mySchemaNext}://" returnstring="myLineNext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+				<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 				<!--<echo>myLineNext="${myLineNext}"</echo>-->
 			</ac:else>
 	</ac:if>

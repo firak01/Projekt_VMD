@@ -52,7 +52,8 @@ function encodeMyHtml(htmlToEncode) {
 function getStrLeftBackStr(sourceStr,keyStr,objControl){
 	var sReturn=""; 
 	var bReturnControl=false;
-	var sReturnControl="Fehler";		
+	var sReturnControl="Fehler";
+	var bReturnChanged=null;	
 	try{	
 		var objControlCaller = new Object();
 		var sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
@@ -64,7 +65,9 @@ function getStrLeftBackStr(sourceStr,keyStr,objControl){
 			//arr.shift();		//entfernt das erste Element aus dem Array
 			sReturn = (keyStr==null | keyStr=='') ? '' : arr.join();
 			print("sourceStr | keyStr | sReturn = '" + sourceStr + "' | '" + keyStr + "' | '" + sReturn + "'");
-			sReturnControl="Alles o.k."
+			if(sourceStr==sReturn){ bReturnChanged=false } else { bReturnChanged=true};
+			
+			sReturnControl="Alles o.k.";
 			bReturnControl=true;					
 		}catch(err){	
 			//#### SIMPLES ERROR HANDLING #######
@@ -81,6 +84,7 @@ function getStrLeftBackStr(sourceStr,keyStr,objControl){
 	}
 	objControl.bReturnControl=bReturnControl;
 	objControl.sReturnControl=sReturnControl;
+	objControl.bReturnChanged=bReturnChanged;
 	return sReturn;			
 }
 
@@ -89,6 +93,7 @@ function getStrLeftStr(sourceStr, keyStr,objControl){
 	var sReturn="";
 	var bReturnControl=false;
 	var sReturnControl="Fehler";		
+	var bReturnChanged=null;
 	try{	
 		var objControlCaller = new Object();
 		var sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
@@ -96,8 +101,8 @@ function getStrLeftStr(sourceStr, keyStr,objControl){
 
 		try{
 			sReturn = (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
-		
-			sReturnControl="Alles o.k."
+			if(sourceStr==sReturn){ bReturnChanged=false } else { bReturnChanged=true};
+			sReturnControl="Alles o.k.";
 			bReturnControl=true;					
 		}catch(err){	
 			//#### SIMPLES ERROR HANDLING #######
@@ -114,5 +119,41 @@ function getStrLeftStr(sourceStr, keyStr,objControl){
 	}
 	objControl.bReturnControl=bReturnControl;
 	objControl.sReturnControl=sReturnControl;
+	objControl.bReturnChanged=bReturnChanged;
 	return sReturn;			
+}
+
+  //aus JSZ - Kernel   
+function getStrRightStr(sourceStr, keyStr, objControl){
+	var sReturn="";
+	var bReturnControl=false;
+	var sReturnControl="Fehler";
+	var bReturnChanged=null;
+	try{
+		var objControlCaller = new Object();
+		var sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
+		
+		try{
+			var idx = sourceStr.indexOf(keyStr);
+			sReturn = (idx == -1 | keyStr=='') ? '' : sourceStr.substr(idx+keyStr.length);
+			if(sourceStr==sReturn){ bReturnChanged=false } else { bReturnChanged=true};
+			sReturnControl="Alles o.k.";
+			bReturnControl=true;	
+		}catch(err){	
+			//#### SIMPLES ERROR HANDLING #######
+			print(sScript+"Fehler gefangen: " + err);
+			bReturnControl=false;
+			sReturnControl=sScript+"Fehler. "+ err;					
+		}
+	}catch(err){	
+		//#### SIMPLES ERROR HANDLING #######
+		print("Fehler (vor Funktionsnamensermittlung) gefangen: " + err);
+		bReturnControl=false;
+		sReturnControl="Fehler. "+ err;					
+	}
+	objControl.bReturnControl=bReturnControl;
+	objControl.sReturnControl=sReturnControl;
+	objControl.bReturnChanged=bReturnChanged;
+	return sReturn;
 }

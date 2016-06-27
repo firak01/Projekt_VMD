@@ -32,32 +32,6 @@
 	  
 
 <!-- ######## Scriptdefs #############################################-->					
-  <!-- ########################### -->
-  <scriptdef name="stringLeftBackStringZZZ" language="javascript">
-   <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-   <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returnstring" />     
-     <![CDATA[
-	  var text = attributes.get("text");
-	  var match = attributes.get("matchstring");
-       
-      sReturn = getStrLeftBackStr(text, match);
-	   
-      project.setProperty(attributes.get("returnstring"), sReturn);
-	   
-	//äquivalent zu JSZ - Kernel
-	//@LeftBack equivalent, !!! casesensitive
-	function getStrLeftBackStr(sourceStr, keyStr){
-		arr = sourceStr.split(keyStr)
-		arr.pop();
-		return (keyStr==null | keyStr=='') ? '' : arr.join(keyStr)
-	}
-  ]]>
-  </scriptdef>
-  
   <!-- ############################################################ -->
 	<scriptdef name="stringSubStringZZZ" language="javascript">
 	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
