@@ -60,13 +60,22 @@ function getStrLeftBackStr(sourceStr,keyStr,objControl){
 		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 
 		try{
-			arr = sourceStr.split(keyStr);
-			arr.pop();		//entfernt das letzte Element aus dem Array
-			//arr.shift();		//entfernt das erste Element aus dem Array
-			sReturn = (keyStr==null | keyStr=='') ? '' : arr.join();
-			print("sourceStr | keyStr | sReturn = '" + sourceStr + "' | '" + keyStr + "' | '" + sReturn + "'");
-			if(sourceStr==sReturn){ bReturnChanged=false } else { bReturnChanged=true};
+			//sReturn = (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
+			//if(sourceStr==sReturn){ bReturnChanged=false } else { bReturnChanged=true};
 			
+			arr = sourceStr.split(keyStr)
+			arr.pop();
+			//arr.shift();		//entfernt das erste Element aus dem Array
+			//20160105: so unterschlaegt man aber keyStr: return (keyStr==null | keyStr=='') ? '' : arr.join();		
+			//                     Darum in einer Schleife zusammenbauen		
+			if(arr.length>=2){
+				for (index = 0; index < arr.length-1; ++index) {
+					sReturn=sReturn+arr[index]+keyStr;
+				}
+			}
+			sReturn=sReturn+arr[arr.length-1];	
+			
+			if(sourceStr==sReturn){ bReturnChanged=false } else { bReturnChanged=true};			
 			sReturnControl="Alles o.k.";
 			bReturnControl=true;					
 		}catch(err){	

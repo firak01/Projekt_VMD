@@ -28,7 +28,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
 			 	 			 
 <!-- <target name="compile" depends="-declaration,-myTestArrayInitJsZZZ,-myTestArrayDebugJsZZZ,-myTestIsArrayEmptyJsZZZ,-myTestArrayStringTrimJsZZZ,-myTestArrayStringImplodeJsZZZ-myTestArrayGetJsZZZ,-myTestArrayPlusStringJsZZZ,-myTestArrayLeftBackStringJsZZZ,-myTestArrayAppendJsZZZ, -myTestArrayAppendArrayJsZZZ"> -->
-<target name="compile" depends="-declaration,-myTestArrayStringTrimJsZZZ">
+<target name="compile" depends="-declaration,-myTestArrayLeftBackStringJsZZZ">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	

@@ -31,67 +31,6 @@
 <!-- ######## Scriptdefs ############################################################################--> 
 <!-- TODO: Scriptdefs in eigene Bibliothek auslagern -->
 	  	    
-  <!-- ########################### -->
-  <scriptdef name="stringLeftBackStringZZZ" language="javascript">
-   <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-   <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-	<attribute name="text" />
-    <attribute name="matchstring" />
-    <attribute name="returnstring" />     
-     <![CDATA[
-	  var text = attributes.get("text");
-	  var match = attributes.get("matchstring");
-      //print("matchstring="+match); 
-	  
-	   //! FEHLER, Z.B. BEI EINEM BEGINNENDEN BACKSLASH, darum encoden.
-	   var matchToEncode=match;
-	   var matchEncoded = encodeMyHtml(matchToEncode);
-	   //print("encoded matchstring=" + matchEncoded);
-	   
-	   var textToEncode=text;
-	   var textEncoded = encodeMyHtml(textToEncode);
-	   //print("encoded textstring=" + textEncoded);
-	  
-      sReturn = getStrLeftBackStr(textEncoded, matchEncoded);
-	  //print("return vor unescape: getStrLeftBackStr=" + sReturn);
-	  sReturn = unescape(sReturn);
-      project.setProperty(attributes.get("returnstring"), sReturn);
-	   
-	//äquivalent zu JSZ - Kernel
-	//@LeftBack equivalent, !!! casesensitive
-	function getStrLeftBackStr(sourceStr, keyStr){
-		arr = sourceStr.split(keyStr);
-		arr.pop();		//entfernt das letzte Element aus dem Array
-		//arr.shift();		//entfernt das erste Element aus dem Array
-		//!! so unterschlaegt man aber keyStr: return (keyStr==null | keyStr=='') ? '' : arr.join();		
-		
-		var sReturn="";
-		if(arr.length>=2){
-		for (index = 0; index < arr.length-1; ++index) {
-			sReturn=sReturn+arr[index]+keyStr;
-		}
-		}
-		sReturn=sReturn+arr[arr.length-1];
-		return sReturn;
-		
-	}
-	
-	//TODO: In den JSZ Kernel bringen
-		function encodeMyHtml(htmlToEncode) {
-		 var encodedHtml = escape(htmlToEncode);
-		 encodedHtml = encodedHtml.replace(/\//g,"%2F");
-		 encodedHtml = encodedHtml.replace(/\?/g,"%3F");
-		 encodedHtml = encodedHtml.replace(/=/g,"%3D");
-		 encodedHtml = encodedHtml.replace(/&/g,"%26");
-		 encodedHtml = encodedHtml.replace(/@/g,"%40");
-		 return encodedHtml;
-		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
-	   }
-  ]]>
-  </scriptdef>
-  
-
  <!-- ########################### -->
 <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
 <!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
@@ -150,7 +89,7 @@
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringEncode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
  <!-- TODO Test für stringUnencodeJsZZZ -->
- <target name="compile" depends="-myTestStringRightString">
+ <target name="compile" depends="-myTestStringLeftBackString">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -327,6 +266,78 @@
 		<echo message="subtext = ${subtext}" />
 	</target> 
 	
+	<target name="-myTestStringLeftBackString">
+		<fl:let>sScript::='-myTestStringLeftBackString: '</fl:let>
+		
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef stringLeftBackStringJsZZZ</fl:logo>
+		
+		
+		
+		<property name="totaltext04" value="asdfx" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
+		<property name="matchstring04" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
+		<echo message="totaltext = ${totaltext04}" />
+		<echo message="matchstring = ${matchstring04}" />
+		
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<stringLeftBackStringJsZZZ inputstring="${totaltext04}" inputmatchstring="${matchstring04}" returnstring="leftbacktext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="leftbacktext = ${leftbacktext}" />
+		<echo message="valuechanged = ${myReturnChanged}" />
+		<echo message="############################" />
+		
+		<property name="totaltext03" value="asdfasdf" />
+		<property name="matchstring03" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
+		<echo message="totaltext = ${totaltext03}" />
+		<echo message="matchstring = ${matchstring03}" />
+		
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<stringLeftBackStringJsZZZ inputstring="${totaltext03}" inputmatchstring="${matchstring03}" returnstring="leftbacktext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="leftbacktext = ${leftbacktext}" />
+		<echo message="valuechanged = ${myReturnChanged}" />
+		<echo message="############################" />
+				
+		<property name="totaltext" value="asdfasdfx" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
+		<property name="matchstring" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
+		<echo message="totaltext = ${totaltext}" />
+		<echo message="matchstring = ${matchstring}" />
+		
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<stringLeftBackStringJsZZZ inputstring="${totaltext}" inputmatchstring="${matchstring}" returnstring="leftbacktext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="leftbacktext = ${leftbacktext}" />
+		<echo message="valuechanged = ${myReturnChanged}" />
+		<echo message="############################" />
+
+		<property name="totaltext02" value="asdfasdfasdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->	
+		<property name="matchstring02" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->	
+		<echo message="totaltext = ${totaltext02}" />
+		<echo message="matchstring = ${matchstring02}" />
+		
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<stringLeftBackStringJsZZZ inputstring="${totaltext02}" inputmatchstring="${matchstring02}" returnstring="leftbacktext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="leftbacktext = ${leftbacktext}" />
+		<echo message="valuechanged = ${myReturnChanged}" />
+		<echo message="############################" />	
+
+		</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+		</trycatch>				
+	</target> 
+	
 	<target name="-myTestStringLeftString">
 		<fl:let>sScript::='-myTestArrayAppendJsZZZ: '</fl:let>
 		
@@ -371,46 +382,5 @@
 	</target> 
 	
 	
-	<target name="-myTestStringLeftBackString">
-		<echo>myTestStringLeftBackString: </echo>
-		<property name="totaltext04" value="asdfa" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
-		<property name="matchstring04" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
-		<echo message="totaltext = ${totaltext04}" />
-		<echo message="matchstring = ${matchstring04}" />
-		
-		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringLeftBackStringZZZ text="${totaltext04}" matchstring="${matchstring04}" returnstring="leftbacktext" />
-		<echo message="leftbacktext = ${leftbacktext}" />
-		
-		<echo>#####################################</echo>
-		<property name="totaltext03" value="asdfasdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
-		<property name="matchstring03" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
-		<echo message="totaltext = ${totaltext03}" />
-		<echo message="matchstring = ${matchstring03}" />
-		
-		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringLeftBackStringZZZ text="${totaltext03}" matchstring="${matchstring03}" returnstring="leftbacktext" />
-		<echo message="leftbacktext = ${leftbacktext}" />
-		
-		<echo>#####################################</echo>
-		<property name="totaltext" value="asdfasdfa" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
-		<property name="matchstring" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->			
-		<echo message="totaltext = ${totaltext}" />
-		<echo message="matchstring = ${matchstring}" />
-		
-		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringLeftBackStringZZZ text="${totaltext}" matchstring="${matchstring}" returnstring="leftbacktext" />
-		<echo message="leftbacktext = ${leftbacktext}" />
-		
-		<echo>#####################################</echo>
-		<property name="totaltext02" value="asdfasdfasdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->	
-		<property name="matchstring02" value="sdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich und properies sind nicht aenderbar -->	
-		<echo message="totaltext = ${totaltext02}" />
-		<echo message="matchstring = ${matchstring02}" />
-		
-		<!-- Hier wird die scriptdef Methode aufgerufen -->
-		<stringLeftBackStringZZZ text="${totaltext02}" matchstring="${matchstring02}" returnstring="leftbacktext" />
-		<echo message="leftbacktext = ${leftbacktext}" />
-		
-	</target> 
+	
  </project>
