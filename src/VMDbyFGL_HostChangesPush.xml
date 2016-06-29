@@ -496,56 +496,7 @@
 			}		   
 		 ]]>
 	</scriptdef>
-		  				
-	<!-- ############################################################ -->
-	<scriptdef name="stringSubStringZZZ" language="javascript">
-	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
-		 <attribute name="text" />
-		 <attribute name="start" />
-		 <attribute name="end" />
-		 <attribute name="property" />
-		 <![CDATA[
-		   var text = attributes.get("text");
-		   if(text==''){
-		   //print("Leerstring im JS Teil stringSubStringZZZ");
-		   project.setProperty(attributes.get("property"), '');
-		   }else{
-		   var start = attributes.get("start");
-		   var end = attributes.get("end") || text.length();
-		   project.setProperty(attributes.get("property"), text.substring(start, end));
-		   }
-		 ]]>
-	</scriptdef>
-	
-	<!-- ########################### -->
-	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="inputstring" />
-    <attribute name="returnstring" />
-    <attribute name="returncontrol" />	
-     <![CDATA[
-	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-	 //TODO: Die Erweiterung endsWithPos in den JSZ - Kernel packen
-	 print("Starte stringUnencodeJsZZZ");
-	  
-	 var myString = attributes.get("inputstring");
-     //print("myString="+myString); 
-	 var myReturnControl=false;
-			  	  
-	 var myStringUnencoded=unescape(myString);	  
-	 //print("myStringUnencoded =" + myStringUnencoded);
-	   
-	 //Feedback, ob etwas geändert worden ist.	  
-	 if(myStringUnencoded!=myString){			
-		myReturnControl = true;
-	 };
-	   project.setProperty(attributes.get("returncontrol"), myReturnControl);	   	   	 			
-       project.setProperty(attributes.get("returnstring"), myStringUnencoded);
-     ]]>
-  </scriptdef>	
-
+		  					
   <!-- ##### Macrodefs, gesammelt in einem Target, das dann von den Untertargets eingebunden werden kann ##### -->
 <target name="-initMacrodef">
  
@@ -1464,7 +1415,8 @@
 								</ac:then>
 								<ac:else>												
 									<!-- Kommentarzeilen überspringen. Sie beginnen mit einem #  -->																
-									<stringSubStringZZZ text="${myLineTrimmed}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
+									<stringSubStringJsZZZ inputstring="${myLineTrimmed}" inputindexstart="0" inputindexend="1" returnstring="subtext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+									<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 									<!-- <fl:echo message="subtext = ${subtext}" /> -->
 									<ac:if>
 										<ac:equals arg1="${subtext}" arg2="#" />
@@ -1592,7 +1544,8 @@
 				<fl:fail message="Argument Error: Empty line"/>
 			</ac:then>
 			<ac:else>
-				<stringSubStringZZZ text="${myLineNext}" start="0" end="1" property="subtext" /> <!-- anwenden der oben definierten scriptdef funktion substring -->
+				<stringSubStringJsZZZ inputstring="${myLineNext}" inputindexstart="0" inputindexend="1" returnstring="subtext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+				<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 				<ac:if>
 					<ac:equals arg1="${subtext}" arg2="#" />
 					<ac:then>
@@ -4133,8 +4086,9 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 
 	<!-- Ggfs. ist der String durch JavaScript encoded worden, dies macht z.B. arrayAppend vom mir automatisch.
 	hier also erst einmal unencoden -->	
-	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" returncontrol="bControl" />
-	<echo message="${sScript}bcontrol | mysStringUnecoded = ${bControl} | ${mysStringUnencoded}" />
+	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo message="${sScript}bcontrol | mysStringUnecoded = ${myReturnControl} | ${mysStringUnencoded}" />
 	
 	<!-- Das eigentliche Escapen des Backslashs -->	
 	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
@@ -4152,7 +4106,8 @@ Ich will aber versuchen es mit einer Scriptdef <reflectionTargetCurrent> zu lös
 		</and>
 		<then>
 			<echo message="${sScript}Encoded wiederherstellen" />
-			<stringEncodeJsZZZ inputstring="${mysString}" returnstring="mysStringEncoded" returncontrol="bcontrol" />
+			<stringEncodeJsZZZ inputstring="${mysString}" returnstring="mysStringEncoded"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 			<fl:let>mysString::="${mysStringEncoded}"</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben-->
 		</then>
 		<else>

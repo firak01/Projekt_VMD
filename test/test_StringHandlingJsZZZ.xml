@@ -27,69 +27,13 @@
 		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
-	
-<!-- ######## Scriptdefs ############################################################################--> 
-<!-- TODO: Scriptdefs in eigene Bibliothek auslagern -->
-	  	    
- <!-- ########################### -->
-<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-  <scriptdef name="stringSubStringZZZ" language="javascript">
-	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
-		 <attribute name="text" />
-		 <attribute name="start" />
-		 <attribute name="end" />
-		 <attribute name="property" />
-		 <![CDATA[
-		   var text = attributes.get("text");
-		   if(text==''){
-		   //print("Leerstring im JS Teil stringSubStringZZZ");
-		   project.setProperty(attributes.get("property"), '');
-		   }else{
-		   var start = attributes.get("start");
-		   var end = attributes.get("end") || text.length();
-		   project.setProperty(attributes.get("property"), text.substring(start, end));
-		   }
-		 ]]>
-	</scriptdef>
-	
- <!-- ########################### -->
-	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="inputstring" />
-    <attribute name="returnstring" />
-    <attribute name="returncontrol" />	
-     <![CDATA[
-	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-	 //TODO: Die Erweiterung endsWithPos in den JSZ - Kernel packen
-	 print("Starte stringUnencodeJsZZZ");
-	  
-	 var myString = attributes.get("inputstring");
-     //print("myString="+myString); 
-	 var myReturnControl=false;
-			  	  
-	 var myStringUnencoded=unescape(myString);	  
-	 //print("myStringUnencoded =" + myStringUnencoded);
-	   
-	 //Feedback, ob etwas geändert worden ist.	  
-	 if(myStringUnencoded!=myString){			
-		myReturnControl = true;
-	 };
-	   project.setProperty(attributes.get("returncontrol"), myReturnControl);	   	   	 			
-       project.setProperty(attributes.get("returnstring"), myStringUnencoded);
-     ]]>
-  </scriptdef>	
-  
+	 
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringEncode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
- <!-- TODO Test für stringUnencodeJsZZZ -->
- <target name="compile" depends="-myTestStringLeftBackString">
+ <!-- <target name="compile" depends="-myTestStringExplode,-myTestStringEncode,-myTestStringUnencode,-myTestStringSubstring,-myTestStringLeftString,-myTestStringRightString,-myTestStringLeftBackString,-myTestStringContainsString,-myTestStringCountString"> -->
+ <target name="compile" depends="-myTestStringUnencode">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -256,14 +200,39 @@
 	</target>
 	
 	<target name="-myTestStringSubstring">
-		<echo>myTestStringSubstring: </echo>
+		<fl:let>sScript::='-myTestStringSubstring: '</fl:let>
 		
+		<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef stringLeftBackStringJsZZZ</fl:logo>
+		
+				
 		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
-		<stringSubstringZZZ text="asdfasdfasdf" start="2" end="10" property="subtext" />
-		<echo message="subtext = ${subtext}" />
+		<stringSubStringJsZZZ inputstring="asdfasdfasdf" inputindexstart="2" inputindexend="10" returnstring="subtext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="substring = ${subtext}" />
+		<echo message="valuechanged = ${myReturnChanged}" />
+		<echo message="############################" />
 		
-		<stringSubStringZZZ text="asdfasdfasdf" start="0" end="1" property="subtext" />
-		<echo message="subtext = ${subtext}" />
+		
+		<stringSubStringJsZZZ inputstring="asdfasdfasdf" inputindexstart="0" inputindexend="1" returnstring="subtext" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="substring = ${subtext}" />
+		<echo message="valuechanged = ${myReturnChanged}" />
+		<echo message="############################" />
+		</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+		</trycatch>			
 	</target> 
 	
 	<target name="-myTestStringLeftBackString">
@@ -359,7 +328,6 @@
 		<echo message="############################" />
 	</target> 
 	
-	
 	<target name="-myTestStringRightString">
 		<fl:let>sScript::='-myTestStringRightString: '</fl:let>
 		
@@ -381,6 +349,45 @@
 		<echo message="############################" />
 	</target> 
 	
-	
+	<target name="-myTestStringUnencode">
+		<fl:let>sScript::='-myTestStringUnencode: '</fl:let>
+		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef stringUnencodeJsZZZ</fl:logo>
+
+		<property name="totaltext01" value="asdfasdfasdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich -->	
+		<echo message="totaltext = ${totaltext01}" />
+		
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<stringEncodeJsZZZ inputstring="${totaltext01}" returnstring="returntext01" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="returntext = ${returntext01}" />
+		<echo message="returnchanged = ${myReturnChanged}" />
+		
+		<echo message="######## Nun wieder zurueckcodieren" />
+		<stringUnencodeJsZZZ inputstring="${returntext01}" returnstring="returntext01b" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="returntextb = ${returntext01b}" />
+		<echo message="returnchanged = ${myReturnChanged}" />
+		<echo message="############################" />
+		
+		<property name="totaltext02" value="äsdfäsdfäsdf" /><!-- merke flaka ist hier nicht eingebunden, als kein fl:let moeglich -->	
+		<echo message="totaltext = ${totaltext02}" />
+		
+		<!-- Hier wird die scriptdef Methode aufgerufen -->
+		<stringEncodeJsZZZ inputstring="${totaltext02}" returnstring="returntext02" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="returntext = ${returntext02}" />
+		<echo message="returnchanged = ${myReturnChanged}" />
+		
+		<echo message="######## Nun wieder zurueckcodieren" />
+		<stringUnencodeJsZZZ inputstring="${returntext02}" returnstring="returntext02b" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+		<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		<echo message="returntextb = ${returntext02b}" />
+		<echo message="returnchanged = ${myReturnChanged}" />
+		<echo message="############################" />
+		
+	</target> 
 	
  </project>

@@ -29,53 +29,7 @@
 	  </classpath>
 	</taskdef>
 	
-	  
-
-<!-- ######## Scriptdefs #############################################-->					
-  <!-- ############################################################ -->
-	<scriptdef name="stringSubStringZZZ" language="javascript">
-	<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
-		 <attribute name="text" />
-		 <attribute name="start" />
-		 <attribute name="end" />
-		 <attribute name="property" />
-		 <![CDATA[
-		   var text = attributes.get("text");
-		   var start = attributes.get("start");
-		   var end = attributes.get("end") || text.length();
-		   project.setProperty(attributes.get("property"), text.substring(start, end));
-		 ]]>
-	</scriptdef>
-
-  <!-- ########################### -->
-	<scriptdef name="stringUnencodeJsZZZ" language="javascript">
-	<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
-	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-				Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. --> 
-	<attribute name="inputstring" />
-    <attribute name="returnstring" />
-    <attribute name="returncontrol" />	
-     <![CDATA[
-	 //TODO: Die Encoding Erweiterung in den JSZ - Kernel bringen.
-	 //TODO: Die Erweiterung endsWithPos in den JSZ - Kernel packen
-	 print("Starte stringUnencodeJsZZZ");
-	  
-	 var myString = attributes.get("inputstring");
-     //print("myString="+myString); 
-	 var myReturnControl=false;
-			  	  
-	 var myStringUnencoded=unescape(myString);	  
-	 //print("myStringUnencoded =" + myStringUnencoded);
-	   
-	 //Feedback, ob etwas geändert worden ist.	  
-	 if(myStringUnencoded!=myString){			
-		myReturnControl = true;
-	 };
-	   project.setProperty(attributes.get("returncontrol"), myReturnControl);	   	   	 			
-       project.setProperty(attributes.get("returnstring"), myStringUnencoded);
-     ]]>
-  </scriptdef>	
-	
+	 	
 <!-- ############## Hilfstargets ############################################################-->
 	<!-- ######## Hilfstargets ###########################################--> 
 <target name ="-arrayStringEscapeBackslashZZZ">
@@ -252,8 +206,9 @@
 
 	<!-- Ggfs. ist der String durch JavaScript encoded worden, dies macht z.B. arrayAppend vom mir automatisch.
 	hier also erst einmal unencoden -->	
-	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" returncontrol="bControl" />
-	<echo message="${sScript}bcontrol | mysStringUnecoded = ${bControl} | ${mysStringUnencoded}" />
+	<stringUnencodeJsZZZ inputstring="${mysString}" returnstring="mysStringUnencoded" returncontrol="myReturnControl"  returnControlString="myReturnControlString" sflagcontrol="" />
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo message="${sScript}bcontrol | mysStringUnecoded = ${myReturnControl} | ${mysStringUnencoded}" />
 	
 	<!-- Das eigentliche Escapen des Backslashs -->	
 	<!-- Aufruf des propertyregex Targets: Hier zum vervierfachen der Backslashe -->	
@@ -271,7 +226,8 @@
 		</and>
 		<then>
 			<echo message="${sScript}Encoded wiederherstellen" />
-			<stringEncodeJsZZZ inputstring="${mysString}" returnstring="mysStringEncoded" returncontrol="bcontrol" />
+			<stringEncodeJsZZZ inputstring="${mysString}" returnstring="mysStringEncoded"  returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 			<fl:let>mysString::="${mysStringEncoded}"</fl:let><!--wichtig: In Hochkommata setzen. Dadurch wird der Wert 'byValue' uebergeben-->
 		</then>
 		<else>
