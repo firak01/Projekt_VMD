@@ -1,0 +1,145 @@
+﻿ <project name="ZAnt_basic_util_datatypeZZZ"   basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+	
+<!-- ######## Scriptdefs #############################################-->			
+<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+ <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+ 
+ <!-- ########################### -->
+<scriptdef name="isBooleanZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob der Wert irgendwie boolean interpretiert werden kann. -->
+		<!-- Es werden Ausdrücke wie null, eins nicht in boolean umgesetzt.
+		
+		    In boolean umgesetzt werden:
+			- Strings 0, 1 
+			- Strings true, false
+			
+			TODO: 
+			- Zahlen 0, 1
+		-->
+			
+			
+		
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+												
+		<attribute name="valueinput" />
+		<attribute name="valuereturn" />
+		<attribute name="isboolean" />
+		<![CDATA[		   		  
+		   var bBooleanValue = null;
+		   var bIsBoolean = null;
+		   
+		   var myValueInput = attributes.get("valueinput");
+		   //print("myValueInput='"+myValueInput+"'");		   			
+			if(isNumber(myValueInput)){
+				//print("boolean liegt als Zahl vor: " + myValueInput);	
+				if (myValueInput=='1') {			   
+					bBooleanValue = true;
+					bIsBoolean = true;
+				}else if(myValueInput=='0'){
+					bBooleanValue = false;
+					bIsBoolean = true;
+				}else{
+					bBooleanValue = null;
+					bIsBoolean = false;
+				};
+			}else{			
+				//print("boolean liegt als String vor: " + myValueInput);	
+				if (myValueInput=='true') {			   
+				   bBooleanValue = true;
+				   bIsBoolean = true;
+				}else if(myValueInput=='false') {
+					bBooleanValue = false;
+					bIsBoolean = true;				
+				}else{					
+					bIsBoolean = false;
+				};			
+			}
+						
+			project.setProperty(attributes.get("valuereturn"), bBooleanValue);
+			project.setProperty(attributes.get("isboolean"), bIsBoolean);
+			
+			function isNumber(n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			}
+			
+			//TODO: Diese Funktion in JSZ-Kernel Bibliotheken packen. 
+			//TODO: In einer entsprechenden Scriptdef Funktion nutzen.
+			function convertBoolToInt()
+			{
+				var testBool = true;
+				result = (testBool)?1:0;
+				alert(result);
+			}
+		 ]]>
+	</scriptdef>
+	
+		<!-- ########################### -->
+	<scriptdef name="isSetZZZ" language="javascript">
+		<!-- Hiermit prueft man, ob der Wert irgendwie als gesetzt interpretiert werden kann. -->
+		<!-- Es werden Ausdrücke, die ${ } entsprechen als nicht gesetzt angesehen.
+		     
+		-->
+			
+		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
+		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+												
+		<attribute name="valueinput" />
+		<attribute name="valuereturn" />
+		<attribute name="isset" />
+		<![CDATA[		   		  
+		   var bIsSetValue = null;
+		   var bIsSet = null;
+		   
+		   var myValueInput = attributes.get("valueinput");
+		   //print("myValueInput='"+myValueInput+"'");		   			
+			
+			//Die ersten beiden Zeichen und das letze Zeichen prüfen.
+		    var sBeginning = myValueInput.substring(0, 2);
+			//print("ermittelter Anfang="+sBeginning);
+			
+		   enableJava();
+		   importPackage(Packages.basic.zBasic.util.datatype.string);	   			  
+		   var sEnding = StringZZZ.right(myValueInput,1);
+			//print("Per JAZ-Kernel ermitteltes Stringende (aus '" + myValueInput + "'): '" + sEnding +"'");
+			   			   
+						
+			if(sBeginning=="${" && sEnding=="}") {
+				bIsSet=false;
+			}else{
+				bIsSet=true;
+				bIsSetValue=myValueInput;
+			}
+						
+			project.setProperty(attributes.get("valuereturn"), bIsSetValue);
+			project.setProperty(attributes.get("isset"), bIsSet);
+			
+			//Todo: Diese Funktion in den JSZ Kernel packen
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+		 ]]>
+	</scriptdef>	
+	
+ </project>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?> 
-<project  name="test_DatatypeHandlingJsZZZ" default="compile" basedir=".."
+<project  name="test_MathHandlingJsZZZ" default="compile" basedir=".."
 		  xmlns:fl="antlib:it.haefelinger.flaka"
 		  xmlns:ac="antlib://net/sf/antcontrib"><!-- damit definiert man für antcontrib , bzw. FLAKA einen eigenen Namespace. Antcontrib wird hier per taskdef (siehe unten) hinzugefügt. -->
 
