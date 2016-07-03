@@ -520,7 +520,8 @@
 	<property name="vmd" value="${nothing}"/><!--Merke: In der if-Abfrage <isset property="..."></isset> funktioniert nicht immer, darum mit einer eigenen Methode prüfen -->
     <echo message="Wert fuer vmd=${vmd}"/>
 	<isSetZZZ valueinput="${vmd}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<ac:if>
 	 <equals arg1="${myBooleanValue}" arg2="true" />     
       <ac:then>
@@ -536,7 +537,8 @@
 	<property name="host" value="${nothing}"/><!--Merke: In der if-Abfrage <isset property="..."></isset> funktioniert nicht immer, darum mit einer eigenen Methode prüfen -->
     <echo message="Wert fuer host= ${host}"/>	
   	<isSetZZZ valueinput="${host}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<ac:if>
 	 <equals arg1="${myBooleanValue}" arg2="true" />
       <ac:then>
@@ -1311,7 +1313,8 @@
 												<fl:echo>2e. returnControl.Schema: '${returnControl.Schema}</fl:echo> -->
 											
 											<!-- Falls der Controller meint returnControl.Schema==true, dann hat das Schema gewechselt und damit müssen diese Anweisungen ausgeführt werden. -->																						
-												<isBooleanZZZ valueinput="${returnControl.SchemaChanged}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+												<isBooleanJsZZZ inputvalue="${returnControl.SchemaChanged}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+												<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 												<ac:if>
 												  <equals arg1="${myBooleanValue}" arg2="true" />
 												  <ac:then>		
@@ -1458,7 +1461,8 @@
 	<!-- Prüfe, ob sich das Schema geändert hat -->	
 	<isSetZZZ valueinput="${myStringCurrent.Schema}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
 	<!-- Das Ergebnis von isSetZZZ prüfen -->
-	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<!--<ac:if>
 	  <equals arg1="${myBooleanValue}" arg2="true" />
       <ac:then>		
@@ -1853,7 +1857,8 @@
 	<!-- TODO noch kaputt -->
 	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->
 	<isSetZZZ valueinput="${myRightPart}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<ac:if>
 	 <equals arg1="${myBooleanValue}" arg2="true" />     
       <ac:then>
@@ -2552,7 +2557,8 @@
 	</antcallback>	
 	<fl:let>myCaseLeft ::= "${returnString}"</fl:let>	
 
-	<isBooleanZZZ valueinput="${returnControl}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanJsZZZ inputvalue="${returnControl}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<fl:choose><!-- Merke: choose muss man verwenden, wenn man otherwise einsetzen will. -->
 		<fl:when test="${myValueIsBoolean}==true">
 			<fl:choose>
@@ -2611,7 +2617,8 @@
 			                               <!--        Kleines f, d.h. Datei existiert nicht, Verzeichnis aber. -->
 			<!-- <fl:fail message="Datei/Verzeichnis existiert NICHT: ${conf.copyLocalFilePath}"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird. Steuerungsdateien dürfen aber auch "nicht existieren". -->
 			<isFilenameRelevantVMD text="${myPart}" property="myisfilenamePart" />			
-			<isBooleanZZZ valueinput="${myisfilenamePart}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+			<isBooleanJsZZZ inputvalue="${myisfilenamePart}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 			<fl:choose>
  			<fl:when test="${myValueIsBoolean}==true">
 				<!-- <echo>When:  Ein boolean Wert wurde gefunden.</echo> -->

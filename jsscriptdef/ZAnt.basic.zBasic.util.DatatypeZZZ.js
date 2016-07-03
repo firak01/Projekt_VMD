@@ -17,5 +17,13 @@
 		 //merke: mit unescape(...) bekommt man den korrekten String wieder zurück.
 	   }
 			
-			
-			
+						
+	function convertBoolToInt()
+			{
+				//TODO: Diese Funktion in JSZ-Kernel Bibliotheken packen. 
+				//TODO: In einer entsprechenden Scriptdef Funktion nutzen.
+				var testBool = true;
+				result = (testBool)?1:0;
+				//alert(result);
+				return result;
+			}		

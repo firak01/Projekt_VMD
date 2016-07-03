@@ -130,11 +130,9 @@
 	<echo>-- true Fall -------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'true'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" />
-	<!-- TODO GOON: Das noch einbauen
-	 returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
-	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/> -->
-	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueIsBoolean = ${myValueIsBoolean} </echo>
+	<isBooleanJsZZZ inputvalue="${mytestBool}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
+	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueChanged = ${myReturnChanged} | myValueIsBoolean = ${myValueIsBoolean} </echo>
 	
 	<!-- ein wenig Hintergrundinformationen -->
 	<fl:echo>true -> nativetype = '#{nativetype(true)}'</fl:echo>
@@ -159,15 +157,17 @@
 	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
 	
 		
-	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- Anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
+	<isBooleanJsZZZ inputvalue="${myBooleanValue}" returnbooleanvalue="myBooleanValue02" returnboolean="myValueIsBoolean02"  returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueChanged = ${myReturnChanged} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
 	
 	<echo>--------------------------------------------------------------------------------------------------</echo>
 	<echo>-- false Fall ------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'false'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- Anwenden der oben definierten scriptdef funktion -->
-	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueIsBoolean = ${myValueIsBoolean} </echo>
+	<isBooleanJsZZZ inputvalue="${mytestBool}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean"  returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue = ${myBooleanValue} | myValueChanged = ${myReturnChanged} | myValueIsBoolean = ${myValueIsBoolean} </echo>
 	
 	<!-- ein wenig Hintergrundinformationen -->
 	<fl:echo>true -> nativetype = '#{nativetype(true)}'</fl:echo>
@@ -183,15 +183,17 @@
 	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
 	
 		
-	<isBooleanZZZ valueinput="${myBooleanValue}" valuereturn="myBooleanValue02" isboolean="myValueIsBoolean02" /><!-- Anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
+	<isBooleanJsZZZ inputvalue="${myBooleanValue}" returnbooleanvalue="myBooleanValue02" returnboolean="myValueIsBoolean02"  returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue02 = ${myBooleanValue02} | myValueChanged = ${myReturnChanged} | myValueIsBoolean02 = ${myValueIsBoolean02} </echo>
 		
 	<echo>--------------------------------------------------------------------------------------------------</echo>
 	<echo>----bloedsinn Fall -------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= 'bloedsinn'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueA" isboolean="myValueIsBooleanA" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<echo>es gilt: myBooleanValueA = ${myBooleanValueA} | myValueIsBooleanA = ${myValueIsBooleanA} </echo>
+	<isBooleanJsZZZ inputvalue="${mytestBool}" returnbooleanvalue="myBooleanValueA" returnboolean="myValueIsBooleanA"  returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValueA = ${myBooleanValueA} | myValueChanged = ${myReturnChanged} | myValueIsBooleanA = ${myValueIsBooleanA} </echo>
 	
 	<!-- ein wenig Hintergrundinformationen -->
 	<fl:echo>myBooleanValueA -> nativetype = '#{nativetype(${myBooleanValueA})}'</fl:echo>	<!-- Merke: Das hinterste Hochkomma wird nicht angezeigt. Flaka bricht vorher ab. -->	
@@ -207,8 +209,9 @@
 	<echo>antcallback ermittelt Wert: '${returnBooleanValue}'</echo>
 		
 	<!-- ACHTUNG: Hier wird eine nicht existierende Property an die isBooleanZZZ Funktion übergeben -->
-	<isBooleanZZZ valueinput="${myBooleanValueA}" valuereturn="myBooleanValue02A" isboolean="myValueIsBoolean02A" /><!-- anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02A = ${myBooleanValue02A} | myValueIsBoolean02A = ${myValueIsBoolean02A} </echo>
+	<isBooleanJsZZZ inputvalue="${myBooleanValueA}" returnbooleanvalue="myBooleanValue02A" returnboolean="myValueIsBoolean02A" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue02A = ${myBooleanValue02A} | myValueChanged = ${myReturnChanged} | myValueIsBoolean02A = ${myValueIsBoolean02A} </echo>
 	
 	<!-- Merke: Weil eine nicht existierende Property an die isBooleanZZZ Funktion überben wurde, ist die Auswertung besonders interessant -->
 	<!-- Auswertung der Rückgabewerte von isBooleanZZZ -->
@@ -236,43 +239,50 @@
 	<echo>---1 Fall          -------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= '1'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueB" isboolean="myValueIsBooleanB" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<echo>es gilt: myBooleanValueB = ${myBooleanValueB} | myValueIsBooleanB = ${myValueIsBooleanB} </echo>
+	<isBooleanJsZZZ inputvalue="${mytestBool}" returnbooleanvalue="myBooleanValueB" returnboolean="myValueIsBooleanB" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValueB = ${myBooleanValueB} | myValueChanged = ${myReturnChanged} | myValueIsBooleanB = ${myValueIsBooleanB} </echo>
 	
-	<isBooleanZZZ valueinput="${myBooleanValueB}" valuereturn="myBooleanValue02B" isboolean="myValueIsBoolean02B" /><!-- anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02B = ${myBooleanValue02B} | myValueIsBoolean02B = ${myValueIsBoolean02B} </echo>
+	<isBooleanJsZZZ inputvalue="${myBooleanValueB}" returnbooleanvalue="myBooleanValue02B" returnboolean="myValueIsBoolean02B" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue02B = ${myBooleanValue02B} | myValueChanged = ${myReturnChanged} | myValueIsBoolean02B = ${myValueIsBoolean02B} </echo>
 	
 	<echo>--------------------------------------------------------------------------------------------------</echo>
 	<echo>----eins Fall  ------------------------wird nicht als boolean erkannt ----------------------------</echo>
 	<fl:let>mytestBool ::= 'eins'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueC" isboolean="myValueIsBooleanC" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<echo>es gilt: myBooleanValueC = ${myBooleanValueC} | myValueIsBooleanC = ${myValueIsBooleanC} </echo>
+	<isBooleanJsZZZ inputvalue="${mytestBool}" returnbooleanvalue="myBooleanValueC" returnboolean="myValueIsBooleanC" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValueC = ${myBooleanValueC} | myValueChanged = ${myReturnChanged} | myValueIsBooleanC = ${myValueIsBooleanC} </echo>
 	
-	<isBooleanZZZ valueinput="${myBooleanValueC}" valuereturn="myBooleanValue02C" isboolean="myValueIsBoolean02C" /><!-- anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02C = ${myBooleanValue02C} | myValueIsBoolean02C = ${myValueIsBoolean02C} </echo>
+	<isBooleanJsZZZ inputvalue="${myBooleanValueC}" returnbooleanvalue="myBooleanValue02C" returnboolean="myValueIsBoolean02C" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue02C = ${myBooleanValue02C} | myValueChanged = ${myReturnChanged} | myValueIsBoolean02C = ${myValueIsBoolean02C} </echo>
 	
 	<echo>--------------------------------------------------------------------------------------------------</echo>
 	<echo>---0 Fall ----------------------------------------------------------------------------------------</echo>
 	<fl:let>mytestBool ::= '0'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueD" isboolean="myValueIsBooleanD" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<echo>es gilt: myBooleanValueD = ${myBooleanValueD} | myValueIsBooleanD = ${myValueIsBooleanD} </echo>
+	<isBooleanJsZZZ inputvalue="${mytestBool}" returnbooleanvalue="myBooleanValueD" returnboolean="myValueIsBooleanD" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValueD = ${myBooleanValueD} | myValueChanged = ${myReturnChanged} | myValueIsBooleanD = ${myValueIsBooleanD} </echo>
 	
-	<isBooleanZZZ valueinput="${myBooleanValueD}" valuereturn="myBooleanValue02D" isboolean="myValueIsBoolean02D" /><!-- anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02D = ${myBooleanValue02D} | myValueIsBoolean02D = ${myValueIsBoolean02D} </echo>
+	<isBooleanJsZZZ inputvalue="${myBooleanValueD}" returnbooleanvalue="myBooleanValue02D" returnboolean="myValueIsBoolean02D" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue02D = ${myBooleanValue02D} | myValueChanged = ${myReturnChanged} | myValueIsBoolean02D = ${myValueIsBoolean02D} </echo>
 	
 	<echo>--------------------------------------------------------------------------------------------------</echo>
 	<echo>----null Fall  -------------------------- wird nicht als boolean erkannt -------------------------</echo>
 	<fl:let>mytestBool ::= 'null'</fl:let>
 	<echo>mytestBool, String = ${mytestBool}</echo>
-	<isBooleanZZZ valueinput="${mytestBool}" valuereturn="myBooleanValueE" isboolean="myValueIsBooleanE" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<echo>es gilt: myBooleanValueE = ${myBooleanValueE} | myValueIsBooleanE = ${myValueIsBooleanE} </echo>
+	<isBooleanJsZZZ inputvalue="${mytestBool}" returnbooleanvalue="myBooleanValueE" returnboolean="myValueIsBooleanE" returnchanged="myReturnChangedE" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValueE = ${myBooleanValueE} | myValueChanged = ${myReturnChangedE} | myValueIsBooleanE = ${myValueIsBooleanE} </echo>
 	
-	<isBooleanZZZ valueinput="${myBooleanValueE}" valuereturn="myBooleanValue02E" isboolean="myValueIsBoolean02E" /><!-- anwenden der oben definierten scriptdef funktion -->	
-	<echo>es gilt: myBooleanValue02E = ${myBooleanValue02E} | myValueIsBoolean02E = ${myValueIsBoolean02E} </echo>
-	
-	
+	<isBooleanJsZZZ inputvalue="${myBooleanValueE}" returnbooleanvalue="myBooleanValue02E" returnboolean="myValueIsBoolean02E"  returnchanged="myReturnChanged02E" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+	<echo>es gilt: myBooleanValue02E = ${myBooleanValue02E} | myValueChanged = ${myReturnChanged02E} | myValueIsBoolean02E = ${myValueIsBoolean02E} </echo>
+		
 	</try>
 		<catch>
 			<echo>In &lt;catch&gt;.</echo>
