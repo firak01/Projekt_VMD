@@ -519,7 +519,8 @@
 					
 	<property name="vmd" value="${nothing}"/><!--Merke: In der if-Abfrage <isset property="..."></isset> funktioniert nicht immer, darum mit einer eigenen Methode prüfen -->
     <echo message="Wert fuer vmd=${vmd}"/>
-	<isSetZZZ valueinput="${vmd}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isSetJsZZZ inputvalue="${vmd}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<ac:if>
@@ -536,7 +537,8 @@
 	
 	<property name="host" value="${nothing}"/><!--Merke: In der if-Abfrage <isset property="..."></isset> funktioniert nicht immer, darum mit einer eigenen Methode prüfen -->
     <echo message="Wert fuer host= ${host}"/>	
-  	<isSetZZZ valueinput="${host}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+  	<isSetJsZZZ inputvalue="${host}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<ac:if>
@@ -1459,8 +1461,9 @@
 	
 
 	<!-- Prüfe, ob sich das Schema geändert hat -->	
-	<isSetZZZ valueinput="${myStringCurrent.Schema}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
-	<!-- Das Ergebnis von isSetZZZ prüfen -->
+	<isSetJsZZZ inputvalue="${myStringCurrent.Schema}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
+	<!-- Das Ergebnis von isSetJsZZZ prüfen -->
 	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<!--<ac:if>
@@ -1856,7 +1859,8 @@
 	
 	<!-- TODO noch kaputt -->
 	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->
-	<isSetZZZ valueinput="${myRightPart}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isSetJsZZZ inputValue="${myRightPart}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<ac:if>
@@ -1913,9 +1917,7 @@
 			</not>-->
 	
 		</and>
-		
-		
-		
+
 		<ac:then>		
 			<fl:echo>${sScript}Ergebnis: ${returnControl}, haenge Array an.</fl:echo>
 			<arrayAppendArrayJsZZZ arrayinput="${mysaTotal.filedir}" array2append="${mysaFiledir}" arrayReturn="myArrayTotal1" returncontrol="myReturnControl" returncontrolstring="myReturnControlString" sflagcontrol="" />

@@ -43,8 +43,7 @@
 			//Aufruf der "Arbeitsfunktion".
 			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 			var objControlCaller=new Object();
-			var objValueCaller=new Object(); //Es gibt nur call by value. Also müssen geänderte Eingabewerte per Object übergeben und geholt werden.
-			
+			var objValueCaller=new Object(); //Es gibt nur call by value. Also müssen geänderte Eingabewerte per Object übergeben und geholt werden.			
 			var bReturn = isBooleanJs(objKernelLibs, myValue, objValueCaller, objControlCaller);				
 			if(!objControlCaller.bReturnControl){									
 				bReturnControl=false;
@@ -178,7 +177,7 @@
 
      			
 			if(isNumber(myValue)){
-				print("boolean liegt als Zahl vor: " + myValue);	
+				//print("boolean liegt als Zahl vor: " + myValue);	
 				if (myValue=='1') {			   
 					bReturnBooleanValue = true;
 					bReturn = true;
@@ -190,7 +189,7 @@
 					bIsBoolean = false;
 				};
 			}else{			
-				print("boolean liegt als String vor: " + myValue);	
+				//print("boolean liegt als String vor: " + myValue);	
 				if (myValue=='true') {			   
 				   bReturnBooleanValue = true;
 				   bReturn = true;
@@ -250,66 +249,220 @@
 		 ]]>
 	</scriptdef>
 	
-		<!-- ########################### -->
-	<scriptdef name="isSetZZZ" language="javascript">
+<!-- ########################### -->
+<scriptdef name="isSetJsZZZ" language="javascript">
 		<!-- Hiermit prueft man, ob der Wert irgendwie als gesetzt interpretiert werden kann. -->
-		<!-- Es werden Ausdrücke, die ${ } entsprechen als nicht gesetzt angesehen.
-		     
-		-->
-			
-		<!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->			
-		<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
-					Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
-												
-		<attribute name="valueinput" />
-		<attribute name="valuereturn" />
-		<attribute name="isset" />
-		<![CDATA[		   		  
-		   var bIsSetValue = null;
-		   var bIsSet = null;
-		   
-		   var myValueInput = attributes.get("valueinput");
-		   //print("myValueInput='"+myValueInput+"'");		   			
-			
-			//Die ersten beiden Zeichen und das letze Zeichen prüfen.
-		    var sBeginning = myValueInput.substring(0, 2);
-			//print("ermittelter Anfang="+sBeginning);
-			
-		   enableJava();
-		   importPackage(Packages.basic.zBasic.util.datatype.string);	   			  
-		   var sEnding = StringZZZ.right(myValueInput,1);
-			//print("Per JAZ-Kernel ermitteltes Stringende (aus '" + myValueInput + "'): '" + sEnding +"'");
-			   			   
-						
-			if(sBeginning=="${" && sEnding=="}") {
-				bIsSet=false;
-			}else{
-				bIsSet=true;
-				bIsSetValue=myValueInput;
+		<!-- Es werden Ausdrücke, die ${ } entsprechen als nicht gesetzt angesehen. -->
+									
+		<attribute name="inputvalue" />
+		<attribute name="returnvalue" />
+		<attribute name="returnboolean" />
+		
+		<attribute name="returncontrol" />
+		<attribute name="returncontrolstring" />
+		<attribute name="returnchanged" />
+		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen realisieren. -->	    
+     <![CDATA[	
+		//print("Starte isSetJsZZZ");
+			  	
+	    var myValue = attributes.get("inputvalue");
+		//print("myValue='"+myValue+"'");		   
+	   
+	    //Aufruf der "Arbeitsfunktion".
+		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
+		var objControlCaller=new Object();
+		var objValueCaller=new Object(); //Es gibt nur call by value. Also müssen geänderte Eingabewerte per Object übergeben und geholt werden.			
+		var bReturn = isSetJs(objKernelLibs, myValue, objValueCaller, objControlCaller);				
+		if(!objControlCaller.bReturnControl){									
+			bReturnControl=false;
+			bReturnChanged=false;
+			sReturn="";
+			iReturn=-1;
+		}else{					
+		}	
+		//print("objControlCaller.bReturnChanged="+objControlCaller.bReturnChanged);
+		if(!(objControlCaller.bReturnChanged==undefined) && !(objControlCaller.bReturnChanged==null)){
+			bReturnChanged = objControlCaller.bReturnChanged;
+		}else{
+			bReturnChanged = null;
+		}		
+		var myReturnValue=objValueCaller.myValue;
+		//print("bReturnValue="+myReturnValue);		
+		if(myReturnValue!=null && myReturnValue!=undefined) project.setProperty(attributes.get("returnvalue"), myReturnValue);
+		
+		//print("bReturnChanged="+bReturnChanged);
+		bReturnControl=objControlCaller.bReturnControl;
+		sReturnControl=objControlCaller.sReturnControl;
+					
+		//project.setProperty(attributes.get("returnstring"), sReturn);				
+		//project.setProperty(attributes.get("returnarraystring"),arrReturn);
+		project.setProperty(attributes.get("returnboolean"), bReturn);
+		//project.setProperty(attributes.get("returninteger"), iReturn);
+		
+	   	   						
+		//### START SNIPPET 01 ################################################################
+		if(attributes.get("returncontrol")!=null){ project.setProperty(attributes.get("returncontrol"),bReturnControl); 	}
+		if(attributes.get("returncontrolstring")!=null){ project.setProperty(attributes.get("returncontrolstring"),sReturnControl); }
+		if(attributes.get("returnchanged")!=null){ project.setProperty(attributes.get("returnchanged"),bReturnChanged); 	}
+		
+		//###################################################################
+        //### KERNEL LIBS HINZUFÜGEN
+        //###################################################################			
+		function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){				
+			var sScript = "enableKernelAntJs: ";
+			try{
+				if(objKernelLibs==undefined || objKernelLibs==null){
+					var err = new Error("objKernelLibs nicht deklariert.");
+					throw err;
+				}
+				if(sDirSubDefault==undefined || sDirSubDefault==null){				
+					sDirSubDefault="jsscriptdef";
+				}else if(sDirSubDefault.trim()==''){
+					sDirSubDefault="jsscriptdef";
+				}
+				eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verf�gung gestellt werden.
+									
+				var objControlCaller=new Object();
+				usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+				if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+					
+				bReturnControl=true;
+				sReturnControl=sScript+"Alles o.k.";
+				bReturn=true;
+			}catch(err){	
+				//#### SIMPLES ERROR HANDLING #######
+				print(sScript+"Fehler gefangen: " + err);
+				bReturnControl=false;
+				sReturnControl=sScript+"Fehler. "+ err;					
 			}
-						
-			project.setProperty(attributes.get("valuereturn"), bIsSetValue);
-			project.setProperty(attributes.get("isset"), bIsSet);
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;
+			return bReturn;
+		}
+		//### ENDE SNIPPET 01 ################################################################
 			
-			//Todo: Diese Funktion in den JSZ Kernel packen
-			function enableJava(){
-			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
-			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
-			   - ....
-			*/
-			
-				//zu Testzwecken:
-				//var version = java.lang.System.getProperty("java.version");
-				//print("Java Version:" + version);
-				
-				//var test = java.lang.System.getProperty("java.class.path");
-				//println("classpath="+test);
-				
-				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+		//######################################################################################################
+		function isSetJs(objKernelLibs, myValue, objValue, objControl){	
+			var bReturn=false;
+			var bIsSetValue=null;
+	  
+			//###START SNIPPET 02 ###################################################################################################################			
+			//IN JEDER FUNKTION DAS LADEN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG	
+			//######################################################################################################################
+			var sScript=null;
+			var bKernelInitialised=true;
+			var bReturnControl=false;
+			var sReturnControl="Fehler";	
+			var bReturnChanged=null;
+			try{				
+					if(objKernelLibs==undefined || objKernelLibs==null)	throw new Error("Keine Kernel Ant Js Libs uebergeben.");
+					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+						//print("Noch keine Kernel Ant Js Libs vorhanden zum Laden, lade sie jetzt.");
+							
+						var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
+						var objControlCallerKernel=new Object();
+						var bReturn = enableKernelAntJs(objKernelLibs, sDirRepositoryJsscriptdef, objControlCallerKernel);			
+						if(!objControlCallerKernel.bReturnControl) throw new Error(objControlCallerKernel.sReturnControl);	
+					}
+					
+					//print("Eval Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["ALIAS"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						//funktioniert: 
+						try{
+							eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+							//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+						}catch(errEval){
+							//#### SIMPLES ERROR HANDLING FUER KONKRETE BIBLIOTHEK #######
+							//print("Fehler gefangen fuer JS-Bibliothek: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);	
+                            throw new Error("Fehler gefangen fuer JS-Bibliothek mit Alias: "+objKernelLibs[i]["ALIAS"] + " - "  + errEval);					
+						}	
+					}				
+					enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
+					var objControlCaller = new Object();
+					sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
+					
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING VOR SCRIPT ERMITTLUNG #######
+					print("Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl="Fehler. "+ err;
+					bKernelInitialised=false;
+				}
 				try{
-					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
-				}catch(e){}
+					if(bKernelInitialised){						
+						main:{			
+							//print(sScript + "START");								
+							//print("###ENDE SNIPPET 02 ###################################################");
+			
+							if(myValue==undefined || myValue==null){
+								bReturnControl=true;
+								sReturnControl="Eingabewert nicht vorhanden";
+								break main;
+							}
+							
+							//Die ersten beiden Zeichen und das letze Zeichen prüfen.
+							var sBeginning = myValue.substring(0, 2);
+							//print("ermittelter Anfang="+sBeginning);
+			
+							enableJava();
+							importPackage(Packages.basic.zBasic.util.datatype.string);	   			  
+							var sEnding = StringZZZ.right(myValue,1);
+							//print("Per JAZ-Kernel ermitteltes Stringende (aus '" + myValue + "'): '" + sEnding +"'");
+			   			   						
+							if(sBeginning=="${" && sEnding=="}") {
+								bReturn=false;
+							}else{
+								bReturn=true;
+								bIsSetValue=myValue;
+							}
+											
+							//In dieser Funktion sinnvoll? Behalte das erst einmal bei, damit ist es flexibler hinsichtlich ggfs. notwendiger Erweiterungen.
+							//Feedback, ob etwas geändert worden ist.	  
+						   if(myValue!=bIsSetValue){			
+								bReturnChanged = true;
+								//print(sScript + "VALUE CHANGED");	
+							}else{			
+								bReturnChanged = false;
+								//print(sScript + "VALUE NOT CHANGED");	
+							};								
+							sReturnControl="Alles o.k.";
+							bReturnControl=true;
+														
+					//print("### START SNIPPET 03 ###################################################");
+					//print(sScript + "ENDE");								
+					} //end main:
+				}//end if bKernelInitialised
+			}catch(err){	
+				//#### ERROR HANDLING #######				
+				print(sScript+"Fehler gefangen: " + err);
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. " + err;					
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl=false;
+					sReturnControl=sScript + myErrorString;				
+				}catch(e){
+					//#### ERROR HANDLING IM ERRORHANDLING #######
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript + "Fehler im ErrorHandling. "+ e;
+				}
 			}
+			//print(sScript+bReturnControl+" | " + sReturnControl);
+			objControl.bReturnControl=bReturnControl;
+			objControl.sReturnControl=sReturnControl;
+			objControl.bReturnChanged=bReturnChanged;
+            //### ENDE SNIPPET 03 ###########################################################			
+		       	   
+		    objValue.myValue=bIsSetValue;
+			return bReturn;	   
+		}
 		 ]]>
 	</scriptdef>	
 	

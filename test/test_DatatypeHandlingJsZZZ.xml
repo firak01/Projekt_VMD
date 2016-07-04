@@ -34,7 +34,7 @@
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
  <!-- <target name="compile" depends="-myTestIsBoolean,-myTestIsSet"> -->
- <target name="compile" depends="-myTestIsBoolean">
+ <target name="compile" depends="-myTestIsSet">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -115,16 +115,13 @@
 	<!-- TODO: Ein Untertarget machen, in dem über paramter die Variablen übergeben werden. 
 	                  Dann dieses Target in einer Schleife aufrufen, für die einzelnen Testwerte.
                       Die Testwerte kämen dann aus einem Array.  -->
-					  
-	<!-- TODO: Den Test auf den Boolean-Wert in eine zentrale Unterfunktion auslagern, wie ? -->
-	
 		
 	<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
 	<trycatch property="myError" reference="myErrorObject">
 	<try>		
 		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
 		<fl:logo>${sScript}
-		Meine Loesung: Scriptdef stringLeftBackStringJsZZZ</fl:logo>
+		Meine Loesung: Scriptdef isBooleanJsZZZ</fl:logo>
 	
 	<echo>--------------------------------------------------------------------------------------------------</echo>
 	<echo>-- true Fall -------------------------------------------------------------------------------------</echo>
@@ -296,13 +293,27 @@
   
 <!-- ######################################################### -->  
 <target name="-myTestIsSet">
-	<fl:logo>myTestIsSet</fl:logo>
+	<fl:let>sScript::='-myTestIsSet: '</fl:let>
+	<!-- Merke: Eine Funktion true(...) funktioniert in Ant gar nicht. gibt´s gar nicht, weiss nicht woher sie kommen soll ! -->
+	<!-- Merke2: <fl:fail message="blablabla"/> --><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+		
+	<!-- Wende hier von antcontrib den try...catch mechanismus an. -->
+	
+	<!-- TODO/BEACHTE:
+	     Vergleiche die Stellen an denen isSet funktioniert (ausserhalb des antcallback vs. innerhalb des antcallbacks -->
+	
+	<trycatch property="myError" reference="myErrorObject">
+	<try>		
+		<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+		<fl:logo>${sScript}
+		Meine Loesung: Scriptdef isSetJsZZZ</fl:logo>
+	
 	
 	<echo>- isset: Normale, funktioniert ----------------------------------------------------</echo>
 	<property name="controlstring" value="${nothing}"/>
 	<echo message="Wert fuer controlstring=${controlstring}"/>
 	<ac:if>
-      <isset property="controlstring"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <isset property="controlstring"/>
       <ac:then>
 		<fl:let>myControlstring::="${controlstring}"</fl:let>
 		<echo>Property gesetzt. MyControlstring=${myControlstring}</echo>
@@ -315,7 +326,7 @@
 	
 	<echo>- isset, ohne dass die Property deklariert worden ist, funktioniert auch. --------</echo>	
 	<ac:if>
-      <isset property="neverever"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
+      <isSet property="neverever"/><!-- Merke: An dieser Stelle (ausserhalb des antcallback) funktioniert isset wieder. -->
       <ac:then>	
 		<echo>Property gesetzt. neverever=${neverever}</echo>
 	  </ac:then>
@@ -328,10 +339,12 @@
 	<echo>- teste isSetZZZ: false Fall ---------- </echo>
 	<property name="myProperty" value="${nothing}"/>
 	<echo message="Wert fuer myProperty=${myProperty}"/>
-	<isSetZZZ valueinput="${myProperty}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isSetJsZZZ inputvalue="${myProperty}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	
 	<!-- Das Ergebnis von isSetZZZ prüfen -->
-	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	<ac:if>
 	  <equals arg1="${myBooleanValue}" arg2="true" />
       <ac:then>		
@@ -346,10 +359,12 @@
 	<echo>- teste isSetZZZ: true Fall ---------- </echo>
 	<property name="myProperty02" value="etwasGesetztes"/>
 	<echo message="Wert fuer myProperty02=${myProperty02}"/>
-	<isSetZZZ valueinput="${myProperty02}" valuereturn="myIsSetValue" isset="myValueIsSet" /><!-- anwenden der oben definierten scriptdef funktion -->
-	
+	<isSetJsZZZ inputvalue="${myProperty02}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+		
 	<!-- Das Ergebnis von isSetZZZ prüfen -->
-	<isBooleanZZZ valueinput="${myValueIsSet}" valuereturn="myBooleanValue" isboolean="myValueIsBoolean" /><!-- anwenden der oben definierten scriptdef funktion -->
+	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
+	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
 	<ac:if>
 	  <equals arg1="${myBooleanValue}" arg2="true" />
       <ac:then>		
@@ -366,6 +381,16 @@
 	
 	<echo>-----------------------------------------------------------------------------------</echo>
 	
+	
+	</try>
+		<catch>
+			<echo>In &lt;catch&gt;.</echo>
+			<echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo>
+		</catch>
+		<finally>
+			<echo>In &lt;finally&gt;.</echo>
+		</finally>
+		</trycatch>	
  </target>
  
  </project>

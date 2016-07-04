@@ -27,3 +27,26 @@
 				//alert(result);
 				return result;
 			}		
+		
+		
+/*Prüft, ob etwas ein Array ist */
+function isArray(obj) {
+   if (obj.constructor.toString().indexOf("Array") == -1)
+      return false;
+   else
+      return true;
+}
+
+    //aus JSZ-Kernel		
+	function isEmpty( objIn ) {
+	if ( null == objIn || "" == objIn ) {
+		 return true;
+		  }
+		  
+	 if(isArray(objIn)){
+	 	if(objIn.length<= -1 ){
+	 		return true;
+	 	}
+	 }	  
+	 return false;
+ }
