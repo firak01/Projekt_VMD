@@ -1,0 +1,264 @@
+﻿ <project name="zAnt_custom_zProject_vmd_MachineRessourceZZZ"   basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+	
+<!-- ######## Scriptdefs #############################################-->			
+<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+ <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+ 
+ <!-- ########################### -->
+<target name="-computeFilenameVMD">
+		<!-- Ermittle den Dateinamen für VMD-Datei, unabhaengig davon ob auf Client oder Hostmaschine. -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		<fl:let>myPathClientUsed::="${pathClientUsed}"</fl:let>
+	
+	<!-- Auf dem Host und auf einem VMWare Clientrechner unterscheiden sich die Dateien in ihrer Namensstruktur.
+	     Daher erst prüfen, ob man auf einem Client- oder auf einem Hostrechner ist. -->
+		 	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
+	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->		
+	<antcallback target="-isHostVMD" return="returnControl,returnBoolean">
+				<param name="dirPathClient" value="${myPathClientUsed}"/>				
+	</antcallback>
+	<echo message="Ergebnis'isHostVMD' = ${returnBoolean}" />	 
+	<ac:if>
+		<ac:equals arg1="${returnBoolean}" arg2="true" />
+		<ac:then>
+			<fl:echo>Hostrechner identifiziert.</fl:echo>
+			
+			<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
+			<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+			<antcallback target="-computeFilenameHostVMD" return="returnFilename">
+				<param name="osUsed" value="${myOsUsed}"/>					
+			</antcallback>	
+			<fl:let>myFilename::="${returnFilename}"</fl:let>
+		</ac:then>
+		<ac:else>
+			<fl:echo>Ggfs VMware Client auf Host identifiziert.</fl:echo>
+			<!-- Prüfe, um sicherzugehen auch das mit einem Target ab. -->
+			<!-- TODO GOON: Hole den Hostnamen aus einer rechnerspezifischen Konfiguration -->
+			<antcallback target="-isClientVMD" return="returnControl,returnBoolean">
+					<param name="dirPathClient" value="${myPathClientUsed}"/>				
+					<param name="hostUsed" value="${myHostUsed}"/>				
+			</antcallback>
+			<ac:if>
+				<ac:equals arg1="${returnBoolean}" arg2="true" />
+				<ac:then>
+					<fl:echo>VMware Client auf Host Rechner bestätigt.</fl:echo>
+				 
+					<!-- TODO GOON: Den Hostnamen in der Konfigurationsdatei hinterlegen -->
+					<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
+						<param name="osUsed" value="${myOsUsed}"/>					
+						<param name="hostUsed" value="${myHostUsed}"/>	
+					</antcallback>				 
+					<fl:let>myFilename::="${returnFilename}"</fl:let>
+				</ac:then>
+				<ac:else>
+					<fl:echo>VMware Client auf Host Rechner NICHT bestätigt.</fl:echo>
+					<fl:fail message="UNGEPLANTER VORZEITIGER SICHERHEITSABBRUCH: Konfiguration pruefen."/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+				</ac:else>
+			</ac:if>			
+		</ac:else>
+	</ac:if><!-- Pruefung auf isHost -->
+
+			<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
+ 
+ <!-- ########################### -->	
+<target name="-computeFilenameHostVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:let>myFilename::="FGL${myOsUsed}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
+	
+ <!-- ########################### --> 	
+<target name="-computeFilenameClientHostNamedVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myOsUsed::="${osUsed}"</fl:let>
+		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
+		
+		<fl:install-property-handler />
+		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+		
+		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:let>myFilename::="VM_FGL${myOsUsed}_${env.COMPUTERNAME}_${myHostUsed}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+ 
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnFilename" value="${myFilename}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
+	</target>
+ 
+ <!-- ############################################################ -->		
+	<scriptdef name="isFilenameRelevantVMD" language="javascript">
+		 <attribute name="text" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   //Überprüft, ob der eingegebenen Dateiname ein vom VMD zu verarbeitender Dateiname ist.
+		   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
+		   var text = attributes.get("text");
+		   var berg=false;
+		   print("Starte isFilenameRelevantVMD '" + text + "'");
+
+		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
+		   //      Dies ggfs. in JSZ-Kernel uebernehmen
+		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
+		   
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   enableJava();
+		   importPackage(Packages.basic.zBasic.util.file);
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   var sEnding = FileEasyZZZ.getNameEnd(text);
+		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + text + "'): '" + sEnding +"'");
+		   
+		   //Hier die für VMD relevanten Dateiendungen erfassen.
+		   if(sEnding=="txt"){		   
+			berg =true;
+		   }
+		   if(berg==true){	
+			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt relevant.");
+			}else{
+			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt NICHT relevant.");
+			}
+		   project.setProperty(attributes.get("property"), berg);	
+
+		   function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}		   
+		 ]]>
+	</scriptdef>
+	
+ <!-- ############################################################ -->
+<target name="-isHostVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
+		<fl:let>returnBoolean::=false</fl:let>			
+		<fl:let>returnControl::=false</fl:let>
+				
+		<!-- Den Dateinamen tatsächlich berechnen -->
+		<!-- <fl:install-property-handler /> Das ist in Untertargets nicht erlaubt!!! -->
+		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+		</antcallback>
+		<echo message="errechneter Dateiname = ${returnFilename}" />
+				
+		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
+		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
+		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
+		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
+  
+		<fl:choose>
+			<fl:when test=" '${vmdClientFilePath}'.tofile.exists == true ">
+			<echo>Client Verzeichnis Host-VMD-Datei existiert: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=true</fl:let>
+		</fl:when>
+		<otherwise>
+			<echo>Client Verzeichnis Host-VMD-Datei existiert NICHT: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=false</fl:let>
+		</otherwise>
+	</fl:choose>
+    <fl:let>returnControl::=true</fl:let>		
+		
+		
+		
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnControl" value="${returnControl}" />
+		<ac:var name="returnBoolean" value="${returnBoolean}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
+	</target>
+	
+ <!-- ############################################################ -->
+<target name="-isClientVMD">
+		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
+		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
+		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
+		<fl:let>returnBoolean::=false</fl:let>			
+		<fl:let>returnControl::=false</fl:let>
+				
+		
+				
+		<!-- Den Dateinamen tatsächlich berechnen -->
+		<!-- <fl:install-property-handler /> Das ist in Untertargets nicht erlaubt!!! -->
+		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+		
+		<!-- 3. Ermittle die Indexposition, den Dateinamen und den Dateipfad -->	
+		<!-- TODO IDEE: Dieses in einen Dateibehandlungs Scriptdef packen -->
+		<!-- von der Anzahl der Werte -1 abziehen, um den Index zu bekommen -->
+		<var name="op1" value="${mysaTotal.sFilename.iSize}"/>
+		<var name="op2" value="1"/>
+		<var name="op" value="-"/>
+		<math result="iubound" operand1="${op1}" operation="${op}" operand2="${op2}" datatype="int"/>
+		<echo>${sScript}Errechneter ubound Wert des Arrays: ${iubound}</echo>
+	
+		
+		<echo>VMD_OS= ${env.VMD_OS}</echo>
+		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
+					<param name="osUsed" value="${osUsed}"/>					
+					<param name="hostUsed" value="${myHostUsed}"/>	
+		</antcallback>
+		<echo message="errechneter Dateiname = ${returnFilename}" />
+				
+		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
+		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
+		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
+		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
+		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
+  
+		<fl:choose>
+			<fl:when test=" '${vmdClientFilePath}'.tofile.exists == true ">
+			<echo>Client Verzeichnis Host-VMD-Datei existiert: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=true</fl:let>
+		</fl:when>
+		<otherwise>
+			<echo>Client Verzeichnis Host-VMD-Datei existiert NICHT: ${vmdClientFilePath}</echo>
+			<fl:let>returnBoolean::=false</fl:let>
+		</otherwise>
+	</fl:choose>
+    <fl:let>returnControl::=true</fl:let>		
+		
+		
+		
+		<!-- Rueckgabebwerte -->			
+		<ac:var name="returnControl" value="${returnControl}" />
+		<ac:var name="returnBoolean" value="${returnBoolean}" />
+		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
+	</target>
+ 
+
+ </project>

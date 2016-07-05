@@ -1,0 +1,281 @@
+﻿ <project name="zAnt_basic_util_file_FileEasyZZZ"   basedir=".."
+	xmlns:ac="antlib://net/sf/antcontrib"
+	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
+	
+<!-- ######## Scriptdefs #############################################-->			
+<!-- ### ScriptDefs, u.a für die Stringverarbeitung, MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem wg. der Übersicht die Camelcase Variante beibehalten. ###-->
+<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in der eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten.
+			Bei den Attributen, die in den Tags verwendet werden, funktioniert nur Kleinschreibung. -->
+ <!-- Merke: Da scheinbar kein 'call by reference' gemacht wird, muss ein geänderter Wert als neue Variable zurückgegeben werden.-->		
+ 
+ <!-- ########################### -->
+
+ 
+ <!-- ############################################################-->	
+	<scriptdef name="getFilenameFromPathJsZZZ" language="javascript">
+		 <attribute name="pathstring" />
+		 <attribute name="returnfilename" />
+		 <attribute name="returncontrol" />
+		 <attribute name="returnacontrolstring" />
+		 <attribute name="sflagcontrol" />
+		 <![CDATA[
+		   //Hole aus dem angegebenen Dateipfad den Dateinamen
+		   var sPath = attributes.get("pathstring");
+		   
+		   var berg=false;
+		   var myArrayErg = new Array();
+		   var myFlagControl = attributes.get("sflagcontrol");
+		   
+		   print("Starte getFilenameFromPathZZZ '" + sPath + "'");
+
+		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
+		   //      Dies ggfs. in JSZ-Kernel uebernehmen
+		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
+		   
+		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
+		   enableJava();
+		   importPackage(Packages.basic.zBasic.util.file);
+		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
+		   
+		   //var test = java.lang.System.getProperty("java.class.path");
+		   //println("classpath="+test);
+		   
+		   //var sFilename = FileEasyZZZ.getNameOnly(sPath);
+		   //print("Per JAZ-Kernel ermittelter Dateiname (aus '" + sPath + "'): '" + sFilename +"'");
+		   
+		   var objFile = FileEasyZZZ.getFile(sPath);
+		   //var sDirectoryName = objFile.getParent(); //Holt aus dem Dateinamen den Verzeichnisnamen.
+		   var sFilename = objFile.getName(); //Holt aus dem Pfad den reinen Dateinamen.
+		   
+		   //Hier Rueckgabewert anhand gelungener Dateinamensermittlung
+		   if(sFilename!=""){		   
+			berg =true;
+			myArrayErg[0]="alles o.k.";
+		   }else{
+			berg = false;
+			myArrayErg[0]="alles o.k.";
+		   }
+		   
+		  
+		   project.setProperty(attributes.get("returnfilename"), sFilename);	
+		   project.setProperty(attributes.get("returncontrol"), berg);	
+		   project.setProperty(attributes.get("returnacontrolstring"), myArrayErg);
+
+		   function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}		   
+		 ]]>
+	</scriptdef>
+	
+	<!-- ############################################################ -->		
+	<scriptdef name="isDirectoryZZZ" language="javascript">
+		 <attribute name="text" />
+		 <attribute name="property" />
+		 <![CDATA[
+		   enableJava();
+		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist Package notwendig
+		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
+		   var text = attributes.get("text");
+		   //print ("start isDirectoryZZZ for: '" + text +"'");
+		   //var fd = new java.io.File(text);
+		   var fd = new File(text);
+		   var berg = false;
+		   if(fd.exists()){
+		   if (fd.isDirectory()) {
+			   //print(fd.getPath()+" => js true");
+		       berg = true;
+			} else {
+				//print(fd.getPath()+" =>js false");
+				berg = false;
+			}
+			}else{
+				//print(fd.getPath()+" =>js not existing!");
+			}
+			project.setProperty(attributes.get("property"), berg);
+			
+			function enableJava(){
+			/* Diese Funktion stellt alles bereit, um von JavaScript aus auf Java zuzugreifen.
+			   - Stelle Kompatibilität zu Java 7 (Rhino) her, um importPackage, importClass nutzen zu können, die es im neuen Java 8 (Nashorn) nicht gibt.
+			   - ....
+			*/
+			
+				//zu Testzwecken:
+				//var version = java.lang.System.getProperty("java.version");
+				//print("Java Version:" + version);
+				
+				//var test = java.lang.System.getProperty("java.class.path");
+				//println("classpath="+test);
+				
+				//Merke: Damit wird auch unter Java 8 (Nashorn) die alte Java 7 (Rhino) Funktionalität bereitgestellt.
+				try{
+					load("nashorn:mozilla_compat.js"); //Das wirft ausser in Java 8 einen Fehler.
+				}catch(e){}
+			}
+		 ]]>
+	</scriptdef>
+	
+	<!-- ########################### -->
+	<!-- MERKE: GROSS-/Kleinschreibung ist bei den Tagnamen wichtig! Trotzdem in den eingesetzten -ZZZ Funktionen wg. der Übersicht die Camelcase Variante beibehalten. -->
+	<scriptdef name="isFileRootJsZZZ" language="javascript">
+     <attribute name="inputfilepath" />
+     <attribute name="returnboolean" />
+	 <attribute name="returncontrol" />
+	 <attribute name="returncontrolstring" />
+     <![CDATA[
+			var myFilepath = attributes.get("inputfilepath");
+			
+			var sReturn=""; 
+			var bReturn=false; //Wird hier nicht zurueckgegeben
+			var bReturnControl=false;
+			var sReturnControl="Fehler";
+		
+			//Die benoetigten Kernel-Funktionen laden
+			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
+			var objKernelLibs = new Array();
+			var objControlCaller=new Object();
+			var bReturn = enableKernelAntJs(objKernelLibs,"", objControlCaller);
+			if(!objControlCaller.bReturnControl){								
+				bReturn=false;
+				sReturn="";
+			}else{										
+				bReturn=isFileRootZZZ(objKernelLibs,myFilepath, objControlCaller);		
+				if(!objControlCaller.bReturnControl){									
+					bReturn=false;
+					sReturn="";
+				}else{										
+				}
+			}	
+			bReturnControl=objControlCaller.bReturnControl;
+			sReturnControl=objControlCaller.sReturnControl;
+			project.setProperty(attributes.get("returnboolean"),bReturn);
+			//project.setProperty(attributes.get("returnstring"),sReturn);
+			project.setProperty(attributes.get("returncontrol"),bReturnControl);
+			project.setProperty(attributes.get("returncontrolstring"),sReturnControl);
+
+			//###################################################################
+            //#### KERNEL LIBS HINZUFÜGEN
+            //###################################################################			
+			function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){			
+				var sScript = "enableKernelAntJs: ";
+				try{
+					if(objKernelLibs==undefined || objKernelLibs==null){
+						var err = new Error("objKernelLibs nicht deklariert.");
+						throw err;
+					}
+					if(sDirSubDefault==undefined || sDirSubDefault==null){				
+						sDirSubDefault="jsscriptdef";
+					}else if(sDirSubDefault.trim()==''){
+						sDirSubDefault="jsscriptdef";
+					}
+					eval('' + org.apache.tools.ant.util.FileUtils.readFully(new java.io.FileReader( '../'+sDirSubDefault+'/ZAnt.basic.zBasic.HandleKernelZZZ.js' )) ); //Zentrale Funktion, in der alle anderen Bibliotheken zur Verfügung gestellt werden.
+										
+					var objControlCaller=new Object();
+					usedKernelAntLibJs(objKernelLibs, sDirSubDefault, objControlCaller); //Rufe die zentrale Funktion auf, um die weiteren Bibliotheken einubinden.
+					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);	
+						
+					bReturnControl=true;
+					sReturnControl=sScript+"Alles o.k."
+					bReturn=true;
+				}catch(err){	
+					//#### SIMPLES ERROR HANDLING #######
+					//print("Fehler gefangen: " + err);
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler. "+ err;					
+				}
+				objControl.bReturnControl=bReturnControl;
+				objControl.sReturnControl=sReturnControl;
+				return bReturn;
+			}
+	 
+	 //####################################################
+	 function isFileRootZZZ(objKernelLibs, myFilepath, objControl){
+		 var sScript = "isFileRootZZZ: ";
+		//var sReturn="nixnix"; 
+		var bReturn=false;
+		var bReturnControl=false;
+		var sReturnControl="Fehler";	
+		try{															
+			//IN JEDER FUNKTION DAS LADERN DER FUNKTIONEN PER EVAL AUSFUEHREN, SONST STEHEND DIE FUNKTIONEN NICHT ZUR VERFUEGUNG					
+			if(objKernelLibs==undefined || objKernelLibs==null){
+				print("Keine Kernel Ant Js Libs uebergeben.");
+			} else {						
+				if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
+					print("Keine Kernel Ant Js Libs vorhanden zum Laden");
+				} else {
+					print("Loading Kernel Ant Js Libs: " + objKernelLibs.length);
+					for (var i = 0; i < objKernelLibs.length; i++) { 	
+						//print("Lib: " + objKernelLibs[i]["Alias"]);					
+						//print("LOADINGSTRING: " + objKernelLibs[i]["LOADINGSTRING"]);
+						//funktioniert: 
+						eval(''+objKernelLibs[i]["LOADER"]); //Loader-String einsetzen.
+						//funktioniert nicht, is ein bissl zuviel: eval(objKernelLibs[i]["CODEEXECUTED"]);
+					}
+				}
+			}
+			print("#######################");								
+			enableJava();
+		   
+		   //Allgemein für Import Statements gilt:
+		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist 'Package' notwendig
+		   //                                                                  //Bei Klassen, die aus dem BasisJava stammen darf 'Package' nicht verwendet werden:    importClass(java.io.File);
+	 
+		   // import statements. Es funktionieren beide Wege. a) Packagename b) Klassenname
+			importClass(Packages.basic.zBasic.ExceptionZZZ);
+			importPackage(Packages.basic.zBasic.util.file);
+	 
+			//###########################
+			 //#### EINGABE ######	 
+			var myFilepath = attributes.get("inputfilepath");
+			//print("myFilepath="+myFilepath);
+			
+			//#### Java, etc.
+			bReturn = FileEasyZZZ.isRoot(myFilepath);
+			//print("bReturn="+bReturn);
+			sReturnControl=sScript+"Alles o.k.";
+			bReturnControl=true;			
+		}catch(err){	
+				print("Fehler gefangen: " + err);
+				//#### SIMPLES ERROR HANDLING #######							
+				//bReturnControl=false;
+				//sReturnControl=sScript+"Fehler. "+ err;	
+
+				//#### ERROR HANDLING #######
+				try{																
+					//Wende Funktion an, zur Ermittlung der aktuellen Funktion
+					var objControlErrh=new Object();//wichtig: Neues ErrorControl Objekt.										
+					var myErrorString = handleError(err,objControlErrh);
+					if(!objControlErrh.bReturnControl) throw new Error(sScript + objControlErrh.sReturnControl);										
+					bReturnControl = false;
+					sReturnControl= myErrorString;				
+				}catch(e){
+					print(e);					
+					bReturnControl=false;
+					sReturnControl=sScript+"Fehler im ErrorHandling. "+ e;
+				}
+			}
+			
+			//#### RÜCKGABE #####
+			objControl.sReturnControl=sReturnControl;				
+			objControl.bReturnControl=bReturnControl;
+			return bReturn;	
+	}//End function isFileRootZZZ
+			
+	      ]]>
+  </scriptdef>
+
+ </project>
