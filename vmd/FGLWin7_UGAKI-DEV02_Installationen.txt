@@ -1,0 +1,28 @@
+### Android Entwicklungsumgebung (in Paderborn)
+
+
+20160805: Autologon aktiviert
+
+20160731: Treiber für Netzwerkkarte installiert
+201607XX: Per Acronis auf dem UGAKI-Rechner übertragen (war ein bissl kompliziert wg UEFI => nicht UEFI)
+201607XX: Auf dem Patton Rechner ein Backup erstellt.
+
+20160531: Updates Win7 eigespielt: Update KB3133977 "Update für windows 7 für X64 bsierte Systeme" ausgelassen, wg. Probleme beim Boot ASUS & UEFI.
+20160531: Image auf neuer Platte wiederhergestellt. 
+
+20160525: VMware Converter 
+20160524: VMware Converter 6.1 deinstalliert, weil Maschine auf dem Zielhost nicht starten konnte (Maschinentyp <= 8 als Ziel).
+20160427: VMware Converter 6.1 installiert und physikalische Maschine in VM konvertiert.
+
+20140602: GitHub Repository für Buch "Programming Android (O'Reilley 2013)" erstellt und erste Projekte nach Eclipse importiert und zum Laufen gebracht.
+20140601: Einen Android - Emulator erstellt, der WhatsApp kann.
+
+20140530: Android Studio 0.5x installiert. Das von der GitHub auf den Desktop geklonte Projekt nicht in Eclipse zum Laufen gebracht. Nach Import des Projekts über Gradle.build im Android Studion aber schon.
+
+20140529: Gradle Plugin für Eclipse installiert. ANROID_HOME Benutzervariable auf C:\java\Android\android gesetzt.
+20140528: GitHub für Windows installiert (von der GitHub Seite)
+20140527: EGit in Eclipse Installiert. HOME BenutzerUmgebungsvariable auf c:\1fgl\ gesetzt, damit die Konfiguration dort gespeichert wird.
+
+20140428: Teamviewer installiert, WakeOnLAN installiert.
+20140427: JavaSDK1.7 installiert, Eclipse Luna installiert, Android SDK installiert, Android Plugin für Eclipse installiert.
+20140427: Installation aus einem Acronis-Backup erstellt.
