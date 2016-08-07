@@ -1,6 +1,10 @@
 ### Android Entwicklungsumgebung (in Paderborn)
 
 
+20160807: 7zip installiert
+20160806: Andorid Projekte ausgechecked
+20160805: PROJEKT_VMD ausgechecked
+20160805: Ant installiert, JAVA_HOME, und ANT_HOME Umgebungsvariablen gesetzt 
 20160805: Autologon aktiviert
 
 20160731: Treiber für Netzwerkkarte installiert
