@@ -1,5 +1,9 @@
 ### Android Entwicklungsumgebung
 
+20160809: Android Toolkit Manager: Updaten der ADT Version, so dass sie mit "AndMore" arbeiten kann.
+20160809: Eclipse Pugin "AndMore" in anderer Eclipse Umgebung installiert
+20160809: Erstellen von Repository und neuer Eclipse Umgebung für das Buch "Android Cookbook"
+
 20160726: Erstellen von Umgebungsvariablen ANT_HOME, ANT_ARGS, JAVA_HOME (dabei auf ein SDK Java verweisen)
 20160726: Entpacken von Apache Ant nach Java
 20160726: Auschecken von Git'Hub das VMD-Projekt
