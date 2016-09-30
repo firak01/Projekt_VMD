@@ -1,5 +1,11 @@
 ### Android Entwicklungsumgebung
 
+20160930: Installation von Packer 7zip
+
+20160922: Installation eines neueren Treibers für AMD Radeon Grafikkarte 7700 HD
+20160922: Android SDK - HAXM installiert (soll Emulatoren auf Intel CPUs unterstützen)
+20160922: Image erstellt und neu auf andere Platte gespiegelt
+
 20160809: Android Toolkit Manager: Updaten der ADT Version, so dass sie mit "AndMore" arbeiten kann.
 20160809: Eclipse Pugin "AndMore" in anderer Eclipse Umgebung installiert
 20160809: Erstellen von Repository und neuer Eclipse Umgebung für das Buch "Android Cookbook"
