@@ -1,4 +1,11 @@
-### Android Entwicklungsumgebung (in Paderborn)
+### Android Entwicklungsumgebung (UGAKI-DEV02, in Paderborn)
+
+20161007: Engergenie Installiert für LAN (und USB)
+20161002: Eclipse - AndMore Plugin installiert (nach Anleitung aus meiner Doku Datenbank)
+
+20160924: Android SDK aktualisiert
+20160924: AVAST Antivirus installiert
+20160828: BACKUP IMAGE erstellt
 
 20160807: Winword 2010 neu über das Internet aktiviert
 20160807: 7zip installiert
