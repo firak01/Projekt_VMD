@@ -2,6 +2,11 @@
 
 #########################################################
 
+20161014: Grafikakrten Treiber AMD HR 5400 installiert V 15... aus 2015, außer "Gaming Evolved App"
+
+20160907: Image erstellt und hier wiederhergestellt
+20160813: 7zip Installiert
+
 20160520: Spiel "Wargame - AirLand Battle" installiert mit Produktschlüssel: WKR7B-LA24J-4L43Z-8GZ8X-2ATFF
 
 20160328: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
