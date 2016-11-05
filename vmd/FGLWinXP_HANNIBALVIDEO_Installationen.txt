@@ -1,0 +1,31 @@
+--- Maschine zur Aufnahme von Videos über TV-USB-Karte
+--- Videoschnitt mit AVIdemux
+--- Videoarchivierung über USB Festplatten
+--- GIMP zum Bildeditieren
+
+20161104: Installation von Windows XP Support Tools (wg. Program setx.exe für VMD Projekt)
+20161104: Java 7 JDK und Apache instaliert
+20161104: Mit GitGUI das VMD Projekt Repository erstellt
+20161104: Installiert für das VMD PRojekt - TortoiseGit-1.7.2.0-32bit.msi (und das XP Path auf 1.8.12.0), Git-1.7.4-preview20110204.exe
+
+20161029: Energenie wohl nur über den WLAN Stick erreichbar, warum?
+20161028: ShudownRestart und ShutdownCancel Links erstellt.
+
+20161006: Image erstellt und und auf 500GB Festplatte gespielt
+20161005: SCS101 wieder in Beteribe genommen (an Engergenie LAN Version)
+
+20160909: WakeOnLan für Alarich eingerichtet
+20160828: Mini USB-WLAN-Stick installiert (7 Links)
+          FritzTV eingerichtet, TELEKOM_FON eingerichtet (wenn der Gigabit - Switch ausfällt, hoffe ich so noch den Rechner steuern zu können)
+20160828: Energienie neu installiert (LAN Version) Wenn man die Datenban behält, kann man sowohl USB als auch LAN verwenden.
+
+
+20160319 BIOS Änderung und neue Batterie
+         Wenn der Strom weg ist, ist das BIOS so eingestellt, dass der Rechner neu startet.
+         ABER: Wenn die BIOS Batterie leer ist (oder die Kontakte nicht richtig sitzen)
+               ist diese BIOS Einstellung weg und er der Rechner startet nicht mehr automatisch.
+         Dito ist ohne Batterie auch die notwendige Einstellung für 
+         - WAKE ON LAN  weg
+         - USB 
+         - Plug & Play OS
+20140325 IE8 - WinXP Updates
