@@ -1,0 +1,54 @@
+### Aufnahmerecorder, VMWareServer
+
+TODO: WINTV Aufnahmen in höherer Qualität testen
+TODO: schien zu klappen 20160405: Installation Software für Trendnet TE100-MP2U
+
+TODO: VMD Projekt einrichen.
+20161103: Installation von GitGUI für Windows und Tortoise Git (für WinXP)
+20161103: Installation von JAva 7 JDK und Apache Ant
+
+20161019: Installation von Ulead Photo Explorer 6.0
+
+20161019: Installation von Philips PCVC 730k WebCam 
+          (Kann über Systemsterung/Kameras/Philips... und dann mit Rechtsclick darauf verwendet werden zum Screenshot erstellen)
+          (Kann von Teamviewer als Video verwendet werden)
+
+20160822: Image erstellt und auf dieser Platte wiederhergestellt.
+
+20160607: ACHTUNG: auvisio PC2TV NICHT installieren. Danach funktioniert Haupauge TV nicht mehr.
+
+20160517: Verzeichnis c:\Server verschoben nach c:\1fgl\server. Dies in den Batches und den Links zum starten/stoppen aktualisiert. Sowie in den "autologon" Scripten.
+20160407: Windows: Netzwerkstatus. Netzwerkkarte - Konfigurieren: Deaktiviere "bei Link Änderung"!!! sonst schaltet er sich wg. der Zeitschaltuhr am Router ein.
+20160407: BIOS: Für Wake On LAN. Aktiviere: Einschalten per PCI Karte, Einschalten per externem Modem. 
+20160405: Image erstellt
+20160405: Umbenannt in SCIPIO-PRV
+
+20160330: Power Manager Software installiert füer PMS2 LAN
+          Tool LAN Find funktioniert erst mit der neuesten Version 6.0.0.22.
+
+20160323: Power DVD installiert.
+
+20160323: Externer DVD Brenner. Brenngeschwindigkeit nur 8x
+		Erweiterte InstallationsCD für Hauppage gebrannt
+20160315: Nero Burning Rom installiert
+
+20160310: Image erstellt
+
+20161008: Download und installation des Codec Packs for Windows.
+
+20160208: WinTV Fehlermeldung behoben bei Scheduler Aufnahme
+          "StartEncoder .... no data"
+          Lösung durch download von Microsoftseite von Deccheck.exe
+          Dort die Decoder auflisten lassen und folgenden Decoder als Default einstellen, trotz Warnung:
+          "InterVideo NonCSS Video Decoder for Hauppauge" ACHTUNG: Soll nicht MP10 Compatible sein.
+
+20160116: WinTV Kabelsuchlauf mit Einstellung "Cable(HRC)"
+20160115: WinTV installiert. 
+          Installation nur mit eingelegter Original CD. 
+          
+20160101: Firefox als Browser installiert und mit meinem Account verbunden.
+2015: Ghost 2003 installiert. PCDos Systemdiskette und erstes Backup. Wiederherstellung auf Wechselplatte.
+2015: VMWare Server 1 installiert.
+2015: Windows XP ist nicht updatebar
+2015: Teamviewer 6 installiert, als Service
+
