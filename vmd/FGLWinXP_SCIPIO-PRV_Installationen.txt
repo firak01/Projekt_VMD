@@ -3,7 +3,8 @@
 TODO: WINTV Aufnahmen in höherer Qualität testen
 TODO: schien zu klappen 20160405: Installation Software für Trendnet TE100-MP2U
 
-TODO: VMD Projekt einrichen.
+20161107: VMD_PROJEKT einrichten
+20161107: Installation von Support Tools für WinXP. Setx.exe wird bereitgestellt für VMD_PROJEKT.
 20161103: Installation von GitGUI für Windows und Tortoise Git (für WinXP)
 20161103: Installation von JAva 7 JDK und Apache Ant
 
