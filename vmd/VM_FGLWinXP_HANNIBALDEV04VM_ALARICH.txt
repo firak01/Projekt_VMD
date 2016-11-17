@@ -1,5 +1,5 @@
 ---- Synchron halten mit DEV05
----- Entwicklungsumgebung von "KernelZZZ", "ScheduledFileArchiveZZZ"
+---- Entwicklungsumgebung von "KernelZZZ", "VideoInternetArchive", "ScheduledFileArchiveZZZ"
 
 ##### Lotus Notes Client 8.53, Für Arbeit mit Foren, Tips, etc. eingerichtet.
             ABER: Die Dateien bleiben auf dem fgl02 - Server und werden nicht lokal repliziert (Platz sparen)
