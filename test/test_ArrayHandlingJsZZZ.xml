@@ -2,7 +2,9 @@
 <project name="tryoutAnt_FlakaListHandling"   default="compile" basedir=".."
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka"><!-- damit definiert man für FLAKA einen eigenen Namespace -->
-	
+	 <!-- ### Notepad++ Hotkeys:
+        ALT + 0, ALT +1, .... XML Tags der Ebene zusammenklappen. -->
+    
 	<!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
 	<!--     Die Definiton von basedir in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
@@ -12,7 +14,17 @@
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_ArrayZZZ.xml"/>
 	<import file="../scriptdef/ZAnt_basic_zBasic_util_test_HelperZZZ.xml"/>
 	
-		
+	  <!-- ### Einbinden von Ant-Contrib ### -->
+   <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
+	<!--    <taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+		<pathelement location="lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	 <taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" />
+	 <taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="${basedir}/../lib/ant-contrib-1.0b3.jar" /> -->
+	
 	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
 	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
 	<!-- gebraucht wird das z.B. für den <for> </for> Task. -->
