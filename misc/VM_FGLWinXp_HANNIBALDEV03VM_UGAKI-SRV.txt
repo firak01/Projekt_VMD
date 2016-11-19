@@ -2,6 +2,7 @@
 ### Eclipse 3.22
          Aktuelle Entwicklungsumgebung von KernelZZZ und VideoArchiv mit Java Version 1.6 für Domino 8 Server
          Workspace zum Buch "Graphic Java - Das AWT beherrschen".
+        ABER: Nur Lotus Notes 7 als Client heir installiert (verwende als Notes Client 8 die HannibalDEV05VM Umgebung)
          
 ---     Eclipse 3.3 WTP
 	Workspace zum Buch "SOA using Java WebServices"
