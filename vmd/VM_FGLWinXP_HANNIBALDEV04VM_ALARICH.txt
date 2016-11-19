@@ -34,8 +34,9 @@
         --- Fatjar und Subversion Plugin
         --- Workspace mit Kernel V2.0 (angebunden an Subversion)
 ####################################################################
+20171119: Überschreibe fehlerhaften Commit von HANNIBALDEV03VM_UGAKI
 20161117: Einrichten der Firefox-Profile PRV und DEV
-20161108:Installation der SUpport Tools für WinXP, wg. setx.exe, benötigt vom VMD_PROJEKT
+20161108: Installation der SUpport Tools für WinXP, wg. setx.exe, benötigt vom VMD_PROJEKT
 
 20151027: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
 
