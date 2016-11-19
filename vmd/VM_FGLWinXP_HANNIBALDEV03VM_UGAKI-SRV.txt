@@ -12,7 +12,7 @@
 Alte Javaprojekte für Albis und die Sparkassn Informatik
 
 #####################################################
-20161119: GitUpdate debugged und lauffähig gemacht
+20161119: GitUpdate debugged und lauffähig gemacht.
 20161104: Installation von Windows XP Support Tools (wg. setx.exe)
 
 20151108: Installation von Git für Windows XP und Erzeugen des repositories für projektVMD
