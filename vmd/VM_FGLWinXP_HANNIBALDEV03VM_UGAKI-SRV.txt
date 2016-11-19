@@ -1,14 +1,27 @@
---- Synchron halten mit HannibalDEV02BVM auf dem Notebook
-#########################################################
-	Eclipse 3.22
-        --- Aktuelle Entwicklungsumgebung von KernelZZZ und VideoArchiv mit Java Version 1.6 für Domino 8 Server
-        --- Workspace zum Buch "Graphic Java - Das AWT beherrschen".
+--- Synchron halten mit HannibalDEV02VM auf dem Notebook
+### Eclipse 3.22
+         Aktuelle Entwicklungsumgebung von KernelZZZ und VideoArchiv mit Java Version 1.6 für Domino 8 Server
+         Workspace zum Buch "Graphic Java - Das AWT beherrschen".
+        ABER: Hier nur Lotus Notes 7 als Client installiert (verwende als Notes Client 8 die HannibalDEV05VM Umgebung)
          
-	Eclipse 3.3 WTP
-	--- Workspace zum Buch "SOA using Java WebServices"
+---     Eclipse 3.3 WTP
+	Workspace zum Buch "SOA using Java WebServices"
 
-Alte Javaprojekte für Albis und die Sparkassen Informatik
-######################################################
+
+
+Alte Javaprojekte für Albis und die Sparkassn Informatik
+
+#####################################################
+20161119: GitUpdate debugged und lauffähig gemacht
+20161104: Installation von Windows XP Support Tools (wg. setx.exe)
+
+20151108: Installation von Git für Windows XP und Erzeugen des repositories für projektVMD
+20151108: Notepad++ mit Erweiterungen compare, explorer, xml tools
+         
+
+2014-06-17: Java7 für Browser installiert mit jxpinstall.exe
+
+2014-06-13: Acrobat Reader 11 installiert.
 2014-06-11: Java 7 SDK installiert
 
 2014-03-15: Ist mit neuesten Updates von der Windows Update Seite versehen
