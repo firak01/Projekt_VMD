@@ -2,17 +2,22 @@
 <project name="test_vmdRelevant"   default="compile" basedir=".."
 	xmlns:ac="antlib://net/sf/antcontrib"
 	xmlns:fl="antlib:it.haefelinger.flaka">
-	 <!-- damit definiert man für antcontrib einen eigenen Namespace -->
-   <!-- damit definiert man für FLAKA einen eigenen Namespace -->
-
-    <!-- ### Notepad++ Hotkeys:
+	 <!-- ### Notepad++ Hotkeys:
         ALT + 0, ALT +1, .... XML Tags der Ebene zusammenklappen. -->
     
-   	<!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
-	<!--     Die Definiton von basedr in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
+	<!-- ### Einbinden der ZKernel - Ant Bibliotheken. Darin liegen die Scriptdefs an einer zentralen Stelle. ### -->
+	<!--     Die Definiton von basedir in diesem aufrufenden Projekt hat scheinbar keine Auswirkung. Man muss ../ davorsetzen. -->
 	<!--     Erstellt man in diesem importierenden Projekt ein importiertes Target, so wird das importierte Target überschrieben. -->
-	<!--<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_arrayZZZ.xml"/>-->
-   
+	<import file="../scriptdef/ZAnt_basic_zBasic_ExceptionZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_string_StringArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_datatype_ArrayZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_basic_zBasic_util_test_HelperZZZ.xml"/>
+	<import file="../scriptdef/ZAnt_custom_zProject_vmd_MachineRessourceZZZ.xml"/>
+	
+	<!-- damit definiert man für antcontrib einen eigenen Namespace -->
+	<!-- damit definiert man für FLAKA einen eigenen Namespace -->
+      
    <!-- ### Einbinden von Ant-Contrib ### -->
    <!-- ### Einbinden von Ant-Contrib, wenn man die verschiedenene Tasks mit einem eigenenen Namen versehen möchte, z.B. <if-contrib> verwenden statt <if> ### -->
 	<!--    <taskdef resource="net/sf/antcontrib/antlib.xml">
@@ -26,565 +31,19 @@
  
 	<!-- ### Einbinden von Ant-Contrib, hierbei muss man die Task-Namen so wählen, wie sie in der ant-contrib Doku benannt sind ### -->
 	<!--        Der Vorteil ist, das man mit der einen Deklaration alle Tasks nutzen kann, der Nachteil ist, man kann keinen 'namespace' faken -->
+	<!-- gebraucht wird das z.B. für den <for> </for> Task. -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 	  <classpath>
 		<pathelement location="${basedir}/lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
 	
-<!-- ######## Scriptdefs ############################################################################--> 
-
-	<!-- ############################################################ -->		
-	<scriptdef name="isFilenameRelevantVMD" language="javascript">
-		 <attribute name="text" />
-		 <attribute name="property" />
-		 <![CDATA[
-		   //Überprüft, ob der eingegebenen Dateiname ein vom VMD zu verarbeitender Dateiname ist.
-		   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
-		   var text = attributes.get("text");
-		   var berg=false;
-		   print("Starte isFilenameRelevantVMD '" + text + "'");
-
-		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
-		   //      Dies ggfs. in JSZ-Kernel uebernehmen
-		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
-		   
-		   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-		   importPackage(Packages.basic.zBasic.util.file);
-		   
-		   //var test = java.lang.System.getProperty("java.class.path");
-		   //println("classpath="+test);
-		   
-		   var sEnding = FileEasyZZZ.getNameEnd(text);
-		   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + text + "'): '" + sEnding +"'");
-		   
-		   //Hier die für VMD relevanten Dateiendungen erfassen.
-		   if(sEnding=="txt"){		   
-			berg =true;
-		   }
-		   if(berg==true){	
-			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt relevant.");
-			}else{
-			print("Dateiendung '" + sEnding +"' ist fuer das VMD Projekt NICHT relevant.");
-			}
-		   project.setProperty(attributes.get("property"), berg);				
-		 ]]>
-	</scriptdef>
-	
-	<!-- ############################################################ -->		
-	<scriptdef name="isFileVmdHostOnHostVMD" language="javascript">
-		 <attribute name="stringinput" />
-		 <attribute name="booleanreturn" />
-		 <![CDATA[
-		   //Überprüft, ob der eingegebenen Dateiname von der Struktur her dem Dateinamen einer Hostdatei entspricht.
-		   //Beispiel: FGLWin81_HIS4528_Installationen.txt		   
-		   var myString = attributes.get("stringinput");
-		   var berg=false;
-		   print("Starte isHostVMD '" + myString + "'");
-		   main:{
-		        berg = isFileVmdHostOnHostVMD(myString);		   
-		   }//end main:
-
-			//Rueckgabewerte
-		   project.setProperty(attributes.get("booleanreturn"), berg);	
-
-			//##################################################################
-			function isFileVmdHostOnHostVMD(myString){
-				var bReturn = false;			
-				main:{			
-				   //1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
-				   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-				   importPackage(Packages.basic.zBasic.util.file);
-				   
-				   //var test = java.lang.System.getProperty("java.class.path");
-				   //println("classpath="+test);
-				   
-				   var sEnding = FileEasyZZZ.getNameEnd(myString);
-				   print("Per JAZ-Kernel ermittelte Dateiendung - aus '" + myString + "': '" + sEnding +"'");
-				   
-				   //Hier die für VMD relevanten Dateiendungen erfassen.
-				   if(sEnding=="txt"){		   
-					bReturn=true;
-				   }else{
-					 bReturn=false;
-				   };
-				   if(bReturn==true){	
-					print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
-					}else{
-					print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
-					break main;
-					}
-					
-					
-					//2. Pruefe ob am Anfang FGL steht.
-					//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-				   importPackage(Packages.basic.zBasic.util.datatype.string);
-				   
-				   //var test = java.lang.System.getProperty("java.class.path");
-				   //println("classpath="+test);
-				   
-				   var sBeginning = StringZZZ.left(myString,3);
-				   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
-				   
-				   //Hier die für VMD relevanten Dateiendungen erfassen.
-				   if(sBeginning=="FGL"){		   
-					bReturn=true;
-				   }else{
-					bReturn=false;
-				   }
-				   if(bReturn==true){	
-					print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
-					}else{
-					print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
-					break main;
-					}			
-					
-					
-				//3. Anzahl Unterstriche
-				var iUnderlineFound = StringZZZ.countChar(myString,"_");
-				if(iUnderlineFound==2){													
-				bReturn=true;
-				}else{
-				bReturn=false;
-				}
-				
-				if(bReturn==true){
-				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==2, d.h. kann durchaus VMD-Datei des Host selber sein.");
-				}else{
-				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==2, d.h. kann keine VMD-Datei des Host selber sein.");
-				break main;
-				}				
-					
-				//4. Endet der Dateiname mit dem eingebenen/benannten Hostnamen?
-				var sNameOnly = FileEasyZZZ.getNameOnly(myString);
-				print("Per JAZ-Kernel ermittelter reiner Dateiname - aus '" + myString + "': '" + sNameOnly +"'");
-			    var sEnding = StringZZZ.rightback(sNameOnly, "_");
-				if(sEnding=="Installation"){
-					bReturn=true;
-				}else{
-					bReturn=false;
-				}
-								
-				if(bReturn==true){
-				print("Dateiendung '" + sEnding + "' kann durchaus VMD-Datei des Host selber sein.");
-				}else{
-				print("Dateiendung '" + sEnding + "' kann keine VMD-Datei des Host selber sein - Erwartet: 'Installation'.");
-				break main;
-				}
-					
-				}//end main:
-				return bReturn;
-			}
-		 ]]>
-	</scriptdef>
-
-	<!-- ############################################################ -->		
-	<scriptdef name="isFileVmdClientOnHostVMD" language="javascript">
-		 <attribute name="stringinput" />
-		 <attribute name="booleanreturn" />
-		 <![CDATA[
-		   //Überprüft, ob der eingegebenen Dateiname von der Struktur her dem Dateinamen einer Hostdatei entspricht.
-		   //Wichtig ist, dass die Überprüfung auf ein Hostnamenssuffix entfällt.		   
-		   //Beispiel: VM_FGLWin7_Ugaki-SRV.txt		   
-		   var myString = attributes.get("stringinput");
-		   var berg=false;
-		   print("Starte isFileVmdOnHostVMD '" + myString + "'");
-		   main:{
-			berg=isFileVmdClientOnHostVMD(myString);			
-		   }//end main:
-
-			//Rueckgabewerte
-		   project.setProperty(attributes.get("booleanreturn"), berg);				
-		   
-	//###############################################################################
-			function isFileVmdClientOnHostVMD(myString){
-				var bReturn = false;			
-				main:{	
-			
-				//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
-			   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-			   importPackage(Packages.basic.zBasic.util.file);
-			   
-			   //var test = java.lang.System.getProperty("java.class.path");
-			   //println("classpath="+test);
-			   
-			   var sEnding = FileEasyZZZ.getNameEnd(myString);
-			   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
-			   
-			   //Hier die für VMD relevanten Dateiendungen erfassen.
-			   if(sEnding=="txt"){		   
-				bReturn=true;
-			   }else{
-				 bReturn=false;
-			   }
-			   if(bReturn==true){	
-				print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
-				}else{
-				print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
-				break main;
-				}
-				
-				
-				//2. Pruefe ob am Anfang VM_ steht.
-				//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-			   importPackage(Packages.basic.zBasic.util.datatype.string);
-			   
-			   //var test = java.lang.System.getProperty("java.class.path");
-			   //println("classpath="+test);
-			   
-			   var sBeginning = StringZZZ.left(myString,3);
-			   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
-			   
-			   //Hier den für VMD relevanten Dateianfang erfassen.
-			   if(sBeginning=="VM_"){		   
-				bReturn=true;
-			   }else{
-				bReturn=false;
-			   }
-			   if(bReturn==true){	
-				print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
-				}else{
-				print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
-				break main;
-				}
-				
-				//3. Zähle die Unterstriche				
-				var iUnderlineFound = StringZZZ.countChar(myString,"_");
-				if(iUnderlineFound==3){													
-				bReturn=true;
-				}else{
-				bReturn=false;
-				}
-				
-				if(bReturn==true){
-				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann durchaus VMD-Datei auf dem Host sein.");
-				}else{
-				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann keine VMD-Datei auf dem Host sein.");
-				break main;
-				}					  
-				
-				}//end main:
-				return bReturn;
-			}
-		 ]]>
-	</scriptdef>
-	
-	<!-- ############################################################ -->		
-	<scriptdef name="isFileVmdClientOnHostNamedVMD" language="javascript">
-		 <attribute name="stringinput" />
-		 <attribute name="hostinput" />
-		 <attribute name="booleanreturn" />
-		 <![CDATA[
-		   //Überprüft, ob der eingegebenen Dateiname von der Struktur her dem Dateinamen einer Hostdatei entspricht.
-		   //Wichtig ist, dass die Überprüfung auf ein Hostnamenssuffix entfällt.		   
-		   //Beispiel: VM_FGLWin7_Ugaki-SRV.txt		   
-		   var myString = attributes.get("stringinput");
-		   var myHost = attributes.get("hostinput");
-		   var berg=false;
-		   print("Starte isFileVmdClientOnHostNamedVMD '" + myString + "' fuer Host '" + myHost + "'");
-		   main:{
-			berg=isFileVmdClientOnHostNamedVMD(myString,myHost);			
-		   }//end main:
-
-			//Rueckgabewerte
-		   project.setProperty(attributes.get("booleanreturn"), berg);				
-		   
-     //#############################################################################
-	 	function isFileVmdClientOnHostVMD(myString){
-				var bReturn = false;			
-				main:{	
-			
-				//1. Pruefe die Dateiendung (Code siehe isFilenameRelevantVMD )
-			   //Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-			   importPackage(Packages.basic.zBasic.util.file);
-			   
-			   //var test = java.lang.System.getProperty("java.class.path");
-			   //println("classpath="+test);
-			   
-			   var sEnding = FileEasyZZZ.getNameEnd(myString);
-			   print("Per JAZ-Kernel ermittelte Dateiendung (aus '" + myString + "'): '" + sEnding +"'");
-			   
-			   //Hier die für VMD relevanten Dateiendungen erfassen.
-			   if(sEnding=="txt"){		   
-				bReturn=true;
-			   }else{
-				 bReturn=false;
-			   }
-			   if(bReturn==true){	
-				print("Dateiendung '" + sEnding +"' kann durchaus VMD-Datei sein.");
-				}else{
-				print("Dateiendung '" + sEnding +"' kann keine VMD-Datei sein.");
-				break main;
-				}
-				
-				
-				//2. Pruefe ob am Anfang VM_ steht.
-				//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-			   importPackage(Packages.basic.zBasic.util.datatype.string);
-			   
-			   //var test = java.lang.System.getProperty("java.class.path");
-			   //println("classpath="+test);
-			   
-			   var sBeginning = StringZZZ.left(myString,3);
-			   print("Per JAZ-Kernel ermittelte Dateianfang (aus '" + myString + "'): '" + sBeginning +"'");
-			   
-			   //Hier den für VMD relevanten Dateianfang erfassen.
-			   if(sBeginning=="VM_"){		   
-				bReturn=true;
-			   }else{
-				bReturn=false;
-			   }
-			   if(bReturn==true){	
-				print("Dateianfang '" + sBeginning +"' kann durchaus VMD-Datei sein.");
-				}else{
-				print("Dateianfang '" + sBeginning +"' kann keine VMD-Datei sein.");
-				break main;
-				}
-				
-				//3. Zähle die Unterstriche				
-				var iUnderlineFound = StringZZZ.countChar(myString,"_");
-				if(iUnderlineFound==3){													
-				bReturn=true;
-				}else{
-				bReturn=false;
-				}
-				
-				if(bReturn==true){
-				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann durchaus VMD-Datei auf dem Host sein.");
-				}else{
-				print("Anzahl Unterstriche im Dateinamen '" + iUnderlineFound +"'. Erwartet ==3, d.h. kann keine VMD-Datei auf dem Host sein.");
-				break main;
-				}					  
-				
-				}//end main:
-				return bReturn;
-			}
-		   
-	//###############################################################################
-			function isFileVmdClientOnHostNamedVMD(myString,myHost){
-				var bReturn = false;			
-				main:{	
-					bReturn = isFileVmdClientOnHostVMD(myString);
-					if(!bReturn) break main;
-					
-					//4. Endet der Dateiname mit dem eingebenen/benannten Hostnamen?				
-					//Hier wird aber eine schon vorhandene JAZ-Kernel Methode verwendet.
-					importPackage(Packages.basic.zBasic.util.file);
-			  
-					var sNameOnly = FileEasyZZZ.getNameOnly(myString);				
-					print("Per JAZ-Kernel ermittelter reiner Dateiname - aus '" + myString + "': '" + sNameOnly +"'");				
-					var sEnding = StringZZZ.right(sNameOnly, "_");	
-					//print("Dateiteil hinter _: '" + sEnding + "' und Hostname: '" + myHost + "'"); 				
-					if(sEnding==myHost){
-						bReturn=true;
-					}else{
-						bReturn=false;
-					}
-				
-					if(bReturn==true){
-						print("Dateiteil hinter _: '" + sEnding + "' kann durchaus VMD-Datei fuer den Host '" + myHost + "' sein.");
-					}else{
-						print("Dateiteil hinter _: '" + sEnding + "' kann keine VMD-Datei fuer den Host '" + myHost + "' sein.");
-						break main;
-					}
-				}//end main:
-				return bReturn;
-			}
-		 ]]>
-	</scriptdef>
-	
-	
-	<!-- ######## Targets ############################################################################--> 	
-<target name="-computeFilenameVMD">
-		<!-- Ermittle den Dateinamen für VMD-Datei, unabhaengig davon ob auf Client oder Hostmaschine. -->
-		<fl:let>myOsUsed::="${osUsed}"</fl:let>
-		<fl:let>myPathClientUsed::="${pathClientUsed}"</fl:let>
-	
-	<!-- Auf dem Host und auf einem VMWare Clientrechner unterscheiden sich die Dateien in ihrer Namensstruktur.
-	     Daher erst prüfen, ob man auf einem Client- oder auf einem Hostrechner ist. -->
-		 	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
-	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->		
-	<antcallback target="-isHostVMD" return="returnControl,returnBoolean">
-				<param name="dirPathClient" value="${myPathClientUsed}"/>				
-	</antcallback>
-	<echo message="Ergebnis'isHostVMD' = ${returnBoolean}" />	 
-	<ac:if>
-		<ac:equals arg1="${returnBoolean}" arg2="true" />
-		<ac:then>
-			<fl:echo>Hostrechner identifiziert.</fl:echo>
-			
-			<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7UGAKI-SRV_Installationen.txt -->
-			<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
-			<antcallback target="-computeFilenameHostVMD" return="returnFilename">
-				<param name="osUsed" value="${myOsUsed}"/>					
-			</antcallback>	
-			<fl:let>myFilename::="${returnFilename}"</fl:let>
-		</ac:then>
-		<ac:else>
-			<fl:echo>Ggfs VMware Client auf Host identifiziert.</fl:echo>
-			<!-- Prüfe, um sicherzugehen auch das mit einem Target ab. -->
-			<!-- TODO GOON: Hole den Hostnamen aus einer rechnerspezifischen Konfiguration -->
-			<antcallback target="-isClientVMD" return="returnControl,returnBoolean">
-					<param name="dirPathClient" value="${myPathClientUsed}"/>				
-					<param name="hostUsed" value="${myHostUsed}"/>				
-			</antcallback>
-			<ac:if>
-				<ac:equals arg1="${returnBoolean}" arg2="true" />
-				<ac:then>
-					<fl:echo>VMware Client auf Host Rechner bestätigt.</fl:echo>
-				 
-					<!-- TODO GOON: Den Hostnamen in der Konfigurationsdatei hinterlegen -->
-					<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
-						<param name="osUsed" value="${myOsUsed}"/>					
-						<param name="hostUsed" value="${myHostUsed}"/>	
-					</antcallback>				 
-					<fl:let>myFilename::="${returnFilename}"</fl:let>
-				</ac:then>
-				<ac:else>
-					<fl:echo>VMware Client auf Host Rechner NICHT bestätigt.</fl:echo>
-					<fl:fail message="UNGEPLANTER VORZEITIGER SICHERHEITSABBRUCH: Konfiguration pruefen."/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
-				</ac:else>
-			</ac:if>			
-		</ac:else>
-	</ac:if><!-- Pruefung auf isHost -->
-
-			<!-- Rueckgabebwerte -->			
-		<ac:var name="returnFilename" value="${myFilename}" />
-		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
-	</target>
-	
-<!-- ######## Targets ############################################################################--> 	
-<target name="-computeFilenameHostVMD">
-		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
-		<fl:let>myOsUsed::="${osUsed}"</fl:let>
-		
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-		
-		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
-		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
-		<fl:let>myFilename::="FGL${myOsUsed}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-
-		<!-- Rueckgabebwerte -->			
-		<ac:var name="returnFilename" value="${myFilename}" />
-		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
-	</target>
- 
- <!-- ######## Targets ############################################################################--> 	
-<target name="-computeFilenameClientHostNamedVMD">
-		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
-		<fl:let>myOsUsed::="${osUsed}"</fl:let>
-		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
-		
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-		
-		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
-		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
-		<fl:let>myFilename::="VM_FGL${myOsUsed}_${env.COMPUTERNAME}_${myHostUsed}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-
-		<!-- Rueckgabebwerte -->			
-		<ac:var name="returnFilename" value="${myFilename}" />
-		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->	
-	</target>
-
-
-	
- <!-- ######## Targets ############################################################################--> 	
- <target name="-isHostVMD">
-		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
-		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
-		<fl:let>returnBoolean::=false</fl:let>			
-		<fl:let>returnControl::=false</fl:let>
-				
-		<!-- Den Dateinamen tatsächlich berechnen -->
-		<!-- <fl:install-property-handler /> Das ist in Untertargets nicht erlaubt!!! -->
-		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
-		<echo>VMD_OS= ${env.VMD_OS}</echo>
-		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
-					<param name="osUsed" value="${osUsed}"/>					
-		</antcallback>
-		<echo message="errechneter Dateiname = ${returnFilename}" />
-				
-		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
-		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
-		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
-		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
-		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
-  
-		<fl:choose>
-			<fl:when test=" '${vmdClientFilePath}'.tofile.exists == true ">
-			<echo>Client Verzeichnis Host-VMD-Datei existiert: ${vmdClientFilePath}</echo>
-			<fl:let>returnBoolean::=true</fl:let>
-		</fl:when>
-		<otherwise>
-			<echo>Client Verzeichnis Host-VMD-Datei existiert NICHT: ${vmdClientFilePath}</echo>
-			<fl:let>returnBoolean::=false</fl:let>
-		</otherwise>
-	</fl:choose>
-    <fl:let>returnControl::=true</fl:let>		
-		
-		
-		
-		<!-- Rueckgabebwerte -->			
-		<ac:var name="returnControl" value="${returnControl}" />
-		<ac:var name="returnBoolean" value="${returnBoolean}" />
-		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
-	</target>
-	
-	 <!-- ######## Targets ############################################################################--> 	
- <target name="-isClientVMD">
-		<!-- Ermittle den Dateinamen für die Host-VMD-Datei -->
-		<fl:let>myPathClientUsed::="${dirPathClient}"</fl:let>
-		<fl:let>myHostUsed::="${hostUsed}"</fl:let>
-		<fl:let>returnBoolean::=false</fl:let>			
-		<fl:let>returnControl::=false</fl:let>
-				
-		<!-- Den Dateinamen tatsächlich berechnen -->
-		<!-- <fl:install-property-handler /> Das ist in Untertargets nicht erlaubt!!! -->
-		<!-- <property environment="env" />  Das ist in Untertargets nicht erlaubt!!! --><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
-		<echo>VMD_OS= ${env.VMD_OS}</echo>
-		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
-					<param name="osUsed" value="${osUsed}"/>					
-					<param name="hostUsed" value="${myHostUsed}"/>	
-		</antcallback>
-		<echo message="errechneter Dateiname = ${returnFilename}" />
-				
-		<!-- TODO Goon : Prüfen, ob diese Datei im Clientverzeichnis existiert -->
-		<!-- TODO GON: Die Konfigurationsdatei für das Projekt muss entweder eingelesen werden, oder der Parameter muss von aussen übergeben werden. 
-		     project.vmd.dirPathClientFgl=c:/1fgl/client -->
-		<fl:let>vmdClientFilePath ::= "${myPathClientUsed}\\${returnFilename}"</fl:let><!-- beachte hier die doppelten Doppelpunkte, um den bereits gesetzten Wert zu ersetzten -->		
-		<echo>Pruefe Existenz der Datei: ${vmdClientFilePath}</echo>
-  
-		<fl:choose>
-			<fl:when test=" '${vmdClientFilePath}'.tofile.exists == true ">
-			<echo>Client Verzeichnis Host-VMD-Datei existiert: ${vmdClientFilePath}</echo>
-			<fl:let>returnBoolean::=true</fl:let>
-		</fl:when>
-		<otherwise>
-			<echo>Client Verzeichnis Host-VMD-Datei existiert NICHT: ${vmdClientFilePath}</echo>
-			<fl:let>returnBoolean::=false</fl:let>
-		</otherwise>
-	</fl:choose>
-    <fl:let>returnControl::=true</fl:let>		
-		
-		
-		
-		<!-- Rueckgabebwerte -->			
-		<ac:var name="returnControl" value="${returnControl}" />
-		<ac:var name="returnBoolean" value="${returnBoolean}" />
-		<!-- <arrayCopyJsZZZ arrayinput="${myaError}" arrayreturn="returnaString" sflagcontrol="" /> --><!-- So gibt man einen Arraywertzurueck -->			
-	</target>
- 
-	
 <!-- ################################################################################# -->
 	<!-- Die einzelnen Tests im depends hinzufügen -->
   <!-- Merke: 'interne Targets' sollten mit einem Minuszeichen beginnen, so dass sie von aussen nicht gestartet werden können.
              Dies gibt einen 'unknown argument' Fehler, der sich unter Windows auch nicht mit dem Setzen in Hockkommata umgehen.-->
- <!-- <target name="compile" depends="-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsFileVmdHostOnHostVMD,-myTestIsFileVmdClientOnHostVMD,-myTestIsFileVmdClientOnHostNamedVMD,-myTestIsHostVMD,-myTestIsClientVMD,-myTestComputeFilenameClientHostNamedVMD,-myTestComputeFilenameVMD"> -->
- <target name="compile" depends="-myTestComputeFilenameVMD">
+ <!-- <target name="compile" depends="-declaration,-myTestIsFilenameRelevantVMD,-myTestComputeFilenameHostVMD,-myTestIsFileVmdHostOnHostVMD,-myTestIsFileVmdClientOnHostVMD,-myTestIsFileVmdClientOnHostNamedVMD,-myTestIsHostVMD,-myTestIsClientVMD,-myTestComputeFilenameClientHostNamedVMD,-myTestComputeFilenameVMD"> -->
+ <target name="compile" depends="-declaration,-myTestComputeFilenameVMD,-myTestIsClientVMD,-myTestComputeFilenameHostVMD,-myTestComputeFilenameClientHostNamedVMD,-myTestIsHostVMD,-myTestIsFileVmdClientOnHostVMD">
     <echo>Im default - Target..., das von allen anderen Targets abhängt. </echo>
 	<!-- WIRD NICHT BENÖTIGT -->
 	
@@ -600,100 +59,251 @@
 	-->
   </target>
   
-	<!-- Versuch unabhängig vom Client oder Hostrechner den VMD-Dateinamen zu errechnen. -->
+    <target name="-declaration">
+	  <!-- um EL referencen zusätzlich zu den normalen Ant Referencen anzustellen (außerhalb der Flaka Tasks), muss man die ant standard property 	helper engine austauschen.
+	  dies passiert hier durch flaka´s install-property handler task -->
+	  <fl:install-property-handler />	
+  </target>
+  
+  <!-- FGL 20161110: TODO GOON - Weitere Funktionenen vorher testen -->
 	<target name="-myTestComputeFilenameVMD">
-		<echo>myTestComputeFilenameVMD: </echo>
-
-		<!-- Das Betriebssystem, in der Batch ermittelt. -->
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
-		<echo>VMD_OS=${env.VMD_OS}</echo>
-		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>		
-		<fl:let>pathClientUsed::="c:\1fgl\client"</fl:let>		
-		<antcallback target="-computeFilenameVMD" return="returnFilename">
-					<param name="osUsed" value="${osUsed}"/>
-					<param name="pathClientUsed" value="${pathClientUsed}"/>					
-		</antcallback>
+		<fl:let>sScript::='-myTestComputeFilenameVMD: '</fl:let>
+		<!-- Versuch unabhängig vom Client oder Hostrechner den VMD-Dateinamen zu errechnen. -->
 		
-		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+		 <!--  Wende hier von antcontrib den try...catch mechanismus an.--> 
+		 <trycatch property="myError" reference="myErrorObject">
+		 <try>
+		
+			<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+			<fl:logo>${sScript}
+			Meine Loesung: Target computeFilenameVMD</fl:logo>	
+
+			<!-- Das Betriebssystem, in der Batch ermittelt. -->
+			<fl:install-property-handler />
+			<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+			<echo>VMD_OS=${env.VMD_OS}</echo>
+			<fl:let>osUsed::='${env.VMD_OS}'</fl:let>		
+			<fl:let>pathClientUsed::="c:\1fgl\client"</fl:let>		
+			<antcallback target="-computeFilenameVMD" return="returnFilename">
+						<param name="osUsed" value="${osUsed}"/>
+						<param name="pathClientUsed" value="${pathClientUsed}"/>					
+			</antcallback>
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo>Ermittelter Dateiname= ${returnFilename}</echo>
+		 </try>
+		 <catch>
+		  <echo>In catch.</echo> 
+		  <echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo> 
+		 </catch>
+		 <finally>
+		  <echo>In finally.</echo> 
+		 </finally>
+		 </trycatch>
+		
 	</target>
+  
+  
+	<target name="-myTestIsHostVMD">
+		<fl:let>sScript::='-myTestIsHostVMD: '</fl:let>			
+		<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
+		<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->
+		
+		 <!--  Wende hier von antcontrib den try...catch mechanismus an.--> 
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+		
+			<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+			<fl:logo>${sScript}
+			Meine Loesung: Target isHostVMD</fl:logo>
+			
+			<antcallback target="-isHostVMD" return="returnControl,returnBoolean">
+						<param name="dirPathClient" value="c:\\1fgl\\client"/>				
+			</antcallback>			
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo message="Ergebnis = ${returnBoolean}" />
+			
+		</try>
+		<catch>
+		  <echo>In catch.</echo> 
+		  <echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo> 
+		  </catch>
+		<finally>
+		  <echo>In finally.</echo> 
+		</finally>
+		</trycatch>		
+	</target>
+  	
+	
 	
 	<target name="-myTestComputeFilenameHostVMD">
-		<echo>myTestComputeFilenameHostVMD: </echo>
-
-		<!-- Das Betriebssystem, in der Batch ermittelt. -->
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
-		<echo>VMD_OS= ${env.VMD_OS}</echo>
-		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+		<fl:let>sScript::='-myTestComputeFilenameHostVMD: '</fl:let>
+				
+		<!--  Wende hier von antcontrib den try...catch mechanismus an.--> 
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+			<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+			<fl:logo>${sScript}
+			Meine Loesung: Target computeFilenameHostVMD</fl:logo>
 		
-		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
-					<param name="osUsed" value="${osUsed}"/>					
-		</antcallback>
-		
-		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+			<!-- Das Betriebssystem, in der Batch ermittelt. -->
+			<fl:install-property-handler />
+			<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+			<echo>VMD_OS= ${env.VMD_OS}</echo>
+			<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+			
+			<antcallback target="-computeFilenameHostVMD" return="returnFilename">
+						<param name="osUsed" value="${osUsed}"/>					
+			</antcallback>
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+			
+		</try>
+		<catch>
+		  <echo>In catch.</echo> 
+		  <echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo> 
+		  </catch>
+		<finally>
+		  <echo>In finally.</echo> 
+		</finally>
+		</trycatch>		
 	</target>
 	
-	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\VMWare\.... oder auf einem VMWare Client Rechner im Verzeichnis c:\1fgl\Client -->
 	<target name="-myTestComputeFilenameClientHostNamedVMD">
-		<echo>myTestComputeFilenameClientHostNamedVMD: </echo>
+		<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\VMWare\.... oder auf einem VMWare Client Rechner im Verzeichnis c:\1fgl\Client -->
+		<fl:let>sScript::='-myTestComputeFilenameClientHostNamedVMD: '</fl:let>
+					
+		<!--  Wende hier von antcontrib den try...catch mechanismus an.--> 
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+			<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+			<fl:logo>${sScript}
+			Meine Loesung: Target computeFilenameClientHostNamedVMD</fl:logo>
+				
+			<!-- Das Betriebssystem, in der Batch ermittelt. -->
+			<fl:install-property-handler />
+			<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+			<echo>VMD_OS= ${env.VMD_OS}</echo>
+			<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+			
+			<!-- Merke: DUMMYLösung. Hole normalerweise den Hostnamen aus einer Rechnerspezifischen Konfiguration im VMWare-client -->
+			<fl:let>myHostUsed::="${env.COMPUTERNAME}"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
+			<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
+						<param name="osUsed" value="${osUsed}"/>
+						<param name="hostUsed" value="${myHostUsed}"/>						
+			</antcallback>
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo>Ermittelter Dateiname= ${returnFilename}</echo>	
 
-		<!-- Das Betriebssystem, in der Batch ermittelt. -->
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
-		<echo>VMD_OS= ${env.VMD_OS}</echo>
-		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		
-		<!-- Merke: DUMMYLösung. Hole normalerweise den Hostnamen aus einer Rechnerspezifischen Konfiguration im VMWare-client -->
-		<fl:let>myHostUsed::="${env.COMPUTERNAME}"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-		<antcallback target="-computeFilenameClientHostNamedVMD" return="returnFilename">
-					<param name="osUsed" value="${osUsed}"/>
-					<param name="hostUsed" value="${myHostUsed}"/>						
-		</antcallback>
-		
-		<echo>Ermittelter Dateiname= ${returnFilename}</echo>		
+		</try>
+		<catch>
+		  <echo>In catch.</echo> 
+		  <echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo> 
+		  </catch>
+		<finally>
+		  <echo>In finally.</echo> 
+		</finally>
+		</trycatch>				
 	</target>
+	
+	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
+	<!-- TODO: Es muss rechnerspezifisch hinterlegt werden, wie der Hostname lautet. Den kann der Client nämlich nicht herausbekommen.-->
+	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->
+	<target name="-myTestIsClientVMD">
+	<fl:let>sScript::='-myTestIsClientVMD: '</fl:let>
+				
+		<!--  Wende hier von antcontrib den try...catch mechanismus an.--> 
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+			<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+			<fl:logo>${sScript}
+			Meine Loesung: Target isClientVMD</fl:logo>
+		
+		
+			<fl:install-property-handler />
+			<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+			
+			<!-- Berechne den Hostnamen, der ja Bestandteil einer VMD Datei ist. -->
+			<!-- Merke: Auf einem Client-Rechner wird dies beim echten Start durch eine spezielle Batch Datei als Variable übergeben.
+                        Hier im Test gibt es allerdings keine spezielle Batch, um den HOSTnamen auf einem Rechner in einer VM zu übergeben.                        					-->			
+			<fl:let>myHostUsed::="${env.COMPUTERNAME}"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  					
+			<antcallback target="-isClientVMD" return="returnControl,returnBoolean">
+						<param name="dirPathClient" value="c:\\1fgl\\client"/>				
+						<param name="hostUsed" value="${myHostUsed}"/>				
+			</antcallback>
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo message="Ergebnis = ${returnBoolean}" />	
+		</try>
+		<catch>
+		  <echo>In catch.</echo> 
+		  <echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo> 
+		  </catch>
+		<finally>
+		  <echo>In finally.</echo> 
+		</finally>
+		</trycatch>			
+	</target>	
   
 	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client\.... -->
 	<target name="-myTestIsFileVmdClientOnHostVMD">
-		<echo>myTestIsFileVmdClientOnHostVMD: </echo>
-		
-		<!-- Hier wird die scriptdef Methode substring aufgerufen -->
-		<isFileVmdClientOnHostVMD stringinput="asdfasdfasdf" booleanreturn="returnControl" />
-		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
-		
-		
-		<isFileVmdClientOnHostVMD stringinput="dummy.txt" booleanreturn="returnControl" />
-		<echo message="returnControl = ${returnControl}" />
-		
-		<!-- ultimativer Test, bei dem der Dateiname tatsächlich berechnet wird -->
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
-		<echo>VMD_OS= ${env.VMD_OS}</echo>
-		<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
-		<antcallback target="-computeFilenameHostVMD" return="returnFilename">
-					<param name="osUsed" value="${osUsed}"/>					
-		</antcallback>
-		<echo message="errechneter Dateiname = ${returnFilename}" /><!-- ERWARTE FALSE -->
+	<fl:let>sScript::='-myTestIsFileVmdClientOnHostVMD: '</fl:let>
 				
-		<isFileVmdClientOnHostVMD stringinput="${returnFilename}" booleanreturn="returnControl" />
-		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+		<!--  Wende hier von antcontrib den try...catch mechanismus an.--> 
+		<trycatch property="myError" reference="myErrorObject">
+		<try>
+			<!-- Merke: Die einzelnen Tests im depends vom target 'compile' hinzufügen-->
+			<fl:logo>${sScript}
+			Meine Loesung: Scriptdef IsFileVmdClientOnHostJsVMD</fl:logo>
 		
-		<!-- Diese Datei DARF kein _HOSTNAME haben -->
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-		
-		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
-		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->		
-		<fl:let>myInput::="VM_FGLWin7_Ugaki-SRV_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  		
-		<echo message="myInput=${myInput}" />		
-		<isFileVmdClientOnHostVMD stringinput="${myInput}" booleanreturn="returnControl" />
-		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
-		
-		<!-- Hier einen gültigen Dateinamen testen -->
-		<isFileVmdClientOnHostVMD stringinput="VM_FGLWin7_Ugaki-SRV.txt" booleanreturn="returnControl" />
-		<echo message="returnControl = ${returnControl}" /><!-- ERWARTE TRUE -->
-		
+	
+			<!-- Hier wird die scriptdef Methode substring aufgerufen -->
+			<isFileVmdClientOnHostJsVMD stringinput="asdfasdfasdf" booleanreturn="returnControl" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+			
+			
+			<isFileVmdClientOnHostJsVMD stringinput="dummy.txt" booleanreturn="returnControl" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo message="returnControl = ${returnControl}" />
+			
+			<!-- ultimativer Test, bei dem der Dateiname tatsächlich berechnet wird -->
+			<fl:install-property-handler />
+			<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->		
+			<echo>VMD_OS= ${env.VMD_OS}</echo>
+			<fl:let>osUsed::='${env.VMD_OS}'</fl:let>
+			<antcallback target="-computeFilenameHostVMD" return="returnFilename">
+						<param name="osUsed" value="${osUsed}"/>					
+			</antcallback>
+			<echo message="errechneter Dateiname = ${returnFilename}" /><!-- ERWARTE FALSE -->
+					
+			<isFileVmdClientOnHostJsVMD stringinput="${returnFilename}" booleanreturn="returnControl" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+			
+			<!-- Diese Datei DARF kein _HOSTNAME haben -->
+			<fl:install-property-handler />
+			<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
+			
+			<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
+			<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->		
+			<fl:let>myInput::="VM_FGLWin7_Ugaki-SRV_${env.COMPUTERNAME}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  		
+			<echo message="myInput=${myInput}" />		
+			<isFileVmdClientOnHostJsVMD stringinput="${myInput}" booleanreturn="returnControl" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo message="returnControl = ${returnControl}" /><!-- ERWARTE FALSE -->
+			
+			<!-- Hier einen gültigen Dateinamen testen -->
+			<isFileVmdClientOnHostJsVMD stringinput="VM_FGLWin7_Ugaki-SRV.txt" booleanreturn="returnControl" />
+			<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>
+			<echo message="returnControl = ${returnControl}" /><!-- ERWARTE TRUE -->
+			</try>
+		<catch>
+		  <echo>In catch.</echo> 
+		  <echo>Fehler aus 'fail' in Ant abgefangen: ${myError}</echo> 
+		  </catch>
+		<finally>
+		  <echo>In finally.</echo> 
+		</finally>
+		</trycatch>		
 	</target>
 	
 	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\VMWare\.... oder auf einem VMWare Client Rechner im Verzeichnis c:\1fgl\Client -->
@@ -778,40 +388,4 @@
 		<echo message="returnControl = ${returnControl}" />
 		
 	</target>
-	
-	
-	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
-	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->
-	<target name="-myTestIsHostVMD">		
-		<echo>myTestIsHostVMD: </echo>
-				
-		<antcallback target="-isHostVMD" return="returnControl,returnBoolean">
-					<param name="dirPathClient" value="c:\\1fgl\\client"/>				
-		</antcallback>
-		<echo message="Ergebnis = ${returnBoolean}" />
-		
-	</target>
-		
-	<!-- Die Datei auf einem Host-Rechner im Verzeichnis c:\1fgl\client -->
-	<!-- TODO: Es muss rechnerspezifisch hinterlegt werden, wie der Hostname lautet. Den kann der Client nämlich nicht herausbekommen.-->
-	<!-- TODO: Im test-Verzeichnis (also dem gleichen Verzeichnis wie diese test_ * .bat Datei) eine Rechnerspezifische Konfiguration hinterlegen.) -->
-	<target name="-myTestIsClientVMD">
-		<echo>myTestIsClientVMD: </echo>
-		
-		<fl:install-property-handler />
-		<property environment="env" /><!-- ist voraussetzung um mit 'env' auf die Umgebungsvariablen zuzugreifen -->
-		
-		<!-- Berechne den Hostnamen, der ja Bestandteil einer VMD Datei ist. -->
-		<fl:let>myHostUsed::="${env.COMPUTERNAME}"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
-
-				
-		<antcallback target="-isClientVMD" return="returnControl,returnBoolean">
-					<param name="dirPathClient" value="c:\\1fgl\\client"/>				
-					<param name="hostUsed" value="${myHostUsed}"/>				
-		</antcallback>
-		<echo message="Ergebnis = ${returnBoolean}" />		
-	</target>	
-	
-	
-	
  </project>
