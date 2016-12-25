@@ -30,9 +30,13 @@
 	Eclipse 3.22:
         --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
 
-	Eclipse 4.4 Luna
+	Eclipse 4.4 Luna       
         --- Fatjar und Subversion Plugin
-        --- Workspace mit Kernel V2.0 (angebunden an Subversion)
+        --- 1. Workspace mit Kernel V2.0 (angebunden an Subversion)
+
+        --- 2. Workspace mit Kernel V3.0 (angebunden an GitHub)
+
+        
 ####################################################################
 20171119: Überschreibe fehlerhaften Commit von HANNIBALDEV03VM_UGAKI
 20161117: Einrichten der Firefox-Profile PRV und DEV
