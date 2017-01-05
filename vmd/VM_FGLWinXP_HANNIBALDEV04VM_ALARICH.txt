@@ -32,13 +32,16 @@
 
 	Eclipse 4.4 Luna       
         --- Fatjar und Subversion Plugin
-        --- 1. Workspace mit Kernel V2.0 (angebunden an Subversion)
+        --- 1. Workspace mit Kernel V2.0 (angebunden an GitHub, von Subversion nach GitHub übernehmen)
 
-        --- 2. Workspace mit Kernel V3.0 (angebunden an GitHub)
+        --- 2. Workspace mit Kernel V3.0 (angebunden an GitHub) ???? Das sollte in einer anderen Entwicklungsumgebung passieren, da Java 1.7 und Hibernate basierend.
 
         
 ####################################################################
-20171119: Überschreibe fehlerhaften Commit von HANNIBALDEV03VM_UGAKI
+
+20170105: Einrichten von Eclipse Luna Workspace für Kernel02 (Angebunden an GitHub)
+
+20161119: Überschreibe fehlerhaften Commit von HANNIBALDEV03VM_UGAKI
 20161117: Einrichten der Firefox-Profile PRV und DEV
 20161108: Installation der SUpport Tools für WinXP, wg. setx.exe, benötigt vom VMD_PROJEKT
 
