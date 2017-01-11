@@ -15,6 +15,14 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20170111: Firefox Updates von Version 30 auf 51
+20170111: Betzemeier als 7zip komprimiert
+20170111: Installation von 7zip
+20170111: Update der VMWare Tools
+20170111: Installation von Apache Ant und Java 1.7 SDK, Windows XP Support - Tools. Zum Einrichten von Projekt_VMD
+20170111: Installieren von Tortoise Git und GitGUI
+20170111: Einrichten von Eclipse Luna und einen Workspace. Zile: TileHexMap angebunden an Github.
+
 20141101: Betzemeier Workspace erstellt.
 20140916: Nionex Workspace erstellt.
 20140908: Incony Workspace erstellt.
