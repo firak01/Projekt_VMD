@@ -31,10 +31,11 @@
 
 	Eclipse 4.4 Luna
         --- Fatjar und Subversion Plugin
-        --- Workspace mit Kernel V2.0 (angebunden an Subversion)(TODO: Dies an GIT anbinden)
+        --- Workspace mit Kernel V2.0 & VIA-Projekt (an GIT angebunden)
 
 ####################################################################
 
+20170128: GIT Repositories für Kernel02 und VIA Projekt in Eclipse 4.4 Luna eingebunden.
 20170128: WinXP Support Tools installiert - werden benötigt für VMS Projekt (setx)
 20170128: Arbeitsspeicher für virtuelle Maschine auf 3072MB erhöht
 20170103: Eclipse Luna Update
