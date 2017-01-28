@@ -16,6 +16,12 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20170128: WinXP Support Tools installiert, werden für VMD Projekt benötigt (setx)
+20170121: Firefox Konten eingerichtet
+20170121: Incony und Betzemeier Workspace gepackt und zum Host verschoben, wohin?
+
+20170111: Firefox Updates auf V51.x
+20170111: Installation von 7zip
 
 20151108: Java 1.7 JDK Intstalliert, Apache Ant Installiert und entsprechende Umgebungsvariablen gesetzt
 20151108: Repository für ProjektVM erstellt
