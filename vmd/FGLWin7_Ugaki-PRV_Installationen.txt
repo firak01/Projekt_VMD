@@ -2,6 +2,8 @@
 
 #########################################################
 
+20170129: Gimp 2.8.18
+
 20161222: Einrichten der Shutdown , Restart , Cancel , Buttons und Scripte
 
 20161014: Grafikakrten Treiber AMD HR 5400 installiert V 15... aus 2015, auﬂer "Gaming Evolved App"
