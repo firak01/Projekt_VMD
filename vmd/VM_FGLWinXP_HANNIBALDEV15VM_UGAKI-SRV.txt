@@ -1,12 +1,14 @@
-Mit ...DEV14 gleich halten
-##########################################################
 --- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
 --- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
 --- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
 --- TryOut Hibernate
---- TryOut Jsf
-Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
-##########################################################
+###########################################################################################################
+
+20170211: VMD_PROJEKT Repository ausgechecked
+20170210: Apache Ant entpackt. ANT_HOME umgebungsvariable gesetzt, ANT_ARGS
+20170210: Java JDK 1.7 installiert
+20170210: Git für WinXP installiert
+20170207: Eclipse Arbeitsumgebung "Buch Hibernate 2006" muss wohl das Plugin "JBoss Tools" beeinhalten
 
 20140928: Eclipse 4.4 Luna JEE und Workspace für Buch "JavaServerFaces 2.2"
 
@@ -23,6 +25,7 @@ Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 #### Hibernate, SQLite Entwicklungsumgebung
 #### Apache Wicket Entwickungsumgebung 
 #### Google API Entwickklungsumgebung / WLAN Scanner Tool 
+
 
 20130913: Eclipse 4.3 Kepler - Installation des EGIT Plugins
 20130912: Eclipse 4.3 Kepler - Eingerichtet für die Arbeit mit Google API / Google Plugin / Subversion Plugin / nutzt Maven
