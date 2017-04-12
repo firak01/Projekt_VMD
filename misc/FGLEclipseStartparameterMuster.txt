@@ -1,0 +1,4 @@
+C:\java\eclipse-jee-juno-SR2-win32_Maven\eclipse\eclipse.exe    
+-data c:\1fgl\Workspace\Eclipse42FGL_Hibernate 
+-vm c:\java\jre7\bin\javaw.exe -clean -Xms512m -Xmx-1024m
+-vmargs -Duser.name="Fritz Lindhauer"
