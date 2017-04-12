@@ -1,6 +1,6 @@
 ---- Synchron halten mit ...DEV09
 ### Entwickungsumgebung für TileHexMap Projekt (Version 03, d.h. MIT Hibernate, als Maven Projekt)
-#### Apache Wicket Entwickungsumgebung 
+### Apache Wicket Entwickungsumgebung 
 
 
 ### Tryout Projekte (teilweise mit MAVEN): 
@@ -8,15 +8,21 @@
     - WLAN Scanner Tool
     - SQL.JDBC (Einbinden des JDTS Treibers per Maven)
 
-### Incony-Projekte (1. Halbjahr 2014, zum Ausschlachten),
+### Incony-Projekte (1. Halbjahr 2014, zum Ausschlachten, jetzt verschoben),
     Nionex Probearbeitstag 20140915 - Anbindung an DB per JDBC - Parsen von SQL Datei
     Betzemeier automotive software GmbH - Sources zum Ausschlachten - Thema JSF und Hibernate
+    Buch "Java Hibernate Persistence 2nd Edition (2016)"
 
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20170412: Workspace für Buch "Java Hibernate Persistence 2nd Edition (2016)" erstellt. Aber wenn man das Maven Projekt erstellt, kommt es zu einem Fehler.
+
+20170208: Workspace für Tryout Hibernate mit 7zip gepackt und zum Host verschoben
+20170119: Incony und Betzemeier Workspace mit 7zip gepackt und zum Host verschoben
+20170112: Firefox-Profilkonten und Sync eingerichtet
+
 20170111: Firefox Updates von Version 30 auf 51
-20170111: Betzemeier als 7zip komprimiert
 20170111: Installation von 7zip
 20170111: Update der VMWare Tools
 20170111: Installation von Apache Ant und Java 1.7 SDK, Windows XP Support - Tools. Zum Einrichten von Projekt_VMD
