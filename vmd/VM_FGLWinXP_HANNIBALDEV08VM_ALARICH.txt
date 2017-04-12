@@ -11,7 +11,7 @@
 ### Incony-Projekte (1. Halbjahr 2014, zum Ausschlachten, jetzt verschoben),
     Nionex Probearbeitstag 20140915 - Anbindung an DB per JDBC - Parsen von SQL Datei
     Betzemeier automotive software GmbH - Sources zum Ausschlachten - Thema JSF und Hibernate
-    Buch "Java Hibernate Persistence 2nd Edition (2016)"
+    Buch "Java Hibernate Persistence 2nd Edition (2016)" 
 
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
