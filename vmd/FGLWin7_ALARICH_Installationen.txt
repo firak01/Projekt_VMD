@@ -1,6 +1,10 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
+20170506: Sandboxie Program deinstalliert
+20170506: Windows Updates durchgeführt.
+
+20170505 Image mit Acronis erstellt.
 20170305: Image mit Acronis erstellt.
 
 --------------------------------
