@@ -1,6 +1,7 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
+20170507: Umstieg au Firefox64bit
 20170506: Sandboxie Program deinstalliert
 20170506: Windows Updates durchgeführt.
 
