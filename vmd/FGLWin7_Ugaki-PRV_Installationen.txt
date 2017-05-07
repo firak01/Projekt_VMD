@@ -2,6 +2,8 @@
 
 #########################################################
 
+20170507: Umstieg auf Firefox 64bit
+
 20170129: Gimp 2.8.18
 
 20161222: Einrichten der Shutdown , Restart , Cancel , Buttons und Scripte
