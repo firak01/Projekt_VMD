@@ -1,0 +1,17 @@
+### ACER ASPIRE R3610 - Surf- und Mediencenter
+
+#########################################################
+
+20170509: TODO - VMD-Projekt einrichten: ANT , Java SDK, Umgebungsvariablen.
+
+20170508: Erstes Windows Backup
+
+20170508: Windows Updates. Danach funktioniert auch Wake On LAN.
+20170508: Neuer Treiber für Nvidia ION Desptop Chipset.
+20170508: Neuer Treiber für Nvidia ION Desktop Grafikkarte.
+20170507: Firefox Wechsel auf 64bit Version.
+20170505: Firefox Installation und Einrichten.
+20170507: Autologon einrichten
+20170507: Teamviewer Host installiert
+20170428: Windows einrichten
+
