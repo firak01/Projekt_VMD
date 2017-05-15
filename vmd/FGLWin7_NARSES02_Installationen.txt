@@ -2,7 +2,10 @@
 
 #########################################################
 
-20170509: TODO - VMD-Projekt einrichten: ANT , Java SDK, Umgebungsvariablen.
+20170515: Prio zur Speicherung der Prozess Prioritäten installiert
+20170515: Avast Antivirus Free installiert.
+
+20170509: VMD-Projekt einrichten: ANT , Java SDK, Umgebungsvariablen.
 
 20170508: Erstes Windows Backup
 
