@@ -1,0 +1,30 @@
+#### Office 2010 - Umgebung für Entwicklung
+Eclipse Luna Umgebung
+- Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
+- TODO: Hier nun eine Umgebung für WebService Entwicklung aufbauen.
+        Beispiel aus einem Buch.
+
+
+
+
+
+
+########################
+
+20170516: Projekt_VMD eingerichtet, 
+20170516: GitHub Client installiert
+20170516: Java Ant installiert
+
+20170516: Firefox 64bit Version installiert. 32bit Version entfernt.
+20170516: 7zip installiert
+20170516: BGInfo eingerichtet
+20170516: Eclipse Aktualisiert. Daher TODO das Android HelloWorld-Projekt anders einstellen (ADT)
+Android SDK Tools installiert
+
+
+20170103: Winword 2010 startet noch, ohne Lizenkey nachzufordern.
+20170103: Wohl schon früher erstellt als Kopie von "FGLWin7Patton01VM.txt", nun mal anpassen
+
+
+### Office 2010 - Umgebung
+Vor 2013-11-30: Neu hier aktiviert, Office 2010 installiert und aktiviert, acronis 2013 installiert und aktiviert
