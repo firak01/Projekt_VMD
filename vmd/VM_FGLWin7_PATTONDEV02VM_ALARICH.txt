@@ -5,11 +5,15 @@ Eclipse Luna Umgebung
         Beispiel aus einem Buch.
 
 
-
-
-
-
 ########################
+
+20170522: Tomcat Server mit lokalem Benutzer lindhaueradmin versehen. Testweise ein Servlet aus einem Tutorial als .war importiert. Lokal erreichbar.
+20170519: Eclipse WTP installiert, Tomcat Server eingerichtet
+
+20170519: Eclipse AndMore - Plugin installiert aus dem MArketplace (von Update Site klappt nicht) (Google ADT funktioniert nicht mehr mit neuer Android API)
+20170519: Eclipse ADT-Plugin erneut von der Website installiert. Bestehende Version wurde entfernt. Ohne dies hat der Folgeschritt (das ANDMORE - Plugin) nicht funktioniert.
+20170518: Eclipse workspace mit Tomcat-Server, zum Experimentieren
+20170518: Tomcat 8 installiert
 
 20170516: Projekt_VMD eingerichtet, 
 20170516: GitHub Client installiert
