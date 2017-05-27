@@ -7,6 +7,9 @@ Eclipse Luna Umgebung
 
 ########################
 
+20170527: SOAPUI 5.3 installiert und den ersten Webservice getestet.
+20170527: Tomcat Server unter Eclipse mit AXIS2 War File versehen. Den ersten WebService basierend auf einer Java-Datei erstellt.
+
 20170522: Tomcat Server mit lokalem Benutzer lindhaueradmin versehen. Testweise ein Servlet aus einem Tutorial als .war importiert. Lokal erreichbar.
 20170519: Eclipse WTP installiert, Tomcat Server eingerichtet
 
