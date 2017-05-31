@@ -7,6 +7,9 @@ Eclipse Luna Umgebung
 
 ########################
 
+20170530: Arbeitsspeicher der VM auf 3072MB erhöht
+20170530: Backup der VM
+
 20170527: SOAPUI 5.3 installiert und den ersten Webservice getestet.
 20170527: Tomcat Server unter Eclipse mit AXIS2 War File versehen. Den ersten WebService basierend auf einer Java-Datei erstellt.
 
