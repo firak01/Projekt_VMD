@@ -1,5 +1,5 @@
 ---- Synchron halten mit DEV05
----- Entwicklungsumgebung von "KernelZZZ", "ScheduledFileArchiveZZZ"
+---- Entwicklungsumgebung von "KernelZZZ", "VideoInternetArchive", "ScheduledFileArchiveZZZ"
 
 ##### Lotus Notes Client 8.53, Für Arbeit mit Foren, Tips, etc. eingerichtet.
             ABER: Die Dateien bleiben auf dem fgl02 - Server und werden nicht lokal repliziert (Platz sparen)
@@ -19,7 +19,7 @@
 
             
 	Eclipse 3.22
-	      --- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
+	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
               --- VideoInternetArchive (Kernel V02, 1.6er compiler, angebunden an Subversion )
               --- diverse TryOuts: Z.B. CouchDb, TimerTask (angebunden an Subversion)
               --- diverse TryOuts: Z.B. iText, PortScanner (angebunden an CVS)                                   
@@ -30,10 +30,21 @@
 	Eclipse 3.22:
         --- Workspace zum Buch "Herb Schildt´s Java Programming Codebook"
 
-	Eclipse 4.4 Luna
+	Eclipse 4.4 Luna       
         --- Fatjar und Subversion Plugin
-        --- Workspace mit Kernel V2.0 (angebunden an Subversion)
+        --- 1. Workspace mit Kernel V2.0 (angebunden an GitHub, von Subversion nach GitHub übernehmen)
+
+        --- 2. Workspace mit Kernel V3.0 (angebunden an GitHub) ???? Das sollte in einer anderen Entwicklungsumgebung passieren, da Java 1.7 und Hibernate basierend.
+
+        
 ####################################################################
+
+20170105: Einrichten von Eclipse Luna Workspace für Kernel02 (Angebunden an GitHub)
+
+20161119: Überschreibe fehlerhaften Commit von HANNIBALDEV03VM_UGAKI
+20161117: Einrichten der Firefox-Profile PRV und DEV
+20161108: Installation der SUpport Tools für WinXP, wg. setx.exe, benötigt vom VMD_PROJEKT
+
 20151027: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
 
 20151021: Installation Java JDK 1.7, ANT_HOME, ANT_ARGS für Flaka

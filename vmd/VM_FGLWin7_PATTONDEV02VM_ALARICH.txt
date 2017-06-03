@@ -1,0 +1,40 @@
+#### Office 2010 - Umgebung für Entwicklung
+Eclipse Luna Umgebung
+- Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
+- TODO: Hier nun eine Umgebung für WebService Entwicklung aufbauen.
+        Beispiel aus einem Buch.
+
+
+########################
+
+20170530: Arbeitsspeicher der VM auf 3072MB erhöht
+20170530: Backup der VM
+
+20170527: SOAPUI 5.3 installiert und den ersten Webservice getestet.
+20170527: Tomcat Server unter Eclipse mit AXIS2 War File versehen. Den ersten WebService basierend auf einer Java-Datei erstellt.
+
+20170522: Tomcat Server mit lokalem Benutzer lindhaueradmin versehen. Testweise ein Servlet aus einem Tutorial als .war importiert. Lokal erreichbar.
+20170519: Eclipse WTP installiert, Tomcat Server eingerichtet
+
+20170519: Eclipse AndMore - Plugin installiert aus dem MArketplace (von Update Site klappt nicht) (Google ADT funktioniert nicht mehr mit neuer Android API)
+20170519: Eclipse ADT-Plugin erneut von der Website installiert. Bestehende Version wurde entfernt. Ohne dies hat der Folgeschritt (das ANDMORE - Plugin) nicht funktioniert.
+20170518: Eclipse workspace mit Tomcat-Server, zum Experimentieren
+20170518: Tomcat 8 installiert
+
+20170516: Projekt_VMD eingerichtet, 
+20170516: GitHub Client installiert
+20170516: Java Ant installiert
+
+20170516: Firefox 64bit Version installiert. 32bit Version entfernt.
+20170516: 7zip installiert
+20170516: BGInfo eingerichtet
+20170516: Eclipse Aktualisiert. Daher TODO das Android HelloWorld-Projekt anders einstellen (ADT)
+Android SDK Tools installiert
+
+
+20170103: Winword 2010 startet noch, ohne Lizenkey nachzufordern.
+20170103: Wohl schon früher erstellt als Kopie von "FGLWin7Patton01VM.txt", nun mal anpassen
+
+
+### Office 2010 - Umgebung
+Vor 2013-11-30: Neu hier aktiviert, Office 2010 installiert und aktiviert, acronis 2013 installiert und aktiviert

@@ -3,6 +3,9 @@
 --- Wichtig: Niemals Firefox updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
 ######################################################################
 
+20170525: Installation von Firefox 64bit und Verwenden von Profilen, um parallel die alte 3.6er Version mit den VMWare Server2 Plugins nutzen zu können.
+
+20160708: Hinzufügen von STOP/RESTART Links
 20151207: Einbau von 16GB Arbeitspeicher
 
 20151205: Fehlermeldung in VMClient bei Netzwerkzugriff auf Verzeichnisse des Host: "Für diesen Befehl ist nicht genügend Serverspeicher verfügbar."

@@ -1,0 +1,35 @@
+Stand 20160322
+Programmplatz	Sendername
+1	ARD
+2	Sat1
+3	RTL
+4	VOX
+5	NDR
+6	ZDF
+7	Pro7
+8	n-tv
+9	3sat
+10	BBC
+11	WDR
+12	Phoenix
+13	euronews
+14	eurosport
+15	Tele 5
+16	Nikelodeon
+17	RTL 2
+18	CNN
+19	HSE24
+20	Kabel 1
+21	Super RTL
+22	arte
+23	N24
+24	
+25	QVC
+26	Anixe
+27	DMAX
+28	Comedy Center
+29	Sport1
+30	SIXX
+31	Disneychannel
+32	
+33	MDR
