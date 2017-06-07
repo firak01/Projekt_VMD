@@ -6,8 +6,14 @@ Eclipse Luna Umgebung
 - Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
 - Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
 
+TODO:
+Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
+1. Lokales Repository und Projekt 
+   a) JAZKernel (V02) und weitere clonen.
+   b) ZKernelFileCollection importiert.
 
-TODO: Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank.
+2. Projekt JAZTileHexMap03 clonen
+
       Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem WebService zur Verfügung zu stellen.
       Projekte: TILEHEXMAPSERVICE
                 TILEHEXMAPSERVICECLIENT
