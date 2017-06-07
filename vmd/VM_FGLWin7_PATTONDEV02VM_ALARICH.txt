@@ -1,8 +1,19 @@
 #### Office 2010 - Umgebung für Entwicklung
+Merke: Synchron halten der Entwicklungsumgebung auf dem UGAKI-VMWARE-Server mit ..................
+Merke: Basiert auf einem Rechner (Patton) mit einem UEFI BIOS. Dieses ist auf dem UGAKI-VMWARE-Server nicht lauffähig.
+       
 Eclipse Luna Umgebung
 - Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
-- TODO: Hier nun eine Umgebung für WebService Entwicklung aufbauen.
-        Beispiel aus einem Buch.
+- Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
+
+
+TODO: Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank.
+      Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem WebService zur Verfügung zu stellen.
+      Projekte: TILEHEXMAPSERVICE
+                TILEHEXMAPSERVICECLIENT
+
+TODO: 
+  Beispiele aus einem Buch, bzgl. Webservices hier als Workspace.
 
 
 ########################
