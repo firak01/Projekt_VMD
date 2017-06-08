@@ -24,6 +24,8 @@ TODO:
 
 ########################
 
+20170609: Auslagerungsdatei für Speicher abgestellt (soll Performace der VM erhöhen)
+
 20170530: Arbeitsspeicher der VM auf 3072MB erhöht
 20170530: Backup der VM
 
