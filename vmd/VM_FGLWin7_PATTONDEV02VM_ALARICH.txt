@@ -5,8 +5,8 @@ Merke: Basiert auf einem Rechner (Patton) mit einem UEFI BIOS. Dieses ist auf de
 Eclipse Luna Umgebung
 - Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
 - Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
+- Entwicklungsumgebung für ein mögliches TILEHEXMAP03SERVICE - Projekt, also einen WebService verbunden über Hibernate mit einer Datenbank.
 
-TODO:
 Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
 1. Lokales Repository und Projekt 
    a) JAZKernel (V02) und weitere clonen.
@@ -16,6 +16,10 @@ Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
 
       Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem WebService zur Verfügung zu stellen.
       Projekte: TILEHEXMAPSERVICE
+
+TODO:
+- Entwicklungsumgebung für einen Java Client, der TileHexMap03Service nutzt:
+Einrichten eines Projekts
                 TILEHEXMAPSERVICECLIENT
 
 TODO: 
@@ -24,7 +28,8 @@ TODO:
 
 ########################
 
-20170609: Auslagerungsdatei für Speicher abgestellt (soll Performace der VM erhöhen)
+20170609: Auslagerungsdatei für Speicher abgestellt (soll Performace der VM erhöhen), aber dann kann zusätzlich zu Eclipse und Tomcat nicht noch SoapUI gestartet werden.
+          Also Auslieferungdatei fix auf 4096MB festgelegt.
 
 20170530: Arbeitsspeicher der VM auf 3072MB erhöht
 20170530: Backup der VM
