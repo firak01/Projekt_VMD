@@ -3,7 +3,7 @@
 #########################################################
 
 20170628: Image erstellen (ohne Steam, etc.)
-20170628: Update von GitHub Client
+20170628: Update von GitHub Client, Teamviewer Host auf V12.
 20170623: Upgrade auf VM Workstation 12. Da nur hiermit die Debian 8 Umgebung von "Kali Linux" läuft.
 
 20170529: Google Chrome installiert und Erweiterung "Internet Download Manager For Chrome" installiert. Mit dem Ziel 10 GB zu kopieren
