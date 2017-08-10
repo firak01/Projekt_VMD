@@ -14,10 +14,16 @@ Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 
 ##################################################
 
+20170809: TODO: Einrichten einer Umgebung für ein Eclipse Projekt "Tutorial Hibernate Criteria API"
+20170809: TODO: Installation von Eclipse Neon UND Anbinden ang GitHub
+20170809: TODO: Nach DEV 15 bringen
+
+20170215: MySQL Serverstart_ Dienst auf manuell gestellt (statt automatisch)
+
 20170213: installation und Einrichten von VMD-Projekt (Anpassen das Namens dieser Datei, Installation WinXP Support Tools, Apache ANT, JDK1.7, WinGUI & GIT für WinXP)
 
 20170207: firefox Update auf V 51.0
-20170207: Installation per Darg und Droop ausd dem Web JBoss Tools 4.1.2 für eclipse Kepler
+20170207: Installation per Drag und Droop ausd dem Web JBoss Tools 4.1.2 für eclipse Kepler
 20170207: Installation der HSQL-Datenbank
 20170207: Installation der H2-Datenbank (versuche das aus DEV15 nachzuholen) 20140201: Installation der H2-Datenbank
 
