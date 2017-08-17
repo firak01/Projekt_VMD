@@ -2,7 +2,18 @@
 --- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
 --- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
 --- TryOut Hibernate
+--- TryOut Hibernate - Criteria API  (meine Variante übernommen aus Tutorial von Eugenp) 
+--- TODO: Hibernate Criteria Example Tutorial (von Eugenp)
 ###########################################################################################################
+
+20170816: Arbeitsspeicher der VM auf 3 GB erhöht
+20170815: Eclipse Workspace - Hibernate Criteria Example Tutorial
+20170812: Installation von Eclipse Oxygene (braucht Java 8)
+20170812: Installation von Java 8 (unter WinXP auf eigene Gefahr)
+
+20170218: MySQL Server Dienst auf manuell gestellt, statt automatisch
+
+20170218: Verzicht auf Speichererweiterung durch Auslagerungsdatei
 
 20170211: VMD_PROJEKT Repository ausgechecked
 20170210: Apache Ant entpackt. ANT_HOME umgebungsvariable gesetzt, ANT_ARGS
