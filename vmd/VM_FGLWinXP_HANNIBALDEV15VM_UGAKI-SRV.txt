@@ -1,11 +1,13 @@
+Eclipse Workspaces
 --- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
 --- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
 --- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
 --- TryOut Hibernate
 --- TryOut Hibernate - Criteria API  (meine Variante übernommen aus Tutorial von Eugenp) 
---- TODO: Hibernate Criteria Example Tutorial (von Eugenp)
+--- Tutorials von Eugenp (u.a. Hibernate Criteria Example Tutorial)
 ###########################################################################################################
 
+20170817: Eclipse Workspace - Tutorials von Eugenp (u.a. Hibernate Criteria Example Tutorial)
 20170816: Arbeitsspeicher der VM auf 3 GB erhöht
 20170815: Eclipse Workspace - Hibernate Criteria Example Tutorial
 20170812: Installation von Eclipse Oxygene (braucht Java 8)
