@@ -3,15 +3,36 @@
 --- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
 --- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
 --- TryOut Jsf
+--- TryOut Hibernate (insbesondere HQL)
+--- TryOut Hibernate (insbesondere Criteria API)
+--- Workspace mit Tutorials von Eugenp (unter anderem Criteria API)
 Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 
-### es fehlt hier folgendes ##########
+### es fehlt hier folgendes verglichen mit DEV15 (für diesen Workspaces) ##########
+20170207: Nun alles lauffähig ? testen!!!
 --- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
---- TryOut Hibernate
 
 20140202: Installation des Eclipse Plugins "SQLQuery" unter Eclipse Kepler und Juno, Anbindung an lokales SQLite, MySQL  und H2 über windwos Admin Kennwort
-20140201: Installation der H2-Datenbank
+
 ##################################################
+
+20170809: TODO: Einrichten einer Umgebung für ein Eclipse Projekt "Tutorial Hibernate Criteria API"
+
+20170814: Installation von Eclipse OXYGENE Workspace "Tutorials von Eugenp"
+20170814: Anbinden von Eclipse Oxygene an GitHub. Erweiterung für den GitHub - Repository Zugriff. (Neue Software, Abschnitt "Team")
+
+20170809: Installation fon Firefox 52.0.2 als letzte Version für WinXP (Update auf ESR klappt nicht....)
+20170809: Installation von Eclipse OXYGENE und Workspace für "TryoutHibernateCriteriaAPI"
+20170809: Installation von Java 8 (auf eigene Gefahr unter WinXP)
+
+20170215: MySQL Serverstart_ Dienst auf manuell gestellt (statt automatisch)
+
+20170213: installation und Einrichten von VMD-Projekt (Anpassen das Namens dieser Datei, Installation WinXP Support Tools, Apache ANT, JDK1.7, WinGUI & GIT für WinXP)
+
+20170207: firefox Update auf V 51.0
+20170207: Installation per Drag und Droop ausd dem Web JBoss Tools 4.1.2 für eclipse Kepler
+20170207: Installation der HSQL-Datenbank
+20170207: Installation der H2-Datenbank (versuche das aus DEV15 nachzuholen) 20140201: Installation der H2-Datenbank
 
 20140928: Eclipse 4.4 Luna JEE und Workspace für Buch "JavaServerFaces 2.2"
 
