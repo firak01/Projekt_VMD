@@ -1,6 +1,9 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
-20170628: BACKUP IMAGE
+20170818: Telekom Magenta cloud client - Arbeitsverszeichnis von c:\1fgl auf Laufwerk D: verschoben
+
+20170629: Windows Update: KB3133977 "Update für windows 7 für X64 bsierte Systeme" ausgelassen, wg. Probleme beim Boot ASUS & UEFI.
+20170628: BACKUP IMAGEs
 20170628: Update Teamviewer 12
 
 20170623: Updaten auf VMWare Workstation 12. Nur damit die die Debian8 basierende VMWare "Kali Linux" ausfürhbar.
