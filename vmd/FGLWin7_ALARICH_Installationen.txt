@@ -1,6 +1,8 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
+20170922: Installation von Calibre ( eBook Konverter , z.B. von epub nach PDF )
+
 20170828: Installation von Samsung Smart Switch (ersetzt Samsung KIES, welches mit dem Galaxy S3 Neo nicht funktioniert).
 20170824: Installation von Samsung Android Galaxy S3 USB Treiber
 
