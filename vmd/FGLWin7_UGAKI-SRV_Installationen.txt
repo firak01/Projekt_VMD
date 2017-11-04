@@ -1,7 +1,14 @@
 ######################################################################
 --- VMWare Server 2.x
---- Wichtig: Niemals Firefox updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
+--- Wichtig: Niemals Firefox 32bit updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
 ######################################################################
+
+20170818: Installation von Magenta Cloud
+
+20170626: BGInfo eingerichtet.
+20170626: Aktualisierung von GitHub Desktop (geht nur über sehr schnelle Internetverbindung)
+
+20170611: Installation von Teamviewer Host 12 - Die ID bleibt gleich
 
 20170525: Installation von Firefox 64bit und Verwenden von Profilen, um parallel die alte 3.6er Version mit den VMWare Server2 Plugins nutzen zu können.
 

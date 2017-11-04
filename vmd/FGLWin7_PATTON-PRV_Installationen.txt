@@ -1,5 +1,17 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
+20170818: Telekom Magenta cloud client - Arbeitsverszeichnis von c:\1fgl auf Laufwerk D: verschoben
+
+20170629: Windows Update: KB3133977 "Update für windows 7 für X64 bsierte Systeme" ausgelassen, wg. Probleme beim Boot ASUS & UEFI.
+20170628: BACKUP IMAGEs
+20170628: Update Teamviewer 12
+
+20170623: Updaten auf VMWare Workstation 12. Nur damit die die Debian8 basierende VMWare "Kali Linux" ausfürhbar.
+20170623: Installation von Microsoft Network Parser 3.4 (64bit)
+20170623: Installation von Acrylic "Free Wi-Fi Network Scanner for Windows"
+20170623: Installation von 7Link WLAN USB Stick Treibern 
+20170606: Installation von Magenta Cloud Client (Telekom)
+
 20161018: Wg.Spielinstallation im Gerätemanager für das DVD Laufwerk die Region 2 eingestellt (Deutschland gewählt)
 20161018: Installation von Spiel "XCOM Enemy Unknown"
 20160722: Installation von "Free YouTube MP3 Converter
