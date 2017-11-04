@@ -3,9 +3,7 @@ Merke: Synchron halten der Entwicklungsumgebung auf dem UGAKI-VMWARE-Server mit 
 Merke: Basiert auf einem Rechner (Patton) mit einem UEFI BIOS. Dieses ist auf dem UGAKI-VMWARE-Server nicht lauffähig.
        
 Eclipse Luna Umgebung
-- Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
-- Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
-- Entwicklungsumgebung für ein mögliches TILEHEXMAP03SERVICE - Projekt, also einen WebService verbunden über Hibernate mit einer Datenbank.
+- Entwicklungsumgebung für TILEHEXMAP03SERVICE - Projekt, also einen WebService verbunden über Hibernate mit einer Datenbank.
 
 Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
 1. Lokales Repository und Projekt 
@@ -17,16 +15,19 @@ Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
       Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem WebService zur Verfügung zu stellen.
       Projekte: TILEHEXMAPSERVICE
 
-TODO:
-- Entwicklungsumgebung für einen Java Client, der TileHexMap03Service nutzt:
-Einrichten eines Projekts
-                TILEHEXMAPSERVICECLIENT
+
+- Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
+- Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
 
 TODO: 
   Beispiele aus einem Buch, bzgl. Webservices hier als Workspace.
 
 
 ########################
+
+20170624: VMWare Tools aktualisiert, nachdem auf dem Host System der VMWare Workstation 12 installiert wurde.
+
+20170618: Subversive Plugin nach Eclipse Luna installiert und an meinen Subversion Sever angebunden.
 
 20170609: Auslagerungsdatei für Speicher abgestellt (soll Performace der VM erhöhen), aber dann kann zusätzlich zu Eclipse und Tomcat nicht noch SoapUI gestartet werden.
           Also Auslieferungdatei fix auf 4096MB festgelegt.
