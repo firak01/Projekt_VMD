@@ -2,12 +2,33 @@
 
 #########################################################
 
+20170921: Installation von Calibre (Tool zum Konvertieren von eBooks. Z.B. epub nach PDF)
+20170921: Installation von WiseRegistryCleaner Free
+
+20170708: Installation von Avast Antivirus
+
+20170628: Image erstellen (ohne Steam, etc.)
+20170628: Update von GitHub Client, Teamviewer Host auf V12.
+20170623: Upgrade auf VM Workstation 12. Da nur hiermit die Debian 8 Umgebung von "Kali Linux" läuft.
+
+20170529: Google Chrome installiert und Erweiterung "Internet Download Manager For Chrome" installiert. Mit dem Ziel 10 GB zu kopieren
+20170529: Google Drive Manager installiert zur Synchronisation der Ordner mit der lokalen Festplatte, aber grosse Dateien klappen nicht.
+
+20170523: TeleKom Magenta Cloud Client installiert zur Synchronisation der Ordner mit der lokalen Festplatte
+20170513: Spiel Galactic Civilizations 3 installiert
+
+20170507: Umstieg auf Firefox 64bit
+
+20170129: Gimp 2.8.18
+
+20161222: Einrichten der Shutdown , Restart , Cancel , Buttons und Scripte
+
 20161014: Grafikakrten Treiber AMD HR 5400 installiert V 15... aus 2015, außer "Gaming Evolved App"
 
 20160907: Image erstellt und hier wiederhergestellt
 20160813: 7zip Installiert
 
-20160520: Spiel "Wargame - AirLand Battle" installiert mit Produktschlüssel: WKR7B-LA24J-4L43Z-8GZ8X-2ATFF
+20160520: Spiel "Wargame - AirLand Battle" installiert
 
 20160328: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
 

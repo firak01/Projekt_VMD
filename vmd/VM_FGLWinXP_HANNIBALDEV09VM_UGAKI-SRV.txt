@@ -1,5 +1,5 @@
 ---- Synchron halten mit ...DEV08
-### Entwickungsumgebung für TileHexMap Projekt (Version 03, d.h. MIT Hibernate, als Maven Projekt)
+### Entwickungsumgebung für Kernel02 & TileHexMap Projekt (Version 03, d.h. MIT Hibernate, als Maven Projekt)
 ### Dabei wird der zKernel nur als JAR-File eingebunden und hier nicht aktuell entwickelt
 #### Apache Wicket Entwickungsumgebung 
 
@@ -16,6 +16,13 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20170129: Arbeitsspeicher der VM auf 3072MB erhöht
+20170128: WinXP Support Tools installiert, werden für VMD Projekt benötigt (setx)
+20170121: Firefox Konten eingerichtet
+20170121: Incony und Betzemeier Workspace gepackt und zum Host verschoben, wohin?
+
+20170111: Firefox Updates auf V51.x
+20170111: Installation von 7zip
 
 20151108: Java 1.7 JDK Intstalliert, Apache Ant Installiert und entsprechende Umgebungsvariablen gesetzt
 20151108: Repository für ProjektVM erstellt

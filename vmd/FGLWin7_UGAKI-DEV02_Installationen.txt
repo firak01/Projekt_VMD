@@ -1,5 +1,8 @@
 ### Android Entwicklungsumgebung (UGAKI-DEV02, in Paderborn)
 
+20170628: Backups IMAGE erstellt
+20170628: GitHub Aktualisiert, Teamviewr Host auf Version 12 aktualisiert.
+
 20161007: Engergenie Installiert für LAN (und USB)
 20161002: Eclipse - AndMore Plugin installiert (nach Anleitung aus meiner Doku Datenbank)
 
