@@ -11,11 +11,11 @@ Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
    b) ZKernelFileCollection importiert.
 
 2. Projekt JAZTileHexMap03 clonen
-
       Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem WebService zur Verfügung zu stellen.
-      Projekte: TILEHEXMAPSERVICE
+      
+3. Projekt: TILEHEXMAPSERVICE
 
-
+#######################
 - Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
 - Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
 
@@ -24,6 +24,12 @@ TODO:
 
 
 ########################
+
+20171127: Nach Update auf Firefox Quantum (57.0) funktioniert das SQLITE Plugin für den Browser nicht mehr. Alternative SQLite Studio installiert.
+
+20171122: WebTools Plugins in Eclipse installiert (WTP) von http://download.eclipse.org/webtools/repository/oxygen
+20171122: Java 8 installiert, Eclipse Oxygen installiert
+20171122: Problem bei der Generierung von Webservices in meiner bisherigen Umgebung. Neuinstallation.
 
 20170624: VMWare Tools aktualisiert, nachdem auf dem Host System der VMWare Workstation 12 installiert wurde.
 
