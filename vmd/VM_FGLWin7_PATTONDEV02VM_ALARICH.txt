@@ -25,6 +25,7 @@ TODO:
 
 ########################
 
+20171129: Notepad++ installiert. So kann man Eclipse-Projekt Java-Patch Dateien nach ANSI Konvertieren.
 20171127: Nach Update auf Firefox Quantum (57.0) funktioniert das SQLITE Plugin für den Browser nicht mehr. Alternative SQLite Studio installiert.
 
 20171122: WebTools Plugins in Eclipse installiert (WTP) von http://download.eclipse.org/webtools/repository/oxygen
