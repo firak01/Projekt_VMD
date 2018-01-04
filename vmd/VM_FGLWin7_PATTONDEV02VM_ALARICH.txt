@@ -25,6 +25,12 @@ TODO:
 
 ########################
 
+20171230: Eclipse: Installation von nodeclipse [Enide (Studio)} von der Seite: http://www.nodeclipse.org/updates/ 
+20171230: Node.js installiert. Buchbeispiel aus "Firebase Cookbook" mit node.js lauffähig.
+20171230: Für Node.js den Installationsmanager nvm installiert.
+
+20171209: SQLiteDatabaseBrowserPortable installiert.
+
 20171129: Notepad++ installiert. So kann man Eclipse-Projekt Java-Patch Dateien nach ANSI Konvertieren.
 20171127: Nach Update auf Firefox Quantum (57.0) funktioniert das SQLITE Plugin für den Browser nicht mehr. Alternative SQLite Studio installiert.
 
