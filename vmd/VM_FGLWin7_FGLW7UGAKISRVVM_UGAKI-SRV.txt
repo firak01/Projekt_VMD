@@ -25,6 +25,16 @@ TODO:
 
 #####################################
 
+20180104: Eclipse: Installation von nodeclipse [Enide (Studio)] von der Seite: http://www.nodeclipse.org/updates/ 
+20180104: WebTools Plugins in Eclipse installiert (WTP) von http://download.eclipse.org/webtools/repository/oxygen
+20180104: Eclipse Oxygen installiert
+20180104: Notepad++ installiert
+
+20180501: Node.js installiert. Buchbeispiel aus "Firebase Cookbook" mit node.js lauffähig.
+20180501: Für Node.js den Installationsmanager nvm installiert.
+20180105: Java JDK 1.8 installiert
+
+20180104: Auch wenn man von einem anderen Rechner aus per Firefox Portable zugreift, gibt es das Problem vom 20171118!
 20171215: Lösungsansatz 6: Firefox Portabele 3.58 installiert. Nun kann man direkt aus der Serverübersicht eine Konsole ( im Vollbildmodus ) starten.
 20171209: SQLiteDatabaseBrowserPortable installiert
 
