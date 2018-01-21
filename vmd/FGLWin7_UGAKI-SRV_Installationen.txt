@@ -3,6 +3,9 @@
 --- Wichtig: Niemals Firefox 32bit updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
 ######################################################################
 
+20171217: Einrichten von Firefox Portable 3.5 
+          Vielleicht besser für die Arbeit als Konsole für den VMWare Server 2.0.2 als die 3.6er Version des Firefox?
+
 20170818: Installation von Magenta Cloud
 
 20170626: BGInfo eingerichtet.
