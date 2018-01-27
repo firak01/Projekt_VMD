@@ -3,6 +3,8 @@
 TODO: WINTV Aufnahmen in höherer Qualität testen
 TODO: schien zu klappen 20160405: Installation Software für Trendnet TE100-MP2U
 
+20170516: BGInfo eingerichtet, Keinen Dekstophintergrund (besser für Teamviewer)
+
 20161107: VMD_PROJEKT einrichten
 20161107: Installation von Support Tools für WinXP. Setx.exe wird bereitgestellt für VMD_PROJEKT.
 20161103: Installation von GitGUI für Windows und Tortoise Git (für WinXP)
@@ -11,7 +13,7 @@ TODO: schien zu klappen 20160405: Installation Software für Trendnet TE100-MP2U
 20161019: Installation von Ulead Photo Explorer 6.0
 
 20161019: Installation von Philips PCVC 730k WebCam 
-          (Kann über Systemsterung/Kameras/Philips... und dann mit Rechtsclick darauf verwendet werden zum Screenshot erstellen)
+          (Kann über Systemsteuerung/Kameras/Philips... und dann mit Rechtsclick darauf verwendet werden zum Screenshot erstellen)
           (Kann von Teamviewer als Video verwendet werden)
 
 20160822: Image erstellt und auf dieser Platte wiederhergestellt.

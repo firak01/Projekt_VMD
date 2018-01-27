@@ -1,0 +1,78 @@
+#### Office 2010 - Umgebung für Entwicklung
+Merke: Synchron halten der Entwicklungsumgebung auf dem UGAKI-VMWARE-Server mit ..................
+Merke: Basiert auf einem Rechner (Patton) mit einem UEFI BIOS. Dieses ist auf dem UGAKI-VMWARE-Server nicht lauffähig.
+       
+Eclipse Luna Umgebung
+- Entwicklungsumgebung für TILEHEXMAP03SERVICE - Projekt, also einen WebService verbunden über Hibernate mit einer Datenbank.
+
+Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
+1. Lokales Repository und Projekt 
+   a) JAZKernel (V02) und weitere clonen.
+   b) ZKernelFileCollection importiert.
+
+2. Projekt JAZTileHexMap03 clonen
+      Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem WebService zur Verfügung zu stellen.
+      
+3. Projekt: TILEHEXMAPSERVICE
+
+#######################
+- Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
+- Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
+
+TODO: 
+  Beispiele aus einem Buch, bzgl. Webservices hier als Workspace.
+
+
+########################
+
+20171230: Eclipse: Installation von nodeclipse [Enide (Studio)} von der Seite: http://www.nodeclipse.org/updates/ 
+20171230: Node.js installiert. Buchbeispiel aus "Firebase Cookbook" mit node.js lauffähig.
+20171230: Für Node.js den Installationsmanager nvm installiert.
+
+20171209: SQLiteDatabaseBrowserPortable installiert.
+
+20171129: Notepad++ installiert. So kann man Eclipse-Projekt Java-Patch Dateien nach ANSI Konvertieren.
+20171127: Nach Update auf Firefox Quantum (57.0) funktioniert das SQLITE Plugin für den Browser nicht mehr. Alternative SQLite Studio installiert.
+
+20171122: WebTools Plugins in Eclipse installiert (WTP) von http://download.eclipse.org/webtools/repository/oxygen
+20171122: Java 8 installiert, Eclipse Oxygen installiert
+20171122: Problem bei der Generierung von Webservices in meiner bisherigen Umgebung. Neuinstallation.
+
+20170624: VMWare Tools aktualisiert, nachdem auf dem Host System der VMWare Workstation 12 installiert wurde.
+
+20170618: Subversive Plugin nach Eclipse Luna installiert und an meinen Subversion Sever angebunden.
+
+20170609: Auslagerungsdatei für Speicher abgestellt (soll Performace der VM erhöhen), aber dann kann zusätzlich zu Eclipse und Tomcat nicht noch SoapUI gestartet werden.
+          Also Auslieferungdatei fix auf 4096MB festgelegt.
+
+20170530: Arbeitsspeicher der VM auf 3072MB erhöht
+20170530: Backup der VM
+
+20170527: SOAPUI 5.3 installiert und den ersten Webservice getestet.
+20170527: Tomcat Server unter Eclipse mit AXIS2 War File versehen. Den ersten WebService basierend auf einer Java-Datei erstellt.
+
+20170522: Tomcat Server mit lokalem Benutzer lindhaueradmin versehen. Testweise ein Servlet aus einem Tutorial als .war importiert. Lokal erreichbar.
+20170519: Eclipse WTP installiert, Tomcat Server eingerichtet
+
+20170519: Eclipse AndMore - Plugin installiert aus dem MArketplace (von Update Site klappt nicht) (Google ADT funktioniert nicht mehr mit neuer Android API)
+20170519: Eclipse ADT-Plugin erneut von der Website installiert. Bestehende Version wurde entfernt. Ohne dies hat der Folgeschritt (das ANDMORE - Plugin) nicht funktioniert.
+20170518: Eclipse workspace mit Tomcat-Server, zum Experimentieren
+20170518: Tomcat 8 installiert
+
+20170516: Projekt_VMD eingerichtet, 
+20170516: GitHub Client installiert
+20170516: Java Ant installiert
+
+20170516: Firefox 64bit Version installiert. 32bit Version entfernt.
+20170516: 7zip installiert
+20170516: BGInfo eingerichtet
+20170516: Eclipse Aktualisiert. Daher TODO das Android HelloWorld-Projekt anders einstellen (ADT)
+Android SDK Tools installiert
+
+
+20170103: Winword 2010 startet noch, ohne Lizenkey nachzufordern.
+20170103: Wohl schon früher erstellt als Kopie von "FGLWin7Patton01VM.txt", nun mal anpassen
+
+
+### Office 2010 - Umgebung
+Vor 2013-11-30: Neu hier aktiviert, Office 2010 installiert und aktiviert, acronis 2013 installiert und aktiviert

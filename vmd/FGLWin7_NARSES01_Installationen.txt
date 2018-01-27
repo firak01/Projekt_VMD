@@ -1,0 +1,43 @@
+### Private Netzrechner zum Surfen / Musikhören
+
+
+TODO: Einrichten der Shutdown , Restart , Cancel , Buttons und Scripte
+TODO: Installation von GitHub - Client
+TODO: 7zip Installiert
+TODO: Installation von Notepad++
+
+#########################################################
+
+
+
+TODO:      Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
+      Installation von Teamviewer HOST 12.0
+
+20170906: Installation von Apache Ant
+20170906: Installation von Java7 JDK
+20170906: Einrichten des VMD_Projekts
+20170906: Installation von GitHub Desktop Client (64bit)
+20170906: Installation von 7zip (64bit)
+
+20170623: Installation von NVidea Grafik Treibern.
+20170623: Installation von NVidia Chipset Treibern. Dadurch fehlt der Coprozessor im Gerätemanager nicht mehr.
+20170623: Installation von Telekom Magenta Cloud.
+
+20170617: Einrichten von Terratex Cingy - Also nur 64bit Treiber, 6.22. Home Cinema als Software. Einstelungen / Video Render auf "Overlay Mixer"
+
+20170611: Installation Treiber für Terratec Cinergy S USB TV  & die Software
+
+20170506: Windows Backup erstellt auf USB Festplatte
+
+20140505: Unter Windwows die WLAN Verbindung deaktivert (Ziel: Strom sparen)
+
+20170430: "Wake On LAN" eingerichtet. Merke: Dazu muss im BIOS "Deep Sleep" deaktiviert sein. Mac Adresse ist: 90:fb:a6:2c:ab:d3
+          Alterantiv ist es auch mit diesem Gerät möglich es nach dem "Stromausfall" zu starten.
+
+20170429: Installation und Einrichten vom Drucker Borther MFC-6490 CW 192.168.3.246 in Paderborn
+
+20170429: Als Ziel für Remotedesktopverbindungen ist Win7 Professional notwendig.
+
+20170429: Win7 Autologon eingerichtet
+20170427: Installation von Windows 7 Home Premium Edition & Einspielen der Updates
+
