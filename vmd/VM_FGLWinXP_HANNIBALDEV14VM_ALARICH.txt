@@ -5,6 +5,7 @@
 --- TryOut Jsf
 --- TryOut Hibernate (insbesondere HQL)
 --- TryOut Hibernate (insbesondere Criteria API)
+--- Workspace mit Tutorials von Eugenp (unter anderem Criteria API)
 Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 
 ### es fehlt hier folgendes verglichen mit DEV15 (für diesen Workspaces) ##########
@@ -16,11 +17,13 @@ Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 ##################################################
 
 20170809: TODO: Einrichten einer Umgebung für ein Eclipse Projekt "Tutorial Hibernate Criteria API"
-20170809: TODO  Anbinden von Eclipse an GitHub
-20170809: Installation fon Firefox 52.0.2 als letzte Version für WinXP
+
+20170814: Installation von Eclipse OXYGENE Workspace "Tutorials von Eugenp"
+20170814: Anbinden von Eclipse Oxygene an GitHub. Erweiterung für den GitHub - Repository Zugriff. (Neue Software, Abschnitt "Team")
+
+20170809: Installation fon Firefox 52.0.2 als letzte Version für WinXP (Update auf ESR klappt nicht....)
 20170809: Installation von Eclipse OXYGENE und Workspace für "TryoutHibernateCriteriaAPI"
 20170809: Installation von Java 8 (auf eigene Gefahr unter WinXP)
-20170809: TODO: Ab hier nach DEV 15 bringen
 
 20170215: MySQL Serverstart_ Dienst auf manuell gestellt (statt automatisch)
 

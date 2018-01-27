@@ -2,6 +2,13 @@
 
 #########################################################
 
+20180121: Deinstallation von Notepad+++ 32 bit, Installation der 64bit Version und des PluginManagers
+
+20180119: Installation von GitGUI für Pacific Storm - Allies Repository
+
+20170921: Installation von Calibre (Tool zum Konvertieren von eBooks. Z.B. epub nach PDF)
+20170921: Installation von WiseRegistryCleaner Free
+
 20170708: Installation von Avast Antivirus
 
 20170628: Image erstellen (ohne Steam, etc.)
