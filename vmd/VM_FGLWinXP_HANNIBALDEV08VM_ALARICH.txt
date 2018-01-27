@@ -16,6 +16,11 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20180127: SSH in Eclipse Lune (TileHexMap03 Workspace) konfiguriert. Nun klappt wieder "Commit and push"
+20180127: SSH Key Dateien im Verzeichnis .ssh des Benutzers hinterlegt. 
+
+
+20170812: Firefox Updates
 20170412: Workspace für Buch "Java Hibernate Persistence 2nd Edition (2016)" erstellt. Aber wenn man das Maven Projekt erstellt, kommt es zu einem Fehler.
 
 20170208: Workspace für Tryout Hibernate mit 7zip gepackt und zum Host verschoben
