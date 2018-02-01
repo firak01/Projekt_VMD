@@ -13,6 +13,11 @@ TODO: Installation von Notepad++
 TODO:      Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
 
+20180201: Kopieren der SSH Zertifikatsdateien in den .ssh Ordner des Benutzers
+
+20180201: Repository Projekt_VMS
+20180201: Installation von GitGUI
+
 20170906: Installation von Apache Ant
 20170906: Installation von Java7 JDK
 20170906: Einrichten des VMD_Projekts
