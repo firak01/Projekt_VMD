@@ -1,6 +1,16 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
+
+20180121: Installation von Microsoft Visual C++ Redistrubtuable (64bit), wg Fehlers: VCRUNTIME140.dll missing
+20180121: Notepad++: Deinatallation der 32bit Versio , Insatllation der 64bit Version und Insttllation des Plugin Managers.
+
+20171217: Einrichten von Firefox 3.5 (portable) - Lösung als Konsole (über ein Plugin) für den VMWare Server 2.0.2 - (vielleicht besser als 3.6er Firefox Version)
+20171216: Einrichten von VMWaer vSphere Client 10 (update 3) - Zugriff auf VMWare Server 2.0.2 - ABER: Konsole funktioniert nicht.
+
+20171130: Remote Desktop scheint hier nicht zu funktionieren, das kein Windows Professional
+20170922: Installation von Calibre ( eBook Konverter , z.B. von epub nach PDF )
+
 20170828: Installation von Samsung Smart Switch (ersetzt Samsung KIES, welches mit dem Galaxy S3 Neo nicht funktioniert).
 20170824: Installation von Samsung Android Galaxy S3 USB Treiber
 
