@@ -1,5 +1,5 @@
 ---- Synchron halten mit DEV05
----- Entwicklungsumgebung von "KernelZZZ", "VideoInternetArchive", "ScheduledFileArchiveZZZ"
+---- Entwicklungsumgebung von "KernelZZZ V01 und V02", "VideoInternetArchive", "ScheduledFileArchiveZZZ"
 
 ##### Lotus Notes Client 8.53, Für Arbeit mit Foren, Tips, etc. eingerichtet.
             ABER: Die Dateien bleiben auf dem fgl02 - Server und werden nicht lokal repliziert (Platz sparen)
@@ -19,7 +19,7 @@
 
             
 	Eclipse 3.22
-	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
+	--- Entwicklung des "KernelZZZ" V02, (1.6er compiler)(angebunden an Subversion)
               --- VideoInternetArchive (Kernel V02, 1.6er compiler, angebunden an Subversion )
               --- diverse TryOuts: Z.B. CouchDb, TimerTask (angebunden an Subversion)
               --- diverse TryOuts: Z.B. iText, PortScanner (angebunden an CVS)                                   
@@ -34,11 +34,18 @@
         --- Fatjar und Subversion Plugin
         --- 1. Workspace mit Kernel V2.0 (angebunden an GitHub, von Subversion nach GitHub übernehmen)
 
-        --- 2. Workspace mit Kernel V3.0 (angebunden an GitHub) ???? Das sollte in einer anderen Entwicklungsumgebung passieren, da Java 1.7 und Hibernate basierend.
+        --- 2. TODO Löschen: Workspace mit Kernel V3.0 (angebunden an GitHub) ???? Das sollte in einer anderen Entwicklungsumgebung passieren, da Java 1.7 und Hibernate basierend.
+                                                                                                                          Dies in DEV08_Alaraich bzw. DEV09_UGAKI-SRV einrichten
 
         
 ####################################################################
 
+
+20171016: VMWare Tools aktualisiert
+
+20170322: 7zip installiert
+
+20170220: Auslagerungsdatei entfernen.
 20170105: Einrichten von Eclipse Luna Workspace für Kernel02 (Angebunden an GitHub)
 
 20161119: Überschreibe fehlerhaften Commit von HANNIBALDEV03VM_UGAKI

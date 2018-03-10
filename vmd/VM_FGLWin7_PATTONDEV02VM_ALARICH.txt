@@ -1,11 +1,49 @@
 #### Office 2010 - Umgebung für Entwicklung
+Merke: Synchron halten der Entwicklungsumgebung auf dem UGAKI-VMWARE-Server mit ..................
+Merke: Basiert auf einem Rechner (Patton) mit einem UEFI BIOS. Dieses ist auf dem UGAKI-VMWARE-Server nicht lauffähig.
+       
 Eclipse Luna Umgebung
+- Entwicklungsumgebung für TILEHEXMAP03SERVICE - Projekt, also einen WebService verbunden über Hibernate mit einer Datenbank.
+
+Einrichten des TILEHEXMap03 Projekts und der SQLite Datenbank:
+1. Lokales Repository und Projekt 
+   a) JAZKernel (V02) und weitere clonen.
+   b) ZKernelFileCollection importiert.
+
+2. Projekt JAZTileHexMap03 clonen
+      Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem WebService zur Verfügung zu stellen.
+      
+3. Projekt: TILEHEXMAPSERVICE
+
+#######################
 - Geplant war hier APP Entwicklung, aber die Performance ist zu schlecht UND ggf. Treiber Problematik in der virtuellen Maschine.
-- TODO: Hier nun eine Umgebung für WebService Entwicklung aufbauen.
-        Beispiel aus einem Buch.
+- Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
+
+TODO: 
+  Beispiele aus einem Buch, bzgl. Webservices hier als Workspace.
 
 
 ########################
+
+20171230: Eclipse: Installation von nodeclipse [Enide (Studio)} von der Seite: http://www.nodeclipse.org/updates/ 
+20171230: Node.js installiert. Buchbeispiel aus "Firebase Cookbook" mit node.js lauffähig.
+20171230: Für Node.js den Installationsmanager nvm installiert.
+
+20171209: SQLiteDatabaseBrowserPortable installiert.
+
+20171129: Notepad++ installiert. So kann man Eclipse-Projekt Java-Patch Dateien nach ANSI Konvertieren.
+20171127: Nach Update auf Firefox Quantum (57.0) funktioniert das SQLITE Plugin für den Browser nicht mehr. Alternative SQLite Studio installiert.
+
+20171122: WebTools Plugins in Eclipse installiert (WTP) von http://download.eclipse.org/webtools/repository/oxygen
+20171122: Java 8 installiert, Eclipse Oxygen installiert
+20171122: Problem bei der Generierung von Webservices in meiner bisherigen Umgebung. Neuinstallation.
+
+20170624: VMWare Tools aktualisiert, nachdem auf dem Host System der VMWare Workstation 12 installiert wurde.
+
+20170618: Subversive Plugin nach Eclipse Luna installiert und an meinen Subversion Sever angebunden.
+
+20170609: Auslagerungsdatei für Speicher abgestellt (soll Performace der VM erhöhen), aber dann kann zusätzlich zu Eclipse und Tomcat nicht noch SoapUI gestartet werden.
+          Also Auslieferungdatei fix auf 4096MB festgelegt.
 
 20170530: Arbeitsspeicher der VM auf 3072MB erhöht
 20170530: Backup der VM
