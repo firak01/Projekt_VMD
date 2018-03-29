@@ -2,6 +2,10 @@
 
 #########################################################
 
+20180329: Silent Hunter 4 installiert inclusive Mission Pack (damit Version 1.5)
+
+20180320: Emergency 2 Deluxe installiert
+
 20180201: GitGUI: Neues Repository für !1fgl\client\script" und "1fgl\server"
 
 20180121: Deinstallation von Notepad+++ 32 bit, Installation der 64bit Version und des 64bit PluginManagers
