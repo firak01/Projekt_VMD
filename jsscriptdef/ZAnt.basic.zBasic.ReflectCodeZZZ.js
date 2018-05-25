@@ -183,10 +183,13 @@
 				var bIsJava7=isJava7(objControlCaller);
 				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 				
+				var bIsJava8=isJava8(objControlCaller);
+				if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);							
+				
 				//Merke Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
 				//ACHTUNG: Wir Suchen als Funktion das VORLETZTE Element in dem Array
 				if(bIsJava7){		
-					//print(sScript+"7: Ausfuehrung unter Java7");					
+					print(sScript+"7: Ausfuehrung unter Java7");					
 					if('undefined'!=myError && null!=myError){					
 						if(undefined!=myError.stack){		
 							print(sScript+"7: Stack im Error Objekt vorhanden");
@@ -220,9 +223,9 @@
 							iIndex=iuBound-2; //-1, weil der letzte Wert nicht interessiert, sondern der vorletzte, -1 weil wir in der UnterUnterfunkton sind.
 						}
 						sCallerLine = saStacktrace[(iIndex)];
-					}					
-				}else{
-					//print(sScript+"8: Ausfuehrung unter Java8");
+					}	
+				} else if(bIsJava8){
+					print(sScript+"8: Ausfuehrung unter Java8");
 					if('undefined'!=myError && null!=myError){					
 						if(undefined!=myError.stack){		
 							//Java 8, NASHORN funktioniert.
@@ -269,6 +272,10 @@
 						//print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
 						sCallerLine = saStacktrace[(iIndexToBeUsed)];
 					}
+				}else{
+					var sJavaVersion = readJavaVersionString();
+					print(sScript+"9: Ausfuehrung unter JavaXXX: '" + sJavaVersion + "'" );
+					
 				}
 				//print(sScript+"CallerLine="+sCallerLine);
 				sReturn=sCallerLine;
@@ -295,11 +302,14 @@ function reflectMethod_StackMethodFromLine(sStackLine, objControl){
 		if(undefined==sStackLine || null==sStackLine) throw new Error(sScript+"Parameter Stacktrace-Zeile fehlt.");
 											
 		var objControlCaller=new Object();
-		var bJava7=isJava7(objControlCaller);					
+		var bIsJava7=isJava7(objControlCaller);					
 		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 		
+		var bIsJava8=isJava8(objControlCaller);
+		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);			
+				
 		var clean2="";
-		if(bJava7){
+		if(bIsJava7){
 			//print(sScript+"Java 7 Zweig. sStackLine="+sStackLine);
 			var index = sStackLine.indexOf(" (");
 			var clean = sStackLine.slice(index+2, sStackLine.length);
@@ -309,8 +319,8 @@ function reflectMethod_StackMethodFromLine(sStackLine, objControl){
 				clean2 = clean.substring(0,index2).trim();
 			}else{
 				clean2 = clean.trim();
-			}			
-		} else {
+			}	
+		} else if(bIsJava8){
 			//Java8
 			//print(sScript+"NICHT Java 7 Zweig. sStackLine="+sStackLine);
 			var index = sStackLine.indexOf("at ");
@@ -324,6 +334,11 @@ function reflectMethod_StackMethodFromLine(sStackLine, objControl){
 			//print(sScript+"clean="+clean);
 			
 			clean2 = clean.trim();
+		
+		} else {
+			var sJavaVersion = readJavaVersionString();
+			print(sScript+"9: Ausfuehrung unter JavaXXX: '" + sJavaVersion + "'" );
+					
 		}
 		sReturn=clean2;					
 		bReturnControl=true;
@@ -349,10 +364,14 @@ function createStackTrace() {
   var isCallstackPopulated = false;
   try{
 	var objControlCaller=new Object();
-	var bJava7=isJava7(objControlCaller);					
+	var bIsJava7=isJava7(objControlCaller);					
 	if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
 	
-if(bJava7){		
+	var bIsJava8=isJava8(objControlCaller);
+	if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);			
+					
+	
+if(bIsJava7){		
   // print(sScript+"Java7 Fall");
   //+++ Java7 Fall
   try {
@@ -408,7 +427,7 @@ if(bJava7){
   }
   //+++ ENDE Java7 Fall
   //+++ START Java8 Fall
-  }else{
+  }else if(bIsJava8){
 	//print(sScript+"Java8 Fall");
 	try {
 		var objError = new Error();
@@ -416,6 +435,11 @@ if(bJava7){
 	} catch(e) {
 	
 	}
+  
+  }else{
+		var sJavaVersion = readJavaVersionString();
+		print(sScript+"Ausfuehrung unter JavaXXX: '" + sJavaVersion + "'" );
+					
   
   
   }

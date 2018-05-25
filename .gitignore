@@ -31,6 +31,7 @@
 log/log.txt
 log/error.txt
 
+
  
 
 # Auf allen anderen Ebenen .gitignore ausschliessen. Nur zuoberst nicht.

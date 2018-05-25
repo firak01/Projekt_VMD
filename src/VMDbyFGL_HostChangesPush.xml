@@ -1442,7 +1442,6 @@
 	
 	<!-- TODO noch kaputt -->
 	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->
-	<isSetJsZZZ inputValue="${myRightPart}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	

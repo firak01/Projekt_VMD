@@ -26,8 +26,23 @@
 		   var myArrayErg = new Array();
 		   var myFlagControl = attributes.get("sflagcontrol");
 		   
-		   print("Starte getFilenameFromPathZZZ '" + sPath + "'");
+		   var sScript = "getFilenameFromPathJsZZZ: ";
+		   print("Starte " + sScript + " mit Pfad '" + sPath + "'");
 
+		   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		   
 		   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
 		   //      Dies ggfs. in JSZ-Kernel uebernehmen
 		   //var filename = fullPath.replace(/^.*[\\\/]/, '')
@@ -87,6 +102,22 @@
 		 <attribute name="text" />
 		 <attribute name="property" />
 		 <![CDATA[
+			var sScript = "isDirectoryZZZ: ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		 
 		   enableJava();
 		   //importClass(Package.zxyz.abc.myclassZZZ);//um Verkürzt auf File zuzugreifen. sonst nur sinnvoll für Klassen, die nicht BasisJava sind und dann ist Package notwendig
 		   importClass(java.io.File);                               //Bei BasisJava darf Package nicht vorneweg stehen.
@@ -143,6 +174,22 @@
 			var bReturn=false; //Wird hier nicht zurueckgegeben
 			var bReturnControl=false;
 			var sReturnControl="Fehler";
+		
+			var sScript = "isFileRootJsZZZ: ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
 		
 			//Die benoetigten Kernel-Funktionen laden
 			//There is no "pass by reference" available in JavaScript. You can pass an object (which is to say, you can pass-by-value a reference to an object) and then have a function modify the object contents:
