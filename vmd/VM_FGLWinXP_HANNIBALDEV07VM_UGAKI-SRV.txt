@@ -18,6 +18,11 @@
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
 
+TODO: Arbeitsumgebung Eclipse für Buch "Swing Hacks"
+
+20180524: VMD funktioniert
+20180524: VMD Projekt - Setx über Installation von WinXP SupportTools notwendig
+
 20151108: Java 1.7 JDK Intstalliert, Apache Ant Installiert und entsprechende Umgebungsvariablen gesetzt
 20151108: Repository für ProjektVM erstellt
 20151108: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
