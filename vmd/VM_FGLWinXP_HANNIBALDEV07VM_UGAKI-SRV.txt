@@ -2,6 +2,7 @@
 ##############
               --- Eclipse (Luna):
                    Anbindung an GitHub und Einbeziehen dortiger Repositories              
+                   Entwicklungsumgebung für das Buch "Swing Hacks" (an GIT angebunden)
 
 	--- Lotus Notes Client 9, 
 	--- Eclipse (Juno):
@@ -18,7 +19,10 @@
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
 
-TODO: Arbeitsumgebung Eclipse für Buch "Swing Hacks"
+20180527: Firefox - Arbeitsumgebungen - Profile eingerichtet.
+
+20180527: Arbeitsumgebung Eclipse für Buch "Swing Hacks": Repository des Buchs eingebunden
+20180527: Arbeitsumgebung Eclipse für Buch "Swing Hacks": erstellt
 
 20180524: VMD funktioniert
 20180524: VMD Projekt - Setx über Installation von WinXP SupportTools notwendig
