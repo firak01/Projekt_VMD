@@ -16,6 +16,9 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20180603: VMD-Projekt an SSL GIT angebunden.
+20180603: Eclipse Workspace für TileHexMap (an Git angebunden) nun das notwendige Subversion-Projekt aktualisiert.
+
 20180127: SSH in Eclipse Lune (TileHexMap03 Workspace) konfiguriert. Nun klappt wieder "Commit and push"
 20180127: SSH Key Dateien im Verzeichnis .ssh des Benutzers hinterlegt. 
 
