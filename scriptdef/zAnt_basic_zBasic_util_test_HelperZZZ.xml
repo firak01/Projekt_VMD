@@ -18,6 +18,22 @@
 		<attribute name="arrayreturn" />
 		<attribute name="ireturn" /><!-- true, false -->
 		<![CDATA[
+			var sScript = "arrayValueTestFillJsZZZ: ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		
 			enableJava();
 			var myArray = attributes.get("arrayinput");		 
 			var iReturn = false;

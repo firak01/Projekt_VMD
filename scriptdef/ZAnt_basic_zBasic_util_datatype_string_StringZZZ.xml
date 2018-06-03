@@ -23,6 +23,21 @@
 	   var myString = attributes.get("inputstring");
        var myMatch = attributes.get("inputmatchstring");
 	   
+	   var sScript = "stringContainsStringJsZZZ: ";
+	   
+	   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+	   //print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+	   //print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   
 	   
 	   //Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
@@ -218,7 +233,22 @@
 	   var myString = attributes.get("inputstring");
        var myMatch = attributes.get("inputmatchstring");
 	   
-	     //Aufruf der "Arbeitsfunktion".
+	   var sScript = "stringCountStringJsZZZ: ";
+	   
+	   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   	   
+	    //Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 		var objControlCaller=new Object();
 		var iReturn = stringCountStringJs(objKernelLibs, myString, myMatch, objControlCaller);				
@@ -419,6 +449,20 @@
        var myString = attributes.get("inputstring");
        //print("myString="+myString);
 	   
+	   var sScript = "stringEncodeJsZZZ: ";
+	   
+	   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   	   
 	   
 	    //Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
@@ -611,6 +655,21 @@
 		var myString = attributes.get("inputstring");		
 		var myDelimiter = attributes.get("inputdelimiter");		
 			
+		var sScript = "stringExplodeJsZZZ: ";
+
+		//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   		
 		//Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 		var objControlCaller=new Object();
@@ -805,6 +864,22 @@
 	  var myString = attributes.get("inputstring");
 	  var myMatch = attributes.get("inputmatchstring");
       
+	  var sScript = "stringLeftBackStringJsZZZ: ";
+	  
+	  //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   
+	  
 	  //Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 		var objControlCaller=new Object();
@@ -1013,6 +1088,23 @@
 		var myString = attributes.get("inputstring");		
 		var myMatchString = attributes.get("inputmatchstring");		
 			
+		var sScript = "stringLeftStringJsZZZ: ";
+		
+		//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   
+		
+		
 		//Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 		var objControlCaller=new Object();
@@ -1215,6 +1307,23 @@
 		 <![CDATA[
 		   var myString = attributes.get("inputstring");		   
 		   var myMatch = attributes.get("inputmatchstring");
+		   
+		   var sScript = "stringRightStringJsZZZ: ";
+		   
+		   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		   
 		   
 	    //Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
@@ -1422,6 +1531,22 @@
 	  var myStart = attributes.get("inputindexstart");
 	  var myEnd = attributes.get("inputindexend");
       
+	  var sScript = "stringSubStringJsZZZ: ";
+	  
+	  //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   
+	  
 	  //Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 		var objControlCaller=new Object();
@@ -1635,6 +1760,22 @@
 			  	
        var myString = attributes.get("inputstring");
        //print("myString="+myString);
+	   
+	   var sScript = "stringUnencodeJsZZZ: ";
+	   
+	   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   
 	   
 	   
 	    //Aufruf der "Arbeitsfunktion".

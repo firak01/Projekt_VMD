@@ -1,10 +1,58 @@
+# Ignore everything
+*
+
+# Ignore Directories NOT
+#!*/webapps/qisserver/*
+#!*/webapps/ROOT/*
+
+# Don`t ignore directories, so we can recurse into them
+!*/
+
+# Ignore
+.project
+
+
+# But don´t ignore publish modul relevant files
+!*.jar
+!*.properties
+!*.js
+!*.txt
+!*.bat
+!*.xml
+
+# Don´t ignore spezial common used file (share via some reports) 
+#!*4HHN.xsl
+
+# Auch die Datenbankkonfiguration ausschliessen. Das muss unterhalb des 'don't ignore' mit Wildcards der Endung stehen.
+#/webapps/qisserver/WEB-INF/conf/databases_HHN.xml
+#/webapps/qisserver/WEB-INF/conf/LoginConf_HHN.xml
+
+# Ignoriere aber
 log/log.txt
 log/error.txt
-log/log.txt
-log/error.txt
-log/error.txt
-log/error.txt
-log/error.txt
-log/error.txt
-log/error.txt
-log/error.txt
+
+
+ 
+
+# Auf allen anderen Ebenen .gitignore ausschliessen. Nur zuoberst nicht.
+!.gitignore
+*/.gitignore
+*/*/.gitignore
+*/*/*/.gitignore
+*/*/*/*/.gitignore
+*/*/*/*/*/.gitignore
+*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/*/*/*/*/*/*/.gitignore
+*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/.gitignore
+
+
+
+
+/.metadata/

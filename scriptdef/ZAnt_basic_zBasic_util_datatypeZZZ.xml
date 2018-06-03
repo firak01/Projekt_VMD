@@ -36,9 +36,25 @@
 		<attribute name="returnchanged" />
 		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen realisieren. -->	
 		
-		<![CDATA[		
-			//print("Starte isBooleanJsZZZ");			
+		<![CDATA[	
+			var sScript = "isBooleanJsZZZ: "
+			//print("Starte " + sScript);
 			var myValue = attributes.get("inputvalue");
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+			
 			//print("myValue="+myValue);				   
 			//Aufruf der "Arbeitsfunktion".
 			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
@@ -263,15 +279,28 @@
 		<attribute name="returnchanged" />
 		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen realisieren. -->	    
      <![CDATA[	
-		//print("Starte isSetJsZZZ");
-			  	
-	    var myValue = attributes.get("inputvalue");
-		//print("myValue='"+myValue+"'");		   
+	    var sScript = "isSetJsZZZ: ";
+		//print("Starte "+sScript);
+		var myValue = attributes.get("inputvalue");			
+		
+		//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
 	   
 	    //Aufruf der "Arbeitsfunktion".
 		var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 		var objControlCaller=new Object();
 		var objValueCaller=new Object(); //Es gibt nur call by value. Also müssen geänderte Eingabewerte per Object übergeben und geholt werden.			
+		print("isSetJsZZZ: Vor Aufruf der Arbeitsfunktion.");		   	   
 		var bReturn = isSetJs(objKernelLibs, myValue, objValueCaller, objControlCaller);				
 		if(!objControlCaller.bReturnControl){									
 			bReturnControl=false;
@@ -310,6 +339,7 @@
         //###################################################################			
 		function enableKernelAntJs(objKernelLibs, sDirSubDefault, objControl){				
 			var sScript = "enableKernelAntJs: ";
+			print(sScript+": Start.");
 			try{
 				if(objKernelLibs==undefined || objKernelLibs==null){
 					var err = new Error("objKernelLibs nicht deklariert.");
@@ -357,7 +387,7 @@
 			try{				
 					if(objKernelLibs==undefined || objKernelLibs==null)	throw new Error("Keine Kernel Ant Js Libs uebergeben.");
 					if(objKernelLibs.length==0 || objKernelLibs.length==undefined){
-						//print("Noch keine Kernel Ant Js Libs vorhanden zum Laden, lade sie jetzt.");
+						print("Arbeitsfunktion isSetJs: Noch keine Kernel Ant Js Libs vorhanden zum Laden, lade sie jetzt.");
 							
 						var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
 						var objControlCallerKernel=new Object();
