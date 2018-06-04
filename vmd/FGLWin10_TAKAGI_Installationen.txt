@@ -1,0 +1,14 @@
+TAKAGI Rechner. Noch ohne Branch.
+Es wird demnächst TAKAGI_PRV und TAKAGI_DEV geben
+######################################################################
+
+20180603: Weil das VMD Projekt "klemmte", hier erst einmal noch Java7 installiert und in JAVA_HOME gesetzt.
+20180529: Installation von Notepad++ (64bit)
+
+20180529: Einrichten des VMD-Projekts: Path Variablen und ANT, erstellen dieser Datei
+20180529: Installation von Java 8 SDK
+20180529: Installation von Teamviewer 13
+20180528: Installation von Microsoft Office 2016 (Home and Student Version)
+20180527: Installation von Acronis True Image 2018, erstes BACKUP und Clonen auf einer andere Platte
+
+
