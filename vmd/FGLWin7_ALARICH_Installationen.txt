@@ -1,11 +1,32 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
-20170507: Umstieg au Firefox64bit
+20180529: c:\1fgl als Repository (Projekt_VMS) in Betrieb genommen.
+
+20180121: Installation von Microsoft Visual C++ Redistribtuable (64bit), wg Fehlers: VCRUNTIME140.dll missing
+20180121: Notepad++: Deinatallation der 32bit Version , Installation der 64bit Version und Installation des Plugin Managers.
+
+20171217: Einrichten von Firefox 3.5 (portable) - Lösung als Konsole (über ein Plugin) für den VMWare Server 2.0.2 - (vielleicht besser als 3.6er Firefox Version)
+20171216: Einrichten von VMWaer vSphere Client 10 (update 3) - Zugriff auf VMWare Server 2.0.2 - ABER: Konsole funktioniert nicht.
+
+20171130: Remote Desktop scheint hier nicht zu funktionieren, das kein Windows Professional
+20170922: Installation von Calibre ( eBook Konverter , z.B. von epub nach PDF )
+
+20170828: Installation von Samsung Smart Switch (ersetzt Samsung KIES, welches mit dem Galaxy S3 Neo nicht funktioniert).
+20170824: Installation von Samsung Android Galaxy S3 USB Treiber
+
+20170820: Installation der Teiber für WLAN / WIFI / ADAPTER : AWUS051NH V2 (ideal für Kali Linux)
+
+20170623: Installation von Microsoft Network Monitor 3.4 (64bit)
+20170623: Installation von Acrylic Wifi Home 3.1
+20170623: Upgrade auf VMWare Workstation 12 (nur damit ist die Debian 8 Umgebung von "Kali Linux" lauffähig.
+20170525: Installation von Telekom Magenta Cloud Client
+
+20170507: Umstieg auf Firefox64bit
 20170506: Sandboxie Program deinstalliert
 20170506: Windows Updates durchgeführt.
 
-20170505 Image mit Acronis erstellt.
+20170505: Image mit Acronis erstellt.
 20170305: Image mit Acronis erstellt.
 
 --------------------------------

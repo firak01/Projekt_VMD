@@ -1,5 +1,7 @@
 ﻿### Notebook bei der HIS - hier Installationen - sofern sie bemerkenswert sind - verzeichnen.
 
+2016-11-17: Einrichten des Profils FGL-DEV für technische Bookmarks und Themen
+2016-11-17 : 2 Jahre HIS - Einrichten des Firefox Profils HIS-HIS unter dem Account lindhauer@his.de
 2015-05-20 : Teamviewer 10 installiert
 Teständerung2
  

@@ -229,21 +229,21 @@
 	</fl:choose>
 			
   <echo>Verwende Projektdatei: ${vmdUsed}</echo>
-  <property name="projekt.vmd.configPath" value="${vmdUsed}" />
+  <property name="project.vmd.configPath" value="${vmdUsed}" />
   
   <!-- Teste mal, ob ein defaultwert durch loadproperties ueberschrieben werden kann -->
-  <property name="projekt.useDefaultWhenMissing" value="false" />
+  <property name="project.useDefaultWhenMissing" value="false" />
   
 	<!-- ######## Anwenden, der lokalen Konfiguration -->
-	<echo>Verwendet Projektkonfiguration: ${projekt.vmd.configPath}</echo>
+	<echo>Verwendet Projektkonfiguration: ${project.vmd.configPath}</echo>
 	
 	<!-- Prüfe, ob die angegebenen Datei vorhanden ist -->	 
 	 <fl:choose>
-		<fl:when test=" '${projekt.vmd.configPath}'.tofile.exists == true ">
-			<echo>Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert: ${projekt.vmd.configPath}</echo>
+		<fl:when test=" '${project.vmd.configPath}'.tofile.exists == true ">
+			<echo>Ggfs. in Projektdatei angegebene/zu verwendende Projektkonfiguration existiert: ${project.vmd.configPath}</echo>
 			
 			<loadproperties>
-				<file file="${projekt.vmd.configPath}"/>
+				<file file="${project.vmd.configPath}"/>
 			</loadproperties> 	 
 			<echo>test1 hat den Wert: ${test1}</echo>
 	
@@ -293,8 +293,8 @@
 			<!-- TODO : Prüfe die Controldatei auf Validität. -->
 		</fl:when>
 		<otherwise>
-			<echo>Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert NICHT: ${projekt.vmd.configPath}</echo>
-			<fl:fail message="In Projektdatei angegebene Projektkonfiguration existiert NICHT: ${projekt.vmd.configPath}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
+			<echo>Ggfs. in Projektdatei angebene/zu verwendende Projektkonfiguration existiert NICHT: ${project.vmd.configPath}</echo>
+			<fl:fail message="In Projektdatei angegebene Projektkonfiguration existiert NICHT: ${project.vmd.configPath}"/><!-- Das fail bewirkt, dass das Ant Script sofort abgebrochen wird -->
 		</otherwise>
 	</fl:choose>
 	</target>
@@ -1442,7 +1442,6 @@
 	
 	<!-- TODO noch kaputt -->
 	<!--### Aufruf des Controllers der verschiedenen Fälle ####################-->
-	<isSetJsZZZ inputValue="${myRightPart}" returnvalue="myIsSetValue" returnboolean="myValueIsSet" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	
 	<isBooleanJsZZZ inputvalue="${myValueIsSet}" returnbooleanvalue="myBooleanValue" returnboolean="myValueIsBoolean" returnchanged="myReturnChanged" returncontrol="myReturnControl" returnControlString="myReturnControlString" sflagcontrol="" />	 
 	<catchReturnControlZZZ script="${sScript}" returnControl="${myReturnControl}" returncontrolstring="${myReturnControlString}"/>	

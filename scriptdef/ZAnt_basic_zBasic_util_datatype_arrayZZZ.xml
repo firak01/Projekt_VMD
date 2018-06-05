@@ -17,12 +17,28 @@
 		<attribute name="returncontrolstring" />
 		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
 		<![CDATA[
+			var sScript = "arryAppendJsZZZ: ";
+		
 		    //Merke: In diesem Aufrufteil gibt es ein explizites Errorhandling (sonst müsste man die Funktionen auch hier laden),
 			//       also auch keinen "Funktionsnamen". Ergo taucht dieser Teil nicht im "Stack der Funktionen" auf.
 			//       Darum ist es Konvention, dass die "Arbeitsfunktion" genauso heisst wie das Scriptdef.
 			var myArray = attributes.get("arrayinput");		 
 			var myValue = attributes.get("valueinput");
 			var myFlagControl = attributes.get("sflagcontrol");
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
 			
 			//Aufruf der "Arbeitsfunktion".
 			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
@@ -253,10 +269,25 @@
 		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
 
 		<![CDATA[
+		    var sScript = "arrayAppendArrayJsZZZ: ";
+			
 			var myArray = attributes.get("arrayinput");		 
 			var myArray2append = attributes.get("array2append");
 			var myFlagControl = attributes.get("sflagcontrol");
 						
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
 			//Aufruf der "Arbeitsfunktion".
 			var objKernelLibs = new Array(); //ACHTUNG, NICHT LOESCHEN DOKU: objKernelLibs als eigenes Objekt in den Funktionsargumenten. Grund: Sonst müsste bei jedem objControlCaller Objekt die objKernelLibs erst ubergeben werden.
 			var objControlCaller=new Object();
@@ -488,12 +519,27 @@
 			
 
 		<![CDATA[
+			var sScript = "arrayCopyJsZZZ: ";
+			
 			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
 		
 			var myArray = attributes.get("arrayinput");		 
 			var myFlagControl = attributes.get("sflagcontrol");
 			var myArrayReturn = new Array();
 			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   						
 			//###################################################################
 			//### Die benoetigten Kernel-Funktionen laden
 			//###################################################################			
@@ -684,6 +730,22 @@
 	<attribute name="returncontrolString" />-->
 	
 		<![CDATA[	
+			var sScript = "arrayDebugJsZZZ: ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		
 			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
 		
 			var myArray = attributes.get("arrayinput");					
@@ -884,7 +946,23 @@
 		<attribute name="returncontrolString" />
 			
 
-		<![CDATA[			
+		<![CDATA[		
+			var sScript = "arrayElementCountJsZZZ: ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		
 			var lista = attributes.get("arrayinput");		 
 			var iReturn = -1;
 			
@@ -1090,6 +1168,22 @@
 		<attribute name="returncontrolString" />
 		
 		<![CDATA[
+			var sScript = "arrayGetJsZZZ: ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+						
 			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
 		
 			var lista = attributes.get("arrayinput");		 
@@ -1313,7 +1407,23 @@
 		<attribute name="returncontrol" /> 
 		<attribute name="returncontrolString" />
 	
-		<![CDATA[							
+		<![CDATA[	
+			var sScript = "arrayInitJsZZZ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		
 			var sDirRepositoryJsscriptdef = attributes.get("sDirRepositoryJsscriptdef");
 		
 			var mySize = attributes.get("isize");	
@@ -1501,6 +1611,22 @@
 		<attribute name="returncontrolstring" />
 		<attribute name="sflagcontrol" /> <!-- so mögliche Erweiterungen wie 'leere auffüllen' von vorne bzw. von hinten realisieren. -->
 		<![CDATA[
+			var sScript = "isArrayEmptyJsZZZ";
+			
+			//##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		
 			//Merke: In diesem Aufrufteil gibt es ein explizites Errorhandling (sonst müsste man die Funktionen auch hier laden),
 			//       also auch keinen "Funktionsnamen". Ergo taucht dieser Teil nicht im "Stack der Funktionen" auf.
 			//       Darum ist es Konvention, dass die "Arbeitsfunktion" genauso heisst wie das Scriptdef.

@@ -3,6 +3,12 @@
 --- Videoarchivierung über USB Festplatten
 --- GIMP zum Bildeditieren
 
+20180310: MP3directorCut installiert - Tool um MP3 Dateien zu schneiden.
+
+20180211: Windows RessourceKit Tools installiert (sleep Befehl für WinXP)
+
+20170603: Installation von winflash - zum updaten von BIOS - Grund: Vielleicht kann man dann USB deaktivieren.
+
 20161104: Installation von Windows XP Support Tools (wg. Program setx.exe für VMD Projekt)
 20161104: Java 7 JDK und Apache instaliert
 20161104: Mit GitGUI das VMD Projekt Repository erstellt
