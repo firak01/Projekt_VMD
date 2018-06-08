@@ -2,6 +2,7 @@
 ##############
               Eclipse Luna
 	- Workspace FGL4 eingerichtet für TryOuts, angebunden an entsprechende Repositories
+              - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
               - Workspace für das XSLT-Buch "XSlt XSL und XQuery" einrichten und GitRepository dahin importiert. 
               - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert. 
               - Workspace für das Ant Projekt "VMD" erstellt und an das GitRepository angebunden.
@@ -21,6 +22,15 @@
 	Alte ZKernel Entwicklungumgebung
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 #################################################
+
+20180530: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror"
+20180528: Firefox Arbeitsumgebungen eingerichtet. Hier ein Beispiellink: C:\Programme\firefox\firefox.exe -no-remote -new-window -P "FGL-PRV" 
+20180524: VMD Projekt eingerichtet. Dazu für SetX die WinXP SupportTools installiert.
+
+20180523: Eclipse Luna Workspace für das Buch "Swing Hacks" eingerichtet
+20180425: SSH Dateien für GitHub in das Verzeichnis c:\1fgl\.ssh kopiert. Warum das Verzeichnis? Nun kann GitGUI auch per SSH auf GitHub zugreifen.
+
+--------------------
 20151029: Notepad++ installiert, mit den Erweiterungen compare, explorer, xml tools
 
 20150412: PDF24creator installiert

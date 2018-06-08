@@ -204,12 +204,28 @@
 	 <attribute name="text" />
 	 <attribute name="property" />
 	 <![CDATA[
+		var sScript = "isFilenameRelevantVMD: ";
+	 
 	   //Überprüft, ob der eingegebenen Dateiname ein vom VMD zu verarbeitender Dateiname ist.
 	   //Daraus wird dann ermittelt, ob es sich bei dem Konfigurationseintrag um ein Verzeichnis oder um einen Dateinamen handeln muss.
 	   var text = attributes.get("text");
 	   var berg=false;
-	   print("Starte isFilenameRelevantVMD '" + text + "'");
+	   print("Starte " + sScript + " mit Argument '" + text + "'");
 
+	   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+		//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g,"");
+		}
+		String.prototype.ltrim = function() {
+			return this.replace(/^\s+/,"");
+		}
+		String.prototype.rtrim = function() {
+			return this.replace(/\s+$/,"");
+		}								
+		//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+	   
+	   
 	   //TODO: So soll man den Dateinamen aus einem String bekommen, per JavaScript.
 	   //      Dies ggfs. in JSZ-Kernel uebernehmen
 	   //var filename = fullPath.replace(/^.*[\\\/]/, '')
@@ -266,7 +282,25 @@
 		   //Beispiel: VM_FGLWin7_Ugaki-SRV.txt		   
 		   var myString = attributes.get("stringinput");
 		   var berg=false;
-		   print("Starte isFileVmdOnHostVMD '" + myString + "'");
+		   
+		   var sScript = "isFileVmdClientOnHostJsVMD: ";
+		   
+		   print("Starte " + sScript + " mit Argument '" + myString + "'");
+		   
+		   //##### 20180523: trim() und andere Funktionen werden nicht gefunden, unter winXP und vermutlich IE Browser.
+			//print(sScript + "Start der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");
+			String.prototype.trim = function() {
+				return this.replace(/^\s+|\s+$/g,"");
+			}
+			String.prototype.ltrim = function() {
+				return this.replace(/^\s+/,"");
+			}
+			String.prototype.rtrim = function() {
+				return this.replace(/\s+$/,"");
+			}								
+			//print(sScript + "Ende der Implementierung notwendiger Prototype-Funktionen, sicherheitshalber... ");	   
+		   
+		   
 		   main:{
 			berg=isFileVmdClientOnHostVMD(myString);			
 		   }//end main:

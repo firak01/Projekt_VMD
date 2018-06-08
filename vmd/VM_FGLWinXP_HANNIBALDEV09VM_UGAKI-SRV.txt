@@ -16,6 +16,15 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20180127: Hinterlegen der SSH Keys im Verzeichnis .ssh
+
+20170218: Verzicht auf Speichererweiterung durch Auslagerungsdatei
+
+20170211: VMD_PROJEKT Repository ausgechecked
+20170210: Apache Ant entpackt. ANT_HOME umgebungsvariable gesetzt, ANT_ARGS
+20170210: Java JDK 1.7 installiert
+20170210: Git für WinXP installiert
+
 20170129: Arbeitsspeicher der VM auf 3072MB erhöht
 20170128: WinXP Support Tools installiert, werden für VMD Projekt benötigt (setx)
 20170121: Firefox Konten eingerichtet

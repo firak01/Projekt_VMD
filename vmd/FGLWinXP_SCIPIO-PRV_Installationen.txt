@@ -3,6 +3,16 @@
 TODO: WINTV Aufnahmen in höherer Qualität testen
 TODO: schien zu klappen 20160405: Installation Software für Trendnet TE100-MP2U
 
+
+20180604: Einrichten des 1fgl Repositories. Scipio Scripte dort aufnehmen.
+
+20180125: Installation des Windows Ressource Kit (XP) damit u.a. der sleep Befehl zur Verfügung steht.
+
+20180117: Shutdown Batch in die Autostartgruppe übernommen. Also wird dieser Rechner hautpsächlich zum Starten des Patton-Rechners verwendet.
+20180117: WAKE-On-LAN Batch für Patton in die Autostartgruppe übernommen.
+
+20170516: BGInfo eingerichtet, Keinen Dekstophintergrund (besser für Teamviewer)
+
 20161107: VMD_PROJEKT einrichten
 20161107: Installation von Support Tools für WinXP. Setx.exe wird bereitgestellt für VMD_PROJEKT.
 20161103: Installation von GitGUI für Windows und Tortoise Git (für WinXP)
@@ -11,7 +21,7 @@ TODO: schien zu klappen 20160405: Installation Software für Trendnet TE100-MP2U
 20161019: Installation von Ulead Photo Explorer 6.0
 
 20161019: Installation von Philips PCVC 730k WebCam 
-          (Kann über Systemsterung/Kameras/Philips... und dann mit Rechtsclick darauf verwendet werden zum Screenshot erstellen)
+          (Kann über Systemsteuerung/Kameras/Philips... und dann mit Rechtsclick darauf verwendet werden zum Screenshot erstellen)
           (Kann von Teamviewer als Video verwendet werden)
 
 20160822: Image erstellt und auf dieser Platte wiederhergestellt.
