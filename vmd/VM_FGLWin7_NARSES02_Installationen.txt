@@ -2,6 +2,8 @@
 
 #########################################################
 
+20180608: GitGui für Win7 installiert. Repository 1fgl eingerichtet
+
 20170515: Prio zur Speicherung der Prozess Prioritäten installiert
 20170515: Avast Antivirus Free installiert.
 
