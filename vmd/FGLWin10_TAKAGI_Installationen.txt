@@ -8,7 +8,7 @@ WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
 20180609: Einrichten des Repositories für 1fgl
-20180609: Installation von GitGui for Windows
+20180609: Installation von GitGui for Windows und kopieren der .ssh Dateien in die Benutzer
 
 20180605: Java 8 in JAVA_HOME gesetzt.
 20180605: Firefox (64bit) installiert und Profile eingerichtet.
