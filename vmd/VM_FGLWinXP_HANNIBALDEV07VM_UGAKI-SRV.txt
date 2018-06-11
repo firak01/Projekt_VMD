@@ -2,7 +2,8 @@
 ##############
               --- Eclipse (Luna):
                    Anbindung an GitHub und Einbeziehen dortiger Repositories              
-                   Entwicklungsumgebung für das Buch "Swing Hacks" (an GIT angebunden)
+	     - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
+                    -                                    Weitere Tryouts an mein GitHub Repository angebunden
 
 	--- Lotus Notes Client 9, 
 	--- Eclipse (Juno):
@@ -18,6 +19,10 @@
 	ZKernel Entwicklungsumgebung für Java 1.6 (angebunden an CVS System)
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
+
+20180611: Firefox Arbeitsumgebungen eingerichtet. Hier ein Beispiellink: C:\Programme\firefox\firefox.exe -no-remote -new-window -P "FGL-PRV" 
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Robot"
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror"
 
 20180527: Firefox - Arbeitsumgebungen - Profile eingerichtet.
 
