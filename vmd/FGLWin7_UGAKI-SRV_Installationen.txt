@@ -3,7 +3,8 @@
 --- Wichtig: Niemals Firefox 32bit updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
 ######################################################################
 
-20180202: Installation vor Repository: Projekt_VMS
+20180610: GitGui verwaltet nunr Projekt_VMD
+20180202: Installation vor Repository: Projekt_VMS (1fgl)
 20180202: Installation von Git for Windows (64bit)
 
 20180121: Notepad++: Deinstallation der 32bit Version, Installation der 64bit Version und des neuen Plugin Managers.

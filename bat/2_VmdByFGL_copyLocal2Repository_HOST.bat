@@ -13,11 +13,13 @@ echo uebergebener Parameter 1: %1
 echo uebergebener Parameter 2: %2
 echo alle Parameter: %*
 
+SET controlstring="TestwertAusBatch"
+
 REM Ermittle auf Batch Ebene das verwendete Betriebssystem, um es als Parameter über eine Umgebungsvariable an das ANT Script zu uebergeben.
 SET "returnMachineLocalOs="
 call :MachineLocalOsZZZ returnMachineLocalOs
 set "VMD_OS=!returnMachineLocalOs!"
-ECHO VMD_OS Kuerzel (errechnet): %VMD_OS%
+ECHO VMD_OS Kuerzel (errechnet, Batch Ebene): %VMD_OS%
 
 REM #################################################################################
 REM Ermittle auf Batch Ebene einen Timestamp, dieser dient zuerst zur Benennung der Log-Dateien, ist aber auch im Script auslesbar.
@@ -450,13 +452,15 @@ REM ##########################################################################
 	
 REM Ermittle auf Batch Ebene das verwendete Betriebssystem, um es als Parameter über eine Umgebungsvariable an das ANT Script zu uebergeben.
 FOR /F "tokens=2 delims=[]" %%a IN ('VER') DO FOR /F "tokens=2" %%b IN ("%%a") DO SET VersionNumber=%%b
+echo.Betriebssystem-Versionsnummer=%VersionNumber%
 
 FOR /F "tokens=1 delims=." %%a IN ("%VersionNumber%") DO SET VersionMajor=%%a
 FOR /F "tokens=2 delims=." %%a IN ("%VersionNumber%") DO SET VersionMinor=%%a
 FOR /F "tokens=3 delims=." %%a IN ("%VersionNumber%") DO SET VersionBuild=%%a
 
+echo.VersionMajor=%VersionMajor%
 IF %VersionMajor%==6 (
-	REM echo.6
+	echo.6- VersionMinor=%VersionMinor% VersionBuild=%VersionBuild%
 	IF %VersionMinor%==4 (
 		 SET VersionName=Windows 10
 		 SET returnMachineLocalOs=Win10
@@ -483,6 +487,7 @@ IF %VersionMajor%==6 (
 	)
 ) ELSE (
 	IF %VersionMajor%==5 (
+	echo.5- VersionMinor=%VersionMinor% VersionBuild=%VersionBuild%
 		IF %VersionMinor%==2 (
 			SET VersionName=Windows Server 2003
 			SET returnMachineLocalOs=W2003
@@ -498,7 +503,8 @@ IF %VersionMajor%==6 (
 			)
 		)
 	) ELSE (
-		IF %VersionMajor%==4 ( 				
+		IF %VersionMajor%==4 (
+		echo.4- VersionMinor=%VersionMinor% VersionBuild=%VersionBuild%		
 			IF %VersionMinor%==90 (
 				SET VersionName=Windows ME
 				SET returnMachineLocalOs=WinME
@@ -520,8 +526,15 @@ IF %VersionMajor%==6 (
 			)
 		) ELSE (
 			IF %VersionMajor%==3 (
+				echo.3- VersionMinor=%VersionMinor% VersionBuild=%VersionBuild%
 				SET VersionName=Windows 3.1
 				SET returnMachineLocalOs=Win31
+			) ELSE (
+				IF %VersionMajor%==10 (
+					echo.10- VersionMinor=%VersionMinor% VersionBuild=%VersionBuild%
+					SET VersionName=Windows 10
+					SET returnMachineLocalOs=Win10
+				)
 			)
 		)
 	)
@@ -530,13 +543,13 @@ IF %VersionMajor%==6 (
 REM ECHO Versionsnummer: %VersionNumber%
 ::ECHO VersionMajor.VersionMinor.VersionBuild: %VersionMajor%.%VersionMinor%.%VersionBuild%
 ::ECHO VersionName: %VersionName%
-::ECHO VMD_OS Kuerzel (errechnet): %returnMachineLocalOs%
+ECHO VMD_OS Kuerzel (errechnet): %returnMachineLocalOs%
 
 GOTO :MachineLocalOsZZZEnd
 :MachineLocalOsZZZEnd
 (
   ENDLOCAL & REM RETURN VALUES
-  ::echo.%returnMachineLocalOs%
+  echo.MachineLocalOsZZZEnd mit Ergebnis: %returnMachineLocalOs%
   set "%~1=%returnMachineLocalOs%"
   exit /b
 )
