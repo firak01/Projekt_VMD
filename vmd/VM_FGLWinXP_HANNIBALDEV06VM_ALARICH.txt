@@ -1,15 +1,18 @@
 ----Synchron halten mit ...DEV07.....
 ##############
-              Eclipse Luna
-	- Workspace FGL4 eingerichtet für TryOuts, angebunden an entsprechende Repositories
+              Eclipse Luna	
               - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
+                                                                                                                 Einzelne Tryouts an eigene Repositories angebunden.
+
               - Workspace für das XSLT-Buch "XSlt XSL und XQuery" einrichten und GitRepository dahin importiert. 
-              - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert. 
+	- Workspace FGL4 eingerichtet für XSLT-TryOuts, angebunden an entsprechende Repositories (noch über HTTP).
+                TODO: Diese Repositories auf git: Protokoll umstellen.
+
+              - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert.
+ 
               - Workspace für das Ant Projekt "VMD" erstellt und an das GitRepository angebunden.
 
-                 TODO: Weitere Tryouts dahin verschieben.
-              
-
+              TODO: Weitere Tryouts nach Bedarf in neuen Workpaces erstellen und dahin verschieben.              
 	TODO: Workspace für das Spring Tutorial einrichten  und GitRepository dahin importieren. 
 
 	Lotus Notes Client 9, 
@@ -23,7 +26,8 @@
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 #################################################
 
-20180530: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror"
+20180607: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Robot". ( git@github.com:firak01/Tryout_Swing_Robot.git )
+20180530: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror". ( git@github.com:firak01/Tryout_Swing_ApplicationMirror.git )
 20180528: Firefox Arbeitsumgebungen eingerichtet. Hier ein Beispiellink: C:\Programme\firefox\firefox.exe -no-remote -new-window -P "FGL-PRV" 
 20180524: VMD Projekt eingerichtet. Dazu für SetX die WinXP SupportTools installiert.
 
