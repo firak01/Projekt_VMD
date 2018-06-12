@@ -1,9 +1,19 @@
 ---- Synchron halten mit DEV06
 ##############
               --- Eclipse (Luna):
-                   Anbindung an GitHub und Einbeziehen dortiger Repositories              
-	     - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
-                    -                                    Weitere Tryouts an mein GitHub Repository angebunden
+              - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
+                                                                                                                 Einzelne Tryouts an eigene Repositories angebunden.
+
+              - Workspace für das XSLT-Buch "XSlt XSL und XQuery" einrichten und GitRepository dahin importiert. 
+	- Workspace FGL4 eingerichtet für XSLT-TryOuts, angebunden an entsprechende Repositories (noch über HTTP).
+                TODO: Diese Repositories auf git: Protokoll umstellen.
+
+              - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert.
+
+	- Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden.
+                 Aus dem Repository der Gesamten Werke den Code für das eigentliche Buch exportieren als Eclipse Projekt neu importiert
+                 TODO: Das so neu erstellte Projekt als neues Repository nach GitHub bringen.
+ 
 
 	--- Lotus Notes Client 9, 
 	--- Eclipse (Juno):
@@ -20,9 +30,12 @@
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
 
+20180612: Ecliipse Luna Workspace: Den eigentlichen Buch Code herausgelöst , importiert und als Git Repository eingebunden. ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git )
+20180612: Eclipse Luna Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden. ( git@github.com:jeffheaton/jeffheaton-book-code.git )
+
 20180611: Firefox Arbeitsumgebungen eingerichtet. Hier ein Beispiellink: C:\Programme\firefox\firefox.exe -no-remote -new-window -P "FGL-PRV" 
-20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Robot"
-20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror"
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Robot". ( git@github.com:firak01/Tryout_Swing_Robot.git )
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror". ( git@github.com:firak01/Tryout_Swing_ApplicationMirror.git )
 
 20180527: Firefox - Arbeitsumgebungen - Profile eingerichtet.
 
