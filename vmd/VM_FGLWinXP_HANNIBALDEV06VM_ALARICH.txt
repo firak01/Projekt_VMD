@@ -11,7 +11,8 @@
               - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert.
 
 	- Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden.
-                TODO: Aus dem Repository der Gesamten Werke den Code für das eigentliche Buch exportieren als Eclipse Projekt neu importieren.
+                 Aus dem Repository der Gesamten Werke den Code für das eigentliche Buch exportieren als Eclipse Projekt neu importiert
+                Das so neu erstellte Projekt als neues Repository nach GitHub bringen. (git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git)
  
               - Workspace für das Ant Projekt "VMD" erstellt und an das GitRepository angebunden.
 
@@ -29,6 +30,7 @@
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 #################################################
 
+20180612: Ecliipse Luna Workspace: Den eigentlichen Buch Code herausgelöst , importiert und als Git Repository eingebunden. ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git )
 20180612: Eclipse Luna Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden. ( git@github.com:jeffheaton/jeffheaton-book-code.git )
 
 20180607: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Robot". ( git@github.com:firak01/Tryout_Swing_Robot.git )
