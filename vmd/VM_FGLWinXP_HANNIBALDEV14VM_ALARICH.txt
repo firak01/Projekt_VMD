@@ -5,7 +5,11 @@
 --- TryOut Jsf
 --- TryOut Hibernate (insbesondere HQL)
 --- TryOut Hibernate (insbesondere Criteria API)
+--- TryOut Hibernate (insbesondere Enum)
+
 --- Workspace mit Tutorials von Eugenp (unter anderem Criteria API)
+--- Workspace für das Buch "Persistance with Hibernate (2nd, 2016) - aber die Maven Projekte sind noch nicht als Java Projekt installiert
+--- Workspace für ein J2EE Tutorial, welches den Wildfly-Server nutzt.
 Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 
 ### es fehlt hier folgendes verglichen mit DEV15 (für diesen Workspaces) ##########
@@ -16,7 +20,19 @@ Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 
 ##################################################
 
-20170809: TODO: Einrichten einer Umgebung für ein Eclipse Projekt "Tutorial Hibernate Criteria API"
+20180613: .ssl Schlüssel herkopiert. Projekt_VMD darauf umgestellt.
+20180613: Firefox 8.5.2 esr manuell installiert, weil das Update nicht funktionierte.
+
+20170911: Tutorial "J2EE Projekt 'Library'" als eigenen Workspace und nach GitHub gebracht.
+20170907: Wildfly 8 Server unter Eclipse Workspace für das Tutorial "J2EE" eingerichtet.
+
+
+20170905; Eclipse Plugin "JBoss Tools 4.5" installiert.
+20170904: Einrichten von Wildfly 8 (ehemals JBoss) und Anbinden an eine HSQL Datenbankquelle "DefaultDS" (nach einem Tutorial), Connection String ist: 	
+																jdbc:hsqldb:${jboss.server.data.dir}${/}hypersonic${/}localDB;shutdown=true
+20170904: Einrichten einer Umgebung für das Buch "Persistence with Hibernate (2nd, 2016)"
+
+20170809: Einrichten einer Umgebung für ein Eclipse Projekt "Tutorial Hibernate Criteria API"
 
 20170814: Installation von Eclipse OXYGENE Workspace "Tutorials von Eugenp"
 20170814: Anbinden von Eclipse Oxygene an GitHub. Erweiterung für den GitHub - Repository Zugriff. (Neue Software, Abschnitt "Team")
