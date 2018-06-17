@@ -3,22 +3,40 @@
 --- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
 --- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
 --- TryOut Jsf
---- TryOut Hibernate (insbesondere HQL)
---- TryOut Hibernate (insbesondere Criteria API)
---- TryOut Hibernate (insbesondere Enum)
 
---- Workspace mit Tutorials von Eugenp (unter anderem Criteria API)
---- Workspace für das Buch "Persistance with Hibernate (2nd, 2016) - aber die Maven Projekte sind noch nicht als Java Projekt installiert
---- Workspace für ein J2EE Tutorial, welches den Wildfly-Server nutzt.
+--- Entwickungsumgebung unter Eclipse 4.2. 
+	       TryOut Hibernate (insbesondere HQL) (noch an Subversion angebunden)
+	       TryOut Hibernate (insbesondere Enum)(teilweise noch an Subversion angebunden)(git@github.com:firak01/Tryout_Hibernate_Enum.git)
+
+--- Entwicklungsumgebung unter Eclipse 4.3
+	Workspace mit:
+		Buch "Persistence With Hibernate - 2006"
+
+	Workspace mit:
+		Buch "Persistence API"
+
+--- Entwicklungsumgebungen unter Eclipse 4.7
+	Workspace mit:
+		TryOut Hibernate (insbesondere Criteria API)
+
+	Workspace mit:
+		Tutorials von Eugenp (unter anderem Criteria API)
+
+	Workspace mit: 
+		Buch "Persistance with Hibernate (2nd, 2016) - aber die Maven Projekte sind noch nicht als Java Projekt installiert
+
+	Workspace für:
+		Ein J2EE Tutorial, welches den Wildfly-Server nutzt.
+
+
 Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
-
-### es fehlt hier folgendes verglichen mit DEV15 (für diesen Workspaces) ##########
-20170207: Nun alles lauffähig ? testen!!!
---- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
-
+################################################
+Fehlt noch vergichen mit DEV15VM: 
 20140202: Installation des Eclipse Plugins "SQLQuery" unter Eclipse Kepler und Juno, Anbindung an lokales SQLite, MySQL  und H2 über windwos Admin Kennwort
 
 ##################################################
+
+20180617: Eclipse4.3 für die Hibernate Tryouts an Git angebunden. Repository Pfad liegt unter: C:\1fgl\repo\Eclipse42Hibernate_Tryouts
 
 20180613: .ssl Schlüssel herkopiert. Projekt_VMD darauf umgestellt.
 20180613: Firefox 8.5.2 esr manuell installiert, weil das Update nicht funktionierte.
