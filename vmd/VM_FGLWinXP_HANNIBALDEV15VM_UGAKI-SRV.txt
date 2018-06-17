@@ -1,11 +1,21 @@
 Eclipse Workspaces
---- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
---- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
 --- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
---- TryOut Hibernate
---- TryOut Hibernate - Criteria API  (meine Variante übernommen aus Tutorial von Eugenp) 
---- Tutorials von Eugenp (u.a. Hibernate Criteria Example Tutorial)
+--- TryOut Jsf
+
+--- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
+--- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
+--- TryOut Hibernate (insbesondere HQL)
+--- TryOut Hibernate (insbesondere Criteria API)(meine Variante übernommen aus Tutorial von Eugenp) 
+--- TryOut Hibernate (insbesondere Enum)
+
+--- Workspace mit Tutorials von Eugenp (unter anderem Criteria API)
+--- Workspace für das Buch "Persistance with Hibernate (2nd, 2016) - aber die Maven Projekte sind noch nicht als Java Projekt installiert
+--- Workspace für ein J2EE Tutorial, welches den Wildfly-Server nutzt.
+Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
+
 ###########################################################################################################
+
+20180613: .ssl Schlüssel herkopiert. Projekt_VMD darauf umgestellt.
 
 20170817: Eclipse Workspace - Tutorials von Eugenp (u.a. Hibernate Criteria Example Tutorial)
 20170816: Arbeitsspeicher der VM auf 3 GB erhöht
