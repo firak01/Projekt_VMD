@@ -14,7 +14,7 @@ Eclipse Workspaces
 Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 
 ###########################################################################################################
-TODO: SQLite Studio installieren
+TODO: SQLite Studio installieren. (Merke: SQLite Database Browser Portable kann unter WinXP nicht genutzt werdenn)
 
 20180613: .ssl Schlüssel herkopiert. Projekt_VMD darauf umgestellt.
 
