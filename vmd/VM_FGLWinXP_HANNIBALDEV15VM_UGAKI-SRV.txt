@@ -1,24 +1,25 @@
 Eclipse Workspaces
---- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
+--- Entwicklungsumgebung fÃ¼r Buch "Java ServerFaces 2.2"
 --- TryOut Jsf
 
---- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
---- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
+--- Entwicklungsumgebung fÃ¼r Buch "Persistence With Hibernate - 2006"
+--- Entwickungsumgebung fÃ¼r Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
 --- TryOut Hibernate (insbesondere HQL)
---- TryOut Hibernate (insbesondere Criteria API)(meine Variante übernommen aus Tutorial von Eugenp) 
+--- TryOut Hibernate (insbesondere Criteria API)(meine Variante Ã¼bernommen aus Tutorial von Eugenp) 
 --- TryOut Hibernate (insbesondere Enum)
 
 --- Workspace mit Tutorials von Eugenp (unter anderem Criteria API)
---- Workspace für das Buch "Persistance with Hibernate (2nd, 2016) - aber die Maven Projekte sind noch nicht als Java Projekt installiert
---- Workspace für ein J2EE Tutorial, welches den Wildfly-Server nutzt.
-Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
+--- Workspace fÃ¼r das Buch "Persistance with Hibernate (2nd, 2016) - aber die Maven Projekte sind noch nicht als Java Projekt installiert
+--- Workspace fÃ¼r ein J2EE Tutorial, welches den Wildfly-Server nutzt.
+Achtung: Nur 18GB Festplatte. KapazitÃ¤tsgrenze erreicht.
 
 ###########################################################################################################
+TODO: SQLite Studio installieren
 
-20180613: .ssl Schlüssel herkopiert. Projekt_VMD darauf umgestellt.
+20180613: .ssl SchlÃ¼ssel herkopiert. Projekt_VMD darauf umgestellt.
 
 20170817: Eclipse Workspace - Tutorials von Eugenp (u.a. Hibernate Criteria Example Tutorial)
-20170816: Arbeitsspeicher der VM auf 3 GB erhöht
+20170816: Arbeitsspeicher der VM auf 3 GB erhÃ¶ht
 20170815: Eclipse Workspace - Hibernate Criteria Example Tutorial
 20170812: Installation von Eclipse Oxygene (braucht Java 8)
 20170812: Installation von Java 8 (unter WinXP auf eigene Gefahr)
@@ -30,18 +31,18 @@ Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 20170211: VMD_PROJEKT Repository ausgechecked
 20170210: Apache Ant entpackt. ANT_HOME umgebungsvariable gesetzt, ANT_ARGS
 20170210: Java JDK 1.7 installiert
-20170210: Git für WinXP installiert
+20170210: Git fÃ¼r WinXP installiert
 20170207: Eclipse Arbeitsumgebung "Buch Hibernate 2006" muss wohl das Plugin "JBoss Tools" beeinhalten
 
-20140928: Eclipse 4.4 Luna JEE und Workspace für Buch "JavaServerFaces 2.2"
+20140928: Eclipse 4.4 Luna JEE und Workspace fÃ¼r Buch "JavaServerFaces 2.2"
 
-20140402: WinXP Updates nicht möglich
+20140402: WinXP Updates nicht mÃ¶glich
 
-20140202: Installation des Eclipse Plugins "SQLQuery" unter Eclipse Kepler und Juno, Anbindung an lokales SQLite, MySQL  und H2 über windwos Admin Kennwort
+20140202: Installation des Eclipse Plugins "SQLQuery" unter Eclipse Kepler und Juno, Anbindung an lokales SQLite, MySQL  und H2 Ã¼ber windwos Admin Kennwort
 20140201: Installation der H2-Datenbank
 
 20131211: Installation von MySQL - Datenbank (mysql-installer-community-5.6.15.0.msi)
-20131211: Installation von .Net 4 Framework (als Voraussetzung für die MySQL Datenbank unter windows)
+20131211: Installation von .Net 4 Framework (als Voraussetzung fÃ¼r die MySQL Datenbank unter windows)
 
 
 #### Server: Tomcat 7 / SQLite DB
@@ -51,10 +52,10 @@ Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
 
 
 20130913: Eclipse 4.3 Kepler - Installation des EGIT Plugins
-20130912: Eclipse 4.3 Kepler - Eingerichtet für die Arbeit mit Google API / Google Plugin / Subversion Plugin / nutzt Maven
-20130902: Eclipse 4.2 Juno extra für die Hibernate Entwicklung mit einem Maven Plugin installiert. Nutzt SQLite Datenbank.
-20130902 vorher: Eclipse 4.2 Juno installiert für die Wicket Entwicklung mit Maven Plugin und Subversion Plugin. Nutzt Tomcat Server.
+20130912: Eclipse 4.3 Kepler - Eingerichtet fÃ¼r die Arbeit mit Google API / Google Plugin / Subversion Plugin / nutzt Maven
+20130902: Eclipse 4.2 Juno extra fÃ¼r die Hibernate Entwicklung mit einem Maven Plugin installiert. Nutzt SQLite Datenbank.
+20130902 vorher: Eclipse 4.2 Juno installiert fÃ¼r die Wicket Entwicklung mit Maven Plugin und Subversion Plugin. Nutzt Tomcat Server.
 20130820: SQLite installiert, d.h. Datei SQLITE3.exe in das Verzeichnis c:/Server/Sqlite gepackt und PATH Variable eingerichtet.
 20130819: Firefox installiert PLUS SQLiteManager Plugin.
 20130819: Eclipse ist installiert PLUS Subversive Plugin
-20130725: Erstellt als Kopie aus ...SRV_TOM. Ändern der IP auf Dynamisch per DHCP.
+20130725: Erstellt als Kopie aus ...SRV_TOM. Ã„ndern der IP auf Dynamisch per DHCP.
