@@ -16,6 +16,9 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20180624: SQLIte Studio installiert
+20180624: Neuere SQLite Version 3.24 auf c:\Server\SQLite entpackt.
+
 20180603: VMD-Projekt an SSL GIT angebunden.
 20180603: Eclipse Workspace für TileHexMap (an Git angebunden) nun das notwendige Subversion-Projekt aktualisiert.
 
