@@ -1,7 +1,23 @@
 ######################################################################
 --- VMWare Server 2.x
---- Wichtig: Niemals Firefox updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
+--- Wichtig: Niemals Firefox 32bit updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
 ######################################################################
+
+20180610: GitGui verwaltet nunr Projekt_VMD
+20180202: Installation vor Repository: Projekt_VMS (1fgl)
+20180202: Installation von Git for Windows (64bit)
+
+20180121: Notepad++: Deinstallation der 32bit Version, Installation der 64bit Version und des neuen Plugin Managers.
+
+20171223: Backup und Clonen auf anderer Festplatte
+
+20171217: Einrichten von Firefox Portable 3.5 
+          Vielleicht besser für die Arbeit als Konsole für den VMWare Server 2.0.2 als die 3.6er Version des Firefox?
+
+20170818: Installation von Magenta Cloud
+
+20170626: BGInfo eingerichtet.
+20170626: Aktualisierung von GitHub Desktop (geht nur über sehr schnelle Internetverbindung)
 
 20170611: Installation von Teamviewer Host 12 - Die ID bleibt gleich
 

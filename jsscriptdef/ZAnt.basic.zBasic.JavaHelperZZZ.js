@@ -1,16 +1,41 @@
 //#############################################
 //### Hilfsfunktion JAVA
 //#############################################	
+function readJavaVersionString(){
+	var sScript="readJavaVersionString: ";
+	var sReturn="";
+	var bReturnControl=false;
+	var sReturnControl=sScript+"Fehler";
+	try {			
+		var version = java.lang.System.getProperty("java.version");
+		//print(sScript + "Java Version:" + version);
+						
+		sReturn=version;
+		bReturnControl=true;
+		sReturnControl=sScript + "Alles o.k.";
+	}catch(err){
+		//#### SIMPLES ERROR HANDLING #######
+		//print(err);					
+		bReturnControl=false;
+		sReturnControl=sScript+"Fehler. "+ err;					
+	}
+	objControl.bReturnControl=bReturnControl;
+	objControl.sReturnControl=sReturnControl;								
+	return sReturn;
+}//End function readJavaVersionString
+
 function isJava7(objControl){	
 	var sScript="isJava7: ";
 	var bReturn = false;
 	var bReturnControl=false;
 	var sReturnControl=sScript+"Fehler";
 	try {			
-		var version = java.lang.System.getProperty("java.version");
+		var version = readJavaVersionString();
 		//print("Java Version:" + version);
 		
-		if(version.substring(0,3)=="1.7"){
+		var sVersion = version.toString();
+		//print(sScript + "typeof sVersion: " + typeof sVersion);
+		if(sVersion.substring(0,3)=="1.7"){
 			bJava7found=true;
 		}else {
 			bJava7found=false;
@@ -29,6 +54,37 @@ function isJava7(objControl){
 	objControl.sReturnControl=sReturnControl;								
 	return bReturn;
 }//End function isJava7
+
+function isJava8(objControl){	
+	var sScript="isJava8: ";
+	var bReturn = false;
+	var bReturnControl=false;
+	var sReturnControl=sScript+"Fehler";
+	try {			
+		var version = readJavaVersionString();
+		//print("Java Version:" + version);
+		
+		var sVersion = version.toString();
+		//print(sScript + "typeof sVersion: " + typeof sVersion);
+		if(sVersion.substring(0,3)=="1.8"){
+			bJava8found=true;
+		}else {
+			bJava8found=false;
+		}
+		
+		bReturn=bJava8found;
+		bReturnControl=true;
+		sReturnControl=sScript + "Alles o.k.";
+	}catch(err){
+		//#### SIMPLES ERROR HANDLING #######
+		//print(err);					
+		bReturnControl=false;
+		sReturnControl=sScript+"Fehler. "+ err;					
+	}
+	objControl.bReturnControl=bReturnControl;
+	objControl.sReturnControl=sReturnControl;								
+	return bReturn;
+}//End function isJava8
 	
 //Todo: Diese Funktion in den JSZ Kernel packen
 function enableJava(){
@@ -38,7 +94,7 @@ function enableJava(){
 	*/
 	
 	//zu Testzwecken:
-	var version = java.lang.System.getProperty("java.version");
+	var version = readJavaVersionString();
 	//print("Java Version:" + version);
 	
 	//var test = java.lang.System.getProperty("java.class.path");

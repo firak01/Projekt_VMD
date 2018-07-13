@@ -3,24 +3,62 @@
 --- Entwickungsumgebung für Buch "Java Persistence API" Beispielprojekte unter MySQL Datenbank
 --- Entwicklungsumgebung für Buch "Java ServerFaces 2.2"
 --- TryOut Jsf
---- TryOut Hibernate (insbesondere HQL)
---- TryOut Hibernate (insbesondere Criteria API)
+
+--- Entwickungsumgebung unter Eclipse 4.2. 
+	       	TryOut Hibernate (insbesondere HQL) (noch an Subversion angebunden)
+	       	TryOut Hibernate (insbesondere Enum)(teilweise noch an Subversion angebunden)(git@github.com:firak01/Tryout_Hibernate_Enum.git)
+		Trout Hibernate (Id)(git@github.com:firak01/Tryout_Hibernate_Id.git)
+
+--- Entwicklungsumgebung unter Eclipse 4.3
+	Workspace mit:
+		Buch "Persistence With Hibernate - 2006"
+
+	Workspace mit:
+		Buch "Persistence API"
+
+--- Entwicklungsumgebungen unter Eclipse 4.7
+	Workspace mit:
+		TryOut Hibernate (insbesondere Criteria API)
+
+	Workspace mit:
+		Tutorials von Eugenp (unter anderem Criteria API)
+
+	Workspace mit: 
+		Buch "Persistance with Hibernate (2nd, 2016) - aber die Maven Projekte sind noch nicht als Java Projekt installiert
+
+	Workspace für:
+		Ein J2EE Tutorial, welches den Wildfly-Server nutzt.
+
+
 Achtung: Nur 18GB Festplatte. Kapazitätsgrenze erreicht.
-
-### es fehlt hier folgendes verglichen mit DEV15 (für diesen Workspaces) ##########
-20170207: Nun alles lauffähig ? testen!!!
---- Entwicklungsumgebung für Buch "Persistence With Hibernate - 2006"
-
+################################################
+Fehlt noch vergichen mit DEV15VM: 
 20140202: Installation des Eclipse Plugins "SQLQuery" unter Eclipse Kepler und Juno, Anbindung an lokales SQLite, MySQL  und H2 über windwos Admin Kennwort
 
 ##################################################
 
-20170809: TODO: Einrichten einer Umgebung für ein Eclipse Projekt "Tutorial Hibernate Criteria API"
-20170809: TODO  Anbinden von Eclipse an GitHub
-20170809: Installation fon Firefox 52.0.2 als letzte Version für WinXP
+20180617: Eclipse4.3 für die Hibernate Tryouts an Git angebunden. Repository Pfad liegt unter: C:\1fgl\repo\Eclipse42Hibernate_Tryouts
+
+20180613: .ssl Schlüssel herkopiert. Projekt_VMD darauf umgestellt.
+20180613: Firefox 8.5.2 esr manuell installiert, weil das Update nicht funktionierte.
+
+20170911: Tutorial "J2EE Projekt 'Library'" als eigenen Workspace und nach GitHub gebracht.
+20170907: Wildfly 8 Server unter Eclipse Workspace für das Tutorial "J2EE" eingerichtet.
+
+
+20170905; Eclipse Plugin "JBoss Tools 4.5" installiert.
+20170904: Einrichten von Wildfly 8 (ehemals JBoss) und Anbinden an eine HSQL Datenbankquelle "DefaultDS" (nach einem Tutorial), Connection String ist: 	
+																jdbc:hsqldb:${jboss.server.data.dir}${/}hypersonic${/}localDB;shutdown=true
+20170904: Einrichten einer Umgebung für das Buch "Persistence with Hibernate (2nd, 2016)"
+
+20170809: Einrichten einer Umgebung für ein Eclipse Projekt "Tutorial Hibernate Criteria API"
+
+20170814: Installation von Eclipse OXYGENE Workspace "Tutorials von Eugenp"
+20170814: Anbinden von Eclipse Oxygene an GitHub. Erweiterung für den GitHub - Repository Zugriff. (Neue Software, Abschnitt "Team")
+
+20170809: Installation fon Firefox 52.0.2 als letzte Version für WinXP (Update auf ESR klappt nicht....)
 20170809: Installation von Eclipse OXYGENE und Workspace für "TryoutHibernateCriteriaAPI"
 20170809: Installation von Java 8 (auf eigene Gefahr unter WinXP)
-20170809: TODO: Ab hier nach DEV 15 bringen
 
 20170215: MySQL Serverstart_ Dienst auf manuell gestellt (statt automatisch)
 

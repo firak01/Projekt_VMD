@@ -1,7 +1,24 @@
 ---- Synchron halten mit DEV06
 ##############
               --- Eclipse (Luna):
-                   Anbindung an GitHub und Einbeziehen dortiger Repositories              
+              - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
+                                                                                                                 Einzelne Tryouts an eigene Repositories angebunden.
+
+	- Workspace für das Buch "Swing, 2nd Edition (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
+
+              - Workspace für das XSLT-Buch "XSlt XSL und XQuery" einrichten und GitRepository dahin importiert. 
+	- Workspace FGL4 eingerichtet für XSLT-TryOuts, angebunden an entsprechende Repositories (noch über HTTP).
+                TODO: Diese Repositories auf git: Protokoll umstellen.
+
+              - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert.
+
+	- Workspace für das Projekt_VMD eingeruchtet und an das GitRepository angebunden ( git@github.com:firak01/Projekt_VMD.git )
+
+	- Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden.
+                 Aus dem Repository der Gesamten Werke den Code für das eigentliche Buch exportieren als Eclipse Projekt neu importiert
+
+                 TODO: Das so neu erstellte Projekt als neues Repository nach GitHub bringen.  ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git  )
+ 
 
 	--- Lotus Notes Client 9, 
 	--- Eclipse (Juno):
@@ -17,6 +34,24 @@
 	ZKernel Entwicklungsumgebung für Java 1.6 (angebunden an CVS System)
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
+
+20180706: Eclipse Luna Workspace für das Buch "Swing, 2nd Edition (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
+20180706: Eclipse Luna Workspace für das Projekt_VMD eingerichtet und an das GitRepository angebunden ( git@github.com:firak01/Projekt_VMD.git )
+
+20180612: Ecliipse Luna Workspace: Den eigentlichen Buch Code herausgelöst , importiert und als Git Repository eingebunden. ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git )
+20180612: Eclipse Luna Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden. ( git@github.com:jeffheaton/jeffheaton-book-code.git )
+
+20180611: Firefox Arbeitsumgebungen eingerichtet. Hier ein Beispiellink: C:\Programme\firefox\firefox.exe -no-remote -new-window -P "FGL-PRV" 
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Robot". ( git@github.com:firak01/Tryout_Swing_Robot.git )
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror". ( git@github.com:firak01/Tryout_Swing_ApplicationMirror.git )
+
+20180527: Firefox - Arbeitsumgebungen - Profile eingerichtet.
+
+20180527: Arbeitsumgebung Eclipse für Buch "Swing Hacks": Repository des Buchs eingebunden
+20180527: Arbeitsumgebung Eclipse für Buch "Swing Hacks": erstellt
+
+20180524: VMD funktioniert
+20180524: VMD Projekt - Setx über Installation von WinXP SupportTools notwendig
 
 20151108: Java 1.7 JDK Intstalliert, Apache Ant Installiert und entsprechende Umgebungsvariablen gesetzt
 20151108: Repository für ProjektVM erstellt

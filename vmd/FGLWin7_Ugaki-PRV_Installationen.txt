@@ -2,6 +2,20 @@
 
 #########################################################
 
+20180329: Silent Hunter 4 installiert inclusive Mission Pack (damit Version 1.5)
+
+20180320: Emergency 2 Deluxe installiert
+
+20180201: GitGUI: Neues Repository für !1fgl\client\script" und "1fgl\server"
+
+20180121: Deinstallation von Notepad+++ 32 bit, Installation der 64bit Version und des 64bit PluginManagers
+
+20180119: GitGui: Neues Repository für "spiel\Pacific Storm - Allies"
+20180119: Installation von GitGUI
+
+20170921: Installation von Calibre (Tool zum Konvertieren von eBooks. Z.B. epub nach PDF)
+20170921: Installation von WiseRegistryCleaner Free
+
 20170708: Installation von Avast Antivirus
 
 20170628: Image erstellen (ohne Steam, etc.)
