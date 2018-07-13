@@ -17,6 +17,8 @@
 
 	Eclipse 3.22
 	--- Entwicklung des "KernelZZZ" V2.0, (1.6er compiler)(angebunden an Subversion)
+	--- Entwicklung des JSZ - Kernels (Javascript)(noch an nichts angebungen, TODO)
+	--- Entwicklung des LSZ - Kernels (LotusScript)(noch an nichts angebungen, TODO)
         --- VideoInternetArchive (Kernel V02, 1.6er compiler, angebunden an Subversion )
         --- diverse TryOuts: Z.B. CouchDb, TimerTask (angebunden an Subversion)
         --- diverse TryOuts: Z.B. iText, PortScanner (angebunden an CVS)                 
@@ -29,9 +31,18 @@
 
 	Eclipse 4.4 Luna
         --- Fatjar und Subversion Plugin
-        --- Workspace mit Kernel V2.0 (angebunden an Subversion)
+        --- Workspace mit Kernel V2.0 & VIA-Projekt (an GIT angebunden)
 
 ####################################################################
+
+20180713: GIT Repository für LSZ-Kernel in das für die Lostusscript benötigte Verzeichnis geklont. ( git@github.com:firak01/Projekt_Kernel_LSZ.git )
+20180713: c:\1fgl\.ssh Verzeichnis mit den für github notwendigen Dateien befüllt und bestehende ersetzt. Nachdem ich GitGUI gesagt hatte "neuen Schlüssel" erzeugen.
+
+20170128: GIT Repositories für Kernel02 und VIA Projekt in Eclipse 4.4 Luna eingebunden.
+20170128: WinXP Support Tools installiert - werden benötigt für VMS Projekt (setx)
+20170128: Arbeitsspeicher für virtuelle Maschine auf 3072MB erhöht
+20170103: Eclipse Luna Update
+
 20151025: Installation von Notepad++, mit den Plugins: Compare, Explorerer, XMLTools
 20151025: Installation von GitGUI, TortoiseGIT und Git
 20151024: Installation von Apache Ant, Einrichten der Systemvariablen ANT_HOME und ANT_ARGS
