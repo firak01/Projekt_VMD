@@ -35,6 +35,8 @@
 
 ####################################################################
 
+TODO: Alle anderern Repositories müssten auch darauf umgestellt werden.
+20180713: Projekt_VMD auf git: Protokoll und Adresse umgestellt. 
 20180713: GIT Repository für LSZ-Kernel in das für die Lostusscript benötigte Verzeichnis geklont. ( git@github.com:firak01/Projekt_Kernel_LSZ.git )
 20180713: c:\1fgl\.ssh Verzeichnis mit den für github notwendigen Dateien befüllt und bestehende ersetzt. Nachdem ich GitGUI gesagt hatte "neuen Schlüssel" erzeugen.
 
