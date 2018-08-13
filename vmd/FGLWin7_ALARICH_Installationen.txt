@@ -2,7 +2,7 @@
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
 20180813: KO Player als Android Emulator installiert. 
-          Apps installiert: Für Videokammeras
+          Apps installiert, für Videokammeras:
           -- yoosee
           -- edimax (aber da fehlt die Möglichkeit zur Steuerung)
 
