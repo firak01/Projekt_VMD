@@ -1,5 +1,13 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
+20180813: KO Player installiert als Android Emulator
+          installierte Apps für Kameras:
+           -- yoosee
+
+20180603: Telegram for Windows installiert (Messenger statt Whats app)
+
+20180123: Notepad++: Deinatallation der 32bit Version, Installation von Notepad++ 64bit inclusive PluginManager
+
 20170818: Telekom Magenta cloud client - Arbeitsverszeichnis von c:\1fgl auf Laufwerk D: verschoben
 
 20170629: Windows Update: KB3133977 "Update für windows 7 für X64 bsierte Systeme" ausgelassen, wg. Probleme beim Boot ASUS & UEFI.
