@@ -4,15 +4,20 @@
               - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
                                                                                                                  Einzelne Tryouts an eigene Repositories angebunden.
 
+	- Workspace für das Buch "Swing, 2nd Edition (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
+
               - Workspace für das XSLT-Buch "XSlt XSL und XQuery" einrichten und GitRepository dahin importiert. 
 	- Workspace FGL4 eingerichtet für XSLT-TryOuts, angebunden an entsprechende Repositories (noch über HTTP).
                 TODO: Diese Repositories auf git: Protokoll umstellen.
 
               - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert.
 
+	- Workspace für das Projekt_VMD eingeruchtet und an das GitRepository angebunden ( git@github.com:firak01/Projekt_VMD.git )
+
 	- Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden.
                  Aus dem Repository der Gesamten Werke den Code für das eigentliche Buch exportieren als Eclipse Projekt neu importiert
-                 TODO: Das so neu erstellte Projekt als neues Repository nach GitHub bringen.
+
+                 TODO: Das so neu erstellte Projekt als neues Repository nach GitHub bringen.  ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git  )
  
 
 	--- Lotus Notes Client 9, 
@@ -29,6 +34,9 @@
 	ZKernel Entwicklungsumgebung für Java 1.6 (angebunden an CVS System)
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
+
+20180706: Eclipse Luna Workspace für das Buch "Swing, 2nd Edition (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
+20180706: Eclipse Luna Workspace für das Projekt_VMD eingerichtet und an das GitRepository angebunden ( git@github.com:firak01/Projekt_VMD.git )
 
 20180612: Ecliipse Luna Workspace: Den eigentlichen Buch Code herausgelöst , importiert und als Git Repository eingebunden. ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git )
 20180612: Eclipse Luna Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden. ( git@github.com:jeffheaton/jeffheaton-book-code.git )

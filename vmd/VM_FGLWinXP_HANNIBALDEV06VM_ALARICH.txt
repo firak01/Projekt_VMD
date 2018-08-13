@@ -14,6 +14,8 @@
                  Aus dem Repository der Gesamten Werke den Code für das eigentliche Buch exportieren als Eclipse Projekt neu importiert
                 Das so neu erstellte Projekt als neues Repository nach GitHub bringen. (git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git)
  
+	- Workspace für das Buch "Swing,  2nd Edition (Mannings)" ( git@github.com:firak01/Buch_Swing.git )
+
               - Workspace für das Ant Projekt "VMD" erstellt und an das GitRepository angebunden.
 
               TODO: Weitere Tryouts nach Bedarf in neuen Workpaces erstellen und dahin verschieben.              
@@ -29,6 +31,8 @@
 	Alte ZKernel Entwicklungumgebung
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 #################################################
+
+20180625: Eclipse Luna Workspace für das Buch "Swing, 2nd Edition  (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
 
 20180612: Ecliipse Luna Workspace: Den eigentlichen Buch Code herausgelöst , importiert und als Git Repository eingebunden. ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git )
 20180612: Eclipse Luna Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden. ( git@github.com:jeffheaton/jeffheaton-book-code.git )
