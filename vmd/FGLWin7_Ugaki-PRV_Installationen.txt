@@ -2,6 +2,11 @@
 
 #########################################################
 
+20180817: KO Player (Android Emulator) installiert (Version 1.44) 
+          -- APP YooSee installiert und mit WebCam verbunden.
+
+20180601: Telegram for Windows installiert
+
 20180329: Silent Hunter 4 installiert inclusive Mission Pack (damit Version 1.5)
 
 20180320: Emergency 2 Deluxe installiert
