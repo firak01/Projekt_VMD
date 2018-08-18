@@ -12,6 +12,9 @@
 Alte Javaprojekte für Albis und die Sparkassn Informatik
 
 #####################################################
+20180818: .ssh Dateien hierher kopiert
+20180818: Firefox auf letzte Version 52.09 ESR für WinXP bringen klappt nicht.....
+
 20161119: GitUpdate debugged und lauffähig gemacht.
 20161104: Installation von Windows XP Support Tools (wg. setx.exe)
 
