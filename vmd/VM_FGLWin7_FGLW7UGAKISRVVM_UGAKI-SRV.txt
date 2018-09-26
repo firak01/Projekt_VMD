@@ -17,6 +17,12 @@ Einrichten des TILEHEXMAP Projekts und der SQLITE Datenbank
 3. Projekt TILEHEXMAPSERVICE
 4. Projekt TILEHEXMAPSERVICECLIENT
 
+
+Eclipse Oxygen Umgebung
+- Enwicklungumgebung für Tryouts im Umfeld von Google Firebase und node.js
+
+
+
 #####################################
 - Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
 
@@ -24,6 +30,10 @@ TODO:
   Beispiele aus einem Buch, bzgl. Webservices hier als Workspace
 
 #####################################
+
+20180926: Win7 Updates per Standalone - Offline Dateien (September 2018 von Chip) installiert
+
+20180107: Tryout Projekte für Firebase und node.js als Repository und nach GitHub gebracht.
 
 20180104: Eclipse: Installation von nodeclipse [Enide (Studio)] von der Seite: http://www.nodeclipse.org/updates/ 
 20180104: WebTools Plugins in Eclipse installiert (WTP) von http://download.eclipse.org/webtools/repository/oxygen
