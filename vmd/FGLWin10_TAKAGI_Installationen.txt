@@ -7,7 +7,10 @@ Betriebssystem: Win10 Professional,64bit
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
-20180609: Einrichten des Repositories für 1fgl
+20180926: Win10 Updates durchgeführt.
+
+20180609: Entpacken von "Ultimate Tweak for Windows 10"
+20180609: Einrichten des Repositories für 1fgl ( git@github.com:firak01/1fgl.git )
 20180609: Installation von GitGui for Windows und kopieren der .ssh Dateien in die Benutzer
 
 20180605: Java 8 in JAVA_HOME gesetzt.
