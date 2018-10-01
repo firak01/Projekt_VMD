@@ -7,7 +7,9 @@ Betriebssystem: Win10 Professional,64bit
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
-20180927: BGInfo eingerichtet. Wie in Autostart?
+20181001: BACKUP durchgeführt
+20181001: BGInfo in den unter Win10 versteckten Autostart Ordner
+20180927: BGInfo eingerichtet.
 
 20180927: Autologon / Autologin eingerichtet. 
 20180926: Win10 Updates durchgeführt.
