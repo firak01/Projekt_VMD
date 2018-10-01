@@ -1,6 +1,1 @@
-
-BUILD FAILED
-C:\1fgl\repository\Projekt_VMD\src\VMDbyFGL_HostChangesPush.xml:106: The following error occurred while executing this line:
-C:\1fgl\repository\Projekt_VMD\scriptdef\ZAnt_basic_zBasic_ExceptionZZZ.xml:35: ${sScript}Fehler. Error: enableKernelAntJs: Fehler. TypeError: Cannot find function trim.
-
-Total time: 1 second
+     [exec] Result: 1
