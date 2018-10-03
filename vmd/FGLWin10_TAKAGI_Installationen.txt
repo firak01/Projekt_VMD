@@ -7,6 +7,8 @@ Betriebssystem: Win10 Professional,64bit
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20181003: Treiber und Software für Brother MFC-6490CW installiert
+
 20181001: BACKUP durchgeführt
 20181001: BGInfo in den unter Win10 versteckten Autostart Ordner
 20180927: BGInfo eingerichtet.
