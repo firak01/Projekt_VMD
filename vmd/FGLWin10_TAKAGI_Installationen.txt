@@ -7,7 +7,8 @@ Betriebssystem: Win10 Professional,64bit
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
-20181003: Shutdown - Scripte und Buttons in der Taskleiste eingreichtet
+20181003: Telekom MagentaCLOUD installiert
+20181003: Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 20181003: Treiber und Software für Brother MFC-6490CW installiert
 
 20181001: BACKUP durchgeführt
