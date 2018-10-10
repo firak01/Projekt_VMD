@@ -7,6 +7,12 @@ Betriebssystem: Win10 Professional,64bit
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20181010: Avast Free Antivirus installiert.
+
+20181010: PDF-XCHange Viewer installiert: https://www.chip.de/downloads/PDF-XChange-Viewer_29539244.html
+20181010: PDF Creator installiert (3.3.0) inklusive PDS Architekt
+20181010: Adobe Acrobat Reader installiert (XI 11.0.10)
+
 20181003: Telekom MagentaCLOUD installiert
 20181003: Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 20181003: Treiber und Software für Brother MFC-6490CW installiert
