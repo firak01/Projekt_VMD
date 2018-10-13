@@ -31,6 +31,8 @@ TODO:
 
 #####################################
 
+20181013: Verschoben nach TAKAGI-DEV01. Da es auf dem UGAKI-SRV und VMWare Server 2.0 immer Probleme mit Win7 als Client gab.
+
 20180926: Win7 Updates per Standalone - Offline Dateien (September 2018 von Chip) installiert
 
 20180107: Tryout Projekte für Firebase und node.js als Repository und nach GitHub gebracht.
