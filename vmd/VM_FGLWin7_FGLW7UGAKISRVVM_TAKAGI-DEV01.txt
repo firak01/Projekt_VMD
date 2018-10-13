@@ -1,0 +1,78 @@
+###### Windows 7 - mit 230 GB Kapazität als Server gedacht, ... aber jetzt wohl eher als Entwicklungsumgebung für WebServices mit AXIS2
+Synchon halten mit PATTONDEV02VM_ALARICH
+Merke: Da Patton Rechner UEFi hat als BIOS, kann eine darauf basierende VM auf diesem VMWare Server (UGAKI-SRV) nicht gestartet werden.
+
+Eclipse Luna Umgebung
+- Entwicklungsumgebung für TILEHEXMAP03SERVICE- Projekt
+
+
+Einrichten des TILEHEXMAP Projekts und der SQLITE Datenbank
+1. Lokales Repository und Projekt
+   a) JAZKernel (V02) und weiter clonen.
+   b) ZKernelFileCollection importieren
+
+2. Projekt JAZTileHexMap03 clonen.
+   Ziel ist es dieses Projekt und die Datenbankabfragen dahinter in einem Webservice zur Verfügung zu stellen.
+
+3. Projekt TILEHEXMAPSERVICE
+4. Projekt TILEHEXMAPSERVICECLIENT
+
+
+Eclipse Oxygen Umgebung
+- Enwicklungumgebung für Tryouts im Umfeld von Google Firebase und node.js
+
+
+
+#####################################
+- Hier nun eine Tryout-Umgebung für WebService Entwicklung aufbauen.
+
+TODO:
+  Beispiele aus einem Buch, bzgl. Webservices hier als Workspace
+
+#####################################
+
+20180926: Win7 Updates per Standalone - Offline Dateien (September 2018 von Chip) installiert
+
+20180107: Tryout Projekte für Firebase und node.js als Repository und nach GitHub gebracht.
+
+20180104: Eclipse: Installation von nodeclipse [Enide (Studio)] von der Seite: http://www.nodeclipse.org/updates/ 
+20180104: WebTools Plugins in Eclipse installiert (WTP) von http://download.eclipse.org/webtools/repository/oxygen
+20180104: Eclipse Oxygen installiert
+20180104: Notepad++ installiert
+
+20180501: Node.js installiert. Buchbeispiel aus "Firebase Cookbook" mit node.js lauffähig.
+20180501: Für Node.js den Installationsmanager nvm installiert.
+20180105: Java JDK 1.8 installiert
+
+20180104: Auch wenn man von einem anderen Rechner aus per Firefox Portable zugreift, gibt es das Problem vom 20171118!
+20171215: Lösungsansatz 6: Firefox Portabele 3.58 installiert. Nun kann man direkt aus der Serverübersicht eine Konsole ( im Vollbildmodus ) starten.
+20171209: SQLiteDatabaseBrowserPortable installiert
+
+20171203: LÖSUNGSANSATZ 5: Bei den Systemeigenschaften dieverse UI Optimierungen hinsichtlich von Trees und Comboboxen deaktiviert
+20171118: LÖSUNGSANSATZ 4: Alle Laufwerke auf "sicheren Zugriff" setzen, also nicht mehr "performance" als Ziel.
+20171118: LÖSUNGSANSATZ 3: Das DVD Laufwerk explizit auf Laufwerk E: des Host setzen.
+20171118: LÖSUNGSANSATZ 2: Auf dem Host existiert kein Floppy-Laufwerk. Dieses für die VM entfernt.
+20171118: LÖSUNGSANSATZ 1: Die Auslagerungsdatei in eine separate Virtuelle Festplatte gepackt. (diese optimiert. Muss allerdings persistent Modus sein, sonst ist sie bei jedem Neustart wieder unformatiert.)
+20171118: PROBLEM: Der Browser Client für die VM oder die VM selbst frieren ständig ein.
+
+20171112: SOAPUI - Projekte kopiert
+20171111: Auslagerungsdatei fix auf 4096MB festgelegt
+20171111: True Image Acronis 2011 deinstalliert
+20171111: Teamviewer Host deinstalliert
+
+20170709: Firefox 3.6 deinstalliert, bevor es hier zu verwechselungen mit der aktuellen 64bit Version kommt.
+20170709: VMWareTools von der Server Konsole bereitgestellt und hier installiert (setup64.exe)
+
+20170623: SOAPUI installiert (V 5.3)
+20170623: Ant installiert, Umgebungsvariablen JAVA_HOME ANT_HOME (in den Path) & ANT_ARGS gesetzt
+
+20170621: Firefox 64bit installiert und Profile eigerichtet
+20170621: Java 7 (64bit) installiert (jdk-7u79-windows-x64.exe)
+20170621: 7zip installiert
+20170621: BGInfo eingerichtet
+
+20170611: Arbeitsspeicher der VM auf 3GB erhöht
+
+####
+20150607: Großes Windows7 Update gemacht
+Office 2000 Umgebung
