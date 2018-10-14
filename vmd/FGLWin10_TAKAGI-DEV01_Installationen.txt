@@ -7,6 +7,8 @@ Betriebssystem: Win10 Professional,64bit
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20181014: Installation von 7zip
+
 20181012: Umbenennung in TAKAGI-DEV01 - als Entwicklungsrechner
 
 20181010: VMWare Player installiert (free, 15.0)
