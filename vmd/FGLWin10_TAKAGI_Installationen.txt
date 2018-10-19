@@ -7,6 +7,8 @@ Betriebssystem: Win10 Professional,64bit
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20181019: 7zip installiert (64bit Version)
+
 20181010: VMWare Player installiert (free, 15.0)
 20181010: Avast Free Antivirus installiert.
 20181010: PDF-XCHange Viewer installiert: https://www.chip.de/downloads/PDF-XChange-Viewer_29539244.html
