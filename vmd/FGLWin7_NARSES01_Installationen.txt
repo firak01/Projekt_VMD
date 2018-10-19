@@ -13,6 +13,10 @@ TODO: Installation von Notepad++
 TODO:      Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
 
+20181019: Installation von VLC Video Player
+
+20180226: Ändern des Uhrzeitaktualisiernintervalls über die Registry, auf 3 Stunden. Ändern des Zeitservers.          
+
 20180201: Kopieren der SSH Zertifikatsdateien in den .ssh Ordner des Benutzers
 
 20180201: Repository Projekt_VMS
