@@ -1,0 +1,52 @@
+TAKAGI Rechner. Noch ohne Branch.
+Es wird demnächst TAKAGI_PRV und TAKAGI_DEV geben
+
+Details: Fujitsu Esprimo P957 mit Board: D3502-A13
+                              Prozessor: Intel i7-7700
+Betriebssystem: Win10 Professional,64bit
+Grafikkarte: Nvidia GeForce GTX 745
+WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
+######################################################################
+
+
+20181020: Umbenannt aus dem Branch
+20181020: Notwendige Tools und Treiber der Grafikkarte  Nvidia GeForce GTX 745 installiert. 
+20181020: Notwendige Direct X Dlls installiert.
+20181020: Pacific Storm Allies installiert und Mods rüberkopiert.
+
+20181019: 7zip installiert (64bit Version)
+
+20181010: VMWare Player installiert (free, 15.0)
+20181010: Avast Free Antivirus installiert.
+20181010: PDF-XCHange Viewer installiert: https://www.chip.de/downloads/PDF-XChange-Viewer_29539244.html
+20181010: PDF Creator installiert (3.3.0) inklusive PDS Architekt
+20181010: Adobe Acrobat Reader installiert (XI 11.0.10)
+
+20181003: Telekom MagentaCLOUD installiert
+20181003: Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
+20181003: Treiber und Software für Brother MFC-6490CW installiert
+
+20181001: BACKUP durchgeführt
+20181001: BGInfo in den unter Win10 versteckten Autostart Ordner
+20180927: BGInfo eingerichtet.
+
+20180927: Autologon / Autologin eingerichtet. 
+20180926: Win10 Updates durchgeführt.
+
+20180609: Entpacken von "Ultimate Tweak for Windows 10"
+20180609: Einrichten des Repositories für 1fgl ( git@github.com:firak01/1fgl.git )
+20180609: Installation von GitGui for Windows und kopieren der .ssh Dateien in die Benutzer
+
+20180605: Java 8 in JAVA_HOME gesetzt.
+20180605: Firefox (64bit) installiert und Profile eingerichtet.
+20180603: Weil das VMD Projekt "klemmte", hier erst einmal noch Java7 installiert und in JAVA_HOME gesetzt.
+20180529: Installation von Notepad++ (64bit)
+
+20180529: Einrichten des VMD-Projekts: Path Variablen und ANT, erstellen dieser Datei
+20180529: Installation von Java 8 SDK
+20180529: Clonen des 1fgl-Repositories (mit WAKE ON LAN Scripten, etc.)(Projekt VMS)
+20180529: Installation von Teamviewer 13
+20180528: Installation von Microsoft Office 2016 (Home and Student Version)
+20180527: Installation von Acronis True Image 2018, erstes BACKUP und Clonen auf einer andere Platte
+
+
