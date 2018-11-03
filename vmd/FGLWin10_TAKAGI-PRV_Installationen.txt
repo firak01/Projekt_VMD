@@ -8,6 +8,8 @@ Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20181102: Steam installiert
+20181102: Autologon nach Umbenennung erneut ausgeführt. Ist wohl notwendig um zu funktionieren.
 
 20181020: Umbenannt aus dem Branch
 20181020: Notwendige Tools und Treiber der Grafikkarte  Nvidia GeForce GTX 745 installiert. 
