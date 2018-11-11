@@ -8,6 +8,9 @@
 # Don`t ignore directories, so we can recurse into them
 !*/
 
+# Ignoriere aber
+/log
+
 # Ignore
 .project
 
@@ -28,8 +31,6 @@
 #/webapps/qisserver/WEB-INF/conf/LoginConf_HHN.xml
 
 # Ignoriere aber
-log/log.txt
-log/error.txt
 
 
  
