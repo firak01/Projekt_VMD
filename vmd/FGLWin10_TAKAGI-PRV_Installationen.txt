@@ -6,6 +6,7 @@ Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20181201: PDF Architekt deinstalliert
 20181201: Gimp 2 (64 bit) installiert
 
 20181129: Spiel installiert: Mount & Blade: With Fire And Sword
