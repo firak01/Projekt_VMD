@@ -10,8 +10,12 @@ TODO: Installation von Notepad++
 
 
 
-TODO:      Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
+TODO: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
+
+20190101: Installation von Acronis True Image 2018 (per EXE Datei. Boot per USB Stick mit Win7 &  Acronis eingerichtet)
+
+20181223: Installatin von Notepad++
 
 20181019: Installation von VLC Video Player
 
