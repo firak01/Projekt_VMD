@@ -40,7 +40,9 @@
         
 ####################################################################
 
-20190107: .ssh Dateien hier eingerichtet.
+TODO: VIO Projekt - Funktioniert es noch mit dem Änderungen, die aus der Arbeit am TileHexMap-Projekt stammen?
+20190109: Alle Repositories unter GitGUI neu eingerichtet (SSH) und aktualisiert
+20190107: .ssh Dateien hier eingerichtet. GitGUI arbeitet jetzt im Benutezrverzeichnis, %HOME% nicht mehr auf c:\1fgl zeigend
 
 20171016: VMWare Tools aktualisiert
 
