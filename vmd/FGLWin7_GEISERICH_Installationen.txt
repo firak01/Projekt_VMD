@@ -5,6 +5,7 @@ Betriebssystem: Win7 Home Premium 64bit
 
 #######################################################
 
+20190118: VLC Video Player installiert
 
 20191111: Firefox Portable hierher kopiert. Zum Verbindungsaufbau nach https://ugaki-srv:8333/ui/#
 20190111: CDBurnerXP als Brennprogramm für CD / DVD installiert. Kopierne von CDs geht wohl nur über den Zwischenschrit eine ISO Datei zu erstellen.
