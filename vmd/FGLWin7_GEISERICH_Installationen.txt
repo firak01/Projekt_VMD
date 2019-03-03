@@ -5,6 +5,15 @@ Betriebssystem: Win7 Home Premium 64bit
 
 #######################################################
 
+20190303: Magenta Cloud funktionierte nicht. Über löschen von Dateien im Ordner behoben
+          C:\Users\lindhaueradmin\AppData\Local\MagentaCLOUD
+
+
+20190302: System für RemoteShutdown vorbereitet:
+          HKEY_LOCAL_MACHINE – SOFTWARE – Microsoft – Windows – CurrentVersion – Policies – System
+          Neuer Eintrag: LocalAccountTokenFilterPolicy
+          Mit dem HexWert: 1
+
 20190118: VLC Video Player installiert
 
 20191111: Firefox Portable hierher kopiert. Zum Verbindungsaufbau nach https://ugaki-srv:8333/ui/#
