@@ -29,6 +29,8 @@ TODO:
 
 ########################
 
+20190107: Repository 1fgl eingebunden
+
 20180926: Win7 Updates per Chip Offline Dateien installiert (September 2018) 
 
 20180107: Tryout-Projekte für Google Firebase und node.js als Repository und nach GitHub.

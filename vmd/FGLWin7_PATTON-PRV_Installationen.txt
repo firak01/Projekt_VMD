@@ -1,5 +1,7 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
+20190109: ProjektVMD als repository neu gecloned
+
 20180813: KO Player installiert als Android Emulator
           installierte Apps für Kameras:
            -- yoosee

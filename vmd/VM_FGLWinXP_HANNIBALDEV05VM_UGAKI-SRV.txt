@@ -35,6 +35,11 @@
 
 ####################################################################
 
+20190127: Installation von 7zip
+20190127: Installation von WinArchiverVirtualDrive (zum Einbinden von Archiven als virtuelles CD/DVD Laufwerk)
+
+20190110: 1fgl Repository einbinden, alle anderen Repositories neu eingebunden und auf git:ssh umgestellt.
+
 20180817: Firefox ist auf letzter Version für WinXP: 52.09 ESR
 
 20180713: Projekt_VMD auf git: Protokoll und Adresse umgestellt. 

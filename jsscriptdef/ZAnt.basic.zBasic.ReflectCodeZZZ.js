@@ -189,10 +189,10 @@
 				//Merke Java 7: Nur wenn man tatsächlich einen Fehler provoziert, bekommt man einen Stacktrace.
 				//ACHTUNG: Wir Suchen als Funktion das VORLETZTE Element in dem Array
 				if(bIsJava7){		
-					print(sScript+"7: Ausfuehrung unter Java7");					
+					//print(sScript+"7: Ausfuehrung unter Java7");					
 					if('undefined'!=myError && null!=myError){					
 						if(undefined!=myError.stack){		
-							print(sScript+"7: Stack im Error Objekt vorhanden");
+							//print(sScript+"7: Java7 und Stack im Error Objekt vorhanden");
 							var saStacktrace = myError.stack.split("\n");						
 							//print(sScript + "7: Vorhandener StackTrace=" + saStacktrace);
 							var iuBound=saStacktrace.length-1;
@@ -203,7 +203,7 @@
 							sCallerLine = saStacktrace[(iIndex)];
 						} else {
 							//Normal in Java7, da kein Stacktrace im error-objekt vorhanden ist.
-							print(sScript+"7: KEIN Stack im Error Objekt vorhanden");
+							print(sScript+"7: Java7 und KEIN Stack im Error Objekt vorhanden");
 							var saStacktrace=createStackTrace();
 							//print(sScript + "7: Erstellter StackTrace=" + saStacktrace);
 							var iuBound=saStacktrace.length-1;
@@ -225,7 +225,7 @@
 						sCallerLine = saStacktrace[(iIndex)];
 					}	
 				} else if(bIsJava8){
-					print(sScript+"8: Ausfuehrung unter Java8");
+					//print(sScript+"8: Ausfuehrung unter Java8");
 					if('undefined'!=myError && null!=myError){					
 						if(undefined!=myError.stack){		
 							//Java 8, NASHORN funktioniert.
@@ -243,7 +243,7 @@
 							sCallerLine = saStacktrace[(iIndexToBeUsed)];
 						} else {
 							//Ungewöhnlich in Java 8 - wenn kein error-objekt vorhanden ist, vermutlich wurde kein Error Objekt übergeben.
-							//print(sScript + "8: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
+							//print(sScript + "8: JAva 8, UNGEWOEHNLICH: KEIN Error Stack vorhanden OBWOHL Error Objekt vorhanden ist.");														
 							var stack=createStackTrace();
 							var saStacktrace = stack.split("\n");
 							//print(sScript + "8: Erstellter StackTrace=" + saStacktrace);	
@@ -257,12 +257,13 @@
 							sCallerLine = saStacktrace[(iIndexToBeUsed)];
 						}				
 					}else{
-						//Vermutlich Java7, da kein Stacktrace im error-objekt vorhanden ist.
-						//print(sScript + "8 ohne ErrorObjekt");
+						//Java 8, aber kein Stacktrace im error-objekt vorhanden ist.
+						//print(sScript + "8: Java 8, ohne ErrorObjekt");
 						
 						var stack=createStackTrace();
+						//print(sScript + "8: Erstellter Stack="+stack);
 						var saStacktrace = stack.split("\n");
-						//print(sScript + "8 ohne ErrorObjekt=" + saStacktrace);	
+						//print(sScript + "8: ohne ErrorObjekt=" + saStacktrace);	
 						var iuBound=saStacktrace.length-1;
 						//print(sScript + "8: iuBound="+iuBound+"; iIndex="+iIndex);
 						if(iIndex>iuBound){
@@ -272,10 +273,10 @@
 						//print(sScript + "8: iuBound="+iuBound+"; iIndex to be used="+iIndexToBeUsed);								
 						sCallerLine = saStacktrace[(iIndexToBeUsed)];
 					}
+					//print(sScript+"8: Gefundene sCallerLine='"+sCallerLine+"'");
 				}else{
 					var sJavaVersion = readJavaVersionString();
-					print(sScript+"9: Ausfuehrung unter JavaXXX: '" + sJavaVersion + "'" );
-					
+					print(sScript+"9: Ausfuehrung unter JavaXXX: '" + sJavaVersion + "'" );//Mach hier immer eine Ausgabe, da noch nicht getestete Java Version.					
 				}
 				//print(sScript+"CallerLine="+sCallerLine);
 				sReturn=sCallerLine;
@@ -426,22 +427,32 @@ if(bIsJava7){
 	}
   }
   //+++ ENDE Java7 Fall
+  
   //+++ START Java8 Fall
   }else if(bIsJava8){
 	//print(sScript+"Java8 Fall");
 	try {
 		var objError = new Error();
 		callstack=objError.stack;
+		//print(sScript+"Java8 Fall A: callstack='" + callstack + "'" );
+		
+		//Wenn es keinen Fehler gibt, dann erzeuge künstlich einen.
+		try{
+			throw new Error("DummyErrorZZZ created for Java8 without an error.");
+		}catch(dummyErr){
+			callstack=dummyErr.stack;
+			//print(sScript+"Java8 Fall B: callstack='" + callstack + "'" );
+		}
 	} catch(e) {
-	
+		//#### SIMPLES ERROR HANDLING #######
+		print(err);					
+		bReturnControl=false;
+		sReturnControl=sScript+"Java8 Fall. Fehler: "+ err;
 	}
   
   }else{
 		var sJavaVersion = readJavaVersionString();
-		print(sScript+"Ausfuehrung unter JavaXXX: '" + sJavaVersion + "'" );
-					
-  
-  
+		print(sScript+"Ausfuehrung unter JavaXXX: '" + sJavaVersion + "'" ); //Mach hier immer eine Ausgabe, da Java Version noch ungetestet.
   }
   }catch(err){
 		//#### SIMPLES ERROR HANDLING #######

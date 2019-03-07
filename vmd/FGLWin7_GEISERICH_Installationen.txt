@@ -1,0 +1,47 @@
+GEISERICH Notebook 
+Details: Lenovo Thinkpad R500
+
+Betriebssystem: Win7 Home Premium 64bit
+
+#######################################################
+
+20190303: Magenta Cloud funktionierte nicht. Über löschen von Dateien im Ordner behoben
+          C:\Users\lindhaueradmin\AppData\Local\MagentaCLOUD
+
+
+20190302: System für RemoteShutdown vorbereitet:
+          HKEY_LOCAL_MACHINE – SOFTWARE – Microsoft – Windows – CurrentVersion – Policies – System
+          Neuer Eintrag: LocalAccountTokenFilterPolicy
+          Mit dem HexWert: 1
+
+20190118: VLC Video Player installiert
+
+20191111: Firefox Portable hierher kopiert. Zum Verbindungsaufbau nach https://ugaki-srv:8333/ui/#
+20190111: CDBurnerXP als Brennprogramm für CD / DVD installiert. Kopierne von CDs geht wohl nur über den Zwischenschrit eine ISO Datei zu erstellen.
+
+20190104: Git GUI installiert
+20190103: Java 8 installiert
+
+20190102: PDF XChange Viewer installiert
+20190102: PDFCreator installiert
+20190102: Drucker Brother MFC 6490CW installiert
+20190102: Lotus Notes 8 on a Stick verwendet
+20190102: Office 2000 Premium installiert. Word, Excel, Powerpoint.
+20190102: Teamviewer 14 installiert. Fernwartung mit Kennwort eingerichtet.
+
+20181231: Windows 7 AIK (automated installation kit) installiert (zum Bauen von Boot-Medien für Acronis)
+20181231: 7zip installiert
+
+20181223: Notepad++ (64bit) installiert, inclusive des 64bit Pluginmanagers
+20181223: WAKE ON LAN sichergestellt.
+
+20181222: Firefox und Firefox Arbeitsumgebungen FGL-DEV / FGL-PRV / HIS-HIS zur Synchronisation
+20181222: Autologon
+
+20181220: Image auf anderer Festplatte 
+
+20181217: Installation von Acronis True Image 2018 (und update, und aktiviert)
+20181217 Einbau einer USB 3.0 Express Card. Installation der Treiber per CD.
+
+20181210 Installation des Betriebssystems und einige Tage später Aktivierung per Telefon
+20181203 Einbau zusätzlichem Arbeitsspeicher aus einem anderen Thinkpad

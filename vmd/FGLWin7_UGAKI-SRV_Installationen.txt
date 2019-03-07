@@ -1,7 +1,13 @@
 ######################################################################
 --- VMWare Server 2.x
 --- Wichtig: Niemals Firefox 32bit updaten, da ein Plugin für die Serverkonsole nur unter Firefox 3.6 läuft!!!
+- Verwende HDMI - Anschluss an der Grafikkarte. Nur er gibt ohne angeschaltetem Monitor die 1920x1200 Auflösung! Wichtig für das Arbeiten mit Teamviewer.
 ######################################################################
+
+20181111: PROBLEM BEIM STARTEN DER VMS und des VMWARE HOST MANAGERS
+          Ursache: Eine XML Datei war korrupt.
+          C:\ProgramData\VMware\VMware Server\hostd\datastores.xml
+          Lösung diese  Datei einfach durch die Default-Datei ersetzen.
 
 20180901: Installation von Android Emulator: KO Player
           -- Installation auf dem KO Player: Yoosee - App für WebCam.

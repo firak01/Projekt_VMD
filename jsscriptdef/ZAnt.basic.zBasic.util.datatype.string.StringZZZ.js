@@ -106,8 +106,8 @@ function getStrLeftStr(sourceStr, keyStr,objControl){
 	try{	
 		var objControlCaller = new Object();
 		var sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
-		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);
-
+		//print("TEST 20190106: sScript="+sScript);
+		if(!objControlCaller.bReturnControl) throw new Error(objControlCaller.sReturnControl);		
 		try{
 			sReturn = (sourceStr.indexOf(keyStr) == -1 | keyStr=='') ? '' : sourceStr.split(keyStr)[0];
 			if(sourceStr==sReturn){ bReturnChanged=false } else { bReturnChanged=true};
