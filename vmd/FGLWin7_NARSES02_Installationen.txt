@@ -2,6 +2,8 @@
 
 #########################################################
 
+20190307: Teamviewer 14 update.
+
 20181017: VLC VideoPlayer installiert. ZIEL: Besseres Streaming, ohne Abbrüche wie mit dem Windows Media Player
 20181017: Avast Antivirus Free deinstalliert.
 
