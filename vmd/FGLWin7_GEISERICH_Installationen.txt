@@ -5,6 +5,8 @@ Betriebssystem: Win7 Home Premium 64bit
 
 #######################################################
 
+20190316: Adobe Acrobat Reader installiert
+
 20190303: Magenta Cloud funktionierte nicht. Über löschen von Dateien im Ordner behoben
           C:\Users\lindhaueradmin\AppData\Local\MagentaCLOUD
 
