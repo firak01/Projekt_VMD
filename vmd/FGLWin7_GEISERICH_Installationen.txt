@@ -5,9 +5,19 @@ Betriebssystem: Win7 Home Premium 64bit
 
 #######################################################
 
+20190408: Internet Explorer 11 installiert.
+
+20190408: Memuplay 5.5, Android Emulator installiert.
+          Hier sind weniger Streifen auf der Oberfläche mit Direct X
+          und die U-Boot Brettspiel App funktioniert
+
 20190408: KOPLAYER 1.4.1056, Android Emulator installiert. 
           Damit er läuft im BIOS "Intel Virtualization Technology" enablen.
-          Software Settings: Rendering Mode auf "Open GL" stellen.
+          Software Settings: Rendering Mode auf "Open GL" stellen und nicht auf Direct X
+          ABER: Ohne Direct X Unterstützung läuft z.B. die U-Boot - Das Brettspiel APP nicht.
+                und es gibt Streifen auf der Oberfläche.
+          Merke: Ist Android 4.4.2.
+          
           Merke: Version 2.0.0 funktoniert nicht
 
 20190316: Adobe Acrobat Reader installiert
