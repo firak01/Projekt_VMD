@@ -5,6 +5,11 @@ Betriebssystem: Win7 Home Premium 64bit
 
 #######################################################
 
+20190408: KOPLAYER 1.4.1056, Android Emulator installiert. 
+          Damit er läuft im BIOS "Intel Virtualization Technology" enablen.
+          Software Settings: Rendering Mode auf "Open GL" stellen.
+          Merke: Version 2.0.0 funktoniert nicht
+
 20190316: Adobe Acrobat Reader installiert
 
 20190303: Magenta Cloud funktionierte nicht. Über löschen von Dateien im Ordner behoben
