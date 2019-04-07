@@ -7,9 +7,11 @@ Betriebssystem: Win7 Home Premium 64bit
 
 20190408: Internet Explorer 11 installiert.
 
+20190408: Memuplay auf 5.5.8 update, keine Veränderung.
+
 20190408: Memuplay 5.5, Android Emulator installiert.
           Hier sind weniger Streifen auf der Oberfläche mit Direct X
-          und die U-Boot Brettspiel App funktioniert
+          und die U-Boot Brettspiel App funktioniert... nicht richtig. Nur die Menüs sind vor Missionsbegin vorhanden.
 
 20190408: KOPLAYER 1.4.1056, Android Emulator installiert. 
           Damit er läuft im BIOS "Intel Virtualization Technology" enablen.
