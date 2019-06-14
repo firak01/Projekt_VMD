@@ -1,4 +1,39 @@
-### Android Entwicklungsumgebung
+### 1) Android Entwicklungsumgebung
+###############################################################
+### 2) Alternative zum VMWare Server als Entwicklungsumgebung 
+###    Verwende VMWare Workstation Player
+###############################################################
+
+
+201905..: 
+
+201905..: Firefox Updates von 56 über 57 bis 67.0
+
+201905..: Repository 1fgl in GitGUI eingebunden
+201905..: Repository Projekt_VMD in GitGui eingebunden
+201905..: .SSH Dateien kopiert. Umgebungsvariable HOME gelöscht, damit "Git für Windows" die .SSH Dateien verwendet.
+201905..: Git für Windows 2.15.64bit installiert (GitGUI)
+
+201905..: Firefox Portable 3.51 zum Zugriff auf VMWare Server 2.x herkopiert
+
+201905..: Teamviewer Host Update auf 14.x
+
+201905..: VMWare Portabele 14 herkopiert
+201905..: VMWare Ordner erstellt und VMs eingebunden
+201905..: VMWare15 Workstation Player installiert
+
+
+##################################################################################
+20171009: Android Smart Switch installiert
+20171009: Android Treiber für USB
+20171009: Odin bereitgestellt um Firmware / Custom ROM auf das Handy zu packen
+
+20170628: Windows Updates Update KB3133977 "Update für windows 7 für X64 basierte Systeme" ausgelassen, wg. Probleme beim Boot ASUS & UEFI.
+20170628: Image erstellt
+20170628: Installation von Teamviewer 12 Host als Update, GitHub aktualisert
+
+20161006: Installation von Energenie und Einrichten von PS LAN
+20161006: Installation Treiber Monitor Samsung SB420_BW
 
 20160930: Installation von Packer 7zip
 
@@ -16,7 +51,7 @@
 
 20160706: Installation von Avast Free Antivirus 2016
 
-20160531: Updates Win7 eigespielt: Update KB3133977 "Update für windows 7 für X64 bsierte Systeme" ausgelassen, wg. Probleme beim Boot ASUS & UEFI.
+20160531: Updates Win7 eigespielt: Update KB3133977 "Update für windows 7 für X64 basierte Systeme" ausgelassen, wg. Probleme beim Boot ASUS & UEFI.
 20160531: Image auf neuer Platte wiederhergestellt. 
 
 20160525: VMware Converter 
