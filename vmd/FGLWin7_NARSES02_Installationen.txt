@@ -2,6 +2,8 @@
 
 #########################################################
 
+20190703: Installation von Telegram für Windows
+
 20190627: Installation und Einrichten von T-Online Magenta Cloud
 
 20190626: Umzug von 320 GB auf 240 GB SSD Festplatte
