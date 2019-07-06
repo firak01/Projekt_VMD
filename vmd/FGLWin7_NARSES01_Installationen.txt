@@ -3,6 +3,8 @@
 TODO: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
 
+20190706: Image erstellt und Umzug auf SSD Festplatte.
+
 20190104: Installation von "Autostart Delayer". Damit sanfter/zeitverzögerter Start der Anwendungen. So wird Terratec USB Aufnahmegerät sicherer angezeigt.
 
 20190101: Installation von Acronis True Image 2018 (per EXE Datei. Boot per USB Stick mit Win7 &  Acronis eingerichtet)
