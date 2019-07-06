@@ -1,5 +1,7 @@
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
 
+20190706: Installation von CDBurnerXP - Brennprogramm für CD / DVD
+
 20190615: Installation von CMS - Als Windows Alternative zur WebCam APP YOOSEE. Arbeitet mit dem YOOSEE Account.
 20190615: Update auf VMWare Workstation Player 15
 
