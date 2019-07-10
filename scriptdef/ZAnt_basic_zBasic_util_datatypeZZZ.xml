@@ -411,7 +411,8 @@
 					}				
 					enableJava();//Der Aufruf geht erst nachdem die Kernelbibliotheken geladen wurden	
 					var objControlCaller = new Object();
-					sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";					
+					sScript = reflectMethodCurrent_Name(null, objControlCaller) + ": ";	
+					//print("TEST 20190106: sScript="+sScript);
 					if(!objControlCaller.bReturnControl) throw new Error(sScript + objControlCaller.sReturnControl);
 					
 				}catch(err){	

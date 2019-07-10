@@ -8,9 +8,6 @@
 # Don`t ignore directories, so we can recurse into them
 !*/
 
-# Ignoriere aber
-/log
-
 # Ignore
 .project
 
@@ -31,9 +28,8 @@
 #/webapps/qisserver/WEB-INF/conf/LoginConf_HHN.xml
 
 # Ignoriere aber
+/log/*.txt
 
-
- 
 
 # Auf allen anderen Ebenen .gitignore ausschliessen. Nur zuoberst nicht.
 !.gitignore

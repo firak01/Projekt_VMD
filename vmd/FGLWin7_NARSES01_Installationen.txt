@@ -1,17 +1,15 @@
 ### Private Netzrechner zum Surfen / Musikhören
-
-
-TODO: Einrichten der Shutdown , Restart , Cancel , Buttons und Scripte
-TODO: Installation von GitHub - Client
-TODO: 7zip Installiert
-TODO: Installation von Notepad++
-
-#########################################################
-
-
-
-TODO:      Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
+########################################################
+TODO: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
+
+20190706: Image erstellt und Umzug auf SSD Festplatte.
+
+20190104: Installation von "Autostart Delayer". Damit sanfter/zeitverzögerter Start der Anwendungen. So wird Terratec USB Aufnahmegerät sicherer angezeigt.
+
+20190101: Installation von Acronis True Image 2018 (per EXE Datei. Boot per USB Stick mit Win7 &  Acronis eingerichtet)
+
+20181223: Installatin von Notepad++
 
 20181019: Installation von VLC Video Player
 
