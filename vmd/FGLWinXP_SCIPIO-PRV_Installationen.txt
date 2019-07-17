@@ -3,6 +3,9 @@
 TODO: WINTV Aufnahmen in höherer Qualität testen
 TODO: schien zu klappen 20160405: Installation Software für Trendnet TE100-MP2U
 
+20190717: Teamviewer aktualisiert auf 14.2H
+20190717: Überflüssige Haupauge TV Karte ausgebaut.
+
 20190307: Probleme beim Installieren von Teamviewer 14
           Lösungsansatz IP6 installieren mit folgendem Befehl
           netsh interface IPv6 install
