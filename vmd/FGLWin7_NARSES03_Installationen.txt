@@ -1,7 +1,11 @@
 ### ACER ASPIRE R3610 - Surf- und Mediencenter
-
+### Narses03
+###
 #########################################################
 
+20190724: Windows Ressource Tool Kit installiert, um einige DOS Befehle zu haben.
+20190724: onStartupNarses03 Batch eingerichtet
+20190724: Win7 mit neuem Produktkey aktiviert
 20190724: Übernommen aus Win7 Narses02
 20190724: Einbau der SSD Festplatte und Inbetriebnahme
 
