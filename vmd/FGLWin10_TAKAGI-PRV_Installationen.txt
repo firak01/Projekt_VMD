@@ -6,6 +6,9 @@ Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20191022: Installation über das Tool von GeForce Game Ready Driver Version 440.97 
+20191022: Neuinstallation NVidia Geforce Experience - Tool für Treiberinstallation
+
 20190709: Discord für Windows installiert
 
 20190610: VLC Mediaplayer (64bit) installiert

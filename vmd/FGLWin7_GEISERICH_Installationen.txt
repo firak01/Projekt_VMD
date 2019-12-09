@@ -5,6 +5,8 @@ Betriebssystem: Win7 Home Premium 64bit
 
 #######################################################
 
+20191031: Telegram installiert
+
 20190408: Internet Explorer 11 installiert.
 
 20190408: Memuplay auf 5.5.8 update, keine Veränderung.

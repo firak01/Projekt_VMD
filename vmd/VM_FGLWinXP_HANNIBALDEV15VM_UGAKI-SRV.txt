@@ -34,7 +34,8 @@ ES Fehlt verglichen mit HannibalDEV14VM (Alarich)
 
 ###########################################################################################################
 
-
+20191023: Eclipse Oxygen (4.7) - Subversion hinzugefügt (von https://www.eclipse.org/subversive/downloads.php).
+20191023: Eclipse Oxygen (4.7) - CVS Client hinzugefügt.
 
 20180618: Eclipse Workspace (4.7) an Git Repository angebunden. ( git@github.com:firak01/Tryout_Hibernate_BinaryImage.git )
 20180618: SQLite Studio installiert (Portable Version funktioniert nicht in WinXP).
