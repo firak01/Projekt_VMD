@@ -33,9 +33,26 @@
         --- Fatjar und Subversion Plugin
         --- Workspace mit Kernel V2.0 & VIA-Projekt (an GIT angebunden)
 
+	Eclipse 4.7. Oxygen
+       --- CVS und Subversion Plugin
+       --- Workspace mit Kernel V2.0 & OVPN-Projekt (an GIT angebunden , TODO)
+
 ####################################################################
 
-TODO: Alle anderern Repositories müssten auch darauf umgestellt werden. TEST
+20191023: Git Repository-Zweig c:\1fgl\repo\EclipseOxygen_V01 für Eclipse Oxygen erstellt.
+
+20191023: Installaton von Subversion für Eclipse Oxygen
+20191023: Installation von CVS Client für Eclipse Oxygen
+20191023: Installation/Entpacken von Eclipse Oxygen ( 4.7 )
+20191023: Installatin von Java 8 JDK (unter Win XP auf eigene Gefahr)
+
+20190127: Installation von 7zip
+20190127: Installation von WinArchiverVirtualDrive (zum Einbinden von Archiven als virtuelles CD/DVD Laufwerk)
+
+20190110: 1fgl Repository einbinden, alle anderen Repositories neu eingebunden und auf git:ssh umgestellt.
+
+20180817: Firefox ist auf letzter Version für WinXP: 52.09 ESR
+
 20180713: Projekt_VMD auf git: Protokoll und Adresse umgestellt. 
 20180713: GIT Repository für LSZ-Kernel in das für die Lostusscript benötigte Verzeichnis geklont. ( git@github.com:firak01/Projekt_Kernel_LSZ.git )
 20180713: c:\1fgl\.ssh Verzeichnis mit den für github notwendigen Dateien befüllt und bestehende ersetzt. Nachdem ich GitGUI gesagt hatte "neuen Schlüssel" erzeugen.

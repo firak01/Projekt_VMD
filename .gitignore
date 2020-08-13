@@ -28,11 +28,8 @@
 #/webapps/qisserver/WEB-INF/conf/LoginConf_HHN.xml
 
 # Ignoriere aber
-log/log.txt
-log/error.txt
+/log/*.txt
 
-
- 
 
 # Auf allen anderen Ebenen .gitignore ausschliessen. Nur zuoberst nicht.
 !.gitignore

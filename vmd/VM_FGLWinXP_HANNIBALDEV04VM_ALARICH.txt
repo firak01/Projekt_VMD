@@ -40,6 +40,17 @@
         
 ####################################################################
 
+20191209: Open VPN Installiert, Version 2.3.18 32bit (letzte Version, die mit WinXP kompatibel ist).
+
+20191023: Eclipse Oxygen - Subversion installiert
+20191023: Eclipse Oxygen - CVS Client installiert
+20191023: Eclipse Oxygen (4.7) installiert
+20191023: Java 8 (JDK) installiert, unter WinXP auf eigene Gefahr
+
+20190128: CD/DVD Rom Emulator installiert. Win Archiver Virtual Drive
+
+20190109: Alle Repositories unter GitGUI neu eingerichtet (SSH) und aktualisiert
+20190107: .ssh Dateien hier eingerichtet. GitGUI arbeitet jetzt im Benutezrverzeichnis, %HOME% nicht mehr auf c:\1fgl zeigend
 
 20171016: VMWare Tools aktualisiert
 

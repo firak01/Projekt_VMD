@@ -1,11 +1,39 @@
-TAKAGI Rechner. Noch ohne Branch.
-Es wird demnächst TAKAGI_PRV und TAKAGI_DEV geben
-
+TAKAGI Rechner_PRV. Branch.
 Details: Fujitsu Esprimo P957 mit Board: D3502-A13
                               Prozessor: Intel i7-7700
 Betriebssystem: Win10 Professional,64bit
+Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
+
+20191022: Installation über das Tool von GeForce Game Ready Driver Version 440.97 
+20191022: Neuinstallation NVidia Geforce Experience - Tool für Treiberinstallation
+
+20190709: Discord für Windows installiert
+
+20190610: VLC Mediaplayer (64bit) installiert
+
+20181220: Spiel installiert - von UGAKI-PRV dupliziert: Kerbal Space Program 1.5.1 (mit Mods)
+
+20181201: Irfanview 4.x installiert. Plugins ebenfalls installiert.
+20181201: PDF Architekt deinstalliert
+20181201: Gimp 2 (64 bit) installiert
+
+20181129: Spiel installiert: Mount & Blade: With Fire And Sword
+20181127: Für Operation Eastside "Direct Play" automtisch installiert.
+20181127: Spiel installiert: Perry Rhodan Operation Eastside
+20181125: Spiel installiert: The Vanguard Prophecy
+
+20181123: MPEG2 Videoerweiterung von Microsoft für Win10 installiert
+20181117: Spiel installiert: Master of Orion ( IV - neue Steam Version)
+
+20181102: Steam installiert
+20181102: Autologon nach Umbenennung erneut ausgeführt. Ist wohl notwendig um zu funktionieren.
+
+20181020: Umbenannt aus dem Branch
+20181020: Notwendige Tools und Treiber der Grafikkarte  Nvidia GeForce GTX 745 installiert. 
+20181020: Notwendige Direct X Dlls installiert.
+20181020: Pacific Storm Allies installiert und Mods rüberkopiert.
 
 20181019: 7zip installiert (64bit Version)
 

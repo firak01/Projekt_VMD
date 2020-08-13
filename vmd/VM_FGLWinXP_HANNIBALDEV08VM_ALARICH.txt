@@ -16,6 +16,8 @@
 #### Server: Tomcat 7 / SQLite DB
 ##################################################################################################################
 
+20190730: GIT Repositories aktualisiert
+
 20180624: SQLIte Studio installiert
 20180624: Neuere SQLite Version 3.24 auf c:\Server\SQLite entpackt.
 
