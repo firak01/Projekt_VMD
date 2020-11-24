@@ -1,6 +1,12 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
+20201121: Einbau einer SSD 1GB
+20201120: Windows wollte nicht starten, Zurückspielen eines Images mit Bezeichnung "20181004VorUpdates"
+
+########################
+20190930: Installation von AVD-NativeApp-4.3.14-Release zum Download von Videos
+
 20180813: KO Player als Android Emulator installiert. 
           Apps installiert, für Videokammeras:
           -- yoosee
