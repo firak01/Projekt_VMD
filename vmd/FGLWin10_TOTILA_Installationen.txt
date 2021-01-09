@@ -1,0 +1,17 @@
+TOTILA - Notebook
+Details: Medion Erazer Defender P10 17''
+Seriennummer: 2007NH77DDWMKAP200516
+mit Board: ...........
+Prozessor: Intel i7-7700
+
+Betriebssystem: Win10 HOME,64bit
+Grafikkarte: RTX2060 mit 6144 MB
+WAKE ON LAN, mit Mac Adresse: 80:FA:5B:83:23:D0
+######################################################################
+
+20210109: Einrichten von VMD-Projekt:
+          Anbinden von GitGUI an das Projekt_VMD ( git@github.com:firak01/Projekt_VMD.git )
+          Installation von Java 8
+
+20201230: Installation von GitGUI - 1fgl Repository angebunden. ( git@github.com:firak01/1fgl.git ) .ssh-Dateien dazu herkopiert
+20201230: Instalaltion Acronis, erstes Backup
