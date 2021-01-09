@@ -9,10 +9,30 @@ Grafikkarte: RTX2060 mit 6144 MB
 WAKE ON LAN, mit Mac Adresse: 80:FA:5B:83:23:D0
 ######################################################################
 
+TODOS:
+Installation von Teamviewer
+Installation von Notepad++ (64bit)
+Entpacken von "Ultimate Tweak for Windows 10"
+BGInfo eingerichtet.
+BGInfo in den unter Win10 versteckten Autostart Ordner
+Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
+Telekom MagentaCLOUD installiert
+Adobe Acrobat Reader installiert (XI 11.0.10)
+PDF Creator installiert (3.3.0) ! NICHT den PDF Architekt
+PDF-XCHange Viewer installiert: https://www.chip.de/downloads/PDF-XChange-Viewer_29539244.html
+VMWare Player installiert (free, 15.0)
+7zip installiert (64bit Version)
+Steam installiert
+Gimp 2 (64 bit) installiert
+VLC Mediaplayer (64bit) installiert
+Discord für Windows installiert
+
+
 20210109: Einrichten von VMD-Projekt:
           Anbinden von GitGUI an das Projekt_VMD ( git@github.com:firak01/Projekt_VMD.git )
           Installation von JDKs: Java 8, Java 7 
 	  Installation von Apache Ant (jeweils Umgebungsvariablen erzeugen und Classpath erweitern um JAVA_HOME, ANT_HOME, ANT_ARGS  
 
+20201230: Installation von Firefox (64bit) und Profile eingerichtet
 20201230: Installation von GitGUI - 1fgl Repository angebunden. ( git@github.com:firak01/1fgl.git ) .ssh-Dateien dazu herkopiert
-20201230: Instalaltion Acronis, erstes Backup
+20201230: Installation Acronis, erstes Backup
