@@ -16,12 +16,12 @@ Entpacken von "Ultimate Tweak for Windows 10"
 BGInfo eingerichtet.
 BGInfo in den unter Win10 versteckten Autostart Ordner
 Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
-VMWare Player installiert (free, 15.0)
 7zip installiert (64bit Version)
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
-20210124: Installation von VMWare Worstation Player 16
+20210124: Installation von VMWare Worstation Player 16 (free).
+           Merke: Nach der Installation war ein Neustart erforderlich. Er findet sonst keine ini - Datei unterhalb des Benutzer-Verzeichnisses von Windows.
 
 20210121: Autologon fuer Win10 eingerichtet
 
