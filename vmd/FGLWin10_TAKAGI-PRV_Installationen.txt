@@ -6,6 +6,12 @@ Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20200814: Image erstellt und Clonen der Festplatte
+20200813: Installation des Spiels "Total War Troy"
+20200810: Installation von Epic Game Launcher
+
+20200102: Update von VMWare Workstation 15 Player - Grund war, dass nach dem Start der VM immer ein schwarzer Bildschirm kam.
+
 20191022: Installation über das Tool von GeForce Game Ready Driver Version 440.97 
 20191022: Neuinstallation NVidia Geforce Experience - Tool für Treiberinstallation
 

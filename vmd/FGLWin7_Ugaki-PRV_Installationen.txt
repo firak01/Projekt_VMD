@@ -2,6 +2,11 @@
 
 #########################################################
 
+20200813: Installation von Total War - Troy
+20200813: Installation von EpicGames Launcher
+20200813: Installation von MCAffee Antivirus
+20200813: Deinstallation von Avast Antivirus
+
 20180817: KO Player (Android Emulator) installiert (Version 1.44) 
           -- APP YooSee installiert und mit WebCam verbunden.
 

@@ -1,0 +1,49 @@
+TOTILA - Notebook
+Details: Medion Erazer Defender P10 17''
+Seriennummer: 2007NH77DDWMKAP200516
+mit Board: ...........
+Prozessor: Intel i7-7700
+
+Betriebssystem: Win10 HOME,64bit
+Grafikkarte: RTX2060 mit 6144 MB
+WAKE ON LAN, mit Mac Adresse: 80:FA:5B:83:23:D0
+######################################################################
+
+TODOS:
+Installation von Teamviewer
+Installation von Notepad++ (64bit)
+Entpacken von "Ultimate Tweak for Windows 10"
+BGInfo eingerichtet.
+BGInfo in den unter Win10 versteckten Autostart Ordner
+Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
+7zip installiert (64bit Version)
+Gimp 2 (64 bit) installiert
+Discord für Windows installiert
+
+20210124: Installation von VMWare Worstation Player 16 (free).
+           Merke: Nach der Installation war ein Neustart erforderlich. Er findet sonst keine ini - Datei unterhalb des Benutzer-Verzeichnisses von Windows.
+
+20210121: Autologon fuer Win10 eingerichtet
+
+20210117: Installation von Filezilla
+
+20210109: Installation von GOG Galaxy Client der Spieleplattform
+20200109: Installation von Epic Client der Spieleplattform
+20210109: Installation von Steam Client der Spielplattform
+20210109: Installation von Telekom MagentaCLOUD
+20210109: Installation des VLC Mediaplayer (64bit)
+20200129: Installation des PDF24 Creator (mit kostenlosem PDF24 Account)
+20210109: PDF-XCHange Viewer installiert: https://www.chip.de/downloads/PDF-XChange-Viewer_29539244.html
+20200109: Einrichten von Micorsoft Office aus meinem Microsoft - Konto
+20200109: Installation von Druckertreiber und ControlCenter4 für Brother DCP-JW572DW
+20200109: ACRONIS IMAGE erstellt
+
+20210109: Einrichten von VMD-Projekt:
+          Anbinden von GitGUI an das Projekt_VMD ( git@github.com:firak01/Projekt_VMD.git )
+          Installation von JDKs: Java 8, Java 7 
+	  Installation von Apache Ant (jeweils Umgebungsvariablen erzeugen und Classpath erweitern um JAVA_HOME, ANT_HOME, ANT_ARGS  
+
+20201230: Installation von Adobe Acrobat Reader (XI 11.0.10)
+20201230: Installation von Firefox (64bit) und Profile eingerichtet
+20201230: Installation von GitGUI - 1fgl Repository angebunden. ( git@github.com:firak01/1fgl.git ) .ssh-Dateien dazu herkopiert
+20201230: Installation Acronis, erstes Backup
