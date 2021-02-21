@@ -11,7 +11,6 @@ WAKE ON LAN, mit Mac Adresse: 80:FA:5B:83:23:D0
 
 TODOS:
 Installation von Teamviewer
-Installation von Notepad++ (64bit)
 Entpacken von "Ultimate Tweak for Windows 10"
 BGInfo eingerichtet.
 BGInfo in den unter Win10 versteckten Autostart Ordner
@@ -19,6 +18,8 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 7zip installiert (64bit Version)
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
+
+20210221: Installation von Notepad++ (64bit)
 
 20210124: Installation von VMWare Worstation Player 16 (free).
            Merke: Nach der Installation war ein Neustart erforderlich. Er findet sonst keine ini - Datei unterhalb des Benutzer-Verzeichnisses von Windows.
