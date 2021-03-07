@@ -19,6 +19,8 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
+20210307: Installation von McAffee Antivirus Plus.
+20210306: Installation von Spiel: Hearts of Iron 3 Collection (Von CD) 
 20210306: Installation von Recuva - einem Tool um verlorene Dateien (auch von USB-Stick) wiederherzustellen.
 20210221: Installation von Notepad++ (64bit)
 
