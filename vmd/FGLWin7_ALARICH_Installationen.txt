@@ -1,6 +1,11 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
+20210309: Neuinstallation von Telegram
+
+20210104: Installieren von Epic-Games Spieleplattform
+20210104: Installieren von GOG-Galaxy Spieleplattform
+
 20201121: Einbau einer SSD 1GB
 20201120: Windows wollte nicht starten, Zurückspielen eines Images mit Bezeichnung "20181004VorUpdates"
 
