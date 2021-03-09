@@ -22,6 +22,7 @@ Discord für Windows installiert
 20210307: Installation von McAffee Antivirus Plus.
 20210306: Installation von Spiel: Hearts of Iron 3 Collection (Von CD) 
 20210306: Installation von Recuva - einem Tool um verlorene Dateien (auch von USB-Stick) wiederherzustellen.
+20210306: Installation von ChromaCam - einem Toll für Bilschirmhintergründe (z.B. für Big Blue Button Konferenz Software)
 20210221: Installation von Notepad++ (64bit)
 
 20210124: Installation von VMWare Worstation Player 16 (free).
