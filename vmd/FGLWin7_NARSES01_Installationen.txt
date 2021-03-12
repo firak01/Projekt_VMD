@@ -3,6 +3,8 @@
 TODO: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
 
+20210312: Installation von Timesync zur Zeitsynchronisation
+
 20190706: Image erstellt und Umzug auf SSD Festplatte.
 
 20190104: Installation von "Autostart Delayer". Damit sanfter/zeitverzögerter Start der Anwendungen. So wird Terratec USB Aufnahmegerät sicherer angezeigt.
