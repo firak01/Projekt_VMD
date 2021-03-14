@@ -3,6 +3,8 @@
 ###
 #########################################################
 
+20210314: Installation von Timesync
+
 20190724: Windows Ressource Tool Kit installiert, um einige DOS Befehle zu haben.
 20190724: onStartupNarses03 Batch eingerichtet
 20190724: Win7 mit neuem Produktkey aktiviert
