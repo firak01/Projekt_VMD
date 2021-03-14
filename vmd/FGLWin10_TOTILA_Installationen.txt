@@ -10,7 +10,7 @@ WAKE ON LAN, mit Mac Adresse: 80:FA:5B:83:23:D0
 ######################################################################
 
 TODOS:
-Installation von Teamviewer
+Installation von OpenOffice - mit dem Ziel Worddateien bearbeiten zu können
 Entpacken von "Ultimate Tweak for Windows 10"
 BGInfo eingerichtet.
 BGInfo in den unter Win10 versteckten Autostart Ordner
@@ -18,6 +18,8 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 7zip installiert (64bit Version)
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
+
+20210314: Installation von Teamviewer 15 , mit Remotezugriff
 
 20210307: Installation von McAffee Antivirus Plus.
 20210306: Installation von Spiel: Hearts of Iron 3 Collection (Von CD) 
