@@ -19,6 +19,7 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
+20210527: Installation von WhatsApp für Windows
 
 20210101: Installation von Bandicam zum Aufnehmen von Bildschirmvideos
 20210330: Installation von Telegram
