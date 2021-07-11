@@ -2,6 +2,15 @@
 --- Videoschnitt mit AVIdemux
 --- Videoarchivierung über USB Festplatten
 --- GIMP zum Bildeditieren
+---############################################################################
+
+20210303: Installation eines Dienstes zur komfortableren Zeitsynchronisierung: time-sync ( setup_timesync_172.exe )
+
+20190308: Wg Fehlermeldung beim Freigeben von NEtzlaufwerken "Nicht genug Serverspeicher"
+          Registry Key eingetragen:
+          HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lanmanserver\parameters
+          Neuen DWORD Wert: 
+          IRPStackSize  mit dem Maximum von 50 versehen.
 
 20180310: MP3directorCut installiert - Tool um MP3 Dateien zu schneiden.
 

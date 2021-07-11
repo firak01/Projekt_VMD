@@ -2,6 +2,10 @@
 
 #########################################################
 
+20210314: Installation von Timesync
+
+20190724: Installation von Windows Ressource Tool Kit - um auch alte DOS Befehle ggfs. unter Win7 zu haben.
+
 20190703: Installation von Telegram für Windows
 
 20190627: Installation und Einrichten von T-Online Magenta Cloud
