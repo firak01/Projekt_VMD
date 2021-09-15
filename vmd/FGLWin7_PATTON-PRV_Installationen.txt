@@ -2,8 +2,16 @@
 
 TODO Zwischeninstallationen nachholen
 
-20200208 BIOS Einstellung auf "OS OTHER" beim Security Boot geändert, damit läufts (s. Eintrag hier vom 20170629)
-20200208 Backup von 20171007 wiederhergestellt und mit aktuellem Spieleordner Backup kombiniert
+
+
+20210915: Installation von f.lux, um die Bildschimrhelligkeit anzupassen.
+
+20210526: Neues Einspielen des letzten Backups vom 20170628 , da nach Grafikkartentreiberaktualisierung Windows nicht starten wollte
+
+#########
+
+20200208: BIOS Einstellung auf "OS OTHER" beim Security Boot geändert, damit läufts (s. Eintrag hier vom 20170629)
+20200208: Backup von 20171007 wiederhergestellt und mit aktuellem Spieleordner Backup kombiniert
          Grund waren Probleme beim Wiederhochfahren wg. UEFI
 
 ##########
