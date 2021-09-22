@@ -19,7 +19,16 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
-20210915: Installatin von f.lux zum Ändern der Bildschirmhelligkeit
+20210921: Installation von Borderless Gaming.
+          Damit kann man ältere Spiele mit geringerer Auflösung auf einem Monitor mit hoher Auflösung ohne Rahmen ausführen.
+          Klappt bei:
+          "Sid Meiers Railroads"
+
+          Klappt nicht bei:
+          "Ironclads Pacific" (das Clicken funktioniert dann nicht mehr)
+          
+
+20210915: Installation von f.lux zum Ändern der Bildschirmhelligkeit
 
 20210528: Shutdown Scripte der Taskleiste hinzugefuegt
 20210527: Installation von WhatsApp fuer Windows
