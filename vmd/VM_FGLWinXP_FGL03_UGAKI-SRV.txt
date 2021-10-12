@@ -5,6 +5,17 @@
 
 #################################################
 
+20210812: Der Start der Java Konsole funktioniert nicht mehr. Daher die normale Konsole automatisch starten
+		Das hat den Nachteil, dass ein Runterfahren des Servers per Batch nicht möglich ist.
+
+		Dazu in der Registry folgende Wert geändert
+		HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\Lotus Domino Server (CLotusDominodata)
+		Image PAth
+		von
+		c:\Lotus\Domino\nservice.exe "-jc"
+		nach
+		c:\Lotus\Domino\nservice.exe "-s" "=c:\Lotus\Domino\notes.ini"
+
 20190112: VMD_PROJEKT eingerichtet. Java 7 JDK installiert, Ant installiert, WinXP SupportTools installiert
 20190112: Repositories 1fgl und VMD_PROJEKT angebunden.
 20190112: GitGui installiert

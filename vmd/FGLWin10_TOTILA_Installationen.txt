@@ -10,7 +10,7 @@ WAKE ON LAN, mit Mac Adresse: 80:FA:5B:83:23:D0
 ######################################################################
 
 TODOS:
-Installation von Teamviewer
+Installation von OpenOffice - mit dem Ziel Worddateien bearbeiten zu können
 Entpacken von "Ultimate Tweak for Windows 10"
 BGInfo eingerichtet.
 BGInfo in den unter Win10 versteckten Autostart Ordner
@@ -19,9 +19,33 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
+20210923: Installationvon Spiel: Napoleon - Victory & Glory (Game Menu)(Matrix Portal)
+
+20210921: Installation von Borderless Gaming.
+          Damit kann man ältere Spiele mit geringerer Auflösung auf einem Monitor mit hoher Auflösung ohne Rahmen ausführen.
+          Klappt bei:
+          "Sid Meiers Railroads"
+
+          Klappt nicht bei:
+          "Ironclads Pacific" (das Clicken funktioniert dann nicht mehr)
+          
+
+20210915: Installation von f.lux zum Ändern der Bildschirmhelligkeit
+
+20210528: Shutdown Scripte der Taskleiste hinzugefuegt
+20210527: Installation von WhatsApp fuer Windows
+
+20210101: Installation von Bandicam zum Aufnehmen von Bildschirmvideos
+20210330: Installation von Telegram
+
+20210318: Installation von Windows-EZCastLite-Release-1.3.1.133 zum Streamen auf den Fernseher
+
+20210314: Installation von Teamviewer 15 , mit Remotezugriff
+
 20210307: Installation von McAffee Antivirus Plus.
 20210306: Installation von Spiel: Hearts of Iron 3 Collection (Von CD) 
 20210306: Installation von Recuva - einem Tool um verlorene Dateien (auch von USB-Stick) wiederherzustellen.
+20210306: Installation von ChromaCam - einem Toll für Bilschirmhintergründe (z.B. für Big Blue Button Konferenz Software)
 20210221: Installation von Notepad++ (64bit)
 
 20210124: Installation von VMWare Worstation Player 16 (free).

@@ -6,6 +6,12 @@ Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20210711: Installation und Freischalten von Whats App auf diesem Rechner
+
+20210104: Installieren von GOG Galaxy - Spieleplattform
+
+20200904: Installation von DOSBox
+
 20200814: Image erstellt und Clonen der Festplatte
 20200813: Installation des Spiels "Total War Troy"
 20200810: Installation von Epic Game Launcher
