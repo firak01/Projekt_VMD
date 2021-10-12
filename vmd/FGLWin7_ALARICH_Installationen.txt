@@ -1,6 +1,8 @@
 #### Client / server Rechner:
 #### Daher VMWareClient nicht updaten. Ist so Konfiguriert, das die Server auch ohne ein Netzwerk funktionieren)
 
+20211021: Installation von WhatsApp für PC
+
 20210309: Neuinstallation von Telegram
 
 20210104: Installieren von Epic-Games Spieleplattform
