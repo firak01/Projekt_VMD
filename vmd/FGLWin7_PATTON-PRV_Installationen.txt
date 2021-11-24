@@ -2,6 +2,9 @@
 
 TODO Zwischeninstallationen nachholen
 
+20211124: Update des Grafikkartentreibers für die AMD Radeon HD 7700.
+          Zuvor Backupimage erstellt. Was auch notwendig war. Funktioniert hat folgende Version: Win7-64Bit-Radeon-Software-Adrenalin-2019-Edition-19.11.2-Nov14
+          Scheint auch die letzte für Win7 zu sein.
 
 
 20210915: Installation von f.lux, um die Bildschimrhelligkeit anzupassen.
