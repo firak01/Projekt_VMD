@@ -2,8 +2,19 @@
 
 TODO Zwischeninstallationen nachholen
 
-20200208 BIOS Einstellung auf "OS OTHER" beim Security Boot geändert, damit läufts (s. Eintrag hier vom 20170629)
-20200208 Backup von 20171007 wiederhergestellt und mit aktuellem Spieleordner Backup kombiniert
+20211124: Update des Grafikkartentreibers für die AMD Radeon HD 7700.
+          Zuvor Backupimage erstellt. Was auch notwendig war. Funktioniert hat folgende Version: Win7-64Bit-Radeon-Software-Adrenalin-2019-Edition-19.11.2-Nov14
+          Scheint auch die letzte für Win7 zu sein.
+
+
+20210915: Installation von f.lux, um die Bildschimrhelligkeit anzupassen.
+
+20210526: Neues Einspielen des letzten Backups vom 20170628 , da nach Grafikkartentreiberaktualisierung Windows nicht starten wollte
+
+#########
+
+20200208: BIOS Einstellung auf "OS OTHER" beim Security Boot geändert, damit läufts (s. Eintrag hier vom 20170629)
+20200208: Backup von 20171007 wiederhergestellt und mit aktuellem Spieleordner Backup kombiniert
          Grund waren Probleme beim Wiederhochfahren wg. UEFI
 
 ##########
