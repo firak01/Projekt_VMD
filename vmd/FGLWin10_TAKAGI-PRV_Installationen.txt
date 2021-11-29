@@ -6,6 +6,7 @@ Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20211129: Installation von "FunMark" mit GPU-Z als Tools für die Messung der Grafikkarte
 20210711: Installation und Freischalten von Whats App auf diesem Rechner
 
 20210104: Installieren von GOG Galaxy - Spieleplattform
