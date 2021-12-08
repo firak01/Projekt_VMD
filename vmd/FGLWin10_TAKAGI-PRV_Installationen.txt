@@ -2,9 +2,16 @@ TAKAGI Rechner_PRV. Branch.
 Details: Fujitsu Esprimo P957 mit Board: D3502-A13
                               Prozessor: Intel i7-7700
 Betriebssystem: Win10 Professional,64bit
-Grafikkarte: Nvidia GeForce GTX 745
+eingebaute neue Grafinkarte AMD Radeon RX550
+ausgebaute Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
+
+20211208: Installation Grafikkartentreiber aus dem Paket: Non-WHQL-Radeon-Software-Adrenalin-2020-21.11.3-Win10-Win11-64Bit-Nov17
+20211208: Austausch der Grafikkarte, Einbau der AMD Radeon RX550
+
+20211206: Migration von HDD auf SSD Festplatte, mit Acronis "clonen" und neue Festplatte per USB angebunden.
+          Merke: Bisherige Images lassen sich wohl nicht auf die SSD zurückspielen.
 
 20211129: Installation von "FunMark" mit GPU-Z als Tools für die Messung der Grafikkarte
 20210711: Installation und Freischalten von Whats App auf diesem Rechner
