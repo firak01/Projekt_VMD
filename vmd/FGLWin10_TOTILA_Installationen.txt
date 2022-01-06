@@ -19,7 +19,10 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
-20210923: Installationvon Spiel: Napoleon - Victory & Glory (Game Menu)(Matrix Portal)
+
+20220106: Installation von HP Smart für DeskJet 3750 und Einrichten des Druckers
+
+20210923: Installation von Spiel: Napoleon - Victory & Glory (Game Menu)(Matrix Portal)
 
 20210921: Installation von Borderless Gaming.
           Damit kann man ältere Spiele mit geringerer Auflösung auf einem Monitor mit hoher Auflösung ohne Rahmen ausführen.
