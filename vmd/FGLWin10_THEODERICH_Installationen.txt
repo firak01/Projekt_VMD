@@ -1,0 +1,48 @@
+THEODERICH - Notebook
+Prozessor: Intel(R) Core(TM) i5-6300U CPU @ 2.40GHz   2.50 GHz
+Installierter RAM	20,0 GB (19,9 GB verwendbar)
+Geräte-ID	7B1C899D-C490-4A39-A6D6-74898E2D5C44
+Produkt-ID	00330-50077-49557-AAOEM
+Systemtyp	64-Bit-Betriebssystem, x64-basierter Prozessor
+
+Seriennummer: 
+mit Board: ..............................
+
+Betriebssystem: Windows 10 Pro
+Grafikkarte: ............................
+WAKE ON LAN, mit Mac Adresse: ...........
+######################################################################
+
+TODOS:
+Installation von OpenOffice - mit dem Ziel Worddateien bearbeiten zu können
+Entpacken von "Ultimate Tweak for Windows 10"
+BGInfo eingerichtet.
+BGInfo in den unter Win10 versteckten Autostart Ordner
+Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
+7zip installiert (64bit Version)
+
+
+TODO: Anlehnung an Totila für die Grundliegenden Installationen.
+
+TODO: 20220104: Installation von Firefox (64bit) und Profile eingerichtet
+ 
+20220111: Einrichten von Projekt_VMD,
+	  Installation von JDKs: Java 8, Java 7
+	  Installation von Apache Ant (jeweils Umgebungsvariablen erzeugen und Classpath erweitern um JAVA_HOME, ANT_HOME, ANT_ARGS  
+
+20220106: Installation der Software für den Drucker HP Deskjet 3750
+          von 123.hp.com
+	Merke: HP Printer Password Reset: Method 1
+    	With your printer on, press and hold the Wi-Fi button and the cancel button simultaneously. This will put your HP printer into setup mode.
+   	 Download the HP Smart app onto your Android device or iPhone to complete the password change procedure.
+   	 Within the HP Smart app, choose “Printer Setup. ”
+   	 Scroll to the bottom and choose “Advance Settings.”
+  	 Select “Settings and Security.”
+  	 Choose “Password Settings” from the drop-down menu.
+  	 You will be prompted to choose a new password for your HP printer
+
+20220104: Anbinden von GitGUI an das Projekt_VMD Repository ( git@github.com:firak01/Projekt_VMD.git )
+20220104  Anbinden von GitGUI anb das 1fgl Repository ( git@github.com:firak01/1fgl.git )
+20220104: Installation von Tortoise Git und GitGUI.  .ssh-Dateien dazu herkopiert
+20220103: Installation Acronis 2020 und Aktivierung, erstes Backup
+20220103: Einbau 1TB M.2 NV... Festplatte, Formatierung mit MBR.
