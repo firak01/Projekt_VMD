@@ -19,13 +19,17 @@ Entpacken von "Ultimate Tweak for Windows 10"
 BGInfo eingerichtet.
 BGInfo in den unter Win10 versteckten Autostart Ordner
 Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
-7zip installiert (64bit Version)
+
 
 
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
 
 TODO: 20220104: Installation von Firefox (64bit) und Profile eingerichtet
- 
+
+20220124: Update Acronis True Image
+20220124: Installation von 7zip
+20220124: Installation von VMWare Player 16
+
 20220111: Einrichten von Projekt_VMD,
 	  Installation von JDKs: Java 8, Java 7
 	  Installation von Apache Ant (jeweils Umgebungsvariablen erzeugen und Classpath erweitern um JAVA_HOME, ANT_HOME, ANT_ARGS  
