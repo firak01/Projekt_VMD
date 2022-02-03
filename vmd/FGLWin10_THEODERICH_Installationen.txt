@@ -11,6 +11,11 @@ mit Board: ..............................
 Betriebssystem: Windows 10 Pro
 Grafikkarte: ............................
 WAKE ON LAN, mit Mac Adresse: ...........
+
+Merke 20220202: 
+Ins BIOS bin ich bisher nur über die Win10 Wiederherstellen Menüpunkt gekommen.
+Die F1 Taste funktioniert nicht.
+
 ######################################################################
 
 TODOS:
@@ -25,6 +30,17 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
 
 TODO: 20220104: Installation von Firefox (64bit) und Profile eingerichtet
+
+20220203: Installation der Spieleplattform "Epic Games"
+20220203: Installation des OwnCloud Clients
+20220203: Installation des neuen MagentaCloud Clients (2022)
+20220203: Einrichten von Firefox Profile
+20220203: Einrichten von Autologon
+
+20220202: Installation der Spieleplattform STEAM
+
+20220202: Die Ersten VMs gestartet.
+          Wichtig: Dazu musste im BIOS erst die Nutzung der Virtualisierung aktiviert werden.
 
 20220124: Update Acronis True Image
 20220124: Installation von 7zip
