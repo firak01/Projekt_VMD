@@ -19,7 +19,7 @@ Die F1 Taste funktioniert nicht.
 ######################################################################
 
 TODOS:
-Installation von OpenOffice - mit dem Ziel Worddateien bearbeiten zu können
+
 Entpacken von "Ultimate Tweak for Windows 10"
 BGInfo eingerichtet.
 BGInfo in den unter Win10 versteckten Autostart Ordner
@@ -28,8 +28,20 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 
 
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
+TODO: WAKE ON LAN
 
-TODO: 20220104: Installation von Firefox (64bit) und Profile eingerichtet
+20220204: Image erstellt
+20220204: Installation von OpenOffice/LibreOffice 7.3.0.3 - mit dem Ziel "moderne" Worddateien bearbeiten zu können
+
+20220204: Kopieren von IBM Lotus Notes 8 Portable
+
+20220204: Installation von Microsoft Office 2000 (Word, Excel, Powerpoint)
+
+20220204: Installation Treiber und Anwendung für Drucker Brother DCP-J572DW
+          unter der IP: 192.168.3.247
+
+20220204: Installation Acrobat Reader 11XI
+20220204: Image erstellt
 
 20220203: Installation der Spieleplattform "Epic Games"
 20220203: Installation des OwnCloud Clients
@@ -50,7 +62,7 @@ TODO: 20220104: Installation von Firefox (64bit) und Profile eingerichtet
 	  Installation von JDKs: Java 8, Java 7
 	  Installation von Apache Ant (jeweils Umgebungsvariablen erzeugen und Classpath erweitern um JAVA_HOME, ANT_HOME, ANT_ARGS  
 
-20220106: Installation der Software für den Drucker HP Deskjet 3750
+20220106: Installation der Software für den Drucker HP Deskjet 3700
           von 123.hp.com
 	Merke: HP Printer Password Reset: Method 1
     	With your printer on, press and hold the Wi-Fi button and the cancel button simultaneously. This will put your HP printer into setup mode.
