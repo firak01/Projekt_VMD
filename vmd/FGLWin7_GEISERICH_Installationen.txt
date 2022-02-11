@@ -5,6 +5,14 @@ Betriebssystem: Win7 Home Premium 64bit
 
 #######################################################
 
+20220211: Acronis True Image 2018 - Update Version installiert
+20220211: Telekom neuen MagentaCLOUD Client (2022) installiert
+
+20200505: PDF X CHange Viewr zum Bearbeiten von PDFs installiert.
+
+20191201: Acronis True Image 2018 - Update Version installiert
+20191130: Installation von PowerDVD 8 von DVD zum Abspielen von DVDs
+
 20191031: Telegram installiert
 
 20190408: Internet Explorer 11 installiert.
