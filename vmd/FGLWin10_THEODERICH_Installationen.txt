@@ -9,8 +9,10 @@ Seriennummer:
 mit Board: ..............................
 
 Betriebssystem: Windows 10 Pro
+Audioausgabe: WOHL LEIDER NUR ÜBER EXTERNEN LAUTSPRECHER ODER Kopfhörer
+              Microfon und Webcam sind vorhanden.
 Grafikkarte: ............................
-WAKE ON LAN, mit Mac Adresse: ...........
+WAKE ON LAN, mit Mac Adresse:  50:7B:9D:D7:0A:F1
 
 Merke 20220202: 
 Ins BIOS bin ich bisher nur über die Win10 Wiederherstellen Menüpunkt gekommen.
@@ -18,17 +20,38 @@ Die F1 Taste funktioniert nicht.
 
 ######################################################################
 
+Es fehlt: TomTom MyDriveConnect (Utas Navigerät)
+Eclipse Arbeitsumgebungen für Android, Android SDK
+
+
 TODOS:
-
 Entpacken von "Ultimate Tweak for Windows 10"
-BGInfo eingerichtet.
-BGInfo in den unter Win10 versteckten Autostart Ordner
-Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
-
-
+Installation von Telegram
+IInstallation von Filezilla Client
 
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
-TODO: WAKE ON LAN
+
+20220215: Installation von WhatsApp
+20220215: Bereitstellen von TableTopSimulator Mod Saver als Tool um einmal erfolgreich gefundene Dateien zu sichern.
+20220215: Installation von .net 5 Runtime
+
+20220208: Bearbeiten von der windows\drivers\etc\host Datei als Admin und dort die Server IPs hinzugefügt
+
+20220208: Installation von K-Lite Codec Pack, bringt andere Player mit (z.B. Windows Media Player Classic)
+
+20220207: Installation von VLC als Videoplayer / Audioplayer
+
+20220205:Image erstellt
+20220205: BGInfo eingerichtet.
+          BGInfo in den unter Win10 versteckten Autostart Ordner
+20220205: Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
+          RemoteShutdown über Registry Update erlaubt (Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System  Wert für LocalAccountTokenFilterPolicy = 1  )
+20220205: WAKE ON LAN eingerichtet.
+          Dazu LENOVO update intalliert: osfj10ww.exe
+          Das reicht aber nicht. In den Energiespareinstellungen muss folgendes sein:
+                 Auswählen was beim Drücken des Netzschalters passieren soll.
+                 Checkbox deaktiviert sein: Schnellstart aktivieren (empfohlen)
+          
 
 20220204: Image erstellt
 20220204: Installation von OpenOffice/LibreOffice 7.3.0.3 - mit dem Ziel "moderne" Worddateien bearbeiten zu können
