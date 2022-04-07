@@ -31,6 +31,8 @@ IInstallation von Filezilla Client
 
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
 
+20220407: Installation von McAfee Antivierenprogram
+
 20220215: Installation von WhatsApp
 20220215: Bereitstellen von TableTopSimulator Mod Saver als Tool um einmal erfolgreich gefundene Dateien zu sichern.
 20220215: Installation von .net 5 Runtime
