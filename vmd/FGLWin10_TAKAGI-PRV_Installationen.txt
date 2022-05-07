@@ -7,6 +7,10 @@ ausgebaute Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20220507: Installation von Active@ ISO Burner "Burn CD/DVD/Blu-ray ISO images compatible with the ISO 9660 standard" - tool zum Brennen von bootable DVDs
+
+20220201: Installation des neuen MagentaCloud Clients
+
 20211208: Installation Grafikkartentreiber aus dem Paket: Non-WHQL-Radeon-Software-Adrenalin-2020-21.11.3-Win10-Win11-64Bit-Nov17
 20211208: Austausch der Grafikkarte, Einbau der AMD Radeon RX550
 
