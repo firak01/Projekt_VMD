@@ -1,6 +1,10 @@
 ### Private Festplatte mit Spielen ect.
-
+###
 #########################################################
+
+20220201: Deinstallation des Telekom Online Managers
+20220201: Installation des neuen MagentaCloud
+20220201: Installation von GoogleDrive App
 
 20200813: Installation von Total War - Troy
 20200813: Installation von EpicGames Launcher

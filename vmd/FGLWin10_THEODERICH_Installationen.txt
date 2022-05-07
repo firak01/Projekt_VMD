@@ -1,0 +1,107 @@
+THEODERICH - Notebook
+Prozessor: Intel(R) Core(TM) i5-6300U CPU @ 2.40GHz   2.50 GHz
+Installierter RAM	20,0 GB (19,9 GB verwendbar)
+Geräte-ID	7B1C899D-C490-4A39-A6D6-74898E2D5C44
+Produkt-ID	00330-50077-49557-AAOEM
+Systemtyp	64-Bit-Betriebssystem, x64-basierter Prozessor
+
+Seriennummer: 
+mit Board: ..............................
+
+Betriebssystem: Windows 10 Pro
+Audioausgabe: WOHL LEIDER NUR ÜBER EXTERNEN LAUTSPRECHER ODER Kopfhörer
+              Microfon und Webcam sind vorhanden.
+Grafikkarte: ............................
+WAKE ON LAN, mit Mac Adresse:  50:7B:9D:D7:0A:F1
+
+Merke 20220202: 
+Ins BIOS bin ich bisher nur über die Win10 Wiederherstellen Menüpunkt gekommen.
+Die F1 Taste funktioniert nicht.
+
+######################################################################
+
+Es fehlt: TomTom MyDriveConnect (Utas Navigerät)
+Eclipse Arbeitsumgebungen für Android, Android SDK
+
+
+TODOS:
+Entpacken von "Ultimate Tweak for Windows 10"
+Installation von Telegram
+IInstallation von Filezilla Client
+
+TODO: Anlehnung an Totila für die Grundliegenden Installationen.
+
+20220429: Installation von GOG Galaxy 2.0 Spieleplattform
+
+20220407: Installation von McAfee Antivierenprogram
+
+20220215: Installation von WhatsApp
+20220215: Bereitstellen von TableTopSimulator Mod Saver als Tool um einmal erfolgreich gefundene Dateien zu sichern.
+20220215: Installation von .net 5 Runtime
+
+20220208: Bearbeiten von der windows\drivers\etc\host Datei als Admin und dort die Server IPs hinzugefügt
+
+20220208: Installation von K-Lite Codec Pack, bringt andere Player mit (z.B. Windows Media Player Classic)
+
+20220207: Installation von VLC als Videoplayer / Audioplayer
+
+20220205:Image erstellt
+20220205: BGInfo eingerichtet.
+          BGInfo in den unter Win10 versteckten Autostart Ordner
+20220205: Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
+          RemoteShutdown über Registry Update erlaubt (Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System  Wert für LocalAccountTokenFilterPolicy = 1  )
+20220205: WAKE ON LAN eingerichtet.
+          Dazu LENOVO update intalliert: osfj10ww.exe
+          Das reicht aber nicht. In den Energiespareinstellungen muss folgendes sein:
+                 Auswählen was beim Drücken des Netzschalters passieren soll.
+                 Checkbox deaktiviert sein: Schnellstart aktivieren (empfohlen)
+          
+
+20220204: Image erstellt
+20220204: Installation von OpenOffice/LibreOffice 7.3.0.3 - mit dem Ziel "moderne" Worddateien bearbeiten zu können
+
+20220204: Kopieren von IBM Lotus Notes 8 Portable
+
+20220204: Installation von Microsoft Office 2000 (Word, Excel, Powerpoint)
+
+20220204: Installation Treiber und Anwendung für Drucker Brother DCP-J572DW
+          unter der IP: 192.168.3.247
+
+20220204: Installation Acrobat Reader 11XI
+20220204: Image erstellt
+
+20220203: Installation der Spieleplattform "Epic Games"
+20220203: Installation des OwnCloud Clients
+20220203: Installation des neuen MagentaCloud Clients (2022)
+20220203: Einrichten von Firefox Profile
+20220203: Einrichten von Autologon
+
+20220202: Installation der Spieleplattform STEAM
+
+20220202: Die Ersten VMs gestartet.
+          Wichtig: Dazu musste im BIOS erst die Nutzung der Virtualisierung aktiviert werden.
+
+20220124: Update Acronis True Image
+20220124: Installation von 7zip
+20220124: Installation von VMWare Player 16
+
+20220111: Einrichten von Projekt_VMD,
+	  Installation von JDKs: Java 8, Java 7
+	  Installation von Apache Ant (jeweils Umgebungsvariablen erzeugen und Classpath erweitern um JAVA_HOME, ANT_HOME, ANT_ARGS  
+
+20220106: Installation der Software für den Drucker HP Deskjet 3700
+          von 123.hp.com
+	Merke: HP Printer Password Reset: Method 1
+    	With your printer on, press and hold the Wi-Fi button and the cancel button simultaneously. This will put your HP printer into setup mode.
+   	 Download the HP Smart app onto your Android device or iPhone to complete the password change procedure.
+   	 Within the HP Smart app, choose “Printer Setup. ”
+   	 Scroll to the bottom and choose “Advance Settings.”
+  	 Select “Settings and Security.”
+  	 Choose “Password Settings” from the drop-down menu.
+  	 You will be prompted to choose a new password for your HP printer
+
+20220104: Anbinden von GitGUI an das Projekt_VMD Repository ( git@github.com:firak01/Projekt_VMD.git )
+20220104  Anbinden von GitGUI anb das 1fgl Repository ( git@github.com:firak01/1fgl.git )
+20220104: Installation von Tortoise Git und GitGUI.  .ssh-Dateien dazu herkopiert
+20220103: Installation Acronis 2020 und Aktivierung, erstes Backup
+20220103: Einbau 1TB M.2 NV... Festplatte, Formatierung mit MBR.

@@ -2,6 +2,10 @@
 
 TODO Zwischeninstallationen nachholen
 
+
+
+20220106: Installation von HP Smart und Einrichten den HP DeskJet 3750 Druckers
+
 20211124: Update des Grafikkartentreibers für die AMD Radeon HD 7700.
           Zuvor Backupimage erstellt. Was auch notwendig war. Funktioniert hat folgende Version: Win7-64Bit-Radeon-Software-Adrenalin-2019-Edition-19.11.2-Nov14
           Scheint auch die letzte für Win7 zu sein.
@@ -17,7 +21,7 @@ TODO Zwischeninstallationen nachholen
 20200208: Backup von 20171007 wiederhergestellt und mit aktuellem Spieleordner Backup kombiniert
          Grund waren Probleme beim Wiederhochfahren wg. UEFI
 
-##########
+########## START: ZWISCHENINSTALLATION NACHHOLEN
 
 20191130: Installation von PowerDVD V8 von DVD zum DVD Abspielen
 
@@ -41,7 +45,11 @@ TODO Zwischeninstallationen nachholen
 
 20180123: Notepad++: Deinatallation der 32bit Version, Installation von Notepad++ 64bit inclusive PluginManager
 
-###############
+########## ENDE: ZWISCHENINSTALLATION NACHHOLEN
+
+
+
+
 
 20170818: Telekom Magenta cloud client - Arbeitsverszeichnis von c:\1fgl auf Laufwerk D: verschoben
 

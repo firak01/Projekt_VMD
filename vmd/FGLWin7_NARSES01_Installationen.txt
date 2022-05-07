@@ -3,6 +3,8 @@
 TODO: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
 
+20220107: Update von Acronis True Image 2018
+
 20210312: Installation von Timesync zur Zeitsynchronisation
 
 20190706: Image erstellt und Umzug auf SSD Festplatte.
