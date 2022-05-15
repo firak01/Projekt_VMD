@@ -377,7 +377,7 @@
 				<param name="osUsed" value="${osUsed}"/>
 				<param name="pathClientUsed" value="${pathClientUsed}"/>					
 	</antcallback>		
-	<echo>Errechneter wert der VMD Datei=${returnFilename}</echo>
+	<echo>Ergebnis von computeFilenameVMD. Errechneter wert der VMD Datei=${returnFilename}</echo>
 	<fl:let>src.dirFglClientFileName::="${returnFilename}"</fl:let><!-- Merke: Der Computername wird nicht extra gesetzte. Er kommt aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 	<fl:let>dest.dirRepositoryVmdPath::="${conf.dirRepositoryPath}"</fl:let>
 	<fl:let>dest.dirRepositoryVmdBackupPath::="${dest.dirRepositoryVmdPath}Backups"</fl:let><!-- Die erstellten Backup - zip Dateien sollten ausserhalb des Git Repositories sein -->
@@ -573,7 +573,7 @@
 	<fl:let>myTargetDirectory ::= "${targetDirectory}"</fl:let>
 	<fl:let>myFileNameVmd ::= "${fileNameVmd}"</fl:let>
 		
-	<echo>a) VMD File:</echo>
+	<echo>a) VMD File: ${fileNameVmd}</echo>
 	<!-- <echo>conf.dirRepositoryArchive = "${conf.dirRepositoryArchive}"</echo>
 	<echo>mySourceDirectory = "${mySourceDirectory}"</echo>
 	<echo>myTargetDirectory = "${myTargetDirectory}"</echo>

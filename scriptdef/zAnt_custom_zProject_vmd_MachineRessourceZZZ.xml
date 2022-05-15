@@ -33,11 +33,13 @@
 			<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
 			<antcallback target="-computeFilenameHostVMD" return="returnFilename">
 				<param name="osUsed" value="${myOsUsed}"/>					
-			</antcallback>	
+			</antcallback>							
 			<fl:let>myFilename::="${returnFilename}"</fl:let>
+			<fl:echo>computeFilenameClientHostNamedVMD = ${myFilename}</fl:echo>
 		</ac:then>
 		<ac:else>
-			<fl:echo>Ggfs VMware Client auf Host identifiziert.</fl:echo>
+			<fl:echo>Ggfs VMware Client auf Host identifiziert. </fl:echo>
+			<fl:echo>computeFilenameClientHostNamedVMD A = ${returnFilename}</fl:echo>
 			<!-- Prüfe, um sicherzugehen auch das mit einem Target ab. -->
 			<!-- TODO GOON: Hole den Hostnamen aus einer rechnerspezifischen Konfiguration -->
 			<antcallback target="-isClientVMD" return="returnControl,returnBoolean">
@@ -55,6 +57,7 @@
 						<param name="hostUsed" value="${myHostUsed}"/>	
 					</antcallback>				 
 					<fl:let>myFilename::="${returnFilename}"</fl:let>
+					<fl:echo>computeFilenameClientHostNamedVMD B = ${myFilename}</fl:echo>
 				</ac:then>
 				<ac:else>
 					<fl:echo>VMware Client auf Host Rechner NICHT bestätigt.</fl:echo>
@@ -79,6 +82,7 @@
 		
 		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
 		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		<fl:echo>computeFilenameHostVMD env.Computername = ${env.COMPUTERNAME}</fl:echo>
 		<fl:let>myFilename::="FGL${myOsUsed}_${env.COMPUTERNAME}_Installationen.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
 
 		<!-- Rueckgabebwerte -->			
@@ -97,6 +101,7 @@
 		
 		<!-- Nach Fgl soll das Kürzel des Betriebssystems kommen, also z.B. FglWin7_UGAKI-SRV_Installationen.txt -->
 		<!-- Merke: Gross-/Kleinschreibung ist fuer den Dateinamen wichtig -->
+		
 		<fl:let>myFilename::="VM_FGL${myOsUsed}_${env.COMPUTERNAME}_${myHostUsed}.txt"</fl:let><!-- Merke: Aus der Liste der Windows Umgebungsvariablen: DOS Box. SET - Befehl und ENTER --> 	  
  
 		<!-- Rueckgabebwerte -->			
