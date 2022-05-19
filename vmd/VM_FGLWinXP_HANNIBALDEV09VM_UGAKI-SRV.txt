@@ -13,7 +13,7 @@
     Nionex Probearbeitstag 20140915 - Anbindung an DB per JDBC - Parsen von SQL Datei
     Betzemeier automotive software GmbH - Sources zum Ausschlachten - Thema JSF und Hibernate
 
-#### Server: Tomcat 7 / SQLite DB 
+#### Server: Tomcat 7 / SQLite DB  
 ##################################################################################################################
 
 20220519: Installation von neuem IE8 und GitGui wg. MAC - Fehler beim Verbindungsversuch mit GitHub
