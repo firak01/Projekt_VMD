@@ -39,8 +39,9 @@
 
 ####################################################################
 
-20191023: Git Repository-Zweig c:\1fgl\repo\EclipseOxygen_V01 für Eclipse Oxygen erstellt.
+20220519: Installation von neuem IE 8 und GitGui - Wg MAC Fehler beim Verbinden mit GitHub
 
+20191023: Git Repository-Zweig c:\1fgl\repo\EclipseOxygen_V01 für Eclipse Oxygen erstellt.
 20191023: Installaton von Subversion für Eclipse Oxygen
 20191023: Installation von CVS Client für Eclipse Oxygen
 20191023: Installation/Entpacken von Eclipse Oxygen ( 4.7 )
