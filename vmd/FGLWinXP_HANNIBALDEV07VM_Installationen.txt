@@ -1,0 +1,116 @@
+---- Synchron halten mit DEV06
+##############
+              --- Eclipse (Luna):
+              - Workspace für das Buch "Swing Hacks" (2005) eingerichtet und an das GitRepository des Verlags angebunden.
+                                                                                                                 Einzelne Tryouts an eigene Repositories angebunden.
+
+	- Workspace für das Buch "Swing, 2nd Edition (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
+
+              - Workspace für das XSLT-Buch "XSlt XSL und XQuery" einrichten und GitRepository dahin importiert. 
+	- Workspace FGL4 eingerichtet für XSLT-TryOuts, angebunden an entsprechende Repositories (noch über HTTP).
+                TODO: Diese Repositories auf git: Protokoll umstellen.
+
+              - Workspace für das Buch "Pro Apache Xml" einrichten und als GitRepository exportiert.
+
+	- Workspace für das Projekt_VMD eingeruchtet und an das GitRepository angebunden ( git@github.com:firak01/Projekt_VMD.git )
+
+	- Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden.
+                 Aus dem Repository der Gesamten Werke den Code für das eigentliche Buch exportieren als Eclipse Projekt neu importiert
+
+                 TODO: Das so neu erstellte Projekt als neues Repository nach GitHub bringen.  ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git  )
+ 
+
+	--- Lotus Notes Client 9, 
+	--- Eclipse (Juno):
+             	Entwicklungsumgebung Projekte Java Coder_KommentarEntfernen, TryOut Java generell und  Swing, JAXB, XSLT, JAXB, JAXP, Lucene, JDBC.SQL usw. OHNE MAVEN  
+            
+	--- Entwicklungsumgebung für das Buch "Lucene in action"
+	
+	--- Eclipse 3.2 
+	ZKernel Entwicklungumgebung für Java 1.6 (angebunden an CVS System)
+	Plugin zum Packen des JAR-Archivs
+
+	--- Eclipse 4.2EE Juno
+	ZKernel Entwicklungsumgebung für Java 1.6 (angebunden an CVS System)
+	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
+##############################################      
+
+20220519: Installation von IE8 und neuere GitGUI Version wg. MAC - Fehler beim Verbinden mit  GitHub
+
+20200111: Installation von OpenVPN für Win XP
+20200111: Neue Git Repositories für OpenVPN Projekt unterhalb des repo Pfads von Eclipse Oxygen
+20200111: Installation von Eclipse Oxygen 1a
+20200111: Installation von Java 8 (auf eigene Gefahr unter WinXP)
+
+20180706: Eclipse Luna Workspace für das Buch "Swing, 2nd Edition (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
+20180706: Eclipse Luna Workspace für das Projekt_VMD eingerichtet und an das GitRepository angebunden ( git@github.com:firak01/Projekt_VMD.git )
+
+20180612: Ecliipse Luna Workspace: Den eigentlichen Buch Code herausgelöst , importiert und als Git Repository eingebunden. ( git@github.com:firak01/Buch_HttpRecipesJavaBots4Tryout.git )
+20180612: Eclipse Luna Workspace für das Buch "HTTP Programming Recipes for JavaBots" erstellt und GitRepository des Autors eingebunden. ( git@github.com:jeffheaton/jeffheaton-book-code.git )
+
+20180611: Firefox Arbeitsumgebungen eingerichtet. Hier ein Beispiellink: C:\Programme\firefox\firefox.exe -no-remote -new-window -P "FGL-PRV" 
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Robot". ( git@github.com:firak01/Tryout_Swing_Robot.git )
+20180611: Eclipse Luna Workspace für das Buch "Swing Hacks" : Ergänzt um ein Projekt "Tryout_Swing_Application_Mirror". ( git@github.com:firak01/Tryout_Swing_ApplicationMirror.git )
+
+20180527: Firefox - Arbeitsumgebungen - Profile eingerichtet.
+
+20180527: Arbeitsumgebung Eclipse für Buch "Swing Hacks": Repository des Buchs eingebunden
+20180527: Arbeitsumgebung Eclipse für Buch "Swing Hacks": erstellt
+
+20180524: VMD funktioniert
+20180524: VMD Projekt - Setx über Installation von WinXP SupportTools notwendig
+
+20151108: Java 1.7 JDK Intstalliert, Apache Ant Installiert und entsprechende Umgebungsvariablen gesetzt
+20151108: Repository für ProjektVM erstellt
+20151108: Installation von Notepad++ mit den Erweiterungen compare, explorer, xml tools
+
+2015-04-12: PDF24Creator installiert
+      
+2015-01-11: Egit für Eclipse installiert und Projekt "XSLT Buch" ausgechecked
+2015-01-11: Eclipse Luna installiert.
+2015-01-11: Git für Windows (mit XP Fix) installiert. Repository unter c:\1fgl\repo eingerichtet.
+
+2014-04-11: Workspace und Unterverzeichnisse unter java -  für das Buch "Lucene in Action" erstellt. 
+2014-04-11: Diverse TryOuts in den anderen Workspace aufgenommen. Unter anderenTryOuts für Lucene und das Tool LUKE.
+
+2014-02-18: Windows XP Updates.
+
+2013-11-22: Thunderbird als E-Mail Programm installiert
+
+2013-11-20: Lotus Notes Designer 9.01. englisch installiert (über bestehende Version)
+
+2013-07-15: Lotus Notes 9 Updates/Fixes installiert
+2013-06-15: 
+2013-05     : Lotus Notes 8 deinstalliert Notes 9 installiert
+Als Entwicklungsumgebung Dev07
+###############################################
+2013-04-05: Chrome installiert
+2013-04-05: Update des Internet Explorers auf Version 8
+
+2013 03 28: Workspace mit SOAP UI Projekten errichtet
+2013-03-27: CouchDb Version 1.21 installiert
+
+2013-03-24: soapui installiert
+2013-03-24: node.js installiert, ist in komodoEdit konfiguriert.
+2013-03-24: Komodo Edit 8 als JavaScript Editor installiert
+
+2013-03-08: curl im client Verzeichnis installiert
+
+2012-11-14: Java 1.7 API Dokumentation hinzugefügt
+2012-11-13: Installation von Java 7
+
+2012-11-06: Installation der Treiber & Software für den Brother Drucker auf 192.168.3.249
+2012-11-06: Installation der Java 6 - API DOCS
+
+###########################################
+2012-10-19: Domino Designer. Das Installieren von Plugins erlaubt. Plugins von der Update Site installiert: 1. SVN 2. Firebug light
+2012-10-19: Notes 8.5.3 Client mit Desiger und Administrator installiert, Fixpack 1 & 2 installiert. Upgradepack 1 für Designer installiert. Siehe: http://www-10.lotus.com/ldd/ddwiki.nsf/xpViewCategories.xsp?lookupName=Domino%20Designer%20XPages%20Extension%20Library
+
+2012-10-18: Plugin EGIT für GIT Versionskontrolle in Eclipse Installiert (schon mal vorsorglich, da es noch keinen GIT Server gibt)
+2012-10-18: Plugin für SVN in Eclipse (inklusive SVN Konnector - Installation nach Verbindung mit dem Internet)SVN 
+2012-10-18: Installation von Eclipse Juno (4.2) EE und WebDeveloper
+2012-10-18: Installation von Java 6 JRE & SDK
+
+2012-10-16: Dateien in das Software Verzeichnis kopiert. (Unter Verwendung der MBS Relay VM).
+2012-10-14: Arbeitsspeicher auf 768 MB verringert. Windows neu Aktiviert
+2012-10-13: Aufgeräumt, d.h. deinstallation von Notes 7, glassfish Server, Tom tom, etc.
