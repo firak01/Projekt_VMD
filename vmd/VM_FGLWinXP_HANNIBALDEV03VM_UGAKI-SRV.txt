@@ -12,6 +12,9 @@
 Alte Javaprojekte für Albis und die Sparkassn Informatik
 
 #####################################################
+
+20220517: Neues Git Version und GitGUI Installiert wg. MAC - Fehler bei Verbindungsversuch mit GitHub
+
 20180818: .ssh Dateien hierher kopiert
 20180818: Firefox auf letzte Version 52.09 ESR für WinXP gebracht.
 
