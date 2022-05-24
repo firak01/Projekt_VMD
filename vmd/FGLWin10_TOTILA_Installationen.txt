@@ -19,6 +19,7 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
+20220524: Installation von ownCloud
 
 20220106: Installation von HP Smart für DeskJet 3750 und Einrichten des Druckers
 
