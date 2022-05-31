@@ -3,6 +3,9 @@
 TODO Zwischeninstallationen nachholen
 
 
+20220531: Treiber und Hilfsprogramme für 27 Zoll Monitor von AOC (Screen+, i-Menu)
+
+20220110: Telegram für Windows installiert (Messenger statt whats app)
 
 20220106: Installation von HP Smart und Einrichten den HP DeskJet 3750 Druckers
 
@@ -22,6 +25,8 @@ TODO Zwischeninstallationen nachholen
          Grund waren Probleme beim Wiederhochfahren wg. UEFI
 
 ########## START: ZWISCHENINSTALLATION NACHHOLEN
+
+
 
 20191130: Installation von PowerDVD V8 von DVD zum DVD Abspielen
 
@@ -46,8 +51,6 @@ TODO Zwischeninstallationen nachholen
 20180123: Notepad++: Deinatallation der 32bit Version, Installation von Notepad++ 64bit inclusive PluginManager
 
 ########## ENDE: ZWISCHENINSTALLATION NACHHOLEN
-
-
 
 
 
