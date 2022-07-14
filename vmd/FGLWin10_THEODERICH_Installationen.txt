@@ -31,6 +31,10 @@ IInstallation von Filezilla Client
 
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
 
+20220714: Installation von AnyDesk als Teamviewer Ersatz
+
+20220709: Installation von MyDriveConnect für das TomTom Navigationsgerät
+
 20220429: Installation von GOG Galaxy 2.0 Spieleplattform
 
 20220407: Installation von McAfee Antivierenprogram
