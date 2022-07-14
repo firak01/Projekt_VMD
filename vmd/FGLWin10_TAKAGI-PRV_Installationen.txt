@@ -7,6 +7,8 @@ ausgebaute Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20220714: Installation von Epic Pen - eimen "Screen Annotation Tool"
+
 20220507: Installation von Active@ ISO Burner "Burn CD/DVD/Blu-ray ISO images compatible with the ISO 9660 standard" - tool zum Brennen von bootable DVDs
 
 20220201: Installation des neuen MagentaCloud Clients
