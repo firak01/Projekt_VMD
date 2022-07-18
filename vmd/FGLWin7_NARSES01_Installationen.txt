@@ -1,7 +1,13 @@
-### Private Netzrechner zum Surfen / Musikhören
+########################################################
+### Private Netzrechner und TV - Aufnahmerechner
+###
 ########################################################
 TODO: Windows Aufgabenplanung - Tägliches herunterfahren - sicher ist sicher.
       Installation von Teamviewer HOST 12.0
+
+20220718: Installation von Anydesk als Teamviewer Alternative
+
+20220201: Installation des neuen MagentaCloud Clients
 
 20220107: Update von Acronis True Image 2018
 
