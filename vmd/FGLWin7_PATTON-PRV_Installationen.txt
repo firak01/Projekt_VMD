@@ -5,6 +5,7 @@ TODO Ggfs. Zwischeninstallationen (s.u.) nachholen
 TODO 20220817: Ungelöstes Problem - Clonen oder Installieren von Win10 auf eine SSD Platte, funktioniert nicht
 ###########################################################################################################################
 
+20220914: Installation von ownCloud zur Synchronisation von Ordnern mit der HIS
 
 20220817: Installation von Anydesk als Teamviewer Alternative
 20220816: Installation von Cruzial Storage Executive. Tool von Cruzial für Festplatten... aber die Ziel SSD hat schon die neueste Firmware.
@@ -71,7 +72,7 @@ TODO 20220817: Ungelöstes Problem - Clonen oder Installieren von Win10 auf eine 
 20160722: Installation von "Free YouTube MP3 Converter
 
 20160529: Windows Product Key Viewer installiert. Ermittelter Product Key: MHGKX-8Y4GT-KVGXY-M3VGW-Q9VKC
-20160528: Installtion von MediathekView und VLC Player zum Download aus den Mediatheken des Staatsfernsehns
+20160528: Installation von MediathekView und VLC Player zum Download aus den Mediatheken des Staatsfernsehns
 
 20160528: Windows Updates. 
          ! Paket nicht installieren, sonst startet das ASUS Board mit UEFI nicht mehr!
