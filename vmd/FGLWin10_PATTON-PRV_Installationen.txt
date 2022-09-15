@@ -15,6 +15,8 @@
 # 
 ###########################
 
+20220915: Installation von AMD Grafikkartentreiber
+
 20220915: Installation von Steam
 20220915: Einrichten des default lokalen Administrators, um Zugriffe auf Netzwerkressourcen zu erlauben
 
