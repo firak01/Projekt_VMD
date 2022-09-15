@@ -9,6 +9,7 @@
 # Wake on LAN, mit MAC Adresse: 
 ###########################
 
+20220915: Download der SSH ID-Dateien aus Magentacloud als zip und Extrahieren der Dateien in Benutzer\xxx\.ssh Verzeichnis
 20220915: Repository 1fgl\repository\Projekt_VMD clonen
 20220915: Repository 1fgl clonen
 20220915: Installation von GitGui für Windows
