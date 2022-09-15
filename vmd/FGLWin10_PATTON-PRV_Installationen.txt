@@ -5,12 +5,29 @@
 # RAM: 16 GB
 #
 # Betriebssystem: Win10 Professional, 64 bit (übernommen von vorheriger Win7 Installation, verknüpft mit Microsoft Konto)
+# Grafikkarte: AMD Radeon HD 7700
 #
 # Wake on LAN, mit MAC Adresse: 
+#
+# Problem:
+# Wie auch die Vorgängerversion Win7, funktioniert der Neustart nach dem Clonen der Festplatte auf eine SSD nicht.
+# 20220915: Funktionierte nun doch mit Acronis True Image 2021 von DVD.
+# 
 ###########################
 
+20220915: Installation von Steam
+20220915: Einrichten des default lokalen Administrators, um Zugriffe auf Netzwerkressourcen zu erlauben
+
+20220915: Erstellen des ersten Backups mit Acronis.
 20220915: Download der SSH ID-Dateien aus Magentacloud als zip und Extrahieren der Dateien in Benutzer\xxx\.ssh Verzeichnis
 20220915: Repository 1fgl\repository\Projekt_VMD clonen
 20220915: Repository 1fgl clonen
 20220915: Installation von GitGui für Windows
 20220915: Installation von Firefox
+20220915: Installation Win10 Treiber von der ASUS Homepage für das Mainboard H87Pro
+
+Vorher:
+Installation von Acronis True Image für Crucial.
+Zum Start ist Voraussetzung eine Festplatte (auch per USB) im System zu haben.
+Damit hat dann auch das Erstellen eines ersten Backups.
+
