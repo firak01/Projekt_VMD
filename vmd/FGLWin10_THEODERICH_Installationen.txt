@@ -31,6 +31,12 @@ IInstallation von Filezilla Client
 
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
 
+#######################################################################
+20221205: Installation von OpenVPNGUI, bereitstellen der Konfigurationsdatei .ovpn und .p12 und .key Datei im config - Verzeichnis für Verbindungsaufbau zur HIS
+
+20221020: Windows Update
+20221020: Image erstellt
+
 20220714: Installation von AnyDesk als Teamviewer Ersatz
 
 20220709: Installation von MyDriveConnect für das TomTom Navigationsgerät
