@@ -19,6 +19,15 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
+20221205: Installation von OpenVPN (GUI) ---> Damit klappt es. In das Verzeichnis C:\Program Files\OpenVPN\config die .ovpn Datei und die .key Datei kopiert.
+                                              Das .p12 Zertifikat hatte ich ja schon vorher in den Windows Speicher eingebunden (OpenVPN Storage).
+20221205: Installation von OpenVPNConnect 3 ---> Aber trotz importe des .p12 - Zertifikats und Bereitstellen .ovpn Konfiguration, keine Verbindung zum HIS Netzwerk
+
+20221013: Erstellen Image ohne VMWare und Spiel Ordner
+20221013: Installation von AOMEI - Partition Assistant Professional UND Aktivierung mit einem Key
+
+20221011: Installation von HTTracker, Tool zum Kopieren und Offline Bereitstellen von ganzen WebSites
+
 20220915: Update VMWarePlayer von 16.2.3 -> 16.2.4
 
 20220524: Installation von ownCloud
