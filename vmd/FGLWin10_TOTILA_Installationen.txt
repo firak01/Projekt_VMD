@@ -19,6 +19,11 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
+20230104: Installation und Einrichten von WinAuth als Tokengenerator für HISPRO
+20230104: Installation und Einrichten von 3CX Telefonsoftware für HIS eG
+
+20221212: Installation von Nmap - einem Port Scanner Tool
+
 20221205: Installation von OpenVPN (GUI) ---> Damit klappt es. In das Verzeichnis C:\Program Files\OpenVPN\config die .ovpn Datei und die .key Datei kopiert.
                                               Das .p12 Zertifikat hatte ich ja schon vorher in den Windows Speicher eingebunden (OpenVPN Storage).
 20221205: Installation von OpenVPNConnect 3 ---> Aber trotz importe des .p12 - Zertifikats und Bereitstellen .ovpn Konfiguration, keine Verbindung zum HIS Netzwerk
