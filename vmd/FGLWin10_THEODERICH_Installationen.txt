@@ -32,6 +32,10 @@ IInstallation von Filezilla Client
 TODO: Anlehnung an Totila für die Grundliegenden Installationen.
 
 #######################################################################
+
+20230104: Installation und Einrichten von WinAuth als Tokengenerator für HISPRO
+20230104: Installation und Einrichten von 3CX Telefonsoftware für HIS eG
+
 20221205: Installation von OpenVPNGUI, bereitstellen der Konfigurationsdatei .ovpn und .p12 und .key Datei im config - Verzeichnis für Verbindungsaufbau zur HIS
 
 20221020: Windows Update
