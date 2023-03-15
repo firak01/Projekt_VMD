@@ -7,6 +7,11 @@ ausgebaute Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20230315: Microsoft OneDrive installiert
+20230314: Google Drive, um im Windows Dateiexplorer darauf wie auf ein Laufwerk zugreifen zu können
+
+20230309: Microsoft Teams installiert
+
 20230104: Installation und Einrichten von WinAuth - Tokengenerator für HISPRO
 20230104: Installation und Einrichten von 3CX - Telefonsoftware für HIS eG
 
