@@ -19,6 +19,10 @@ Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
 
+20230328: Neuinstallation von McAfee LifeSave mit einem weiteren Jahr Lizenz (ohne Abo)
+
+20230310: Installation von Microsoft Teams
+
 20230104: Installation und Einrichten von WinAuth als Tokengenerator für HISPRO
 20230104: Installation und Einrichten von 3CX Telefonsoftware für HIS eG
 
