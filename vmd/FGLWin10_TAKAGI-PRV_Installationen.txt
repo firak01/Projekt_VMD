@@ -7,6 +7,25 @@ ausgebaute Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20230315: Microsoft OneDrive installiert
+20230314: Google Drive, um im Windows Dateiexplorer darauf wie auf ein Laufwerk zugreifen zu können
+
+20230309: Microsoft Teams installiert
+
+20230104: Installation und Einrichten von WinAuth - Tokengenerator für HISPRO
+20230104: Installation und Einrichten von 3CX - Telefonsoftware für HIS eG
+
+20221219: Installation von Google Chrome
+
+20221212: Installation von Nmap Port Scanner - Tool
+
+20221205: Installation von OwnCloud und verbinden mit https://myshare.his.de/ mir Nachnamen kleingeschrieben
+20221205: Installation von OpenVPN
+
+20221103: Installation von ImgBurn, Tool zum Erstellen von ISO Images aus DVDs/CDs
+
+20221011: Installation von HTTracker, Tool zum Kopieren und Offline Bereitstellen von ganzen WebSites
+
 20220714: Installation von Epic Pen - eimen "Screen Annotation Tool"
 
 20220507: Installation von Active@ ISO Burner "Burn CD/DVD/Blu-ray ISO images compatible with the ISO 9660 standard" - tool zum Brennen von bootable DVDs
