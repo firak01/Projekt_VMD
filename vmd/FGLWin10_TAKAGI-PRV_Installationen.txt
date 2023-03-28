@@ -7,6 +7,8 @@ ausgebaute Grafikkarte: Nvidia GeForce GTX 745
 WAKE ON LAN, mit Mac Adresse: 90:1B:0E_E1:8B:F1
 ######################################################################
 
+20230328: Neuinstallation von McAfee LifeSave mit einem weiteren Jahr Lizenz (ohne Abo)
+
 20230315: Microsoft OneDrive installiert
 20230314: Google Drive, um im Windows Dateiexplorer darauf wie auf ein Laufwerk zugreifen zu können
 
