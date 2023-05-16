@@ -1,8 +1,21 @@
+########################################################################################################################
 ### Spieleplattform, Screencasterstellung, Videobearbeitung
+###
+TODO Ggfs. Zwischeninstallationen (s.u.) nachholen
+TODO 20220817: Ungelöstes Problem - Clonen oder Installieren von Win10 auf eine SSD Platte, funktioniert nicht
+###########################################################################################################################
 
-TODO Zwischeninstallationen nachholen
+20220914: Installation von ownCloud zur Synchronisation von Ordnern mit der HIS
 
+20220817: Installation von Anydesk als Teamviewer Alternative
+20220816: Installation von Cruzial Storage Executive. Tool von Cruzial für Festplatten... aber die Ziel SSD hat schon die neueste Firmware.
 
+20220630: Backup erstellt, Image auf neue HDD-Platte gecloned
+20220629: Clonen auf neue SSD Platte ist gescheitert.
+
+20220531: Treiber und Hilfsprogramme für 27 Zoll Monitor von AOC (Screen+, i-Menu)
+
+20220110: Telegram für Windows installiert (Messenger statt whats app)
 
 20220106: Installation von HP Smart und Einrichten den HP DeskJet 3750 Druckers
 
@@ -21,34 +34,25 @@ TODO Zwischeninstallationen nachholen
 20200208: Backup von 20171007 wiederhergestellt und mit aktuellem Spieleordner Backup kombiniert
          Grund waren Probleme beim Wiederhochfahren wg. UEFI
 
+############################################################################################################
 ########## START: ZWISCHENINSTALLATION NACHHOLEN
-
 20191130: Installation von PowerDVD V8 von DVD zum DVD Abspielen
 
 20191006: Installation von Gimp 2.10.12 zur Grafikbearbeitung
-
-20190719: Repository 1fgl erstellt.
 
 20190706: Installation von CDBurnerXP - Brennprogramm für CD / DVD
 
 20190615: Installation von CMS - Als Windows Alternative zur WebCam APP YOOSEE. Arbeitet mit dem YOOSEE Account.
 20190615: Update auf VMWare Workstation Player 15
 
-
-20190109: ProjektVMD als repository neu gecloned
-
 20180813: KO Player installiert als Android Emulator
           installierte Apps für Kameras:
            -- yoosee
 
-20180603: Telegram for Windows installiert (Messenger statt Whats app)
-
 20180123: Notepad++: Deinatallation der 32bit Version, Installation von Notepad++ 64bit inclusive PluginManager
 
 ########## ENDE: ZWISCHENINSTALLATION NACHHOLEN
-
-
-
+#########################################################################################################
 
 
 20170818: Telekom Magenta cloud client - Arbeitsverszeichnis von c:\1fgl auf Laufwerk D: verschoben
@@ -68,7 +72,7 @@ TODO Zwischeninstallationen nachholen
 20160722: Installation von "Free YouTube MP3 Converter
 
 20160529: Windows Product Key Viewer installiert. Ermittelter Product Key: MHGKX-8Y4GT-KVGXY-M3VGW-Q9VKC
-20160528: Installtion von MediathekView und VLC Player zum Download aus den Mediatheken des Staatsfernsehns
+20160528: Installation von MediathekView und VLC Player zum Download aus den Mediatheken des Staatsfernsehns
 
 20160528: Windows Updates. 
          ! Paket nicht installieren, sonst startet das ASUS Board mit UEFI nicht mehr!
