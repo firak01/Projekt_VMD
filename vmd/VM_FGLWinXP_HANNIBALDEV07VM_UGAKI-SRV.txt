@@ -35,6 +35,15 @@
 	Ehemalige Entwickungsumgebung für TileHexMap Projekt (Version 02, d.h. ohne Hibernate)
 ##############################################      
 
+20230512: Erhöhen des Arbeitsspeichers der VM auf 3072 MB (3 GB). Nun läuft der Eclipse Enwicklungsclient etwas schneller.
+
+20220519: Installation von IE8 und neuere GitGUI Version wg. MAC - Fehler beim Verbinden mit  GitHub
+
+20200111: Installation von OpenVPN für Win XP
+20200111: Neue Git Repositories für OpenVPN Projekt unterhalb des repo Pfads von Eclipse Oxygen
+20200111: Installation von Eclipse Oxygen 1a
+20200111: Installation von Java 8 (auf eigene Gefahr unter WinXP)
+
 20180706: Eclipse Luna Workspace für das Buch "Swing, 2nd Edition (Mannings), teilweise importiert und als Git Repository ( git@github.com:firak01/Buch_Swing.git )
 20180706: Eclipse Luna Workspace für das Projekt_VMD eingerichtet und an das GitRepository angebunden ( git@github.com:firak01/Projekt_VMD.git )
 
