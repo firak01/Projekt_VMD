@@ -8,6 +8,9 @@ Merke: 20240308
 Für Backups mit Acronis hat sich das CLONEN auf eine andere Festplatte bewaehrt.
 ######################################################################
 
+20240328: Installation von McAfee Livesaver 2024er Key
+20240328: Deinstallation von Norton Antivirus 2011
+
 20240308: Installation des NextCloud Clients für einen zweiten MagentaCloud - Account
 
 20220905: Installation des VLC MediaPlayer 64bit
