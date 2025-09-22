@@ -10,14 +10,21 @@ WAKE ON LAN, mit Mac Adresse: 80:FA:5B:83:23:D0
 ######################################################################
 
 TODOS:
-Installation von OpenOffice - mit dem Ziel Worddateien bearbeiten zu können
 Entpacken von "Ultimate Tweak for Windows 10"
 BGInfo eingerichtet.
 BGInfo in den unter Win10 versteckten Autostart Ordner
-Shutdown - Scripte und Buttons in der Taskleiste eingrichtet
 7zip installiert (64bit Version)
 Gimp 2 (64 bit) installiert
 Discord für Windows installiert
+
+########################################################################################
+20250922: Installation von Libre Office
+
+20250408: Installation von Zettlr - Portable Tool zur Bearbeitung von .md ( Markdown ) Dateien
+20250329: Installation von EZMira - Tool um auf den entsprechenden Dongle zu streamen.
+
+20250323: Installation von MSI Afterburner
+20250323: Installation von NVidia App Version 11.0.x
 
 20230328: Neuinstallation von McAfee LifeSave mit einem weiteren Jahr Lizenz (ohne Abo)
 
